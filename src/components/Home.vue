@@ -1,18 +1,21 @@
 <template>
-  <div class="home">
-    <img src="../../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
-  </div>
+	<div class="home">
+		<v-button btn-text="Primary" btn-type="primary"></v-button>
+		<v-modal v-show="show" transition="modal"></v-modal>
+	</div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
 
+import VButton from './ui/button'
+import VModal from './ui/modal'
 export default {
-  name: 'home',
-  components: {
-    HelloWorld
-  }
+	name: 'home',
+	components: {
+		VModal,
+		VButton
+
+	}
 }
 </script>
