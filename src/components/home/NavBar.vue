@@ -1,18 +1,18 @@
 <template>
   <div>
     <b-navbar fixed="top"
-              type="light"
+              type="primary"
               variant="faded"
               toggleable>
-      <b-navbar-toggle target="nav_collapse">User</b-navbar-toggle>
+      <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
       <b-navbar-brand class="brand-logo">
         <img src="../../assets/imgs/logo-small.png">
       </b-navbar-brand>
-
       <b-collapse is-nav
                   id="nav_collapse">
         <b-navbar-nav>
-          <b-nav-item-dropdown right>
+          <b-nav-item-dropdown right
+                               text="User">
             <b-dropdown-item href="#">Account</b-dropdown-item>
             <b-dropdown-item href="#">Settings</b-dropdown-item>
           </b-nav-item-dropdown>
@@ -47,6 +47,7 @@ export default {
 </script>
 
 <style scoped>
+@import '../../assets/style/common.less';
 .brand-logo {
     float: left;
     margin-left: 36px;
