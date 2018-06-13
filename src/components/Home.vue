@@ -28,7 +28,8 @@ export default {
 }
 .nav {
     width: 100%;
-    height: 72px;
+    height: 86px;
+    background-color: bisque;
 }
 
 </style>

@@ -1,20 +1,18 @@
 <template>
   <div>
     <b-navbar fixed="top"
-              type="dark"
-              variant="primary"
+              type="light"
+              variant="faded"
               toggleable>
-      <b-navbar-toggle target="nav_dropdown_collapse"></b-navbar-toggle>
+      <b-navbar-toggle target="nav_collapse">User</b-navbar-toggle>
       <b-navbar-brand class="brand-logo">
         <img src="../../assets/imgs/logo-small.png">
       </b-navbar-brand>
+
       <b-collapse is-nav
-                  visible
-                  id="nav_dropdown_collapse">
+                  id="nav_collapse">
         <b-navbar-nav>
-          <b-nav-item-dropdown text="User"
-                               right
-                               class="user-account">
+          <b-nav-item-dropdown right>
             <b-dropdown-item href="#">Account</b-dropdown-item>
             <b-dropdown-item href="#">Settings</b-dropdown-item>
           </b-nav-item-dropdown>
@@ -51,13 +49,24 @@ export default {
 <style scoped>
 .brand-logo {
     float: left;
-    margin-left: 20px;
-    margin-top: 4px;
+    margin-left: 36px;
+    margin-top: 12px;
 }
-.user-account {
-    float: right;
-    margin-right: 20px;
-    vertical-align: middle;
+.navbar-toggler {
+
+    :after {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        margin-left: .255em;
+        vertical-align: .255em;
+        content: "";
+        border-top: .3em solid;
+        border-right: .3em solid transparent;
+        border-bottom: 0;
+        border-left: .3em solid transparent;
+    }
+
 }
 
 </style>
