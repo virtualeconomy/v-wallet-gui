@@ -3,9 +3,9 @@
 </template>
 
 <script>
-    export default {
-        name: 'grid'
-    }
+export default {
+    name: 'grid'
+}
 </script>
 
 <style scoped>

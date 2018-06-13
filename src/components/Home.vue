@@ -1,8 +1,12 @@
 <template>
-	<div class="home">
-		<v-button btn-text="Primary" btn-type="primary"></v-button>
-		<v-modal v-show="show" transition="modal"></v-modal>
-	</div>
+  <div class="home">
+    <v-button btn-text="Primary"
+              btn-type="primary"></v-button>
+    <v-modal v-show="show"
+             transition="modal">
+
+    </v-modal>
+  </div>
 </template>
 
 <script>
@@ -10,12 +14,12 @@
 
 import VButton from './ui/button'
 import VModal from './ui/modal'
-export default {
-	name: 'home',
-	components: {
-		VModal,
-		VButton
 
-	}
+export default {
+    name: 'Home',
+    components: {
+        VModal,
+        VButton
+    }
 }
 </script>
