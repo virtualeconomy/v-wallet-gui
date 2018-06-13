@@ -8,23 +8,21 @@ import Login from '../components/Login'
 Vue.use(Router)
 
 export default new Router({
-  routes: [
-    {
-      path: '/',
-      name: 'Home',
-      component: Home
+    routes: [{
+        path: '/',
+        name: 'Home',
+        component: Home
     }, {
-      path: 'login',
-      name: 'login',
-      component: Login
+        path: 'login',
+        name: 'login',
+        component: Login
     }, {
-      path: 'signup',
-      name: 'signup',
-      component: Signup
+        path: 'signup',
+        name: 'signup',
+        component: Signup
     }, {
-      path: 'restore',
-      name: 'restore',
-      component: Restore
-    }
-  ]
+        path: 'restore',
+        name: 'restore',
+        component: Restore
+    }]
 })
