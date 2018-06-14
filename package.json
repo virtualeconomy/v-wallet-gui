@@ -14,7 +14,10 @@
     },
     "dependencies": {
         "bootstrap-vue": "^2.0.0-rc.11",
+        "crypto-js": "^3.1.9-1",
+        "identicon.js": "^2.3.2",
         "vue": "^2.5.2",
+        "vue-m-validator": "^1.0.5",
         "vue-router": "^3.0.1"
     },
     "devDependencies": {

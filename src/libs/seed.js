@@ -1,7 +1,7 @@
 "use strict";
 // Derived from waves-api
 //
-Object.defineProperty(exports, "__esModule", { value: true });
+// Object.defineProperty(exports, "__esModule", { value: true });
 var base58_1 = require("./base58");
 var crypto_1 = require("../utils/crypto");
 var logger_1 = require("../utils/logger");
@@ -63,7 +63,7 @@ var Seed = /** @class */ (function () {
     };
     return Seed;
 }());
-module.exports = {
+export default {
     create: function (words) {
         if (words === void 0) { words = 15; }
         var phrase = generateNewSeed(words);

@@ -1,13 +1,13 @@
 "use strict";
 // Derived from waves-api
 //
-Object.defineProperty(exports, "__esModule", { value: true });
+// Object.defineProperty(exports, "__esModule", { value: true });
 var ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
 var ALPHABET_MAP = ALPHABET.split('').reduce(function (map, c, i) {
     map[c] = i;
     return map;
 }, {});
-exports.default = {
+export default {
     encode: function (buffer) {
         if (!buffer.length)
             return '';
