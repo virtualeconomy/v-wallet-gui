@@ -3,6 +3,9 @@
     <div class="nav">
       <nav-bar></nav-bar>
     </div>
+    <!--<div class="transaction-pane">-->
+    <!--<b-button></b-button>-->
+    <!--</div>-->
   </div>
 </template>
 
@@ -21,14 +24,17 @@ export default {
     }
 }
 </script>
-<style scoped>
+<style scoped lang="less">
+@import '../assets/style/variables';
+@import '../assets/style/common';
 .home {
     width: 100%;
     height: 100%;
 }
 .nav {
     width: 100%;
-    height: 86px;
+    height: @topNavH;
+    background-color: @navBgColor;
 }
 
 </style>
