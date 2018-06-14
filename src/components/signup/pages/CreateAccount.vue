@@ -3,92 +3,73 @@
     <div class="nav">
       <nav-bar></nav-bar>
     </div>
-    <div>
-      <v-title
-        title="Create a new account"
-        description="signup for a new account below or you can <a href='#'>restore your account</a> from a backup"
-      >
-      </v-title>
-    </div>
-
-    <form class="text-left">
-      <ul class="form-group">
-        <li
-          v-for="error in validator.errors"
-          :key="error.msgs.toString()">
+    <div class="login-forms">
+      <div class="container">
+        <v-title
+          title="Create a new account"
+          description="signup for a new account below or you can <a href='#'>restore your account</a> from a backup"
+        >
+        </v-title>
+      </div>
+      <hr>
+      <form class="text-left container">
+        <ul class="form-group">
+          <li
+            v-for="error in validator.errors"
+            :key="error.name">
+            <small
+              class="form-text text-danger">
+              {{ error.msgs[0] }}
+            </small>
+          </li>
+        </ul>
+        <div class="form-group">
+          <label>Username</label>
+          <input
+            type="text"
+            class="form-control shadow-sm"
+            :class="{'text-danger':isUsernameErrors,'is-invalid':isUsernameErrors}"
+            v-model="username"
+            placeholder="Enter username"
+            @blur="checkUsername(username)">
+        </div>
+        <div class="form-group password-form">
+          <label>Password</label>
+          <input
+            type="password"
+            name="password"
+            class="form-control shadow-sm"
+            :class="{'text-danger':isPassErrors,'is-invalid':isPassErrors}"
+            placeholder="Password"
+            v-model="password"
+            @blur="checkPassword(password)">
           <small
-            class="form-text text-muted"
-            v-for="msg in error.msgs"
-            :key="msg">
-            {{ msg }}
+            id="emailHelp"
+            class="form-text text-muted text-right">
+            At least 8 characters
           </small>
-        </li>
-      </ul>
-      <div class="form-group">
-        <label>Username</label>
-        <input
-          type="text"
-          class="form-control"
-          :class="{'text-danger':isUsernameErrors,'is-invalid':isUsernameErrors}"
-          v-model="username"
-          placeholder="Enter username"
-          @blur="checkUsername(username)">
-        <ul v-if="isUsernameErrors">
-          <li
-            class="form-text text-danger"
-            v-for="error in validator.getErrors('username')"
-            :key="error">
-            &nbsp;{{ error }}
-          </li>
-        </ul>
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input
-          type="password"
-          name="password"
-          class="form-control"
-          :class="{'text-danger':isPassErrors,'is-invalid':isPassErrors}"
-          placeholder="Password"
-          v-model="password"
-          @blur="checkPassword(password)">
-        <small
-          id="emailHelp"
-          class="form-text text-muted">
-          At least 8 characters
-        </small>
-      </div>
-      <div class="form-group">
-        <input
-          type="password"
-          class="form-control"
-          :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassErrors}"
-          placeholder="Password again"
-          v-model="password2"
-          @blur="checkPasswordMatch(password, password2)">
-        <ul>
-          <li
-            class="form-text text-danger"
-            v-for="error in validator.getErrors('pass')"
-            :key="error"
-          >
-            &nbsp;{{ error }}
-          </li>
-        </ul>
-      </div>
-      <div class="form-group" >
-        <button
-          v-if="isDisabled"
-          type="button"
-          class="btn btn-primary"
-          disabled>Registration</button>
-        <button
-          v-if="isEnabled"
-          type="button"
-          class="btn btn-primary"
-          @click="register">Registration</button>
-      </div>
-    </form>
+        </div>
+        <div class="form-group">
+          <label>Confirm your password</label>
+          <input
+            type="password"
+            class="form-control shadow-sm"
+            :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
+            placeholder="Password again"
+            v-model="password2"
+            @blur="checkPasswordMatch(password, password2)">
+        </div>
+        <div class="form-group submit-button">
+          <b-button
+            :disabled="isSubmitDisabled"
+            :variant="'primary'"
+            :size="'lg'"
+            :block=true
+            @click="register">Registration
+          </b-button>
+        </div>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -108,84 +89,90 @@ export default {
             vTitleTitle: 'CreateAccount',
             vTitleDescription: '',
             isFirstRun: true,
+            isFirst: {
+                'username': true,
+                'pwd1': true,
+                'pwd2': true
+            },
             username: '',
             password: '',
             password2: '',
+            seed: seedLib.create(),
             validator: validator
         }
     },
 
     created() {
-        console.log(validator)
-        const seed = seedLib.create()
-        const password = 'aaaaaaaa'
-        console.log(seed)
-        const encriptedSeed = seedLib.encryptSeedPhrase(seed.phrase, password)
-        console.log(encriptedSeed)
-        const decriptedSeed = seedLib.decryptSeedPhrase(encriptedSeed, password)
-        console.log(decriptedSeed)
+        console.log(this.seed)
         const avatarData = new Identicon('d3b07384d113edec49eaa6238ad5ff00', 420)
         console.log(avatarData)
         validator.reset()
     },
     methods: {
-        notFirst() {
-            this.isFirstRun = false
+        notFirst(field) {
+            this.isFirst[field] = false
+            this.isFirstRun = /true/i.test(Object.values(this.isFirst).join(''))
         },
         checkUsername(_username) {
             const USERNAME = _username.trim()
             const RULE_1 = {
                 expression: !USERNAME || USERNAME === '',
                 name: 'username',
-                msg: 'username field required'
+                msg: 'Username is required'
             }
             const RULE_2 = {
-                expression: /[\d\-+\\.,/()*&^%$#@!~?{};:<>|]/.test(USERNAME),
+                expression: /[-+\\.,/()*&^%$#@!~?{};:<>|]/.test(USERNAME),
                 name: 'username',
-                msg: 'username is not valid'
+                msg: 'Username is not valid (special symbols detected)'
             }
             const RULE_3 = {
                 expression: USERNAME.length > 128,
                 name: 'username',
-                msg: 'username is too long'
+                msg: 'Username is too long (should be at most 128 characters)'
             }
             const RULE_4 = {
                 expression: USERNAME.length < 3 && USERNAME.length !== 0,
                 name: 'username',
-                msg: 'username is too short'
+                msg: 'Username is too short (should be at least 3 characters'
             }
             validator
                 .addRule(RULE_1)
                 .addRule(RULE_2)
                 .addRule(RULE_3)
                 .addRule(RULE_4)
-            this.notFirst()
+            this.notFirst('username')
         },
         checkPassword(pass) {
             const RULE_1 = {
                 expression: !pass || pass === '',
                 name: 'pass',
-                msg: 'pass field required'
+                msg: 'Password is required'
             }
             const RULE_2 = {
                 expression: pass.length < 8,
                 name: 'pass',
                 msg: 'Your password should be of at least 8 characters'
             }
+            const RULE_3 = {
+                expression: !(/[a-zA-z]/.test(pass)),
+                name: 'pass',
+                msg: 'Your passowrd must contain at least 1 alphabetical character'
+            }
             validator
                 .addRule(RULE_1)
                 .addRule(RULE_2)
-            this.notFirst()
+                .addRule(RULE_3)
+            this.notFirst('pwd1')
         },
         checkPasswordMatch(pass, pass2) {
             const RULE_1 = {
                 expression: pass !== pass2,
                 name: 'passmatch',
-                msg: 'Passwords do not match'
+                msg: 'Passwords are not the same'
             }
             validator
                 .addRule(RULE_1)
-            this.notFirst()
+            this.notFirst('pwd2')
         },
         checkForm() {
             this.checkUsername(this.username)
@@ -195,10 +182,12 @@ export default {
         register() {
             this.checkForm()
             console.log('registration')
+            console.log(this.seed)
+            console.log(this.username, this.password)
         }
     },
     computed: {
-        isDisabled() {
+        isSubmitDisabled() {
             return this.isFirstRun === true || this.validator.errors.length > 0
         },
         isEnabled() {
@@ -225,7 +214,6 @@ export default {
 }
 </script>
 <style scoped>
-@import '../../../assets/style/common.less';
 .home {
     width: 100%;
     height: 100%;
@@ -234,5 +222,19 @@ export default {
     width: 100%;
     height: 86px;
 }
-
+.login-forms {
+    width: 400px;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.submit-button {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+}
+.password-form {
+    margin-top: 25px;
+}
 </style>
