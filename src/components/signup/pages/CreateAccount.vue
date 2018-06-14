@@ -287,11 +287,12 @@ export default {
     margin-top: 25px;
 }
 .avatar {
-    border: 1px;
+    border-width: 2px;
+    border-style: solid;
     margin-top: 0px;
     width: 120px;
     height: 120px;
-    border-radius: 8px;
+    border-radius: 10px;
 }
 .btn-change-avt {
     margin-left: 5px;
