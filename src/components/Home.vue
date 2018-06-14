@@ -12,11 +12,13 @@
              :key="asset.address">
           <Asset :title="asset.title"
                  :address="asset.address"
-                 :balance="asset.balance"></Asset>
+                 :balance="asset.balance">
+          </Asset>
         </div>
+        <b-button>Import Cold Wallet</b-button>
       </div>
     </div>
-    <div class="trans-pane">
+    <div class="records-pane">
       <h3>Transaction Records</h3>
       <div>
         <b-table show-empty
@@ -25,7 +27,6 @@
                  :fields="fields"
                  :current-page="currentPage"
                  :per-page="perPage">
-
         </b-table>
       </div>
     </div>
@@ -121,10 +122,20 @@ const items = [
 .assets-pane {
     float: left;
     border-right: 1px solid @bdBgColor;
-    width: 200px;
+    text-align: left;
+    width: @assetsPaneW;
     height: 100%;
+    .asset {
+        padding-left: 20px;
+        margin-top: 16px;
+    }
+    button {
+        width: @btnWMid * 3;
+        height: @btnHMid;
+        margin-top: 12px;
+    }
 }
-.trans-pane {
+.records-pane {
     border-left: 1px solid @bdBgColor;
     text-align: left;
     div {
