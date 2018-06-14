@@ -289,6 +289,7 @@ export default {
 .avatar {
     border-width: 2px;
     border-style: solid;
+    border-color: rgb(180, 180, 180);
     margin-top: 0px;
     width: 120px;
     height: 120px;
