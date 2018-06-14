@@ -23,7 +23,24 @@
             </small>
           </li>
         </ul>
-        <div class="form-group">
+        <div>
+          <label>Avatar</label>
+          <div>
+            <img
+              :src="'data:image/png;base64,'+avatarData"
+              alt="blank"
+              class="avatar">
+            <button
+              class="btn-change-avt btn-primary btn-sm"
+              type="button"
+              :disabled="!avatarCanChange"
+              @click="changeAvatar()"
+            >
+              change one {{ timeLeftToChangeStr }}
+            </button>
+          </div>
+        </div>
+        <div class="form-group username-form">
           <label>Username</label>
           <input
             type="text"
@@ -42,7 +59,7 @@
             :class="{'text-danger':isPassErrors,'is-invalid':isPassErrors}"
             placeholder="Password"
             v-model="password"
-            @blur="checkPassword(password)">
+            @input="checkPassword(password)">
           <small
             id="emailHelp"
             class="form-text text-muted text-right">
@@ -57,7 +74,7 @@
             :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
             placeholder="Password again"
             v-model="password2"
-            @blur="checkPasswordMatch(password, password2)">
+            @input="checkPasswordMatch(password, password2)">
         </div>
         <div class="form-group submit-button">
           <b-button
@@ -98,17 +115,31 @@ export default {
             password: '',
             password2: '',
             seed: seedLib.create(),
+            avatarCanChange: true,
+            timeLeftToChange: void 0,
             validator: validator
         }
     },
 
     created() {
         console.log(this.seed)
-        const avatarData = new Identicon('d3b07384d113edec49eaa6238ad5ff00', 420)
-        console.log(avatarData)
+        // const avatarData = new Identicon(this.seed.address, 200).toString()
+        // this.avatarData = avatarData
         validator.reset()
     },
     methods: {
+        changeAvatar() {
+            this.seed = seedLib.create()
+            this.avatarCanChange = false
+            this.timeLeftToChange = 3
+            const avtChangeTimer = setInterval(() => {
+                this.timeLeftToChange = this.timeLeftToChange - 1
+            }, 1000)
+            setTimeout(() => {
+                this.avatarCanChange = true
+                clearInterval(avtChangeTimer)
+            }, this.timeLeftToChange * 1000)
+        },
         notFirst(field) {
             this.isFirst[field] = false
             this.isFirstRun = /true/i.test(Object.values(this.isFirst).join(''))
@@ -187,6 +218,21 @@ export default {
         }
     },
     computed: {
+        timeLeftToChangeStr() {
+            if (this.timeLeftToChange) {
+                return '(' + this.timeLeftToChange + ')'
+            }
+        },
+        avatarData() {
+            var options = {
+                foreground: [242, 132, 0, 255],
+                background: [255, 255, 255, 255],
+                margin: 0,
+                size: 120,
+                format: 'png'
+            }
+            return new Identicon(this.seed.address, options).toString()
+        },
         isSubmitDisabled() {
             return this.isFirstRun === true || this.validator.errors.length > 0
         },
@@ -236,5 +282,19 @@ export default {
 }
 .password-form {
     margin-top: 25px;
+}
+.username-form {
+    margin-top: 25px;
+}
+.avatar {
+    border: 1px;
+    margin-top: 0px;
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+}
+.btn-change-avt {
+    margin-left: 5px;
+    margin-bottom: 0px;
 }
 </style>

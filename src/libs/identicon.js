@@ -10,12 +10,7 @@
  * http://www.opensource.org/licenses/bsd-license.php
  */
 
-var PNGlib;
-if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
-    PNGlib = require('./pnglib');
-} else {
-    PNGlib = window.PNGlib;
-}
+import PNGlib from './pnglib'
 
 var Identicon = function(hash, options){
     if (typeof(hash) !== 'string' || hash.length < 15) {
