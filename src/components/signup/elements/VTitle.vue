@@ -12,23 +12,6 @@
 export default {
     name: 'VTitle',
     props: {
-        // titleData: {
-        //     type: {
-        //         title: {
-        //             type: String,
-        //             default: ''
-        //         },
-        //         description: {
-        //             type: String,
-        //             default: '',
-        //             required: false
-        //         }
-        //     },
-        //     default: {
-        //         title: '',
-        //         description: ''
-        //     }
-        // }
         title: {
             type: String,
             default: ''
@@ -38,17 +21,6 @@ export default {
             default: '',
             required: false
         }
-        //     {
-        //     title: {
-        //         type: String,
-        //         default: ''
-        //     },
-        //     description: {
-        //         type: String,
-        //         default: '',
-        //         required: false
-        //     }
-        // }
     }
 }
 </script>
