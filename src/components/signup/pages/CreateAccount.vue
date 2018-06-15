@@ -16,10 +16,10 @@
         <div>
           <label>Avatar</label>
           <div class="avatar-group">
-            <img
+            <!-- <img
               :src="'data:image/png;base64,'+avatarData"
               alt="blank"
-              class="avatar">
+              class="avatar"> -->
             <canvas
               class="avatar"
               width="120"
@@ -29,9 +29,9 @@
               Fallback text for browsers not supporting canvas
             </canvas>
             <button
-              class="btn-change-avt btn-primary btn-sm"
+              class="btn-change-avt"
               type="button"
-              :disabled="!avatarCanChange"
+              :disabled="!avatarCanChange||registering"
               @click="changeAvatar()"
             >
               change one {{ timeLeftToChangeStr }}
@@ -56,6 +56,7 @@
             :class="{'text-danger':isUsernameErrors,'is-invalid':isUsernameErrors}"
             v-model="username"
             placeholder="Enter username"
+            :readonly="registering"
             @blur="checkUsername(username)">
         </div>
         <div class="form-group password-form">
@@ -67,6 +68,7 @@
             :class="{'text-danger':isPassErrors,'is-invalid':isPassErrors}"
             placeholder="Password"
             v-model="password"
+            :readonly="registering"
             @input="checkPassword(password)">
           <small
             id="emailHelp"
@@ -82,6 +84,7 @@
             :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
             placeholder="Password again"
             v-model="password2"
+            :readonly="registering"
             @input="checkPasswordMatch(password, password2)">
         </div>
         <div class="form-group submit-button">
@@ -90,9 +93,13 @@
             :variant="'primary'"
             :size="'lg'"
             :block=true
-            @click="register">Registration
+            @click="register">Register
           </b-button>
         </div>
+        <br>
+        <a
+          href="/login"
+          class="footer-link">Login</a>
       </form>
     </div>
   </div>
@@ -104,7 +111,6 @@ import NavBar from '@/components/home/NavBar'
 import VTitle from '@/components/signup/elements/VTitle'
 
 import seedLib from '@/libs/seed.js'
-import Identicon from '@/libs/identicon.js'
 import converters from '@/libs/converters.js'
 import validator from 'vue-m-validator'
 export default {
@@ -126,7 +132,8 @@ export default {
             seed: seedLib.create(),
             avatarCanChange: true,
             timeLeftToChange: void 0,
-            validator: validator
+            validator: validator,
+            registering: false
         }
     },
 
@@ -134,7 +141,6 @@ export default {
         validator.reset()
     },
     mounted() {
-        console.log('mounted')
         window.jdenticon()
     },
     watch: {
@@ -232,6 +238,8 @@ export default {
             this.checkForm()
             console.log('registration')
             console.log(this.seed)
+            this.registering = true
+            this.isFirstRun = true
             console.log(this.username, this.password)
         }
     },
@@ -241,18 +249,8 @@ export default {
                 return '(' + this.timeLeftToChange + ')'
             }
         },
-        avatarData() {
-            var options = {
-                foreground: [242, 132, 0, 255],
-                background: [255, 255, 255, 255],
-                margin: 0,
-                size: 120,
-                format: 'png'
-            }
-            return new Identicon(this.seed.address, options).toString()
-        },
         avataDataHex() {
-            return converters.stringToHexString(this.seed.address)
+            return converters.stringToHexString(this.seed.address).split('').reverse().slice(1, 21).join('')
         },
         isSubmitDisabled() {
             return this.isFirstRun === true || this.validator.errors.length > 0
@@ -310,19 +308,32 @@ export default {
     border-width: 2px;
     border-style: solid;
     border-color: rgb(180, 180, 180);
-    margin-top: 0px;
     width: 120px;
     height: 120px;
     border-radius: 10px;
+    margin-bottom: auto;
+    margin-top: auto;
 }
 .avatar-group {
     margin-bottom: 30px;
+    height: 120px;
+    width: 100%;
 }
 .btn-change-avt {
-    margin-left: 5px;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+    margin-left: 10px;
+    margin-top: auto;
     margin-bottom: 0px;
 }
 .error-messages {
     margin-top: 20px;
+}
+.footer-link {
+    float: right;
 }
 </style>
