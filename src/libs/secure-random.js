@@ -1,7 +1,7 @@
 "use strict";
 // Derived from waves-api
 //
-Object.defineProperty(exports, "__esModule", { value: true });
+// Object.defineProperty(exports, "__esModule", { value: true });
 function nodeRandom(count, options) {
     var crypto = require('crypto');
     var buf = crypto.randomBytes(count);
@@ -53,7 +53,7 @@ function secureRandom(count, options) {
         throw new Error('Your environment is not defined');
     }
 }
-exports.default = {
+export default {
     secureRandom: secureRandom,
     randomArray: function (byteCount) {
         return secureRandom(byteCount, { type: 'Array' });

@@ -8,20 +8,21 @@ import Login from '../components/Login'
 Vue.use(Router)
 
 export default new Router({
+    mode: 'history',
     routes: [{
         path: '/',
         name: 'Home',
         component: Home
     }, {
-        path: 'login',
+        path: '/login',
         name: 'login',
         component: Login
     }, {
-        path: 'signup',
+        path: '/signup',
         name: 'signup',
         component: Signup
     }, {
-        path: 'restore',
+        path: '/restore',
         name: 'restore',
         component: Restore
     }]
