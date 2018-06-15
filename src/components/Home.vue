@@ -34,10 +34,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
-import bButton from 'bootstrap-vue/es/components/button/button'
-import bModal from 'bootstrap-vue/es/components/modal/modal'
-import bTable from 'bootstrap-vue/es/components/table/table'
 import NavBar from './home/NavBar'
 import TransPane from './home/transPane'
 import Asset from './home/Asset'
@@ -47,9 +43,6 @@ export default {
     components: {
         TransPane,
         NavBar,
-        bModal,
-        bButton,
-        bTable,
         Asset
     },
     data: function() {
