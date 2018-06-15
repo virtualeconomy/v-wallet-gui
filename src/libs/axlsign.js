@@ -6,7 +6,7 @@
 //
 // Written by Dmitry Chestnykh.
 // You can use it under MIT or CC0 license.
-Object.defineProperty(exports, "__esModule", { value: true });
+// Object.defineProperty(exports, "__esModule", { value: true });
 // Curve25519 signatures idea and math by Trevor Perrin
 // https://moderncrypto.org/mail-archive/curves/2014/000205.html
 // Derived from TweetNaCl.js (https://tweetnacl.js.org/)
@@ -1373,5 +1373,5 @@ axlsign.generateKeyPair = function (seed) {
         private: sk
     };
 };
-exports.default = axlsign;
+export default axlsign
 //# sourceMappingURL=axlsign.js.map

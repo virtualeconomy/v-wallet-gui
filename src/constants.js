@@ -9,7 +9,8 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
+
+// Object.defineProperty(exports, "__esModule", { value: true });
 export const MAINNET_BYTE = 'W'.charCodeAt(0);
 export const TESTNET_BYTE = 'T'.charCodeAt(0);
 export const INITIAL_NONCE = 0;
@@ -29,7 +30,7 @@ export const DEFAULT_BASIC_CONFIG = {
     timeDiff: 0
 };
 export const MAINNET_NODE = '54.152.46.6:6869'
-export const TESTNET_API = '54.152.46.6:6869'
+export const MAINNET_API = '54.152.46.6:6869'
 
 export const TESTNET_NODE = '54.152.46.6:6869'
 export const TESTNET_API = '54.152.46.6:6869'
