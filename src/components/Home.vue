@@ -15,7 +15,15 @@
                  :balance="asset.balance">
           </Asset>
         </div>
-        <b-button>Import Cold Wallet</b-button>
+        <b-button v-b-modal.importModal>Import Cold Wallet</b-button>
+        <b-modal id="importModal"
+                 centered
+                 title="Import Cold Wallet">
+          <b-container fluid>
+            <b-form>
+            </b-form>
+          </b-container>
+        </b-modal>
       </div>
     </div>
     <div class="records-pane">
@@ -44,6 +52,8 @@ export default {
         TransPane,
         NavBar,
         Asset
+    },
+    methods: {
     },
     data: function() {
         return {

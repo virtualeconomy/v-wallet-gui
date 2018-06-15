@@ -1,16 +1,26 @@
 <template>
   <div>
-    <b-button variant="primary">SEND</b-button>
-    <b-button variant="primary">RECEIVE</b-button>
+    <b-button variant="primary"
+              v-b-modal.sendModal>SEND</b-button>
+    <b-button variant="primary"
+              v-b-modal.receiveModal>RECEIVE</b-button>
+    <b-modal id="sendModal"
+             centered
+             title="Send"></b-modal>
+    <b-modal id="receiveModal"
+             centered
+             title="Receive"></b-modal>
   </div>
 </template>
 
 <script>
-import bButton from 'bootstrap-vue/es/components/button/button'
 export default {
     name: 'TransPane',
     components: {
-        bButton
+
+    },
+    methods: {
+
     }
 }
 </script>
