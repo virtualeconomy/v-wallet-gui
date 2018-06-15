@@ -7,29 +7,27 @@
       <div class="container">
         <v-title
           title="Create a new account"
-          description="signup for a new account below or you can <a href='#'>restore your account</a> from a backup"
+          description="signup for a new account below or you can <a href='/restore'>restore your account</a> from a backup"
         >
         </v-title>
       </div>
       <hr>
       <form class="text-left container">
-        <ul class="form-group">
-          <li
-            v-for="error in validator.errors"
-            :key="error.name">
-            <small
-              class="form-text text-danger">
-              {{ error.msgs[0] }}
-            </small>
-          </li>
-        </ul>
         <div>
           <label>Avatar</label>
-          <div>
+          <div class="avatar-group">
             <img
               :src="'data:image/png;base64,'+avatarData"
               alt="blank"
               class="avatar">
+            <canvas
+              class="avatar"
+              width="120"
+              height="120"
+              :data-jdenticon-hash="avataDataHex"
+            >
+              Fallback text for browsers not supporting canvas
+            </canvas>
             <button
               class="btn-change-avt btn-primary btn-sm"
               type="button"
@@ -40,11 +38,21 @@
             </button>
           </div>
         </div>
+        <ul class="form-group error-messages">
+          <li
+            v-for="error in validator.errors"
+            :key="error.name">
+            <small
+              class="form-text text-danger">
+              {{ error.msgs[0] }}
+            </small>
+          </li>
+        </ul>
         <div class="form-group username-form">
           <label>Username</label>
           <input
             type="text"
-            class="form-control shadow-sm"
+            class="form-control form-control-lg shadow-sm"
             :class="{'text-danger':isUsernameErrors,'is-invalid':isUsernameErrors}"
             v-model="username"
             placeholder="Enter username"
@@ -55,7 +63,7 @@
           <input
             type="password"
             name="password"
-            class="form-control shadow-sm"
+            class="form-control form-control-lg shadow-sm"
             :class="{'text-danger':isPassErrors,'is-invalid':isPassErrors}"
             placeholder="Password"
             v-model="password"
@@ -70,7 +78,7 @@
           <label>Confirm your password</label>
           <input
             type="password"
-            class="form-control shadow-sm"
+            class="form-control form-control-lg shadow-sm"
             :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
             placeholder="Password again"
             v-model="password2"
@@ -97,6 +105,7 @@ import VTitle from '@/components/signup/elements/VTitle'
 
 import seedLib from '@/libs/seed.js'
 import Identicon from '@/libs/identicon.js'
+import converters from '@/libs/converters.js'
 import validator from 'vue-m-validator'
 export default {
     name: 'CreateAccount',
@@ -122,10 +131,19 @@ export default {
     },
 
     created() {
-        console.log(this.seed)
-        // const avatarData = new Identicon(this.seed.address, 200).toString()
-        // this.avatarData = avatarData
         validator.reset()
+    },
+    mounted() {
+        console.log('mounted')
+        window.jdenticon()
+    },
+    watch: {
+        avataDataHex(newHex, oldHex) {
+            console.log(this.avataDataHex)
+            setTimeout(() => {
+                window.jdenticon()
+            }, 0)
+        }
     },
     methods: {
         changeAvatar() {
@@ -164,7 +182,7 @@ export default {
             const RULE_4 = {
                 expression: USERNAME.length < 3 && USERNAME.length !== 0,
                 name: 'username',
-                msg: 'Username is too short (should be at least 3 characters'
+                msg: 'Username is too short (should be at least 3 characters)'
             }
             validator
                 .addRule(RULE_1)
@@ -233,6 +251,9 @@ export default {
             }
             return new Identicon(this.seed.address, options).toString()
         },
+        avataDataHex() {
+            return converters.stringToHexString(this.seed.address)
+        },
         isSubmitDisabled() {
             return this.isFirstRun === true || this.validator.errors.length > 0
         },
@@ -284,7 +305,6 @@ export default {
     margin-top: 25px;
 }
 .username-form {
-    margin-top: 25px;
 }
 .avatar {
     border-width: 2px;
@@ -295,8 +315,14 @@ export default {
     height: 120px;
     border-radius: 10px;
 }
+.avatar-group {
+    margin-bottom: 30px;
+}
 .btn-change-avt {
     margin-left: 5px;
     margin-bottom: 0px;
+}
+.error-messages {
+    margin-top: 20px;
 }
 </style>
