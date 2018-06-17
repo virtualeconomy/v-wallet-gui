@@ -2,7 +2,9 @@
   <div class="home">
     <v-title
       title="Confirm Backup"
-      description="Virify yourba"
+      description="Virify your backup phrase or "
+      :goback-act="true"
+      @goback="goBack"
     >
     </v-title>
     <textarea
@@ -14,33 +16,42 @@
     <div class="backup-words-copy container">
       <p>
         Please write these 15 words down in order or
-        <br>
-        <b-button
-          id="btn-cpy"
-          :disabled="isCpyDisable"
-          v-b-popover.click="'copied'"
-          @click="copyWords"
-          variant="link">
-          copy them
-        </b-button>
       </p>
-      <b-jumbotron class="unselectable">
+      <b-jumbotron class="unselectable wordpad">
         <template v-for="(word, idx) in wordList">
           <span
-            :key="idx"
+            :key="idx + word"
             class="word container shadow"
           >{{ word }}</span>
           &nbsp;
         </template>
       </b-jumbotron>
       <br>
+      <div class="wordpad">
+        <template v-for="(word, idx) in wordList">
+          <span
+            :key="idx"
+            class="word container shadow unselectable"
+          >{{ word }}</span>
+          &nbsp;
+        </template>
+      </div>
+      <br>
       <b-button
-        :disabled="isContinueDisable"
+        v-if="!isContinueDisable"
         :variant="'primary'"
         :size="'lg'"
-        :block=true
-        @click="confirmPage">
-        Continue to confirm {{ buttonTimeStr }}
+        :block="true"
+        href="/">
+        Go Ahead!
+      </b-button>
+      <b-button
+        v-if="isContinueDisable"
+        :variant="'primary'"
+        :size="'lg'"
+        :block="true"
+      >
+        clear tapped words
       </b-button>
       <hr>
       <a
@@ -55,6 +66,7 @@
 import VTitle from '@/components/signup/elements/VTitle'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
+import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
 
 export default {
     name: 'ConfirmBackup',
@@ -62,24 +74,8 @@ export default {
     data: function() {
         return {
             isContinueDisable: true,
-            timeToContinue: 5,
-            timeLeft: 5,
-            isCpyDisable: false
+            selectedWords: []
         }
-    },
-
-    mounted() {
-        console.log('addr', this.address)
-        console.log('usrInf', this.userInfo)
-        console.log('scrInf', this.secretInfo)
-        console.log('seedPhrase', this.wordList)
-        const interval = setInterval(() => {
-            this.timeLeft -= 1
-        }, 1000)
-        setTimeout(() => {
-            clearInterval(interval)
-            this.isContinueDisable = false
-        }, this.timeToContinue * 1000)
     },
 
     computed: {
@@ -107,18 +103,14 @@ export default {
     },
 
     methods: {
-        copyWords() {
-            this.$refs.wordsToCopy.select()
-            window.document.execCommand('copy')
-            this.$root.$emit('bv::show::popover', 'btn-cpy')
-            this.isCpyDisable = true
-            setTimeout(() => {
-                this.$root.$emit('bv::hide::popover', 'btn-cpy')
-                this.isCpyDisable = false
-            }, 800)
+        goBack() {
+            this.$emit('show-page', 'saveBackup')
         },
-        confirmPage() {
-            this.$emit('show-page', 'confirmBackup')
+        goAhead() {
+            setTimeout(() => {
+                console.log('clear login at ', new Date())
+                Vue.ls.clear()
+            }, INITIAL_SESSION_TIMEOUT)
         }
     },
 
@@ -155,8 +147,6 @@ export default {
     margin-right: auto;
 }
 .word {
-    border: 2px solid rgb(160, 160, 160);
-    border-radius: 5px;
     font-size: 100%;
     background-color: rgb(190, 190, 190);
     color: white;
@@ -167,6 +157,8 @@ export default {
     -webkit-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+.wordpad {
     line-height: 200%;
 }
 </style>

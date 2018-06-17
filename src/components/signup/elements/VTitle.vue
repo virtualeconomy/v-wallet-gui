@@ -4,6 +4,13 @@
       {{ title }}
     </H1>
     <span v-html="description"></span>
+    <br>
+    <b-button
+      @click="$emit('goback')"
+      v-if="gobackAct"
+      variant="link">
+      go back
+    </b-button>
     <hr>
   </div>
 </template>
@@ -20,6 +27,11 @@ export default {
         description: {
             type: String,
             default: '',
+            required: false
+        },
+        gobackAct: {
+            type: Boolean,
+            default: false,
             required: false
         }
     }

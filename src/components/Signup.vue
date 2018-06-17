@@ -7,11 +7,15 @@
     <save-backup
       v-else-if="pageId==='saveBackup'"
       @show-page="changePage"></save-backup>
+    <confirm-backup
+      v-else-if="pageId==='confirmBackup'"
+      @show-page="changePage"></confirm-backup>
   </div>
 </template>
 <script>
 import CreateAccount from '@/components/signup/pages/CreateAccount'
 import SaveBackup from '@/components/signup/pages/SaveBackup'
+import ConfirmBackup from '@/components/signup/pages/ConfirmBackup'
 import VHeader from '@/components/signup/elements/VHeader'
 
 export default {
@@ -24,6 +28,7 @@ export default {
     components: {
         CreateAccount,
         SaveBackup,
+        ConfirmBackup,
         VHeader
     },
     methods: {

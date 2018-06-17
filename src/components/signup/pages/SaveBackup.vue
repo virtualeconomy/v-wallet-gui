@@ -69,10 +69,6 @@ export default {
     },
 
     mounted() {
-        console.log('addr', this.address)
-        console.log('usrInf', this.userInfo)
-        console.log('scrInf', this.secretInfo)
-        console.log('seedPhrase', this.wordList)
         const interval = setInterval(() => {
             this.timeLeft -= 1
         }, 1000)

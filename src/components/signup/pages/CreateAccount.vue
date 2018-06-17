@@ -217,6 +217,9 @@ export default {
                 .addRule(RULE_1)
                 .addRule(RULE_2)
                 .addRule(RULE_3)
+            if (!this.isFirst['pwd2']) {
+                this.checkPasswordMatch(this.password, this.password2)
+            }
             this.notFirst('pwd1')
         },
         checkPasswordMatch(pass, pass2) {
