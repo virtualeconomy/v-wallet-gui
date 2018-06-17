@@ -17,6 +17,7 @@
         "crypto-js": "^3.1.9-1",
         "identicon.js": "^2.3.2",
         "vue": "^2.5.2",
+        "vue-ls": "^3.0.5",
         "vue-m-validator": "^1.0.5",
         "vue-router": "^3.0.1"
     },

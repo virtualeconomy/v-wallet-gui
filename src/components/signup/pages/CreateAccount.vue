@@ -1,17 +1,13 @@
 <template>
   <div class="home">
-    <div class="nav">
-      <nav-bar></nav-bar>
+    <div>
+      <v-title
+        title="Create a new account"
+        description="signup for a new account below or you can <a href='/restore'>restore your account</a> from a backup"
+      >
+      </v-title>
     </div>
     <div class="login-forms">
-      <div class="container">
-        <v-title
-          title="Create a new account"
-          description="signup for a new account below or you can <a href='/restore'>restore your account</a> from a backup"
-        >
-        </v-title>
-      </div>
-      <hr>
       <form class="text-left container">
         <div>
           <label>Avatar</label>
@@ -24,7 +20,7 @@
               class="avatar"
               width="120"
               height="120"
-              :data-jdenticon-hash="avataDataHex"
+              :data-jdenticon-hash="avatarDataHex"
             >
               Fallback text for browsers not supporting canvas
             </canvas>
@@ -96,23 +92,25 @@
             @click="register">Register
           </b-button>
         </div>
-        <br>
-        <a
-          href="/login"
-          class="footer-link">Login</a>
       </form>
+      <hr>
+      <a
+        href="/login"
+        class="footer-link">Login</a>
     </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import NavBar from '@/components/home/NavBar'
 import VTitle from '@/components/signup/elements/VTitle'
 
 import seedLib from '@/libs/seed.js'
 import converters from '@/libs/converters.js'
 import validator from 'vue-m-validator'
+import Vue from 'vue'
+import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
+
 export default {
     name: 'CreateAccount',
 
@@ -140,17 +138,19 @@ export default {
     created() {
         validator.reset()
     },
+
     mounted() {
         window.jdenticon()
     },
+
     watch: {
-        avataDataHex(newHex, oldHex) {
-            console.log(this.avataDataHex)
+        avatarDataHex(newHex, oldHex) {
             setTimeout(() => {
                 window.jdenticon()
             }, 0)
         }
     },
+
     methods: {
         changeAvatar() {
             this.seed = seedLib.create()
@@ -211,7 +211,7 @@ export default {
             const RULE_3 = {
                 expression: !(/[a-zA-z]/.test(pass)),
                 name: 'pass',
-                msg: 'Your passowrd must contain at least 1 alphabetical character'
+                msg: 'Your passowrd must contain alphabetical character'
             }
             validator
                 .addRule(RULE_1)
@@ -238,18 +238,41 @@ export default {
             this.checkForm()
             console.log('registration')
             console.log(this.seed)
+            // console.log(this.username, this.password)
+            // console.log(this.avatarDataHex)
             this.registering = true
             this.isFirstRun = true
-            console.log(this.username, this.password)
+            Vue.ls.set('pwd', this.password)
+            Vue.ls.set('address', this.seed.address)
+            const userInfo = {
+                pubKey: this.seed.keyPair.publicKey,
+                encrSeed: seedLib.encryptSeedPhrase(this.seed.phrase, this.password)
+            }
+            const savedInfo = {
+                lastLogin: new Date().getTime(),
+                username: this.username,
+                avtHash: this.avatarDataHex,
+                sesstionTimeout: INITIAL_SESSION_TIMEOUT,
+                info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
+            }
+            setTimeout(() => {
+                console.log('clear login at ', new Date())
+                Vue.ls.clear()
+            }, INITIAL_SESSION_TIMEOUT)
+            window.localStorage.setItem(this.seed.address, JSON.stringify(savedInfo))
+            console.log(JSON.parse(seedLib.decryptSeedPhrase(JSON.parse(
+                window.localStorage.getItem(Vue.ls.get('address'))).info, Vue.ls.get('pwd'))))
+            this.$emit('show-page', 'saveBackup')
         }
     },
+
     computed: {
         timeLeftToChangeStr() {
             if (this.timeLeftToChange) {
                 return '(' + this.timeLeftToChange + ')'
             }
         },
-        avataDataHex() {
+        avatarDataHex() {
             return converters.stringToHexString(this.seed.address).split('').reverse().slice(1, 21).join('')
         },
         isSubmitDisabled() {
@@ -273,7 +296,6 @@ export default {
     },
 
     components: {
-        NavBar,
         VTitle
     }
 }
