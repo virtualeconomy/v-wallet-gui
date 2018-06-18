@@ -6,7 +6,7 @@
               toggleable>
       <b-navbar-toggle target="nav_dropdown_collapse"></b-navbar-toggle>
       <b-navbar-brand class="brand-logo">
-        <img src="../../assets/imgs/logo-small.png">
+        <img src="../../../assets/imgs/logo-small.png">
       </b-navbar-brand>
       <b-collapse is-nav
                   visible
@@ -26,24 +26,10 @@
 </template>
 
 <script>
-import bNavbar from 'bootstrap-vue/es/components/navbar/navbar'
-import bNavbarNav from 'bootstrap-vue/es/components/navbar/navbar-nav'
-import bNavbarBrand from 'bootstrap-vue/es/components/navbar/navbar-brand'
-import bNavbarToggle from 'bootstrap-vue/es/components/navbar/navbar-toggle'
-import bCollapse from 'bootstrap-vue/es/components/collapse/collapse'
-import bNavItemDropdown from 'bootstrap-vue/es/components/nav/nav-item-dropdown'
-import bDropdownItem from 'bootstrap-vue/es/components/dropdown/dropdown-item'
 
 export default {
     name: 'NavBar',
     components: {
-        bNavbar,
-        bNavbarNav,
-        bNavbarBrand,
-        bNavbarToggle,
-        bCollapse,
-        bNavItemDropdown,
-        bDropdownItem
     }
 }
 </script>

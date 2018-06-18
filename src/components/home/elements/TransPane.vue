@@ -4,20 +4,19 @@
               v-b-modal.sendModal>SEND</b-button>
     <b-button variant="primary"
               v-b-modal.receiveModal>RECEIVE</b-button>
-    <b-modal id="sendModal"
-             centered
-             title="Send"></b-modal>
-    <b-modal id="receiveModal"
-             centered
-             title="Receive"></b-modal>
+    <Send></Send>
+    <Receive></Receive>
   </div>
 </template>
 
 <script>
+import Receive from '../modals/Receive'
+import Send from '../modals/Send'
 export default {
     name: 'TransPane',
     components: {
-
+        Receive,
+        Send
     },
     methods: {
 
@@ -26,8 +25,8 @@ export default {
 </script>
 
 <style scoped lang="less">
-@import '../../assets/style/common';
-@import '../../assets/style/variables';
+@import '../../../assets/style/common';
+@import '../../../assets/style/variables';
 div {
     border: 1px solid @bdBgColor;
     height: 132px;

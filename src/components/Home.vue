@@ -16,14 +16,7 @@
           </Asset>
         </div>
         <b-button v-b-modal.importModal>Import Cold Wallet</b-button>
-        <b-modal id="importModal"
-                 centered
-                 title="Import Cold Wallet">
-          <b-container fluid>
-            <b-form>
-            </b-form>
-          </b-container>
-        </b-modal>
+        <ImportColdWallet></ImportColdWallet>
       </div>
     </div>
     <div class="records-pane">
@@ -42,31 +35,32 @@
 </template>
 
 <script>
-import NavBar from './home/NavBar'
-import TransPane from './home/transPane'
-import Asset from './home/Asset'
+import NavBar from './home/elements/NavBar'
+import TransPane from './home/elements/TransPane'
+import Asset from './home/elements/Asset'
+import ImportColdWallet from './home/modals/ImportColdWallet'
+import Vue from 'vue'
 
 export default {
     name: 'Home',
     components: {
+        ImportColdWallet,
         TransPane,
         NavBar,
         Asset
     },
-    methods: {
+    mounted() {
+        setTimeout(() => {
+            Vue.ls.clear()
+        }, window.localStorage.getItem(this.assets.address))
     },
     data: function() {
         return {
             assets: [
                 {
                     title: 'Asset',
-                    address: 'xxxxxxxxxxx',
-                    balance: '1.23vee'
-                },
-                {
-                    title: 'Asset2',
-                    address: 'yyyyyyyyyyy',
-                    balance: '1.24vee'
+                    address: Vue.ls.get('address'),
+                    balance: '0vee'
                 }
             ],
             items: items,
