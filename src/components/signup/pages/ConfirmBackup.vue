@@ -29,10 +29,21 @@
       <br>
       <div class="wordpad">
         <template v-for="(word, idx) in wordList">
-          <span
+          <b-button
             :key="idx"
-            class="word container shadow unselectable"
-          >{{ word }}</span>
+            v-if="!tagFlag[idx]"
+            :variant="'warning'"
+            :size="'sm'"
+            class="shadow-sm unselectable word-btn"
+            @click='tapWord(idx)'
+          >{{ word }}</b-button>
+          <b-button
+            :key="idx"
+            v-else
+            :size="'sm'"
+            class="shadow-sm unselectable word-btn"
+            :disabled="true"
+          >{{ word }}</b-button>
           &nbsp;
         </template>
       </div>
@@ -74,8 +85,16 @@ export default {
     data: function() {
         return {
             isContinueDisable: true,
-            selectedWords: []
+            selectedWords: [],
+            tagFlag: []
         }
+    },
+
+    mounted() {
+        for (var i = 0; i < this.wordList.length; i++) {
+            this.tagFlag.push(false)
+        }
+        console.log(this.tagFlag)
     },
 
     computed: {
@@ -111,6 +130,9 @@ export default {
                 console.log('clear login at ', new Date())
                 Vue.ls.clear()
             }, INITIAL_SESSION_TIMEOUT)
+        },
+        tapWord(idx) {
+            this.tagFlag[idx] = true
         }
     },
 
@@ -160,5 +182,8 @@ export default {
 }
 .wordpad {
     line-height: 200%;
+}
+.word-btn {
+    margin-top: 10px;
 }
 </style>

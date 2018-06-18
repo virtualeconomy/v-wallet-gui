@@ -239,10 +239,6 @@ export default {
         },
         register() {
             this.checkForm()
-            console.log('registration')
-            console.log(this.seed)
-            // console.log(this.username, this.password)
-            // console.log(this.avatarDataHex)
             this.registering = true
             this.isFirstRun = true
             Vue.ls.set('pwd', this.password)
@@ -259,12 +255,9 @@ export default {
                 info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
             }
             setTimeout(() => {
-                console.log('clear login at ', new Date())
                 Vue.ls.clear()
             }, INITIAL_SESSION_TIMEOUT)
             window.localStorage.setItem(this.seed.address, JSON.stringify(savedInfo))
-            console.log(JSON.parse(seedLib.decryptSeedPhrase(JSON.parse(
-                window.localStorage.getItem(Vue.ls.get('address'))).info, Vue.ls.get('pwd'))))
             this.$emit('show-page', 'saveBackup')
         }
     },
