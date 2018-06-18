@@ -6,7 +6,15 @@ import router from './router'
 import BootstrapVue from 'bootstrap-vue'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
+import Storage from 'vue-ls'
 
+const options = {
+    namespace: 'vuejs__',
+    name: 'ls',
+    storage: 'memory'
+}
+
+Vue.use(Storage, options)
 Vue.use(BootstrapVue)
 Vue.config.productionTip = false
 

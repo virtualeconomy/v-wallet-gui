@@ -1,37 +1,33 @@
 <template>
   <div class="home">
-    <div class="nav">
-      <nav-bar></nav-bar>
+    <div>
+      <v-title
+        title="Create a new account"
+        description="signup for a new account below or you can <a href='/restore'>restore your account</a> from a backup"
+      >
+      </v-title>
     </div>
     <div class="login-forms">
-      <div class="container">
-        <v-title
-          title="Create a new account"
-          description="signup for a new account below or you can <a href='/restore'>restore your account</a> from a backup"
-        >
-        </v-title>
-      </div>
-      <hr>
       <form class="text-left container">
         <div>
           <label>Avatar</label>
           <div class="avatar-group">
-            <img
+            <!-- <img
               :src="'data:image/png;base64,'+avatarData"
               alt="blank"
-              class="avatar">
+              class="avatar"> -->
             <canvas
               class="avatar"
               width="120"
               height="120"
-              :data-jdenticon-hash="avataDataHex"
+              :data-jdenticon-hash="avatarDataHex"
             >
               Fallback text for browsers not supporting canvas
             </canvas>
             <button
-              class="btn-change-avt btn-primary btn-sm"
+              class="btn-change-avt"
               type="button"
-              :disabled="!avatarCanChange"
+              :disabled="!avatarCanChange||registering"
               @click="changeAvatar()"
             >
               change one {{ timeLeftToChangeStr }}
@@ -56,6 +52,7 @@
             :class="{'text-danger':isUsernameErrors,'is-invalid':isUsernameErrors}"
             v-model="username"
             placeholder="Enter username"
+            :readonly="registering"
             @blur="checkUsername(username)">
         </div>
         <div class="form-group password-form">
@@ -67,6 +64,7 @@
             :class="{'text-danger':isPassErrors,'is-invalid':isPassErrors}"
             placeholder="Password"
             v-model="password"
+            :readonly="registering"
             @input="checkPassword(password)">
           <small
             id="emailHelp"
@@ -82,6 +80,7 @@
             :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
             placeholder="Password again"
             v-model="password2"
+            :readonly="registering"
             @input="checkPasswordMatch(password, password2)">
         </div>
         <div class="form-group submit-button">
@@ -90,23 +89,28 @@
             :variant="'primary'"
             :size="'lg'"
             :block=true
-            @click="register">Registration
+            @click="register">Register
           </b-button>
         </div>
       </form>
+      <hr>
+      <a
+        href="/login"
+        class="footer-link">Login</a>
     </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import NavBar from '@/components/home/NavBar'
 import VTitle from '@/components/signup/elements/VTitle'
 
 import seedLib from '@/libs/seed.js'
-import Identicon from '@/libs/identicon.js'
 import converters from '@/libs/converters.js'
 import validator from 'vue-m-validator'
+import Vue from 'vue'
+import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
+
 export default {
     name: 'CreateAccount',
 
@@ -126,25 +130,27 @@ export default {
             seed: seedLib.create(),
             avatarCanChange: true,
             timeLeftToChange: void 0,
-            validator: validator
+            validator: validator,
+            registering: false
         }
     },
 
     created() {
         validator.reset()
     },
+
     mounted() {
-        console.log('mounted')
         window.jdenticon()
     },
+
     watch: {
-        avataDataHex(newHex, oldHex) {
-            console.log(this.avataDataHex)
+        avatarDataHex(newHex, oldHex) {
             setTimeout(() => {
                 window.jdenticon()
             }, 0)
         }
     },
+
     methods: {
         changeAvatar() {
             this.seed = seedLib.create()
@@ -205,12 +211,15 @@ export default {
             const RULE_3 = {
                 expression: !(/[a-zA-z]/.test(pass)),
                 name: 'pass',
-                msg: 'Your passowrd must contain at least 1 alphabetical character'
+                msg: 'Your passowrd must contain alphabetical character'
             }
             validator
                 .addRule(RULE_1)
                 .addRule(RULE_2)
                 .addRule(RULE_3)
+            if (!this.isFirst['pwd2']) {
+                this.checkPasswordMatch(this.password, this.password2)
+            }
             this.notFirst('pwd1')
         },
         checkPasswordMatch(pass, pass2) {
@@ -230,29 +239,37 @@ export default {
         },
         register() {
             this.checkForm()
-            console.log('registration')
-            console.log(this.seed)
-            console.log(this.username, this.password)
+            this.registering = true
+            this.isFirstRun = true
+            Vue.ls.set('pwd', this.password)
+            Vue.ls.set('address', this.seed.address)
+            const userInfo = {
+                pubKey: this.seed.keyPair.publicKey,
+                encrSeed: seedLib.encryptSeedPhrase(this.seed.phrase, this.password)
+            }
+            const savedInfo = {
+                lastLogin: new Date().getTime(),
+                username: this.username,
+                avtHash: this.avatarDataHex,
+                sesstionTimeout: INITIAL_SESSION_TIMEOUT,
+                info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
+            }
+            setTimeout(() => {
+                Vue.ls.clear()
+            }, INITIAL_SESSION_TIMEOUT)
+            window.localStorage.setItem(this.seed.address, JSON.stringify(savedInfo))
+            this.$emit('show-page', 'saveBackup')
         }
     },
+
     computed: {
         timeLeftToChangeStr() {
             if (this.timeLeftToChange) {
                 return '(' + this.timeLeftToChange + ')'
             }
         },
-        avatarData() {
-            var options = {
-                foreground: [242, 132, 0, 255],
-                background: [255, 255, 255, 255],
-                margin: 0,
-                size: 120,
-                format: 'png'
-            }
-            return new Identicon(this.seed.address, options).toString()
-        },
-        avataDataHex() {
-            return converters.stringToHexString(this.seed.address)
+        avatarDataHex() {
+            return converters.stringToHexString(this.seed.address).split('').reverse().slice(1, 21).join('')
         },
         isSubmitDisabled() {
             return this.isFirstRun === true || this.validator.errors.length > 0
@@ -275,7 +292,6 @@ export default {
     },
 
     components: {
-        NavBar,
         VTitle
     }
 }
@@ -310,19 +326,32 @@ export default {
     border-width: 2px;
     border-style: solid;
     border-color: rgb(180, 180, 180);
-    margin-top: 0px;
     width: 120px;
     height: 120px;
     border-radius: 10px;
+    margin-bottom: auto;
+    margin-top: auto;
 }
 .avatar-group {
     margin-bottom: 30px;
+    height: 120px;
+    width: 100%;
 }
 .btn-change-avt {
-    margin-left: 5px;
+    color: #fff;
+    background-color: #007bff;
+    border-color: #007bff;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+    margin-left: 10px;
+    margin-top: auto;
     margin-bottom: 0px;
 }
 .error-messages {
     margin-top: 20px;
+}
+.footer-link {
+    float: right;
 }
 </style>
