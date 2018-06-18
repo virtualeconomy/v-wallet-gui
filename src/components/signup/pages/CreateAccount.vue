@@ -81,7 +81,9 @@
             placeholder="Password again"
             v-model="password2"
             :readonly="registering"
-            @input="checkPasswordMatch(password, password2)">
+            @input="checkPasswordMatch(password, password2)"
+            @keyup.enter="registerEnter"
+          >
         </div>
         <div class="form-group submit-button">
           <b-button
@@ -89,7 +91,8 @@
             :variant="'primary'"
             :size="'lg'"
             :block=true
-            @click="register">Register
+            @click="register"
+          >Register
           </b-button>
         </div>
       </form>
@@ -239,6 +242,10 @@ export default {
         },
         register() {
             this.checkForm()
+            // console.log(isSubmitDisabled)
+            if (this.isSubmitDisabled) {
+                return
+            }
             this.registering = true
             this.isFirstRun = true
             Vue.ls.set('pwd', this.password)
@@ -259,6 +266,9 @@ export default {
             }, INITIAL_SESSION_TIMEOUT)
             window.localStorage.setItem(this.seed.address, JSON.stringify(savedInfo))
             this.$emit('show-page', 'saveBackup')
+        },
+        registerEnter() {
+            this.register()
         }
     },
 
