@@ -26,7 +26,6 @@
           &nbsp;
         </template>
       </b-jumbotron>
-      <br>
       <div class="wordarea">
         <template v-for="(word, idx) in wordList">
           <b-button
@@ -114,7 +113,7 @@ export default {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
         wordList() {
-            return this.seedPhrase.split(' ')
+            return this.seedPhrase.split(' ').sort(function(a, b) { return 0.5 - Math.random() })
         },
         buttonTimeStr() {
             if (this.timeLeft > 0) {
@@ -130,7 +129,6 @@ export default {
         tapWord(idx) {
             Vue.set(this.tagFlag, idx, false)
             this.selectedWords.push(this.wordList[idx])
-            console.log(this.wordList[idx])
             if (this.wordList.length === this.selectedWords.length) {
                 this.checkWords()
             }
@@ -196,7 +194,7 @@ export default {
 }
 .wordpad {
     line-height: 210%;
-    min-height: 240px;
+    min-height: 180px;
 }
 .wordarea {
     line-height: 200%;
