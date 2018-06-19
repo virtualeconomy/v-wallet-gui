@@ -15,8 +15,10 @@
                  :balance="asset.balance">
           </Asset>
         </div>
-        <b-button v-b-modal.importModal>Import Cold Wallet</b-button>
-        <ImportColdWallet></ImportColdWallet>
+        <b-btn @click="$root.$emit('bv::show::modal', 'importModal', $event.target)"
+               variant="primary">Import Cold Wallet</b-btn>
+        <ImportColdWallet :cold-address="coldAddress"
+                          show="false"></ImportColdWallet>
       </div>
     </div>
     <div class="records-pane">
@@ -85,7 +87,8 @@ export default {
             currentPage: 1,
             perPage: 5,
             totalRows: items.length,
-            pageOptions: [ 5, 10, 15 ]
+            pageOptions: [ 5, 10, 15 ],
+            coldAddress: ''
         }
     }
 }

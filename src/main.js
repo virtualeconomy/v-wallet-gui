@@ -4,6 +4,7 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import BootstrapVue from 'bootstrap-vue'
+import VueQrcodeReader from 'vue-qrcode-reader'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -17,6 +18,7 @@ const options = {
 
 Vue.use(Storage, options)
 Vue.use(BootstrapVue)
+Vue.use(VueQrcodeReader)
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */
