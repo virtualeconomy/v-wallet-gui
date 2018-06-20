@@ -30,6 +30,7 @@ export default {
         },
         balance: {
             type: String,
+            default: '0 VEE',
             required: true
         }
     }

@@ -43,9 +43,8 @@
         Continue to confirm {{ buttonTimeStr }}
       </b-button>
       <hr>
-      <a
-        href="/"
-        class="footer-link">Skip this step</a>
+      <span @click="gotoHomePage"
+            class="footer-link">Skip this step</span>
     </div>
   </div>
 </template>
@@ -115,6 +114,9 @@ export default {
         },
         confirmPage() {
             this.$emit('show-page', 'confirmBackup')
+        },
+        gotoHomePage() {
+            this.$router.push('/')
         }
     },
 
@@ -143,6 +145,9 @@ export default {
 }
 .footer-link {
     float: right;
+    cursor: pointer;
+    text-decoration: underline;
+    color: #007bff;
 }
 .backup-words-copy {
     width: 450px;
