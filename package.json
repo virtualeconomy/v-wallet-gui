@@ -19,8 +19,7 @@
         "vue": "^2.5.2",
         "vue-ls": "^3.0.5",
         "vue-m-validator": "^1.0.5",
-        "vue-router": "^3.0.1",
-        "vue-select": "^2.4.0"
+        "vue-router": "^3.0.1"
     },
     "devDependencies": {
         "autoprefixer": "^7.1.2",
