@@ -4,15 +4,13 @@
       title="Confirm Backup"
       description="Virify your backup phrase or "
       :goback-act="true"
-      @goback="goBack"
-    >
+      @goback="goBack">
     </v-title>
     <textarea
       v-model="seedPhrase"
       ref="wordsToCopy"
       class="hidden"
-      readonly
-    ></textarea>
+      readonly></textarea>
     <div class="backup-words-copy container">
       <p>
         Please tap the words in right order
@@ -21,8 +19,7 @@
         <template v-for="(word, idx) in selectedWords">
           <span
             :key="idx + word + '-selected'"
-            class="word container shadow"
-          >{{ word }}</span>
+            class="word container shadow">{{ word }}</span>
           &nbsp;
         </template>
       </b-jumbotron>
@@ -34,15 +31,17 @@
             :variant="'warning'"
             :size="'sm'"
             class="shadow-sm unselectable word-btn"
-            @click='tapWord(idx)'
-          >{{ word }}</b-button>
+            @click='tapWord(idx)'>
+            {{ word }}
+          </b-button>
           <b-button
             :key="idx"
             v-else
             :size="'sm'"
             class="shadow-sm unselectable word-btn"
-            :disabled="true"
-          >{{ word }}</b-button>
+            :disabled="true">
+            {{ word }}
+          </b-button>
           &nbsp;
         </template>
       </div>
@@ -62,15 +61,13 @@
         :variant="'primary'"
         :size="'lg'"
         :block="true"
-        @click="clearWords"
-      >
+        @click="clearWords">
         clear and try again
       </b-button>
       <hr>
       <a
         href="/"
-        class="footer-link"
-      >
+        class="footer-link">
         Skip this step</a>
     </div>
   </div>
