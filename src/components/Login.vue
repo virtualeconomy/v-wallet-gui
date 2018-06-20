@@ -216,7 +216,6 @@ export default {
         },
 
         toggleDropdown(e) {
-            console.log('clicked')
             this.dropdownOpen = !this.dropdownOpen
         },
 
@@ -280,7 +279,7 @@ export default {
 
         checkPassword() {
             try {
-                const a = seedLib.decryptSeedPhrase(
+                seedLib.decryptSeedPhrase(
                     JSON.parse(
                         seedLib.decryptSeedPhrase(
                             JSON.parse(
@@ -288,7 +287,6 @@ export default {
                                     this.mutableValue.addr)).info,
                             this.password)).encrSeed,
                     this.password)
-                console.log(a)
                 this.isPwdError = false
             } catch (err) {
                 this.isPwdError = true
@@ -309,11 +307,7 @@ export default {
         hideErrMsg() {
             this.isPwdError = false
         }
-    },
-
-    components: {
     }
-
 }
 </script>
 
