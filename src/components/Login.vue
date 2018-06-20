@@ -5,84 +5,100 @@
         class="brand-logo"
         src="../assets/imgs/logo-small.png">
     </div>
-    <H1>
-      Login
-    </H1>
-    <br>
-    <b-button
-      @click="changePage('/signup')"
-      variant="link">
-      create account
-    </b-button>
-    <hr>
-    <div
-      class="dropdown v-select"
-      :class="dropdownClasses">
-      <div
-        ref="toggle"
-        @mousedown.prevent="toggleDropdown"
-        class="dropdown-toggle container">
-        <div class="selected-tag container">
-          <div class="div-avatar">
-            <canvas
-              class="avatar"
-              width="50"
-              height="50"
-              :data-jdenticon-hash="mutableValue.avt"
-            ></canvas>
-          </div>
-          <div>
-            <div class="usrname">
-              {{ mutableValue.usrname }}
-            </div>
-            <div class="addr">
-              {{ mutableValue.addr }}
-            </div>
-          </div>
-        </div>
-        <i
-          ref="openIndicator"
-          class="open-indicator"></i>
+    <div class="form-login">
+      <H1>
+        Login
+      </H1>
+      <div class="div-link">
+        <b-button
+          class="btn-link"
+          @click="changePage('/signup')"
+          variant="link">
+          Create account
+        </b-button>
       </div>
-      <transition name="fade">
-        <ul
-          ref="dropdownMenu"
-          v-if="dropdownOpen"
-          class="dropdown-menu">
-          <li
-            v-for="(option, index) in usrOptions"
-            :key="index"
-            :class="{ active: isOptionSelected(option), highlight: index === typeAheadPointer }"
-            @mouseover="typeAheadPointer = index">
-            <a @mousedown.prevent="select(option)">
-              <slot
-                name="option"
-                v-bind="option">
-                <div class="div-avatar">
-                  <canvas
-                    class="avatar"
-                    width="50"
-                    height="50"
-                    :data-jdenticon-hash="option.avt"
-                  ></canvas>
-                </div>
-                <div class="container">
-                  <div class="usrname">
-                    {{ option.usrname }}
+      <div class="div-link">
+        <b-button
+          class="btn-link"
+          @click="changePage('/restore')"
+          variant="link">
+          Restore account
+        </b-button>
+      </div>
+      <hr class="hr-login">
+      <div
+        class="dropdown v-select"
+        :class="dropdownClasses">
+        <div
+          ref="toggle"
+          @mousedown.prevent="toggleDropdown"
+          class="dropdown-toggle container">
+          <div class="selected-tag container">
+            <div class="div-avatar">
+              <canvas
+                class="avatar"
+                width="50"
+                height="50"
+                :data-jdenticon-hash="mutableValue.avt"
+              ></canvas>
+            </div>
+            <div>
+              <div class="usrname">
+                {{ mutableValue.usrname }}
+              </div>
+              <div class="addr">
+                {{ mutableValue.addr }}
+              </div>
+            </div>
+          </div>
+          <i
+            ref="openIndicator"
+            class="open-indicator"></i>
+        </div>
+        <transition name="fade">
+          <ul
+            ref="dropdownMenu"
+            v-if="dropdownOpen"
+            class="dropdown-menu">
+            <li
+              v-for="(option, index) in usrOptions"
+              :key="index"
+              :class="{ active: isOptionSelected(option), highlight: index === typeAheadPointer }"
+              @mouseover="typeAheadPointer = index">
+              <a @mousedown.prevent="select(option)">
+                <slot
+                  name="option"
+                  v-bind="option">
+                  <div class="div-avatar">
+                    <canvas
+                      class="avatar"
+                      width="50"
+                      height="50"
+                      :data-jdenticon-hash="option.avt"
+                    ></canvas>
                   </div>
-                  <div class="addr">
-                    {{ option.addr }}
+                  <div class="container">
+                    <div class="usrname">
+                      {{ option.usrname }}
+                    </div>
+                    <div class="addr">
+                      {{ option.addr }}
+                    </div>
                   </div>
-                </div>
-              </slot>
-            </a>
-          </li>
-        </ul>
-      </transition>
+                </slot>
+              </a>
+            </li>
+          </ul>
+        </transition>
+      </div>
+      <div class="input-pwd">
+        <b-form-input
+          type="password"
+          placeholder="Password"
+          size="lg">
+        </b-form-input>
+      </div>
     </div>
-    <b-form-input
-      type="password">
-    </b-form-input>
   </div>
 </template>
 
@@ -258,6 +274,29 @@ export default {
     margin-right: auto;
     min-width: 300px;
 }
+.logo {
+    padding-top: 130px;
+    width: 100%;
+    vertical-align: middle;
+}
+.hr-login {
+    margin-top: 20px;
+}
+.div-link {
+    width: 100%;
+    margin-top: 10px;
+    display: inline-block;
+    height: 10px;
+}
+.btn-link {
+    float: right;
+}
+.form-login {
+    margin-top: 50px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
 .addr {
     font-size: 80%;
     line-height: 70%;
@@ -288,183 +327,179 @@ export default {
     width: 100%;
 }
 .v-select {
-  position: relative;
-  font-family: sans-serif;
-  max-width: 400px;
-  margin-left: auto;
-  margin-right: auto;
+    position: relative;
+    font-family: sans-serif;
+    margin-top: 40px;
 }
 .v-select, .v-select * {
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .v-select .open-indicator {
-  position: absolute;
-  bottom: 6px;
-  right: 10px;
-  display: inline-block;
-  cursor: pointer;
-  pointer-events: all;
-  transition: all 150ms cubic-bezier(1.000, -0.115, 0.975, 0.855);
-  transition-timing-function: cubic-bezier(1.000, -0.115, 0.975, 0.855);
-  opacity: 1;
-  height: 20px; width: 10px;
+    position: absolute;
+    bottom: 6px;
+    right: 10px;
+    display: inline-block;
+    cursor: pointer;
+    pointer-events: all;
+    transition: all 150ms cubic-bezier(1.000, -0.115, 0.975, 0.855);
+    transition-timing-function: cubic-bezier(1.000, -0.115, 0.975, 0.855);
+    opacity: 1;
+    height: 20px; width: 10px;
 }
 .v-select .open-indicator:before {
-  border-color: rgba(60, 60, 60, .5);
-  border-style: solid;
-  border-width: 3px 3px 0 0;
-  content: '';
-  display: inline-block;
-  height: 10px;
-  width: 10px;
-  vertical-align: top;
-  transform: rotate(133deg);
-  transition: all 150ms cubic-bezier(1.000, -0.115, 0.975, 0.855);
-  transition-timing-function: cubic-bezier(1.000, -0.115, 0.975, 0.855);
-  box-sizing: inherit;
+    border-color: rgba(60, 60, 60, .5);
+    border-style: solid;
+    border-width: 3px 3px 0 0;
+    content: '';
+    display: inline-block;
+    height: 10px;
+    width: 10px;
+    vertical-align: top;
+    transform: rotate(133deg);
+    transition: all 150ms cubic-bezier(1.000, -0.115, 0.975, 0.855);
+    transition-timing-function: cubic-bezier(1.000, -0.115, 0.975, 0.855);
+    box-sizing: inherit;
 }
 .v-select.open .open-indicator:before {
-  transform: rotate(315deg);
+    transform: rotate(315deg);
 }
 .v-select.loading .open-indicator {
-  opacity: 0;
+    opacity: 0;
 }
 .v-select.open .open-indicator {
-  bottom: 1px;
+    bottom: 1px;
 }
 .v-select .dropdown-toggle {
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  display: block;
-  padding: 0;
-  background: none;
-  border: 1px solid rgba(60, 60, 60, .26);
-  border-radius: 4px;
-  white-space: normal;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    display: block;
+    padding: 0;
+    background: none;
+    border: 1px solid rgba(60, 60, 60, .26);
+    border-radius: 4px;
+    white-space: normal;
 }
 .v-select .dropdown-toggle:after {
-  visibility: hidden;
-  display: block;
-  font-size: 0;
-  content: " ";
-  clear: both;
-  height: 0;
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
 }
 .v-select.open .dropdown-toggle {
-  border-bottom-width: 0.5px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
+    border-bottom-width: 0.5px;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
 }
 .v-select .dropdown-menu {
-  display:block;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  z-index: 1000;
-  min-width: 160px;
-  padding: 5px 0;
-  margin: 0;
-  width: 100%;
-  overflow-y: scroll;
-  border: 1px solid rgba(0, 0, 0, .26);
-  box-shadow: 0px 3px 6px 0px rgba(0,0,0,.15);
-  border-top: none;
-  border-radius: 0 0 4px 4px;
-  text-align: left;
-  list-style: none;
-  background: #fff;
-  max-height: 400px;
+    display:block;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    min-width: 160px;
+    padding: 5px 0;
+    margin: 0;
+    width: 100%;
+    overflow-y: scroll;
+    border: 1px solid rgba(0, 0, 0, .26);
+    box-shadow: 0px 3px 6px 0px rgba(0,0,0,.15);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    text-align: left;
+    list-style: none;
+    background: #fff;
+    max-height: 400px;
 }
-/* Selected Tags */
 .v-select .selected-tag {
-  color: #333;
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin: 4px 1px 0px 3px;
-  padding: 1px 0.25em;
-  text-align: left;
+    color: #333;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 4px 1px 0px 3px;
+    padding: 1px 0.25em;
+    text-align: left;
 }
 .v-select.single .selected-tag {
-  background-color: transparent;
-  border-color: transparent;
+    background-color: transparent;
+    border-color: transparent;
 }
 .v-select li {
-  line-height: 1.42857143;
-  border-bottom: 0.5px solid rgb(230,230,230);
+    line-height: 1.42857143;
+    border-bottom: 0.5px solid rgb(230,230,230);
 }
 .v-select li > a {
-  display: block;
-  padding: 10px 10px;
-  clear: both;
-  color: #333;
-  white-space: nowrap;
+    display: block;
+    padding: 10px 10px;
+    clear: both;
+    color: #333;
+    white-space: nowrap;
 }
 .v-select li:hover {
-  cursor: pointer;
+    cursor: pointer;
 }
 .v-select .dropdown-menu .active > a {
-  color: #333;
-  background: rgba(50, 50, 50, .1);
+    color: #333;
+    background: rgba(50, 50, 50, .1);
 }
 .v-select .dropdown-menu > .highlight > a {
-  /*
-   * required to override bootstrap 3's
-   * .dropdown-menu > li > a:hover {} styles
-   */
-  background: #5897fb;
-  color: #fff;
+    background: #5897fb;
+    color: #fff;
 }
 .v-select .highlight:not(:last-child) {
-  margin-bottom: 0; /* Fixes Bulma Margin */
+    margin-bottom: 0; /* Fixes Bulma Margin */
 }
 .v-select .spinner {
-  opacity: 0;
-  position: absolute;
-  top: 5px;
-  right: 10px;
-  font-size: 5px;
-  text-indent: -9999em;
-  overflow: hidden;
-  border-top: .9em solid rgba(100, 100, 100, .1);
-  border-right: .9em solid rgba(100, 100, 100, .1);
-  border-bottom: .9em solid rgba(100, 100, 100, .1);
-  border-left: .9em solid rgba(60, 60, 60, .45);
-  transform: translateZ(0);
-  animation: vSelectSpinner 1.1s infinite linear;
-  transition: opacity .1s;
+    opacity: 0;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 5px;
+    text-indent: -9999em;
+    overflow: hidden;
+    border-top: .9em solid rgba(100, 100, 100, .1);
+    border-right: .9em solid rgba(100, 100, 100, .1);
+    border-bottom: .9em solid rgba(100, 100, 100, .1);
+    border-left: .9em solid rgba(60, 60, 60, .45);
+    transform: translateZ(0);
+    animation: vSelectSpinner 1.1s infinite linear;
+    transition: opacity .1s;
 }
 .v-select .spinner,
 .v-select .spinner:after {
-  border-radius: 50%;
-  width: 5em;
-  height: 5em;
+    border-radius: 50%;
+    width: 5em;
+    height: 5em;
 }
 @-webkit-keyframes vSelectSpinner {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 @keyframes vSelectSpinner {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 .fade-enter-active,
 .fade-leave-active {
-  transition: opacity .15s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+    transition: opacity .15s cubic-bezier(1.0, 0.5, 0.8, 1.0);
 }
 .fade-enter,
 .fade-leave-to {
-  opacity: 0;
+    opacity: 0;
+}
+.input-pwd {
+    padding-top: 20px;
 }
 </style>

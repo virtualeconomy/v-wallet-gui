@@ -46,3 +46,5 @@ export const DEFAULT_BASIC_CONFIG = {
     logLevel: 'warning',
     timeDiff: 0
 };
+
+export const ADDRESS_LENGTH = 35;
