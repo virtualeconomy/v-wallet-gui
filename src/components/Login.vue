@@ -12,6 +12,7 @@
       <div class="div-link">
         <b-button
           class="btn-link"
+          :size="'sm'"
           @click="changePage('/signup')"
           variant="link">
           Create account
@@ -20,6 +21,7 @@
       <div class="div-link">
         <b-button
           class="btn-link"
+          :size="'sm'"
           @click="changePage('/restore')"
           variant="link">
           Restore account
@@ -93,10 +95,29 @@
       </div>
       <div class="input-pwd">
         <b-form-input
+          @input="hideErrMsg"
+          @keyup.enter.native="login"
+          v-model="password"
           type="password"
           placeholder="Password"
           size="lg">
         </b-form-input>
+      </div>
+      <div
+        class="msg-err text-danger"
+        v-show="isPwdError">
+        <small>
+          Password is wrong.<a href="/restore"> Forget your password? </a>
+        </small>
+      </div>
+      <div class="submit-button">
+        <b-button
+          :variant="'primary'"
+          :size="'lg'"
+          :block=true
+          @click="login"
+        ><b>Login</b>
+        </b-button>
       </div>
     </div>
   </div>
@@ -105,6 +126,7 @@
 <script>
 import Vue from 'vue'
 import { ADDRESS_LENGTH } from '../constants.js'
+import seedLib from '@/libs/seed.js'
 
 export default {
     name: 'Login',
@@ -112,9 +134,11 @@ export default {
     data: function() {
         return {
             selectedAddr: '',
-            mutableValue: null,
+            mutableValue: void 0,
             dropdownOpen: false,
-            typeAheadPointer: -1
+            typeAheadPointer: -1,
+            isPwdError: false,
+            password: void 0
         }
     },
 
@@ -150,12 +174,6 @@ export default {
 
     mounted() {
         window.jdenticon()
-        console.log(this.usrOptions)
-    },
-
-    updated() {
-        console.log('updated')
-        // window.jdenticon()
     },
 
     computed: {
@@ -258,6 +276,38 @@ export default {
                 return position
             }
             return null
+        },
+
+        checkPassword() {
+            try {
+                const a = seedLib.decryptSeedPhrase(
+                    JSON.parse(
+                        seedLib.decryptSeedPhrase(
+                            JSON.parse(
+                                window.localStorage.getItem(
+                                    this.mutableValue.addr)).info,
+                            this.password)).encrSeed,
+                    this.password)
+                console.log(a)
+                this.isPwdError = false
+            } catch (err) {
+                this.isPwdError = true
+            }
+        },
+
+        login() {
+            this.checkPassword()
+            if (this.isPwdError) {
+                return
+            }
+            console.log(this.password, this.mutableValue.addr)
+            Vue.ls.set('pwd', this.password)
+            Vue.ls.set('address', this.mutableValue.addr)
+            this.$router.push('/')
+        },
+
+        hideErrMsg() {
+            this.isPwdError = false
         }
     },
 
@@ -500,6 +550,13 @@ export default {
     opacity: 0;
 }
 .input-pwd {
-    padding-top: 20px;
+    padding-top: 30px;
+}
+.msg-err {
+    margin-top: 10px;
+    height: 10px;
+}
+.submit-button {
+    margin-top: 30px;
 }
 </style>
