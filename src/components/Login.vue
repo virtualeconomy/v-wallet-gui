@@ -298,7 +298,6 @@ export default {
             if (this.isPwdError) {
                 return
             }
-            console.log(this.password, this.mutableValue.addr)
             Vue.ls.set('pwd', this.password)
             Vue.ls.set('address', this.mutableValue.addr)
             this.$router.push('/')
@@ -336,7 +335,7 @@ export default {
     float: right;
 }
 .form-login {
-    margin-top: 50px;
+    margin-top: 35px;
     max-width: 400px;
     margin-left: auto;
     margin-right: auto;

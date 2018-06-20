@@ -339,9 +339,10 @@ export default {
     margin-top: auto;
 }
 .avatar-group {
-    margin-bottom: 30px;
+    margin-bottom: 10px;
     height: 120px;
     width: 100%;
+    display: inline-flex;
 }
 .btn-change-avt {
     color: #fff;
@@ -354,6 +355,9 @@ export default {
     margin-top: auto;
     margin-bottom: 0px;
     cursor: pointer;
+}
+.btn-change-avt:disabled {
+    opacity: 0.65;
 }
 .error-messages {
     margin-top: 20px;
