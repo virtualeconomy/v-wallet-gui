@@ -1,6 +1,8 @@
 <template>
   <b-modal id="importModal"
            centered
+           return-focus
+           lazy
            @close="importClose"
            @ok="importOk"
            title="Import Cold Wallet">
@@ -14,14 +16,10 @@
                       placeholder="cold wallet address">
         </b-form-input>
       </b-form-group>
-      <b-button class="scanQrCode"
-                type="button"
-                variant="primary"
-                @click="openCamera">Scan</b-button>
       <p class="qrInfo">Please confirm your browser's camera is available.</p>
-      <qrcode-reader @decode="onDecode"
-                     :paused="paused"
-                     @onInit="onInit">
+      <qrcode-reader @init="onInit"
+                     @decode="onDecode"
+                     :paused="paused">
       </qrcode-reader>
     </b-container>
   </b-modal>
@@ -32,7 +30,7 @@ export default {
     name: 'ImportColdWallet',
     data() {
         return {
-            paused: false,
+            paused: true,
             content: ''
         }
     },
@@ -42,9 +40,6 @@ export default {
         },
         importOk: function(evt) {
             console.log('ok')
-        },
-        openCamera: function() {
-            console.log(this)
         },
         async onInit(promise) {
             try {
@@ -64,8 +59,7 @@ export default {
                     throw Error('browser is probably lacking features(WebRTC, Canvas)')
                 }
             } finally {
-                this.paused = true
-                console.log(promise)
+                console.log('onInit')
             }
         },
         onDecode: function(decodeString) {

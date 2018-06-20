@@ -42,6 +42,7 @@ import TransPane from './home/elements/TransPane'
 import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
+import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
 
 export default {
     name: 'Home',
@@ -54,7 +55,7 @@ export default {
     mounted() {
         setTimeout(() => {
             Vue.ls.clear()
-        }, window.localStorage.getItem(this.assets.address))
+        }, window.localStorage.getItem(this.assets.address ? this.assets.address : INITIAL_SESSION_TIMEOUT))
     },
     data: function() {
         return {
