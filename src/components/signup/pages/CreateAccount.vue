@@ -261,9 +261,10 @@ export default {
                 sesstionTimeout: INITIAL_SESSION_TIMEOUT,
                 info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
             }
-            setTimeout(() => {
-                Vue.ls.clear()
-            }, INITIAL_SESSION_TIMEOUT)
+            // clear session in home
+            // setTimeout(() => {
+            //     Vue.ls.clear()
+            // }, INITIAL_SESSION_TIMEOUT)
             window.localStorage.setItem(this.seed.address, JSON.stringify(savedInfo))
             this.$emit('show-page', 'saveBackup')
         },
@@ -357,6 +358,7 @@ export default {
     margin-left: 10px;
     margin-top: auto;
     margin-bottom: 0px;
+    cursor: pointer;
 }
 .error-messages {
     margin-top: 20px;
