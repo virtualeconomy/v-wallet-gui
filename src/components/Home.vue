@@ -88,15 +88,10 @@ export default {
     },
     methods: {
         getBalance: function(address) {
-            // for test
-            const balance = 0 + 'Vee'
-            this.balance[address] = balance
-            console.log(balance)
             const url = TESTNET_NODE + '/assets/balance/' + address
 
-            console.log(url)
             this.$http.get(url).then(response => {
-                console.log(response)
+                this.balance[address] = response.body.balances['VEE'] ? response.body.balances['VEE'] + ' VEE' : '0 VEE'
             }, response => {
                 console.log(response)
             })

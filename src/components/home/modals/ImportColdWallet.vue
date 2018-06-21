@@ -1,7 +1,6 @@
 <template>
   <b-modal id="importModal"
            centered
-           return-focus
            lazy
            @close="importClose"
            @ok="importOk"
@@ -13,25 +12,46 @@
         <b-form-input id="coldAddress"
                       type="text"
                       v-model="content"
+                      :state="isValidAddress"
+                      aria-describedby="inputLiveHelp inputLiveFeedback"
                       placeholder="cold wallet address">
         </b-form-input>
+        <b-form-invalid-feedback id="inputLiveFeedback">
+          Invalid cold wallet address.
+        </b-form-invalid-feedback>
       </b-form-group>
       <p class="qrInfo">Please confirm your browser's camera is available.</p>
       <qrcode-reader @init="onInit"
                      @decode="onDecode"
                      :paused="paused">
       </qrcode-reader>
+      <b-btn @click="scanAgain">Scan again</b-btn>
     </b-container>
   </b-modal>
 </template>
 
 <script>
+import crypto from '@/utils/crypto'
 export default {
     name: 'ImportColdWallet',
     data() {
         return {
-            paused: true,
+            paused: false,
             content: ''
+        }
+    },
+    computed: {
+        isValidAddress: function() {
+            if (!this.content) {
+                return true
+            }
+            let isValid = false
+            try {
+                isValid = crypto.isValidAddress(this.content)
+            } catch (e) {
+                console.log(e)
+            }
+            return isValid
         }
     },
     methods: {
@@ -65,8 +85,11 @@ export default {
         onDecode: function(decodeString) {
             this.paused = true
             this.content = decodeString
-
             console.log(decodeString)
+        },
+        scanAgain: function() {
+            this.paused = false
+            this.content = ''
         }
     }
 }
