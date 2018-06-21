@@ -4,70 +4,71 @@
       title="Confirm Backup"
       description="Virify your backup phrase or "
       :goback-act="true"
-      @goback="goBack"
-    >
+      @goback="goBack">
     </v-title>
     <textarea
       v-model="seedPhrase"
       ref="wordsToCopy"
       class="hidden"
-      readonly
-    ></textarea>
+      readonly></textarea>
     <div class="backup-words-copy container">
       <p>
-        Please write these 15 words down in order or
+        Please tap the words in right order
       </p>
       <b-jumbotron class="unselectable wordpad">
-        <template v-for="(word, idx) in wordList">
+        <template v-for="(word, idx) in selectedWords">
           <span
-            :key="idx + word"
-            class="word container shadow"
-          >{{ word }}</span>
+            :key="idx + word + '-selected'"
+            class="word container shadow">{{ word }}</span>
           &nbsp;
         </template>
       </b-jumbotron>
-      <br>
-      <div class="wordpad">
+      <div class="wordarea">
         <template v-for="(word, idx) in wordList">
           <b-button
             :key="idx"
-            v-if="!tagFlag[idx]"
+            v-if="tagFlag[idx]"
             :variant="'warning'"
             :size="'sm'"
             class="shadow-sm unselectable word-btn"
-            @click='tapWord(idx)'
-          >{{ word }}</b-button>
+            @click='tapWord(idx)'>
+            {{ word }}
+          </b-button>
           <b-button
             :key="idx"
             v-else
             :size="'sm'"
             class="shadow-sm unselectable word-btn"
-            :disabled="true"
-          >{{ word }}</b-button>
+            :disabled="true">
+            {{ word }}
+          </b-button>
           &nbsp;
         </template>
       </div>
-      <br>
+      <div class="error-message">
+        {{ errorMsg }}
+      </div>
       <b-button
         v-if="!isContinueDisable"
         :variant="'primary'"
         :size="'lg'"
         :block="true"
         href="/">
-        Go Ahead!
+        Great! Go Ahead!
       </b-button>
       <b-button
         v-if="isContinueDisable"
         :variant="'primary'"
         :size="'lg'"
         :block="true"
-      >
-        clear tapped words
+        @click="clearWords">
+        clear and try again
       </b-button>
       <hr>
       <a
         href="/"
-        class="footer-link">Skip this step</a>
+        class="footer-link">
+        Skip this step</a>
     </div>
   </div>
 </template>
@@ -77,7 +78,6 @@
 import VTitle from '@/components/signup/elements/VTitle'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
 
 export default {
     name: 'ConfirmBackup',
@@ -86,15 +86,13 @@ export default {
         return {
             isContinueDisable: true,
             selectedWords: [],
-            tagFlag: []
+            tagFlag: [],
+            errorMsg: void 0
         }
     },
 
     mounted() {
-        for (var i = 0; i < this.wordList.length; i++) {
-            this.tagFlag.push(false)
-        }
-        console.log(this.tagFlag)
+        this.tagFlag = Array(this.wordList.length).fill(true)
     },
 
     computed: {
@@ -112,7 +110,7 @@ export default {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
         wordList() {
-            return this.seedPhrase.split(' ')
+            return this.seedPhrase.split(' ').sort(function(a, b) { return 0.5 - Math.random() })
         },
         buttonTimeStr() {
             if (this.timeLeft > 0) {
@@ -125,14 +123,25 @@ export default {
         goBack() {
             this.$emit('show-page', 'saveBackup')
         },
-        goAhead() {
-            setTimeout(() => {
-                console.log('clear login at ', new Date())
-                Vue.ls.clear()
-            }, INITIAL_SESSION_TIMEOUT)
-        },
         tapWord(idx) {
-            this.tagFlag[idx] = true
+            Vue.set(this.tagFlag, idx, false)
+            this.selectedWords.push(this.wordList[idx])
+            if (this.wordList.length === this.selectedWords.length) {
+                this.checkWords()
+            }
+        },
+        clearWords() {
+            this.tagFlag = Array(this.wordList.length).fill(true)
+            this.selectedWords = []
+            this.errorMsg = void 0
+        },
+        checkWords() {
+            const phrases = this.selectedWords.join(' ')
+            if (phrases === this.seedPhrase) {
+                this.isContinueDisable = false
+            } else {
+                this.errorMsg = 'Sorry, words are not in the right order, please click the clear button and tap the words in right order.'
+            }
         }
     },
 
@@ -170,7 +179,7 @@ export default {
 }
 .word {
     font-size: 100%;
-    background-color: rgb(190, 190, 190);
+    background-color: rgb(120, 190, 190);
     color: white;
 }
 .unselectable {
@@ -181,9 +190,20 @@ export default {
     user-select: none;
 }
 .wordpad {
+    line-height: 210%;
+    min-height: 180px;
+}
+.wordarea {
     line-height: 200%;
+    margin-bottom: 20px;
 }
 .word-btn {
     margin-top: 10px;
+}
+.error-message {
+    width: 100%;
+    min-height: 40px;
+    font-size: 80%;
+    color: red;
 }
 </style>

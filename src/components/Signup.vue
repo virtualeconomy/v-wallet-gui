@@ -34,7 +34,6 @@ export default {
     methods: {
         changePage: function(newPageId) {
             this.pageId = newPageId
-            console.log(this.pageId)
         }
     }
 }

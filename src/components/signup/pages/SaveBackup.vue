@@ -2,15 +2,14 @@
   <div class="home">
     <v-title
       title="Save backup phrase"
-      description="Treat your backup phrase with care. You can also find these words in your private profile after logging in"
-    >
+      description="Treat your backup phrase with care. You can also find these words in your private profile after logging in">
     </v-title>
     <textarea
       v-model="seedPhrase"
       ref="wordsToCopy"
       class="hidden"
-      readonly
-    ></textarea>
+      readonly>
+    </textarea>
     <div class="backup-words-copy container">
       <p>
         Please write these 15 words down in order or
@@ -28,8 +27,9 @@
         <template v-for="(word, idx) in wordList">
           <span
             :key="idx"
-            class="word container shadow"
-          >{{ word }}</span>
+            class="word container shadow">
+            {{ word }}
+          </span>
           &nbsp;
         </template>
       </b-jumbotron>
