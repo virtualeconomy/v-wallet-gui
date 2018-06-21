@@ -3,8 +3,7 @@
     <div>
       <v-title
         title="Create a new account"
-        description="signup for a new account below or you can <a href='/restore'>restore your account</a> from a backup"
-      >
+        description="signup for a new account below or you can <a href='/restore'>restore your account</a> from a backup">
       </v-title>
     </div>
     <div class="login-forms">
@@ -20,16 +19,14 @@
               class="avatar"
               width="120"
               height="120"
-              :data-jdenticon-hash="avatarDataHex"
-            >
+              :data-jdenticon-hash="avatarDataHex">
               Fallback text for browsers not supporting canvas
             </canvas>
             <button
               class="btn-change-avt"
               type="button"
               :disabled="!avatarCanChange||registering"
-              @click="changeAvatar()"
-            >
+              @click="changeAvatar()">
               change one {{ timeLeftToChangeStr }}
             </button>
           </div>
@@ -82,8 +79,7 @@
             v-model="password2"
             :readonly="registering"
             @input="checkPasswordMatch(password, password2)"
-            @keyup.enter="registerEnter"
-          >
+            @keyup.enter="registerEnter">
         </div>
         <div class="form-group submit-button">
           <b-button
@@ -91,8 +87,8 @@
             :variant="'primary'"
             :size="'lg'"
             :block=true
-            @click="register"
-          >Register
+            @click="register">
+            Register
           </b-button>
         </div>
       </form>
@@ -242,7 +238,6 @@ export default {
         },
         register() {
             this.checkForm()
-            // console.log(isSubmitDisabled)
             if (this.isSubmitDisabled) {
                 return
             }
@@ -261,9 +256,10 @@ export default {
                 sesstionTimeout: INITIAL_SESSION_TIMEOUT,
                 info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
             }
-            setTimeout(() => {
-                Vue.ls.clear()
-            }, INITIAL_SESSION_TIMEOUT)
+            // clear session in home
+            // setTimeout(() => {
+            //     Vue.ls.clear()
+            // }, INITIAL_SESSION_TIMEOUT)
             window.localStorage.setItem(this.seed.address, JSON.stringify(savedInfo))
             this.$emit('show-page', 'saveBackup')
         },
@@ -357,6 +353,7 @@ export default {
     margin-left: 10px;
     margin-top: auto;
     margin-bottom: 0px;
+    cursor: pointer;
 }
 .error-messages {
     margin-top: 20px;
