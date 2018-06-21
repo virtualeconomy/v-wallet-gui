@@ -64,7 +64,7 @@ export default {
     },
     computed: {
         address() {
-            return 'testaddress'
+            return '3MxYTgmMWiaKT82y4jfZaSPDqEDN1JbETvp'
             // return Vue.ls.get('address')
         },
         userInfo() {
@@ -94,6 +94,7 @@ export default {
             console.log(balance)
             const url = TESTNET_NODE + '/assets/balance/' + address
 
+            console.log(url)
             this.$http.get(url).then(response => {
                 console.log(response)
             }, response => {
