@@ -95,7 +95,7 @@
       <hr>
       <a
         href="/login"
-        class="footer-link">Login</a>
+        class="footer-link"><small>Login</small></a>
     </div>
   </div>
 </template>
