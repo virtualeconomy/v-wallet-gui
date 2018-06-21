@@ -2,6 +2,7 @@
   <b-modal id="importModal"
            centered
            lazy
+           @cancel="importCancel"
            @close="importClose"
            @ok="importOk"
            title="Import Cold Wallet">
@@ -11,7 +12,7 @@
                     description="Please input your cold wallet address.">
         <b-form-input id="coldAddress"
                       type="text"
-                      v-model="content"
+                      v-model="coldAddress"
                       :state="isValidAddress"
                       aria-describedby="inputLiveHelp inputLiveFeedback"
                       placeholder="cold wallet address">
@@ -37,17 +38,17 @@ export default {
     data() {
         return {
             paused: false,
-            content: ''
+            coldAddress: ''
         }
     },
     computed: {
         isValidAddress: function() {
-            if (!this.content) {
+            if (!this.coldAddress) {
                 return true
             }
             let isValid = false
             try {
-                isValid = crypto.isValidAddress(this.content)
+                isValid = crypto.isValidAddress(this.coldAddress)
             } catch (e) {
                 console.log(e)
             }
@@ -58,8 +59,13 @@ export default {
         importClose: function(evt) {
             console.log('close')
         },
-        importOk: function(evt) {
+        importOk: function() {
             console.log('ok')
+            this.$emit('import-cold', this.coldAddress)
+        },
+        importCancel: function() {
+            console.log('cancel')
+            this.importClose()
         },
         async onInit(promise) {
             try {
@@ -84,12 +90,12 @@ export default {
         },
         onDecode: function(decodeString) {
             this.paused = true
-            this.content = decodeString
+            this.coldAddress = decodeString
             console.log(decodeString)
         },
         scanAgain: function() {
             this.paused = false
-            this.content = ''
+            this.coldAddress = ''
         }
     }
 }

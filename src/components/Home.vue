@@ -12,10 +12,14 @@
           <Asset :address="address"
                  :balance="this.balance.address">
           </Asset>
+          <Asset v-if="coldAddress"
+                 @cold-address="importCold"
+                 :cold-balance="this.balance.coldAddress">
+          </Asset>
         </div>
         <b-btn @click="$root.$emit('bv::show::modal', 'importModal', $event.target)"
                variant="primary">Import Cold Wallet</b-btn>
-        <ImportColdWallet :cold-address="coldAddress"
+        <ImportColdWallet :import-cold="coldAddress"
                           show="false"></ImportColdWallet>
       </div>
     </div>
@@ -95,11 +99,16 @@ export default {
             }, response => {
                 console.log(response)
             })
+        },
+        importCold: function(coldAddress) {
+            console.log('cold address' + coldAddress)
+            this.coldAddress = coldAddress
         }
     },
     data: function() {
         return {
             balance: [],
+            coldAddress: '',
             items: items,
             fields: [
                 {
@@ -122,8 +131,7 @@ export default {
             currentPage: 1,
             perPage: 5,
             totalRows: items.length,
-            pageOptions: [ 5, 10, 15 ],
-            coldAddress: ''
+            pageOptions: [ 5, 10, 15 ]
         }
     }
 }
