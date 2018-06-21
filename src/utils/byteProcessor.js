@@ -1,0 +1,105 @@
+"use strict";
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
+Object.defineProperty(exports, "__esModule", { value: true });
+var bignumber_1 = require("../libs/bignumber");
+var base58_1 = require("../libs/base58");
+var convert_1 = require("../utils/convert");
+var concat_1 = require("../utils/concat");
+// var constants = require("../constants");
+// ABSTRACT PARENT
+var ByteProcessor = /** @class */ (function () {
+    function ByteProcessor(name) {
+        this.name = name;
+    }
+    return ByteProcessor;
+}());
+exports.ByteProcessor = ByteProcessor;
+// SIMPLE
+var Base58 = /** @class */ (function (_super) {
+    __extends(Base58, _super);
+    function Base58() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Base58.prototype.process = function (value) {
+        var bytes = base58_1.default.decode(value);
+        return bytes;
+    };
+    return Base58;
+}(ByteProcessor));
+exports.Base58 = Base58;
+var Long = /** @class */ (function (_super) {
+    __extends(Long, _super);
+    function Long() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Long.prototype.process = function (value) {
+        var bytes;
+        if (typeof value === 'number') {
+            bytes = convert_1.default.longToByteArray(value);
+        }
+        else {
+            if (typeof value === 'string') {
+                value = new bignumber_1.default(value);
+            }
+            bytes = convert_1.default.bigNumberToByteArray(value);
+        }
+        return Uint8Array.from(bytes);
+    };
+    return Long;
+}(ByteProcessor));
+exports.Long = Long;
+// COMPLEX
+var AssetId = /** @class */ (function (_super) {
+    __extends(AssetId, _super);
+    function AssetId() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    AssetId.prototype.process = function (value) {
+        value = '';
+        // We must pass bytes of `[0]` for Waves asset ID and bytes of `[1] + assetId` for other asset IDs
+        var bytes = value ? concat_1.concatUint8Arrays(Uint8Array.from([1]), base58_1.default.decode(value)) : Uint8Array.from([0]);
+        return bytes;
+    };
+    return AssetId;
+}(ByteProcessor));
+exports.AssetId = AssetId;
+var Attachment = /** @class */ (function (_super) {
+    __extends(Attachment, _super);
+    function Attachment() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Attachment.prototype.process = function (value) {
+        if (typeof value === 'string') {
+            value = Uint8Array.from(convert_1.default.stringToByteArray(value));
+        }
+        // if (value.length > constants.TRANSFER_ATTACHMENT_BYTE_LIMIT) {
+        //     throw new Error('Maximum attachment length is exceeded');
+        // }
+        var valueWithLength = convert_1.default.bytesToByteArrayWithSize(value);
+        return Uint8Array.from(valueWithLength);
+    };
+    return Attachment;
+}(ByteProcessor));
+exports.Attachment = Attachment;
+var Recipient = /** @class */ (function (_super) {
+    __extends(Recipient, _super);
+    function Recipient() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Recipient.prototype.process = function (value) {
+        var addressBytes = base58_1.default.decode(value);
+        return Uint8Array.from(addressBytes);
+    };
+    return Recipient;
+}(ByteProcessor));
+exports.Recipient = Recipient;
+//# sourceMappingURL=ByteProcessor.js.map
