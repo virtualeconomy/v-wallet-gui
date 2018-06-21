@@ -59,88 +59,11 @@
           :block=true>
           Edit wallet seed
         </b-button>
-        <div
-          v-show="isSeedNoErr">
-          <p>hahahahhahhahahahahahahahahah</p>
-        </div>
-        <!-- <form class="text-left container">
-          <div>
-            <label>Avatar</label>
-            <div class="avatar-group">
-              <canvas
-                class="avatar"
-                width="120"
-                height="120"
-                :data-jdenticon-hash="avatarDataHex">
-                Fallback text for browsers not supporting canvas
-              </canvas>
-              <button
-                class="btn-change-avt"
-                type="button"
-                :disabled="!avatarCanChange||registering"
-                @click="changeAvatar()">
-                change one {{ timeLeftToChangeStr }}
-              </button>
-            </div>
-          </div>
-          <ul class="form-group error-messages">
-            <li
-              v-for="error in validator.errors"
-              :key="error.name">
-              <small
-                class="form-text text-danger">
-                {{ error.msgs[0] }}
-              </small>
-            </li>
-          </ul>
-          <div class="form-group username-form">
-            <label>Username</label>
-            <input
-              type="text"
-              class="form-control form-control-lg shadow-sm"
-              :class="{'text-danger':isUsernameErrors,'is-invalid':isUsernameErrors}"
-              v-model="username"
-              :readonly="registering"
-              @blur="checkUsername(username)">
-          </div>
-          <div class="form-group password-form">
-            <label>Password</label>
-            <input
-              type="password"
-              name="password"
-              class="form-control form-control-lg shadow-sm"
-              :class="{'text-danger':isPassErrors,'is-invalid':isPassErrors}"
-              v-model="password"
-              :readonly="registering"
-              @input="checkPassword(password)">
-            <small
-              id="emailHelp"
-              class="form-text text-muted text-right">
-              At least 8 characters
-            </small>
-          </div>
-          <div class="form-group">
-            <label>Confirm your password</label>
-            <input
-              type="password"
-              class="form-control form-control-lg shadow-sm"
-              :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
-              v-model="password2"
-              :readonly="registering"
-              @input="checkPasswordMatch(password, password2)"
-              @keyup.enter="registerEnter">
-          </div>
-          <div class="form-group submit-button">
-            <b-button
-              :disabled="isSubmitDisabled"
-              :variant="'primary'"
-              :size="'lg'"
-              :block=true
-              @click="register">
-              Register
-            </b-button>
-          </div>
-        </form> -->
+        <update-account
+          class="update-form"
+          :seed-phrase="seedPhrase"
+          v-if="isSeedNoErr">
+        </update-account>
       </div>
     </div>
   </div>
@@ -148,9 +71,11 @@
 
 <script>
 import seedDic from '@/libs/seedDictionary.js'
+import UpdateAccount from '@/components/restore/UpdateAccount'
 
 export default {
     name: 'Restore',
+
     data: function() {
         return {
             pageId: 'registration',
@@ -161,15 +86,10 @@ export default {
             seedPhrase: ''
         }
     },
+
     methods: {
 
-        changePage: function(newPageId) {
-            this.pageId = newPageId
-            console.log(this.pageId)
-        },
-
         checkSeed() {
-            console.log(this.seedInput)
             const isOk = this.isValidSeed(this.seedInput.trim())
             this.showSeedErr = !isOk
             this.isSeedNoErr = isOk
@@ -184,6 +104,7 @@ export default {
             if (wordList.length !== 15) {
                 return false
             }
+
             const libSet = new Set(seedDic)
             return wordList.every(i => libSet.has(i))
         },
@@ -204,6 +125,10 @@ export default {
             this.showSeedErr = false
             this.isSeedNoErr = void 0
         }
+    },
+
+    components: {
+        UpdateAccount
     }
 }
 </script>
@@ -270,5 +195,8 @@ export default {
     border-right: .3em solid transparent;
     border-bottom: 0;
     border-left: .3em solid transparent;
+}
+.update-form {
+    margin-top: 20px;
 }
 </style>
