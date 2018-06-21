@@ -13,13 +13,13 @@
                  :balance="this.balance.address">
           </Asset>
           <Asset v-if="coldAddress"
-                 @cold-address="importCold"
-                 :cold-balance="this.balance.coldAddress">
+                 :address="coldAddress"
+                 :balance="this.balance.coldAddress">
           </Asset>
         </div>
-        <b-btn @click="$root.$emit('bv::show::modal', 'importModal', $event.target)"
+        <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
                variant="primary">Import Cold Wallet</b-btn>
-        <ImportColdWallet :import-cold="coldAddress"
+        <ImportColdWallet @import-cold="importCold"
                           show="false"></ImportColdWallet>
       </div>
     </div>
