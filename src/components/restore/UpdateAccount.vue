@@ -267,13 +267,20 @@ export default {
 .home {
     width: 100%;
     height: 100%;
+    padding-top: 10px;
+    padding-bottom: 5px;
+    border: 2px solid;
+    border-color: rgb(200, 200, 200);
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    border-top: none;
 }
 .nav {
     width: 100%;
     height: 86px;
 }
 .login-forms {
-    width: 400px;
+    width: 430px;
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -282,7 +289,7 @@ export default {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 20px;
+    margin-top: 40px;
 }
 .password-form {
     margin-top: 10px;

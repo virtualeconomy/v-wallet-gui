@@ -21,13 +21,25 @@
         </div>
       </div>
       <div class="login-forms">
+        <p
+          v-show="!isSeedNoErr">
+          Please enter your wallet seed here.
+        </p>
+        <p
+          class="seed-des"
+          v-show="!isSeedNoErr">
+          <small class="text-muted">
+            Wallet seed is the 15 words you are keeping as backup.
+            The words should be seperated by single space
+          </small>
+        </p>
         <b-form-textarea
           v-model="seedInput"
           maxlength="150"
           @keydown.native.enter='preventDefault($event)'
           :state="isSeedNoErr"
           :disabled="isSeedNoErr"
-          placeholder="Please enter your wallet seed here, the 15 words you are keeping as backup, seperating by single space"
+          placeholder="Enter 15 words here"
           :no-resize="true"
           :rows="4"
           :max-rows="6"
@@ -42,7 +54,7 @@
         </div>
         <b-button
           v-if="seedBtnUp"
-          class="btn-continue dropdown"
+          class="btn-continue dropdown shadow-sm"
           :disabled="showSeedErr"
           :variant="'primary'"
           :size="'lg'"
@@ -52,7 +64,7 @@
         </b-button>
         <b-button
           v-else
-          class="btn-continue dropup"
+          class="btn-continue dropup shadow-sm"
           :variant="'warning'"
           :size="'sm'"
           @click="editSeed"
@@ -149,13 +161,13 @@ export default {
    height: 100px;
 }
 .title-des {
-    width: 400px;
+    width: 450px;
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
 }
 .login-forms {
-    width: 400px;
+    width: 450px;
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -164,9 +176,10 @@ export default {
     width: 100%;
     display: inline-block;
     text-align: right;
+    line-height: 80%
 }
 .btn-continue {
-    margin-top: 20px;
+    margin-top: 30px;
 }
 .msg-err {
     margin-top: 10px;
@@ -184,6 +197,10 @@ export default {
     border-bottom: .3em solid;
     border-left: .3em solid transparent;
 }
+.dropup {
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
 .dropdown:after {
     display: inline-block;
     width: 0;
@@ -196,7 +213,10 @@ export default {
     border-bottom: 0;
     border-left: .3em solid transparent;
 }
+.seed-des {
+    text-align: left;
+    line-height: 120%;
+}
 .update-form {
-    margin-top: 20px;
 }
 </style>
