@@ -30,6 +30,7 @@ export default {
         },
         balance: {
             type: String,
+            default: '0 VEE',
             required: true
         }
     }
@@ -37,8 +38,8 @@ export default {
 </script>
 
 <style scoped lang="less">
-@import '../../assets/style/common';
-@import '../../assets/style/variables';
+@import '../../../assets/style/common';
+@import '../../../assets/style/variables';
 
 .asset {
     width: 100%;

@@ -10,7 +10,6 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     return t;
 };
 
-// Object.defineProperty(exports, "__esModule", { value: true });
 export const INITIAL_SESSION_TIMEOUT = 5*60*1000
 export const MAINNET_BYTE = 'W'.charCodeAt(0);
 export const TESTNET_BYTE = 'T'.charCodeAt(0);
@@ -30,8 +29,10 @@ export const DEFAULT_BASIC_CONFIG = {
     logLevel: 'warning',
     timeDiff: 0
 };
+export const MAINNET_NODE = 'http://54.152.46.6:6869'
+export const MAINNET_API = 'http://54.152.46.6:6869'
+
+export const TESTNET_NODE = 'http://54.152.46.6:6869'
+export const TESTNET_API = 'http://54.152.46.6:6869'
+
 export const ADDRESS_LENGTH = 35;
-export const MAINNET_NODE = '54.152.46.6:6869'
-export const MAINNET_API = '54.152.46.6:6869'
-export const TESTNET_NODE = '54.152.46.6:6869'
-export const TESTNET_API = '54.152.46.6:6869'

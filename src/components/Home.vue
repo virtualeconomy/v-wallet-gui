@@ -8,22 +8,20 @@
     </div>
     <div class="assets-pane">
       <div>
-        <div v-for="asset in assets"
-             :key="asset.address">
-          <Asset :title="asset.title"
-                 :address="asset.address"
-                 :balance="asset.balance">
+        <div>
+          <Asset :address="address"
+                 :balance="this.balance.address">
+          </Asset>
+          <Asset v-if="coldAddress"
+                 :address="coldAddress"
+                 :balance="this.balance.coldAddress">
           </Asset>
         </div>
-        <b-button v-b-modal.importModal>Import Cold Wallet</b-button>
-        <b-modal id="importModal"
-                 centered
-                 title="Import Cold Wallet">
-          <b-container fluid>
-            <b-form>
-            </b-form>
-          </b-container>
-        </b-modal>
+        <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
+               variant="primary">Import Cold Wallet</b-btn>
+        <ImportColdWallet :hot-address="address"
+                          @import-cold="importCold"
+                          show="false"></ImportColdWallet>
       </div>
     </div>
     <div class="records-pane">
@@ -42,33 +40,76 @@
 </template>
 
 <script>
-import NavBar from './home/NavBar'
-import TransPane from './home/transPane'
-import Asset from './home/Asset'
+import NavBar from './home/elements/NavBar'
+import TransPane from './home/elements/TransPane'
+import Asset from './home/elements/Asset'
+import ImportColdWallet from './home/modals/ImportColdWallet'
+import Vue from 'vue'
+import { INITIAL_SESSION_TIMEOUT, TESTNET_NODE } from '@/constants.js'
+import seedLib from '@/libs/seed.js'
 
 export default {
     name: 'Home',
     components: {
+        ImportColdWallet,
         TransPane,
         NavBar,
         Asset
     },
+    created() {
+        // if (!this.address) {
+        //     this.$router.push('/login')
+        // }
+        this.getBalance(this.address)
+    },
+    mounted() {
+        setTimeout(() => {
+            Vue.ls.clear()
+        }, window.localStorage.getItem(this.address ? this.address : INITIAL_SESSION_TIMEOUT))
+    },
+    computed: {
+        address() {
+            return '3MxYTgmMWiaKT82y4jfZaSPDqEDN1JbETvp'
+            // return Vue.ls.get('address')
+        },
+        userInfo() {
+            return JSON.parse(window.localStorage.getItem(this.address))
+        },
+        secretInfo() {
+            return JSON.parse(
+                seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
+        },
+        seedPhrase() {
+            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+        },
+        wordList() {
+            return this.seedPhrase.split(' ')
+        },
+        buttonTimeStr() {
+            if (this.timeLeft > 0) {
+                return '(' + this.timeLeft + 's)'
+            }
+        }
+    },
     methods: {
+        getBalance: function(address) {
+            const url = TESTNET_NODE + '/assets/balance/' + address
+
+            this.$http.get(url).then(response => {
+                this.balance[address] = response.body.balances['VEE'] ? response.body.balances['VEE'] + ' VEE' : '0 VEE'
+            }, response => {
+                console.log(response)
+            })
+        },
+        importCold: function(coldAddress) {
+            console.log('cold address' + coldAddress)
+            this.coldAddress = coldAddress
+        }
     },
     data: function() {
         return {
-            assets: [
-                {
-                    title: 'Asset',
-                    address: 'xxxxxxxxxxx',
-                    balance: '1.23vee'
-                },
-                {
-                    title: 'Asset2',
-                    address: 'yyyyyyyyyyy',
-                    balance: '1.24vee'
-                }
-            ],
+            balance: [],
+            coldAddress: '',
             items: items,
             fields: [
                 {
