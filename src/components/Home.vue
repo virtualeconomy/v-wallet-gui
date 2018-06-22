@@ -1,7 +1,11 @@
 <template>
   <div class="home">
     <div class="nav">
-      <nav-bar></nav-bar>
+      <nav-bar :address="address"
+               :cold-address="coldAddress"
+               :pub-key="pubKey"
+               :pri-key="priKey"
+               :seed="wordList"></nav-bar>
     </div>
     <div class="trans-pane">
       <trans-pane></trans-pane>
@@ -72,6 +76,12 @@ export default {
             return '3MxYTgmMWiaKT82y4jfZaSPDqEDN1JbETvp'
             // return Vue.ls.get('address')
         },
+        pubKey() {
+            return ''
+        },
+        priKey() {
+            return ''
+        },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.address))
         },
@@ -83,7 +93,8 @@ export default {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
         wordList() {
-            return this.seedPhrase.split(' ')
+            return ''
+            // return this.seedPhrase.split(' ')
         },
         buttonTimeStr() {
             if (this.timeLeft > 0) {
