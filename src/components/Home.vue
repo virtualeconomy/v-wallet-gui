@@ -19,7 +19,8 @@
         </div>
         <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
                variant="primary">Import Cold Wallet</b-btn>
-        <ImportColdWallet @import-cold="importCold"
+        <ImportColdWallet :hot-address="address"
+                          @import-cold="importCold"
                           show="false"></ImportColdWallet>
       </div>
     </div>

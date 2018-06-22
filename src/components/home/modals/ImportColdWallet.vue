@@ -35,7 +35,13 @@
 import crypto from '@/utils/crypto'
 export default {
     name: 'ImportColdWallet',
-    data() {
+    props: {
+        hotAddress: {
+            type: String,
+            default: ''
+        }
+    },
+    data: function() {
         return {
             paused: false,
             coldAddress: ''
@@ -61,11 +67,19 @@ export default {
         },
         importOk: function() {
             console.log('ok')
+            this.saveCold()
             this.$emit('import-cold', this.coldAddress)
         },
         importCancel: function() {
             console.log('cancel')
             this.importClose()
+        },
+        saveCold: function() {
+            const savedInfo = {
+                coldAddress: this.coldAddress,
+                coldPubKey: this.coldPubKey ? this.coldPubKey : ''
+            }
+            window.localStorage.setItem(this.hotAddress, JSON.stringify(savedInfo))
         },
         async onInit(promise) {
             try {
@@ -102,9 +116,6 @@ export default {
 </script>
 
 <style scoped>
-.scanQrCode {
-    margin-bottom: 10px;
-}
 .qrInfo {
     margin-bottom: 20px;
 }
