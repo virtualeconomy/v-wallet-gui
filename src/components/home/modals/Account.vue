@@ -7,7 +7,7 @@
         <b-form-input id="walletAddress"
                       readonly
                       size="sm"
-                      v-model="walletAddress">
+                      v-model="address">
         </b-form-input>
       </b-form-group>
       <b-form-group label="Cold Wallet Address"
@@ -26,6 +26,24 @@
                       v-model="pubKey">
         </b-form-input>
       </b-form-group>
+      <b-form-group label="Private Key"
+                    label-for="priKey">
+        <!--<b-button @click="privateKey">show</b-button>-->
+        <b-form-input id="priKey"
+                      readonly
+                      size="sm"
+                      v-model="privateKey">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group label="Seed"
+                    label-for="seed">
+        <!--<b-button @click="seedPhrase">show</b-button>-->
+        <b-form-input id="seed"
+                      readonly
+                      size="sm"
+                      v-model="seed">
+        </b-form-input>
+      </b-form-group>
     </div>
   </b-modal>
 </template>
@@ -34,7 +52,7 @@
 export default {
     name: 'Account',
     props: {
-        walletAddress: {
+        address: {
             type: String,
             require: true,
             default: ''
@@ -50,14 +68,24 @@ export default {
             default: ''
         },
         priKey: {
-            type: String,
+            type: Function,
             require: true,
-            default: ''
+            default: function() {
+                return ''
+            }
         },
-        seed: {
-            type: String,
+        seedPhrase: {
+            type: Function,
             require: true,
-            default: ''
+            default: function() {
+                return ''
+            }
+        }
+    },
+    data() {
+        return {
+            seed: this.seedPhrase(),
+            privateKey: this.priKey()
         }
     }
 }

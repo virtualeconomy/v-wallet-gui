@@ -27,7 +27,11 @@
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
-    <Account :wallet-address="walletAddress"></Account>
+    <Account :address="address"
+             :cold-address="coldAddress"
+             :pub-key="pubKey"
+             :pri-key="priKey"
+             :seed-phrase="seedPhrase"></Account>
     <Settings></Settings>
   </div>
 
@@ -46,7 +50,7 @@ export default {
         Account
     },
     props: {
-        walletAddress: {
+        address: {
             type: String,
             require: true,
             default: ''
@@ -62,14 +66,18 @@ export default {
             default: ''
         },
         priKey: {
-            type: String,
+            type: Function,
             require: true,
-            default: ''
+            default: function() {
+                return ''
+            }
         },
-        seed: {
-            type: String,
+        seedPhrase: {
+            type: Function,
             require: true,
-            default: ''
+            default: function() {
+                return ''
+            }
         }
     },
     computed: {

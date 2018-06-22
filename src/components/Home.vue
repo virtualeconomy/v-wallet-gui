@@ -5,7 +5,7 @@
                :cold-address="coldAddress"
                :pub-key="pubKey"
                :pri-key="priKey"
-               :seed="wordList"></nav-bar>
+               :seed-phrase="seedPhrase"></nav-bar>
     </div>
     <div class="trans-pane">
       <trans-pane></trans-pane>
@@ -61,26 +61,30 @@ export default {
         Asset
     },
     created() {
-        // if (!this.address) {
-        //     this.$router.push('/login')
-        // }
+        if (!this.address) {
+            this.$router.push('/login')
+        }
         this.getBalance(this.address)
+        console.log(this.address)
     },
     mounted() {
+        let oldTimeout = INITIAL_SESSION_TIMEOUT
+        try {
+            oldTimeout = JSON.parse(window.localStorage.getItem(this.address)).sesstionTimeout
+        } catch (e) {
+            oldTimeout = INITIAL_SESSION_TIMEOUT
+        }
         setTimeout(() => {
+            console.log('clear')
             Vue.ls.clear()
-        }, window.localStorage.getItem(this.address ? this.address : INITIAL_SESSION_TIMEOUT))
+        }, oldTimeout)
     },
     computed: {
         address() {
-            return '3MxYTgmMWiaKT82y4jfZaSPDqEDN1JbETvp'
-            // return Vue.ls.get('address')
+            return Vue.ls.get('address')
         },
         pubKey() {
-            return ''
-        },
-        priKey() {
-            return ''
+            return this.secretInfo.pubKey
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.address))
@@ -89,12 +93,8 @@ export default {
             return JSON.parse(
                 seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
         },
-        seedPhrase() {
-            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
-        },
         wordList() {
-            return ''
-            // return this.seedPhrase.split(' ')
+            return this.seedPhrase.split(' ')
         },
         buttonTimeStr() {
             if (this.timeLeft > 0) {
@@ -103,7 +103,7 @@ export default {
         }
     },
     methods: {
-        getBalance: function(address) {
+        getBalance(address) {
             const url = TESTNET_NODE + '/assets/balance/' + address
 
             this.$http.get(url).then(response => {
@@ -112,9 +112,15 @@ export default {
                 console.log(response)
             })
         },
-        importCold: function(coldAddress) {
+        importCold(coldAddress) {
             console.log('cold address' + coldAddress)
             this.coldAddress = coldAddress
+        },
+        seedPhrase() {
+            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+        },
+        priKey() {
+            return seedLib.fromExistingPhrase(this.seedPhrase()).keyPair.privateKey
         }
     },
     data: function() {

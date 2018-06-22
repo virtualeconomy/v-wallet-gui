@@ -7,10 +7,6 @@
         <b-form-select class="setting-input"
                        :options="langOptions"
                        size="sm">
-          <template slot="first">
-            <option :value="null"
-                    disabled>-- Please select an option --</option>
-          </template>
         </b-form-select>
       </div>
       <div class="timeout-setting">
@@ -19,10 +15,6 @@
                        :options="timeoutOptions"
                        size="sm"
                        :input="change">
-          <template slot="first">
-            <option :value="null"
-                    disabled>-- Please select an option --</option>
-          </template>
         </b-form-select>
       </div>
     </div>
