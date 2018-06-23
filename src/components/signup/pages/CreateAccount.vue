@@ -11,10 +11,6 @@
         <div>
           <label>Avatar</label>
           <div class="avatar-group">
-            <!-- <img
-              :src="'data:image/png;base64,'+avatarData"
-              alt="blank"
-              class="avatar"> -->
             <canvas
               class="avatar"
               width="120"

@@ -41,6 +41,7 @@
                 class="avatar"
                 width="50"
                 height="50"
+                v-if="mutableValue"
                 :data-jdenticon-hash="mutableValue.avt"
               ></canvas>
             </div>
@@ -150,13 +151,15 @@ export default {
                 try {
                     const usrStr = strg[addr]
                     const usrObj = JSON.parse(usrStr)
-                    const usr = {
-                        addr: addr,
-                        usrname: usrObj['username'],
-                        avt: usrObj['avtHash'],
-                        sort: usrObj['lastLogin']
+                    if (usrObj['username'] && usrObj['avtHash'] && usrObj['lastLogin']) {
+                        const usr = {
+                            addr: addr,
+                            usrname: usrObj['username'],
+                            avt: usrObj['avtHash'],
+                            sort: usrObj['lastLogin']
+                        }
+                        ac.push(usr)
                     }
-                    ac.push(usr)
                 } catch (err) {
                     return ac
                 }

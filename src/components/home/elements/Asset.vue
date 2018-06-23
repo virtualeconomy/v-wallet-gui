@@ -10,7 +10,7 @@
       </div>
       <div class="balance">
         <span>Balance:</span>
-        <span>{{ balance }}</span>
+        <span>{{ balance }} VEE</span>
       </div>
     </div>
   </div>
@@ -29,8 +29,8 @@ export default {
             required: true
         },
         balance: {
-            type: String,
-            default: '0 VEE',
+            type: Number,
+            default: 0,
             required: true
         }
     }

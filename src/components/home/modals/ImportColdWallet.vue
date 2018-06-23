@@ -21,7 +21,7 @@
           Invalid cold wallet address.
         </b-form-invalid-feedback>
       </b-form-group>
-      <p class="qrInfo">Please confirm your browser's camera is available.</p>
+      <p class="qrInfo">Please confirm your browser's camera available.</p>
       <qrcode-reader @init="onInit"
                      @decode="onDecode"
                      :paused="paused">
@@ -35,12 +35,6 @@
 import crypto from '@/utils/crypto'
 export default {
     name: 'ImportColdWallet',
-    props: {
-        hotAddress: {
-            type: String,
-            default: ''
-        }
-    },
     data: function() {
         return {
             paused: false,
@@ -67,8 +61,7 @@ export default {
         },
         importOk: function() {
             console.log('ok')
-            this.saveCold()
-            this.$emit('import-cold', this.coldAddress)
+            this.$emit('import-cold', this.coldAddress, this.coldPubKey)
         },
         importCancel: function() {
             console.log('cancel')
