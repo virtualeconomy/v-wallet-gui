@@ -9,7 +9,8 @@
     <div class="assets-pane">
       <div>
         <div>
-          <Asset :address="address"
+          <Asset v-if="address"
+                 :address="address"
                  :balance="balance[address]">
           </Asset>
           <Asset v-if="coldAddress"
@@ -58,8 +59,9 @@ export default {
     created() {
         if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
+        } else {
+            this.getBalance(this.address)
         }
-        this.getBalance(this.address)
     },
     mounted() {
         setTimeout(() => {
