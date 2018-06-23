@@ -21,7 +21,7 @@
           Invalid cold wallet address.
         </b-form-invalid-feedback>
       </b-form-group>
-      <p class="qrInfo">Please confirm your browser's camera available.</p>
+      <p class="qrInfo">Please confirm your browser's camera is available.</p>
       <qrcode-reader @init="onInit"
                      @decode="onDecode"
                      :paused="paused">

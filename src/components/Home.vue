@@ -56,7 +56,7 @@ export default {
         Asset
     },
     created() {
-        if (!this.address) {
+        if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
         }
         this.getBalance(this.address)
@@ -68,7 +68,6 @@ export default {
     },
     computed: {
         address() {
-            // return '3MxYTgmMWiaKT82y4jfZaSPDqEDN1JbETvp'
             return Vue.ls.get('address')
         },
         userInfo() {
@@ -94,10 +93,8 @@ export default {
         getBalance: function(address) {
             const url = TESTNET_NODE + '/addresses/balance/' + address
             this.$http.get(url).then(response => {
-                console.log(response)
                 Vue.set(this.balance, address, response.body['balance'])
             }, response => {
-                console.log(response)
                 Vue.set(this.balance, address, 0)
             })
         },
