@@ -3,7 +3,7 @@
            centered
            lazy
            @cancel="importCancel"
-           @close="importClose"
+           @hide="importClose"
            @ok="importOk"
            title="Import Cold Wallet">
     <b-container fluid>
@@ -37,6 +37,7 @@ export default {
     name: 'ImportColdWallet',
     data: function() {
         return {
+            qrInit: false,
             paused: false,
             coldAddress: ''
         }
@@ -57,6 +58,9 @@ export default {
     },
     methods: {
         importClose: function(evt) {
+            if (this.qrInit) {
+                evt.preventDefault()
+            }
             console.log('close')
         },
         importOk: function() {
@@ -76,6 +80,8 @@ export default {
         },
         async onInit(promise) {
             try {
+                console.log(promise)
+                this.qrInit = true
                 await promise
             } catch (error) {
                 if (error.name === 'NotAllowedError') {
@@ -92,6 +98,7 @@ export default {
                     throw Error('browser is probably lacking features(WebRTC, Canvas)')
                 }
             } finally {
+                this.qrInit = false
                 console.log('onInit')
             }
         },
