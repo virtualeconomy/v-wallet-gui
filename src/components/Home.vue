@@ -13,18 +13,18 @@
     <div class="assets-pane">
       <div>
         <div>
-          <Asset :address="address"
-                 :balance="this.balance.address">
+          <Asset v-if="address"
+                 :address="address"
+                 :balance="balance[address]">
           </Asset>
           <Asset v-if="coldAddress"
                  :address="coldAddress"
-                 :balance="this.balance.coldAddress">
+                 :balance="balance[coldAddress]">
           </Asset>
         </div>
         <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
                variant="primary">Import Cold Wallet</b-btn>
-        <ImportColdWallet :hot-address="address"
-                          @import-cold="importCold"
+        <ImportColdWallet @import-cold="importCold"
                           show="false"></ImportColdWallet>
       </div>
     </div>
@@ -61,11 +61,11 @@ export default {
         Asset
     },
     created() {
-        if (!this.address) {
+        if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
+        } else {
+            this.getBalance(this.address)
         }
-        this.getBalance(this.address)
-        console.log(this.address)
     },
     mounted() {
         let oldTimeout = INITIAL_SESSION_TIMEOUT
@@ -103,18 +103,19 @@ export default {
         }
     },
     methods: {
-        getBalance(address) {
-            const url = TESTNET_NODE + '/assets/balance/' + address
 
+        getBalance: function(address) {
+            const url = TESTNET_NODE + '/addresses/balance/' + address
             this.$http.get(url).then(response => {
-                this.balance[address] = response.body.balances['VEE'] ? response.body.balances['VEE'] + ' VEE' : '0 VEE'
+                Vue.set(this.balance, address, response.body['balance'])
             }, response => {
-                console.log(response)
+                Vue.set(this.balance, address, 0)
             })
         },
         importCold(coldAddress) {
             console.log('cold address' + coldAddress)
             this.coldAddress = coldAddress
+            this.getBalance(coldAddress)
         },
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
@@ -125,7 +126,7 @@ export default {
     },
     data: function() {
         return {
-            balance: [],
+            balance: {},
             coldAddress: '',
             items: items,
             fields: [
