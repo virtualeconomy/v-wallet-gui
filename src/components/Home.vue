@@ -3,9 +3,6 @@
     <div class="nav">
       <nav-bar></nav-bar>
     </div>
-    <div class="trans-pane container">
-      <trans-pane></trans-pane>
-    </div>
     <div class="container-fluid">
       <div class="row">
         <div class="col-auto">
@@ -26,19 +23,27 @@
                               show="false"></ImportColdWallet>
           </div>
         </div>
-        <div class="col">
-          <h3>Transaction Records</h3>
-          <div>
-            <b-table show-empty
-                     stacked="md"
-                     :items="items"
-                     :fields="fields"
-                     :current-page="currentPage"
-                     striped="striped"
-                     outlined="outlined"
-                     :per-page="perPage">
-            </b-table>
-          </div>
+        <div class="col container">
+          <b-jumbotron
+            class="col"
+            bg-variant="white"
+            border-variant="primary">
+            <div class="trans-pane">
+              <trans-pane></trans-pane>
+            </div>
+            <h3>Transaction Records</h3>
+            <div>
+              <b-table show-empty
+                       stacked="md"
+                       :items="items"
+                       :fields="fields"
+                       :current-page="currentPage"
+                       striped="striped"
+                       outlined="outlined"
+                       :per-page="perPage">
+              </b-table>
+            </div>
+          </b-jumbotron>
         </div>
       </div>
     </div>
@@ -172,6 +177,8 @@ const items = [
 .trans-pane {
     height:@trxDivH;
     width: 100%;
+    border-bottom: solid 1px;
+    margin-bottom: 10px;
 }
 .assets-pane {
     float: left;

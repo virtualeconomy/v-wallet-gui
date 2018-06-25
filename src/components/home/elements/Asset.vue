@@ -1,7 +1,7 @@
 <template>
   <div
-    class="card"
-    style="width: 18rem;">
+    class="card asset"
+    style="width: 20rem;">
     <div class="card-body text-left">
       <h4 class="card-title">{{ title }}</h4>
       <p class="card-subtitle mb-2">
@@ -43,6 +43,7 @@ export default {
     height: 200px;
     background-color: @navBgColor;
     border: 1px solid @bdBgColor;
+    margin-bottom: 40px;
 }
 
 .txt-addr {
