@@ -65,10 +65,10 @@
         clear and try again
       </b-button>
       <hr>
-      <a
-        href="/"
+      <span
+        @click="$router.push('/')"
         class="footer-link">
-        Skip this step</a>
+        Skip this step</span>
     </div>
   </div>
 </template>
