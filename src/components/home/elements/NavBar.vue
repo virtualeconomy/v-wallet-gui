@@ -30,8 +30,8 @@
     <Account :address="address"
              :cold-address="coldAddress"
              :pub-key="pubKey"
-             :pri-key="priKey"
-             :seed-phrase="seedPhrase"></Account>
+             :get-pri-key="getPriKey"
+             :get-seed-phrase="getSeedPhrase"></Account>
     <Settings></Settings>
   </div>
 
@@ -65,14 +65,14 @@ export default {
             require: true,
             default: ''
         },
-        priKey: {
+        getPriKey: {
             type: Function,
             require: true,
             default: function() {
                 return ''
             }
         },
-        seedPhrase: {
+        getSeedPhrase: {
             type: Function,
             require: true,
             default: function() {

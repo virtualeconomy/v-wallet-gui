@@ -4,8 +4,8 @@
       <nav-bar :address="address"
                :cold-address="coldAddress"
                :pub-key="pubKey"
-               :pri-key="priKey"
-               :seed-phrase="seedPhrase"></nav-bar>
+               :get-pri-key="getPriKey"
+               :get-seed-phrase="getSeedPhrase"></nav-bar>
     </div>
     <div class="trans-pane">
       <trans-pane></trans-pane>
@@ -81,10 +81,14 @@ export default {
     },
     computed: {
         address() {
-            return Vue.ls.get('address')
+            if (Vue.ls.get('address')) {
+                return Vue.ls.get('address')
+            }
         },
         pubKey() {
-            return this.secretInfo.pubKey
+            if (this.secretInfo) {
+                return this.secretInfo.pubKey
+            }
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.address))
@@ -114,11 +118,15 @@ export default {
             this.coldAddress = coldAddress
             this.getBalance(coldAddress)
         },
-        seedPhrase() {
-            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+        getSeedPhrase() {
+            if (this.secretInfo) {
+                return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+            }
         },
-        priKey() {
-            return seedLib.fromExistingPhrase(this.seedPhrase()).keyPair.privateKey
+        getPriKey() {
+            if (this.secretInfo) {
+                return seedLib.fromExistingPhrase(this.getSeedPhrase()).keyPair.privateKey
+            }
         }
     },
     data: function() {

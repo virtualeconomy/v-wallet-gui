@@ -67,14 +67,14 @@ export default {
             require: true,
             default: ''
         },
-        priKey: {
+        getPriKey: {
             type: Function,
             require: true,
             default: function() {
                 return ''
             }
         },
-        seedPhrase: {
+        getSeedPhrase: {
             type: Function,
             require: true,
             default: function() {
@@ -84,8 +84,8 @@ export default {
     },
     data() {
         return {
-            seed: this.seedPhrase(),
-            privateKey: this.priKey()
+            seed: this.getSeedPhrase(),
+            privateKey: this.getPriKey()
         }
     }
 }
