@@ -1,7 +1,7 @@
 <template>
   <b-modal id="accountModal"
            title="Account">
-    <div>
+    <div class="account-container">
       <b-form-group label="Wallet Address"
                     label-for="walletAddress">
         <b-form-input id="walletAddress"

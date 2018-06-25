@@ -90,16 +90,13 @@ export default {
             return JSON.parse(window.localStorage.getItem(this.address))
         },
         secretInfo() {
-            return JSON.parse(
-                seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
+            if (this.userInfo) {
+                return JSON.parse(
+                    seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
+            }
         },
         wordList() {
             return this.seedPhrase.split(' ')
-        },
-        buttonTimeStr() {
-            if (this.timeLeft > 0) {
-                return '(' + this.timeLeft + 's)'
-            }
         }
     },
     methods: {
