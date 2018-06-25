@@ -1,14 +1,15 @@
 <template>
   <div
-    class="card asset"
-    style="width: 20rem;">
-    <div class="card-body text-left">
-      <h4 class="card-title">{{ title }}</h4>
-      <p class="card-subtitle mb-2">
-        <span>Wallet Address: </span>
-        <span class="txt-addr">{{ address }}</span>
-      </p>
-      <p class="card-text"><span>Balance:</span>&nbsp;<span>{{ balance }} VEE</span></p>
+    class="card asset shadow-sm">
+    <div class="card-body text-left no-left-padding">
+      <div class="card-text mb-3">
+        <p class="mb-0">{{ addrShow }}</p>
+        <p class="text-muted mb-0 asset-title">Wallet Address</p>
+      </div>
+      <div class="card-text">
+        <p class="mb-0">{{ balance }} VEE</p>
+        <p class="text-muted mb-0 asset-title">Balance</p>
+      </div>
     </div>
   </div>
 </template>
@@ -30,6 +31,13 @@ export default {
             default: 0,
             required: true
         }
+    },
+    computed: {
+        addrShow() {
+            const addrChars = this.address.split('')
+            addrChars.splice(6, 23, '******')
+            return addrChars.join('')
+        }
     }
 }
 </script>
@@ -39,14 +47,12 @@ export default {
 @import '../../../assets/style/variables';
 
 .asset {
-    width: 100%;
-    height: 200px;
-    background-color: @navBgColor;
-    border: 1px solid @bdBgColor;
-    margin-bottom: 40px;
+    margin-bottom: 10px;
 }
-
-.txt-addr {
-    font-size: 70%
+.no-left-padding {
+    padding-left: 0px;
+}
+.asset-title {
+    font-size: 80%;
 }
 </style>

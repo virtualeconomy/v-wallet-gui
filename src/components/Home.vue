@@ -1,35 +1,39 @@
 <template>
   <div class="home">
-    <div class="nav">
-      <nav-bar :address="address"
-               :cold-address="coldAddress"
-               :pub-key="pubKey"
-               :get-pri-key="getPriKey"
-               :get-seed-phrase="getSeedPhrase"></nav-bar>
-    </div>
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-auto">
-          <div>
-            <div>
-              <Asset v-if="address"
-                     :address="address"
-                     :balance="balance[address]">
-              </Asset>
-              <Asset v-if="coldAddress"
-                     :address="coldAddress"
-                     :balance="balance[coldAddress]">
-              </Asset>
-            </div>
-            <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
-                   variant="primary">Import Cold Wallet</b-btn>
-            <ImportColdWallet @import-cold="importCold"
-                              show="false"></ImportColdWallet>
+    <nav-bar :address="address"
+             :cold-address="coldAddress"
+             :pub-key="pubKey"
+             :username="username"
+             :avt-hash="avtHash"
+             :get-pri-key="getPriKey"
+             :get-seed-phrase="getSeedPhrase"></nav-bar>
+    <div class="container-fluid height-full">
+      <div class="row height-full">
+        <div class="col-auto assets-pane height-full">
+          <div class="asset-title">
+            <b>Assets</b>
           </div>
+          <Asset v-if="address"
+                 :address="address"
+                 :balance="balance[address]">
+          </Asset>
+          <div class="asset-title">
+            <b>Cold Wallet</b>
+          </div>
+          <div>
+            <Asset v-if="coldAddress"
+                   :address="coldAddress"
+                   :balance="balance[coldAddress]">
+            </Asset>
+          </div>
+          <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
+                 variant="primary">Import Cold Wallet</b-btn>
+          <ImportColdWallet @import-cold="importCold"
+                            show="false"></ImportColdWallet>
         </div>
-        <div class="col container">
-          <b-jumbotron
-            class="col"
+        <div class="col page container">
+          <div
+            class=""
             bg-variant="white"
             border-variant="primary">
             <div class="trans-pane">
@@ -47,7 +51,7 @@
                        :per-page="perPage">
               </b-table>
             </div>
-          </b-jumbotron>
+          </div>
         </div>
       </div>
     </div>
@@ -103,6 +107,16 @@ export default {
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.address))
+        },
+        username() {
+            if (this.userInfo) {
+                return this.userInfo.username
+            }
+        },
+        avtHash() {
+            if (this.userInfo) {
+                return this.userInfo.avtHash
+            }
         },
         secretInfo() {
             if (this.userInfo) {
@@ -192,11 +206,6 @@ const items = [
     width: 100%;
     height: 100%;
 }
-.nav {
-    width: 100%;
-    height: @topNavH;
-    background-color: @navBgColor;
-}
 .trans-pane {
     height:@trxDivH;
     width: 100%;
@@ -204,20 +213,14 @@ const items = [
     margin-bottom: 10px;
 }
 .assets-pane {
-    float: left;
-    border-right: 1px solid @bdBgColor;
+    border-right: 1px solid rgb(238, 238, 238);
     text-align: left;
     width: @assetsPaneW;
     height: 100%;
     .asset {
         padding-left: 20px;
-        margin-top: 16px;
     }
-    button {
-        width: @btnWMid * 3;
-        height: @btnHMid;
-        margin-top: 12px;
-    }
+    background-color: rgb(245, 245, 245);
 }
 .records-pane {
     border-left: 1px solid @bdBgColor;
@@ -226,5 +229,14 @@ const items = [
         display: inline-block;
     }
 }
-
+.height-full {
+   height: 100%;
+}
+.page {
+    background-color: rgb(250, 250, 250);
+}
+.asset-title {
+    padding: 10px;
+    margin-top: 10px;
+}
 </style>
