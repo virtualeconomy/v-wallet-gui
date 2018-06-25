@@ -9,18 +9,18 @@
     <div class="assets-pane">
       <div>
         <div>
-          <Asset :address="address"
-                 :balance="this.balance.address">
+          <Asset v-if="address"
+                 :address="address"
+                 :balance="balance[address]">
           </Asset>
           <Asset v-if="coldAddress"
                  :address="coldAddress"
-                 :balance="this.balance.coldAddress">
+                 :balance="balance[coldAddress]">
           </Asset>
         </div>
         <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
                variant="primary">Import Cold Wallet</b-btn>
-        <ImportColdWallet :hot-address="address"
-                          @import-cold="importCold"
+        <ImportColdWallet @import-cold="importCold"
                           show="false"></ImportColdWallet>
       </div>
     </div>
@@ -57,10 +57,11 @@ export default {
         Asset
     },
     created() {
-        // if (!this.address) {
-        //     this.$router.push('/login')
-        // }
-        this.getBalance(this.address)
+        if (!this.address || !Vue.ls.get('pwd')) {
+            this.$router.push('/login')
+        } else {
+            this.getBalance(this.address)
+        }
     },
     mounted() {
         setTimeout(() => {
@@ -69,8 +70,7 @@ export default {
     },
     computed: {
         address() {
-            return '3MxYTgmMWiaKT82y4jfZaSPDqEDN1JbETvp'
-            // return Vue.ls.get('address')
+            return Vue.ls.get('address')
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.address))
@@ -93,22 +93,22 @@ export default {
     },
     methods: {
         getBalance: function(address) {
-            const url = TESTNET_NODE + '/assets/balance/' + address
-
+            const url = TESTNET_NODE + '/addresses/balance/' + address
             this.$http.get(url).then(response => {
-                this.balance[address] = response.body.balances['VEE'] ? response.body.balances['VEE'] + ' VEE' : '0 VEE'
+                Vue.set(this.balance, address, response.body['balance'])
             }, response => {
-                console.log(response)
+                Vue.set(this.balance, address, 0)
             })
         },
         importCold: function(coldAddress) {
             console.log('cold address' + coldAddress)
             this.coldAddress = coldAddress
+            this.getBalance(coldAddress)
         }
     },
     data: function() {
         return {
-            balance: [],
+            balance: {},
             coldAddress: '',
             items: items,
             fields: [
