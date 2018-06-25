@@ -1,17 +1,14 @@
 <template>
-  <div class="asset">
-    <div class="title">
-      <h3>{{ title }}</h3>
-    </div>
-    <div class="content">
-      <div class="address">
+  <div
+    class="card"
+    style="width: 18rem;">
+    <div class="card-body text-left">
+      <h4 class="card-title">{{ title }}</h4>
+      <p class="card-subtitle mb-2">
         <span>Wallet Address: </span>
-        <span>{{ address }}</span>
-      </div>
-      <div class="balance">
-        <span>Balance:</span>
-        <span>{{ balance }} VEE</span>
-      </div>
+        <span class="txt-addr">{{ address }}</span>
+      </p>
+      <p class="card-text"><span>Balance:</span>&nbsp;<span>{{ balance }} VEE</span></p>
     </div>
   </div>
 </template>
@@ -48,4 +45,7 @@ export default {
     border: 1px solid @bdBgColor;
 }
 
+.txt-addr {
+    font-size: 70%
+}
 </style>

@@ -3,37 +3,43 @@
     <div class="nav">
       <nav-bar></nav-bar>
     </div>
-    <div class="trans-pane">
+    <div class="trans-pane container">
       <trans-pane></trans-pane>
     </div>
-    <div class="assets-pane">
-      <div>
-        <div>
-          <Asset v-if="address"
-                 :address="address"
-                 :balance="balance[address]">
-          </Asset>
-          <Asset v-if="coldAddress"
-                 :address="coldAddress"
-                 :balance="balance[coldAddress]">
-          </Asset>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-auto">
+          <div>
+            <div>
+              <Asset v-if="address"
+                     :address="address"
+                     :balance="balance[address]">
+              </Asset>
+              <Asset v-if="coldAddress"
+                     :address="coldAddress"
+                     :balance="balance[coldAddress]">
+              </Asset>
+            </div>
+            <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
+                   variant="primary">Import Cold Wallet</b-btn>
+            <ImportColdWallet @import-cold="importCold"
+                              show="false"></ImportColdWallet>
+          </div>
         </div>
-        <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
-               variant="primary">Import Cold Wallet</b-btn>
-        <ImportColdWallet @import-cold="importCold"
-                          show="false"></ImportColdWallet>
-      </div>
-    </div>
-    <div class="records-pane">
-      <h3>Transaction Records</h3>
-      <div>
-        <b-table show-empty
-                 stacked="md"
-                 :items="items"
-                 :fields="fields"
-                 :current-page="currentPage"
-                 :per-page="perPage">
-        </b-table>
+        <div class="col">
+          <h3>Transaction Records</h3>
+          <div>
+            <b-table show-empty
+                     stacked="md"
+                     :items="items"
+                     :fields="fields"
+                     :current-page="currentPage"
+                     striped="striped"
+                     outlined="outlined"
+                     :per-page="perPage">
+            </b-table>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -162,6 +168,10 @@ const items = [
     width: 100%;
     height: @topNavH;
     background-color: @navBgColor;
+}
+.trans-pane {
+    height:@trxDivH;
+    width: 100%;
 }
 .assets-pane {
     float: left;
