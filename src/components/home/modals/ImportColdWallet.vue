@@ -5,6 +5,8 @@
            @cancel="importCancel"
            @hide="importClose"
            @ok="importOk"
+           :ok-disabled="!coldAddress || !isValidAddress"
+           :cancel-disabled="qrInit"
            title="Import Cold Wallet">
     <b-container fluid>
       <b-form-group label="Cold Wallet Adress"
@@ -63,13 +65,17 @@ export default {
             }
             console.log('close')
         },
-        importOk: function() {
-            console.log('ok')
-            this.$emit('import-cold', this.coldAddress, this.coldPubKey)
+        importOk: function(evt) {
+            if (this.qrInit || !this.coldAddress || !this.isValidAddress) {
+                evt.preventDefault()
+            } else {
+                this.$emit('import-cold', this.coldAddress, this.coldPubKey)
+            }
         },
-        importCancel: function() {
-            console.log('cancel')
-            this.importClose()
+        importCancel: function(evt) {
+            if (this.qrInit) {
+                evt.preventDefault()
+            }
         },
         saveCold: function() {
             const savedInfo = {
