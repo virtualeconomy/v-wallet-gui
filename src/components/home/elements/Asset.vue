@@ -1,7 +1,7 @@
 <template>
   <div
     class="card asset shadow-sm">
-    <div class="card-body text-left no-left-padding">
+    <div class="card-body text-left">
       <div class="card-text mb-3">
         <p class="mb-0">{{ addrShow }}</p>
         <p class="text-muted mb-0 asset-title">Wallet Address</p>

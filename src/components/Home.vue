@@ -27,7 +27,9 @@
             </Asset>
           </div>
           <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
-                 variant="primary">Import Cold Wallet</b-btn>
+                 size="sm"
+                 variant="link"
+                 class="btn-import-cold"><b>Import Cold Wallet</b></b-btn>
           <ImportColdWallet @import-cold="importCold"
                             show="false"></ImportColdWallet>
         </div>
@@ -217,9 +219,6 @@ const items = [
     text-align: left;
     width: @assetsPaneW;
     height: 100%;
-    .asset {
-        padding-left: 20px;
-    }
     background-color: rgb(245, 245, 245);
 }
 .records-pane {
@@ -238,5 +237,11 @@ const items = [
 .asset-title {
     padding: 10px;
     margin-top: 10px;
+}
+.btn-import-cold {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    color: @veeColor;
 }
 </style>
