@@ -31,13 +31,7 @@
     <div class="records-pane">
       <h3>Transaction Records</h3>
       <div>
-        <b-table show-empty
-                 stacked="md"
-                 :items="items"
-                 :fields="fields"
-                 :current-page="currentPage"
-                 :per-page="perPage">
-        </b-table>
+        <Record></Record>
       </div>
     </div>
   </div>
@@ -51,10 +45,12 @@ import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
 import { INITIAL_SESSION_TIMEOUT, TESTNET_NODE } from '@/constants.js'
 import seedLib from '@/libs/seed.js'
+import Record from './home/elements/Record'
 
 export default {
     name: 'Home',
     components: {
+        Record,
         ImportColdWallet,
         TransPane,
         NavBar,
