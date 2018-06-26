@@ -1,13 +1,13 @@
 <template>
   <div
-    class="card asset shadow-sm">
+    :class="classes">
     <div class="card-body text-left">
       <div class="card-text mb-3">
-        <p class="mb-0">{{ addrShow }}</p>
+        <p class="mb-0"><b>{{ addrShow }}</b></p>
         <p class="text-muted mb-0 asset-title">Wallet Address</p>
       </div>
       <div class="card-text">
-        <p class="mb-0">{{ balance }} VEE</p>
+        <p class="mb-0"><b>{{ balance }} VEE</b></p>
         <p class="text-muted mb-0 asset-title">Balance</p>
       </div>
     </div>
@@ -30,6 +30,11 @@ export default {
             type: Number,
             default: 0,
             required: true
+        },
+        selected: {
+            type: Boolean,
+            default: false,
+            required: true
         }
     },
     computed: {
@@ -37,6 +42,12 @@ export default {
             const addrChars = this.address.split('')
             addrChars.splice(6, 23, '******')
             return addrChars.join('')
+        },
+        classes() {
+            if (!this.selected) {
+                return ['card', 'asset', 'shadow-sm']
+            }
+            return ['card', 'asset', 'shadow', 'selected-asset']
         }
     }
 }
@@ -54,5 +65,9 @@ export default {
 }
 .asset-title {
     font-size: 80%;
+}
+.selected-asset {
+    background-color: @veeColor;
+    color: white
 }
 </style>

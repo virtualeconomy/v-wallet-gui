@@ -42,7 +42,7 @@
       </b-collapse>
     </b-navbar>
     <Account :address="address"
-             :cold-address="coldAddress"
+             :cold-addresses="coldAddresses"
              :pub-key="pubKey"
              :get-pri-key="getPriKey"
              :get-seed-phrase="getSeedPhrase"></Account>
@@ -79,10 +79,10 @@ export default {
             require: true,
             default: ''
         },
-        coldAddress: {
-            type: String,
+        coldAddresses: {
+            type: Object,
             require: true,
-            default: ''
+            default: function() {}
         },
         pubKey: {
             type: String,
