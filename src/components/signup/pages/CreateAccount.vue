@@ -359,9 +359,6 @@ export default {
 .error-messages {
     margin-top: 20px;
 }
-.footer-link {
-    float: right;
-}
 .input-height {
     height: 54px;
 }
