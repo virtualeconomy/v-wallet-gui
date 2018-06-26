@@ -3,7 +3,8 @@
     <H1>
       {{ title }}
     </H1>
-    <span v-html="description"></span>
+    <span class="des"
+          v-html="description"></span>
     <br>
     <b-button
       @click="$emit('goback')"
@@ -43,5 +44,8 @@ export default {
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
+}
+.des {
+    color: #9091A3;
 }
 </style>

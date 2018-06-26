@@ -557,11 +557,6 @@ export default {
 .submit-button {
     margin-top: 30px;
 }
-.btn-warning {
-    color: #fff;
-    background-color: @veeColor !important;
-    border-color: @veeColor !important;
-}
 .btn-link {
     color: @veeColor !important;
 }
