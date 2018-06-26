@@ -41,9 +41,8 @@
             <div class="trans-pane">
               <trans-pane></trans-pane>
             </div>
-            <h3>Transaction Records</h3>
             <div>
-              <Record></Record>
+              <Records :address="address"></Records>
             </div>
           </div>
         </div>
@@ -60,12 +59,12 @@ import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
 import { INITIAL_SESSION_TIMEOUT, TESTNET_NODE } from '@/constants.js'
 import seedLib from '@/libs/seed.js'
-import Record from './home/elements/Record'
+import Records from './home/elements/Records'
 
 export default {
     name: 'Home',
     components: {
-        Record,
+        Records,
         ImportColdWallet,
         TransPane,
         NavBar,
@@ -92,9 +91,10 @@ export default {
     },
     computed: {
         address() {
-            if (Vue.ls.get('address')) {
-                return Vue.ls.get('address')
-            }
+            // if (Vue.ls.get('address')) {
+            //     return Vue.ls.get('address')
+            // }
+            return '3P6N2EnapoRxazL7otmV3srTuJVcMW2MQWG'
         },
         pubKey() {
             if (this.secretInfo) {

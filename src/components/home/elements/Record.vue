@@ -32,12 +32,20 @@
       <b-col class="record-amount"
              cols="2">
         <div>
-          <span>{{ transactionAmount }}VEE</span>
+          <span>{{ transactionAmount }} VEE</span>
         </div>
       </b-col>
       <b-col class="record-action"
              cols="1">
-        ...
+        <b-dropdown no-caret
+                    class="more-btn"
+                    right>
+          <template slot="actions">
+            <img src="../../../assets/imgs/icons/ic_more.svg"><span class="sr-only"></span>
+          </template>
+          <b-dropdown-item>TX info</b-dropdown-item>
+          <b-dropdown-item>Copy TX ID</b-dropdown-item>
+        </b-dropdown>
       </b-col>
     </b-row>
   </b-container>
@@ -46,11 +54,18 @@
 <script>
 export default {
     name: 'Record',
-    data() {
-        return {
-            transactionAddress: '3N71HkihDfFQubGiQYax9JwfpZ57AcgqKY4',
-            transactionTime: '12:37, JUN 16',
-            transactionAmount: '-100.26'
+    props: {
+        transactionAddress: {
+            type: String,
+            default: ''
+        },
+        transactionTime: {
+            type: String,
+            default: ''
+        },
+        transactionAmount: {
+            type: String,
+            default: '0'
         }
     }
 }
@@ -86,6 +101,14 @@ export default {
     }
     .record-amount {
         padding-top: 4px;
+    }
+    .record-action {
+        .more-btn {
+            button {
+                background: none;
+                border: none;
+            }
+        }
     }
 }
 
