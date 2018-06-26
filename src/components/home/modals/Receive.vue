@@ -1,6 +1,7 @@
 <template>
   <b-modal id="receiveModal"
            centered
+           lazy
            title="Receive">
     <b-container fluid>
       <b-form-group label="Asset"
