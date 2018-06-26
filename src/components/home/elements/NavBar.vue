@@ -1,25 +1,39 @@
 <template>
   <div>
-    <b-navbar fixed="top"
-              type="light"
-              variant="faded"
-              toggleable>
-      <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
-      <b-navbar-brand class="brand-logo">
-        <img src="../../../assets/imgs/logo-small.png">
+    <b-navbar
+      class="nav-item"
+      variant="faded"
+      toggleable>
+      <b-navbar-toggle target="nav_collapse" ></b-navbar-toggle>
+      <b-navbar-brand>
+        <img
+          class="brand-logo"
+          src="../../../assets/imgs/logo-small.png">
       </b-navbar-brand>
       <b-collapse is-nav
-                  visible
                   id="nav_collapse">
-        <b-navbar-nav>
-          <b-nav-item-dropdown text="User"
-                               class="user-account">
+        <b-navbar-nav class="ml-auto">
+          <b-nav-item-dropdown
+            right
+            no-caret>
+            <template slot="button-content">
+              <div class="row">
+                <span class="col align-self-center">{{ username }}</span>
+                <canvas
+                  class="avatar col"
+                  width="50"
+                  height="50"
+                  :data-jdenticon-hash="avtHash"
+                ></canvas>
+              </div>
+            </template>
             <b-dropdown-item v-b-modal.accountModal>
               Account
             </b-dropdown-item>
             <b-dropdown-item v-b-modal.settingsModal>
               Settings
             </b-dropdown-item>
+            <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item @click="logout">
               Logout
             </b-dropdown-item>
@@ -50,7 +64,17 @@ export default {
         Account
     },
     props: {
+        username: {
+            type: String,
+            require: true,
+            default: ''
+        },
         address: {
+            type: String,
+            require: true,
+            default: ''
+        },
+        avtHash: {
             type: String,
             require: true,
             default: ''
@@ -80,6 +104,9 @@ export default {
             }
         }
     },
+    mounted() {
+        window.jdenticon()
+    },
     computed: {
     },
     methods: {
@@ -93,9 +120,21 @@ export default {
 </script>
 
 <style scoped>
+.dropdown-toggle::after {
+}
+.avatar {
+    border-width: 2px;
+    border-style: solid;
+    border-color: rgb(180, 180, 180);
+    border-radius: 5px;
+    padding: 0px;
+    height: 35px;
+    width: 35px;
+}
 .brand-logo {
-    float: left;
-    margin-left: 20px;
-    margin-top: 4px;
+    height: 30px;
+}
+.nav-item {
+    background-color: rgb(240, 240, 240);
 }
 </style>

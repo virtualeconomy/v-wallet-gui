@@ -3,8 +3,10 @@
            centered
            lazy
            @cancel="importCancel"
-           @close="importClose"
+           @hide="importClose"
            @ok="importOk"
+           :ok-disabled="!coldAddress || !isValidAddress"
+           :cancel-disabled="qrInit"
            title="Import Cold Wallet">
     <b-container fluid>
       <b-form-group label="Cold Wallet Adress"
@@ -37,6 +39,7 @@ export default {
     name: 'ImportColdWallet',
     data: function() {
         return {
+            qrInit: false,
             paused: false,
             coldAddress: ''
         }
@@ -57,15 +60,22 @@ export default {
     },
     methods: {
         importClose: function(evt) {
+            if (this.qrInit) {
+                evt.preventDefault()
+            }
             console.log('close')
         },
-        importOk: function() {
-            console.log('ok')
-            this.$emit('import-cold', this.coldAddress, this.coldPubKey)
+        importOk: function(evt) {
+            if (this.qrInit || !this.coldAddress || !this.isValidAddress) {
+                evt.preventDefault()
+            } else {
+                this.$emit('import-cold', this.coldAddress, this.coldPubKey)
+            }
         },
-        importCancel: function() {
-            console.log('cancel')
-            this.importClose()
+        importCancel: function(evt) {
+            if (this.qrInit) {
+                evt.preventDefault()
+            }
         },
         saveCold: function() {
             const savedInfo = {
@@ -76,6 +86,8 @@ export default {
         },
         async onInit(promise) {
             try {
+                console.log(promise)
+                this.qrInit = true
                 await promise
             } catch (error) {
                 if (error.name === 'NotAllowedError') {
@@ -92,6 +104,7 @@ export default {
                     throw Error('browser is probably lacking features(WebRTC, Canvas)')
                 }
             } finally {
+                this.qrInit = false
                 console.log('onInit')
             }
         },

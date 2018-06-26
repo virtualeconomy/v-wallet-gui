@@ -1,6 +1,7 @@
 <template>
   <b-modal id="sendModal"
            centered
+           lazy
            title="Send">
     <b-container>
     </b-container>

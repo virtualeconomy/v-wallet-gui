@@ -1,11 +1,17 @@
 <template>
-  <div>
-    <b-button variant="primary"
-              v-b-modal.sendModal>SEND</b-button>
-    <b-button variant="primary"
-              v-b-modal.receiveModal>RECEIVE</b-button>
-    <Send></Send>
-    <Receive></Receive>
+  <div class="row justify-content-center height-full">
+    <div class="col-3 align-self-center">
+      <b-button variant="primary"
+                size="lg"
+                v-b-modal.sendModal>SEND</b-button>
+    </div>
+    <div class="col-3 align-self-center">
+      <b-button variant="primary"
+                size="lg"
+                v-b-modal.receiveModal>RECEIVE</b-button>
+    </div>
+    <Send show="false"></Send>
+    <Receive show="false"></Receive>
   </div>
 </template>
 
@@ -25,17 +31,7 @@ export default {
 </script>
 
 <style scoped lang="less">
-@import '../../../assets/style/common';
-@import '../../../assets/style/variables';
-div {
-    border: 1px solid @bdBgColor;
-    height: 132px;
-    width: 100%;
-    button {
-        width: @btnWBig;
-        height: @btnHBig;
-        margin: 36px 20px;
-    }
+.height-full {
+    height: 100%;
 }
-
 </style>
