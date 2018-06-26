@@ -1,26 +1,26 @@
 <template>
-  <div class="container layout-main">
+  <div class="layout-main">
     <div class="container logo">
       <img
         class="brand-logo"
-        src="../assets/imgs/logo-small.png">
+        src="../assets/imgs/icons/01_Sign_up/vee_logo.svg">
     </div>
     <div class="form-login">
       <H1>
-        Login
+        Sign in
       </H1>
-      <div class="div-link">
+      <div class="row">
         <b-button
-          class="btn-link"
+          class="col-12 text-right blink"
           :size="'sm'"
           @click="changePage('/signup')"
           variant="link">
           Create account
         </b-button>
       </div>
-      <div class="div-link">
+      <div class="row">
         <b-button
-          class="btn-link"
+          class="col-12  text-right blink"
           :size="'sm'"
           @click="changePage('/restore')"
           variant="link">
@@ -96,6 +96,7 @@
       </div>
       <div class="input-pwd">
         <b-form-input
+          class="h-input"
           @input="hideErrMsg"
           @keyup.enter.native="login"
           v-model="password"
@@ -113,7 +114,8 @@
       </div>
       <div class="submit-button">
         <b-button
-          :variant="'primary'"
+          class="h-input btn-color"
+          :variant="'warning'"
           :size="'lg'"
           :block=true
           @click="login"
@@ -313,35 +315,32 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
+@import '../assets/style/variables';
+@import '../assets/style/common';
 .layout-main {
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
+    height: 100%;
     min-width: 300px;
+    background-color: rgb(249, 249, 249);
 }
 .logo {
-    padding-top: 130px;
+    padding-top: 74px;
     width: 100%;
     vertical-align: middle;
 }
 .hr-login {
-    margin-top: 20px;
-}
-.div-link {
-    width: 100%;
-    margin-top: 10px;
-    display: inline-block;
-    height: 10px;
-}
-.btn-link {
-    float: right;
+    margin-top: 30px;
 }
 .form-login {
     margin-top: 35px;
-    max-width: 400px;
+    max-width: 560px;
     margin-left: auto;
     margin-right: auto;
+    padding: 40px 50px;
+    border:1px solid #EDEEF2;
+    border-radius: 4px;
+    background-color: white;
 }
 .addr {
     font-size: 80%;
@@ -552,7 +551,26 @@ export default {
     margin-top: 10px;
     height: 10px;
 }
+.h-input {
+    height: 58px;
+}
 .submit-button {
     margin-top: 30px;
+}
+.btn-warning {
+    color: #fff;
+    background-color: @veeColor !important;
+    border-color: @veeColor !important;
+}
+.btn-link {
+    color: @veeColor !important;
+}
+a {
+    color: @veeColor !important;
+}
+.blink {
+    line-height: 18px;
+    padding-top: 0px;
+    padding-bottom: 0px;
 }
 </style>
