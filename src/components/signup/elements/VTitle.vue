@@ -5,8 +5,8 @@
     </H1>
     <span class="des"
           v-html="description"></span>
-    <br>
     <b-button
+      class="btn-goback"
       @click="$emit('goback')"
       v-if="gobackAct"
       variant="link">
@@ -46,5 +46,8 @@ export default {
 }
 .des {
     color: #9091A3;
+}
+.btn-goback {
+    padding-left: 0px;
 }
 </style>
