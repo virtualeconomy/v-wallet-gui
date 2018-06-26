@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_received</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="00A_Export" transform="translate(-266.000000, -80.000000)">
+            <g id="ic_received" transform="translate(266.000000, 80.000000)">
+                <circle id="Oval-2" stroke="#76D0C1" fill="#76D0C1" cx="16" cy="16" r="15.5"></circle>
+                <g id="Shape" transform="translate(10.000000, 9.000000)" fill="#FFFFFF">
+                    <path d="M11.85425,8.354 L6.35425,13.854 C6.15825,14.049 5.84225,14.049 5.64625,13.854 L0.14625,8.354 C-0.04875,8.159 -0.04875,7.842 0.14625,7.646 C0.34225,7.452 0.65825,7.452 0.85425,7.646 L5.50025,12.292 L5.50025,0.5 C5.50025,0.224 5.72425,0 6.00025,0 C6.27525,0 6.50025,0.224 6.50025,0.5 L6.50025,12.293 L11.14625,7.646 C11.24425,7.549 11.37225,7.5 11.50025,7.5 C11.62725,7.5 11.75625,7.549 11.85425,7.646 C12.04925,7.842 12.04925,8.159 11.85425,8.354" id="Fill-1"></path>
+                </g>
+                <rect id="Overlay" fill="#FFFFFF" opacity="0" x="0" y="0" width="32" height="32"></rect>
+            </g>
+        </g>
+    </g>
+</svg>
