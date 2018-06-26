@@ -30,6 +30,7 @@
 <script>
 import Receive from '../modals/Receive'
 import Send from '../modals/Send'
+import Confirm from '../modals/Confirm'
 export default {
     name: 'TransPane',
     props: {
@@ -39,7 +40,13 @@ export default {
             require: true
         }
     },
+    data: function() {
+        return {
+            pageId: 'send'
+        }
+    },
     components: {
+        Confirm,
         Receive,
         Send
     }

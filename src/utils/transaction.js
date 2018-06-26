@@ -12,6 +12,7 @@ var crypto_1 = require("./crypto");
 var concat_1 = require("./concat");
 var base58_1 = require("../libs/base58");
 var remap_1 = require("./remap");
+var constants = require("../constants");
 
 // Fields of the original data object
 var storedFields = { senderPublicKey: new ByteProcessor_1.Base58('senderPublicKey'),
@@ -40,9 +41,10 @@ function makeByteProviders() {
     return byteProviders;
 }
 
+var userData;
 // Save all needed values from user data
 function getData(transferData) {
-    return Object.keys(storedFields).reduce(function (store, key) {
+    userData = Object.keys(storedFields).reduce(function (store, key) {
         store[key] = transferData[key];
         return store;
     }, {});
@@ -52,10 +54,10 @@ function getBytes(transferData) {
     var byteProviders = makeByteProviders();
     if (transferData === void 0) { transferData = {}; }
     // Save all needed values from user data
-    var rawData = getData(transferData);
+    getData(transferData);
     var _dataHolders = byteProviders.map(function (provider) {
         if (typeof provider === 'function') {
-            return provider(rawData);
+            return provider(userData);
         }
         else {
             return provider;
@@ -65,11 +67,10 @@ function getBytes(transferData) {
 }
 
 function getExactBytes(fieldName) {
-    var rawData = getData();
     if (!(fieldName in storedFields)) {
          throw new Error("There is no field '" + fieldName + "' in transfer transaction");
     }
-    return storedFields[fieldName].process(rawData[fieldName]);
+    return storedFields[fieldName].process(userData[fieldName]);
 }
 
 function getSignature(transferData, keyPair) {
@@ -81,8 +82,7 @@ function transformAttachment() {
 }
 
 function transformRecipient() {
-    var rawData = getData();
-    return remap_1.addRecipientPrefix(rawData['recipient']);
+    return remap_1.addRecipientPrefix(userData['recipient']);
 }
 
 function castToAPISchema(data) {
@@ -92,7 +92,7 @@ function castToAPISchema(data) {
 export default {
     prepareForAPI: function(transferData, keyPair) {
         var signature = getSignature(transferData, keyPair);
-        return  __assign({}, {transactionType: constant.TRANSFER_TX_NAME}, castToAPISchema(rawData), {signature: signature});
+        return  __assign({}, {transactionType: constants.TRANSFER_TX_NAME}, castToAPISchema(userData), {signature: signature});
     }
 };
 
