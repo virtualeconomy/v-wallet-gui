@@ -7,7 +7,7 @@
       </v-title>
     </div>
     <div class="login-forms">
-      <form class="text-left container">
+      <form class="text-left">
         <div>
           <label>Avatar</label>
           <div class="avatar-group">
