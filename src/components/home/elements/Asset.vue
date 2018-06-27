@@ -1,14 +1,14 @@
 <template>
   <div
-    class="card asset shadow-sm">
-    <div class="card-body text-left">
-      <div class="card-text mb-3">
-        <p class="mb-0">{{ addrShow }}</p>
-        <p class="text-muted mb-0 asset-title">Wallet Address</p>
+    :class="classes">
+    <div class="card-body card-asset text-left">
+      <div class="card-text mb-2">
+        <p class="mb-0 show-number addr"><b>{{ addrShow }}</b></p>
+        <p class="mb-0 asset-title">Wallet Address</p>
       </div>
       <div class="card-text">
-        <p class="mb-0">{{ balance }} VEE</p>
-        <p class="text-muted mb-0 asset-title">Balance</p>
+        <p class="mb-0 show-number balance"><b>{{ balance }} VEE</b></p>
+        <p class="mb-0 asset-title">Balance</p>
       </div>
     </div>
   </div>
@@ -30,6 +30,11 @@ export default {
             type: Number,
             default: 0,
             required: true
+        },
+        selected: {
+            type: Boolean,
+            default: false,
+            required: true
         }
     },
     computed: {
@@ -37,6 +42,12 @@ export default {
             const addrChars = this.address.split('')
             addrChars.splice(6, 23, '******')
             return addrChars.join('')
+        },
+        classes() {
+            if (!this.selected) {
+                return ['card', 'asset', 'shadow-sm']
+            }
+            return ['card', 'asset', 'shadow', 'selected-asset']
         }
     }
 }
@@ -47,12 +58,38 @@ export default {
 @import '../../../assets/style/variables';
 
 .asset {
-    margin-bottom: 10px;
+    margin-bottom: 15px;
 }
 .no-left-padding {
     padding-left: 0px;
 }
+.selected-asset {
+    background-color: @veeColor;
+    color: white;
+}
 .asset-title {
-    font-size: 80%;
+    font-size: 13px;
+    color: #9091A3;
+}
+.selected-asset .asset-title {
+    color: #FFCEAD;
+}
+.card-asset {
+    padding: 16px 20px;
+}
+.show-number {
+    font-size: 15px;
+}
+.addr {
+    color: #181B3A;
+}
+.selected-asset .addr {
+    color: white;
+}
+.balance {
+    color: #696B8A;
+}
+.selected-asset .balance {
+    color: white;
 }
 </style>

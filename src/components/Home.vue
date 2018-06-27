@@ -1,7 +1,8 @@
 <template>
   <div class="home">
     <nav-bar :address="address"
-             :cold-address="coldAddress"
+             class="navibar"
+             :cold-addresses="coldAddresses"
              :pub-key="pubKey"
              :username="username"
              :avt-hash="avtHash"
@@ -11,35 +12,45 @@
       <div class="row height-full">
         <div class="col-auto assets-pane height-full">
           <div class="asset-title">
-            <b>Assets</b>
+            <img
+              src="../assets/imgs/icons/11_Wallet/ic_assets_line.svg"><b class="title-assets">Assets</b>
           </div>
           <Asset v-if="address"
                  :address="address"
-                 :balance="balance[address]">
+                 :balance="balance[address]"
+                 :selected="address === selectedAddress"
+                 class="pointer unselectable"
+                 @click.native="selectWallet(address)">
           </Asset>
           <div class="asset-title">
-            <b>Cold Wallet</b>
+            <img
+              src="../assets/imgs/icons/11_Wallet/ic_wallet_line.svg"><b class="title-assets">Cold Wallet</b>
           </div>
-          <div>
-            <Asset v-if="coldAddress"
-                   :address="coldAddress"
-                   :balance="balance[coldAddress]">
-            </Asset>
-          </div>
+          <Asset v-if="coldAddresses"
+                 v-for="(coldPubkey, coldAddress) in coldAddresses"
+                 :address="coldAddress"
+                 :key="coldAddress"
+                 :balance="balance[coldAddress]"
+                 :selected="coldAddress === selectedAddress"
+                 class="pointer unselectable"
+                 @click.native="selectWallet(coldAddress)">
+          </Asset>
           <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
                  size="sm"
                  variant="link"
-                 class="btn-import-cold"><b>Import Cold Wallet</b></b-btn>
+                 class="btn-import-cold">
+            <img
+              class="mb-1"
+              src="../assets/imgs/icons/11_Wallet/ic_import.svg"><b class="title-assets">Import Cold Wallet</b></b-btn>
           <ImportColdWallet @import-cold="importCold"
                             show="false"></ImportColdWallet>
         </div>
         <div class="col page container">
           <div
-            class=""
             bg-variant="white"
             border-variant="primary">
             <div class="trans-pane">
-              <trans-pane></trans-pane>
+              <trans-pane :balance="balance[selectedAddress]"></trans-pane>
             </div>
             <div>
               <Records :address="address"></Records>
@@ -63,20 +74,26 @@ import Records from './home/elements/Records'
 
 export default {
     name: 'Home',
-    components: {
-        Records,
-        ImportColdWallet,
-        TransPane,
-        NavBar,
-        Asset
+    data: function() {
+        return {
+            balance: {},
+            selectedAddress: ''
+        }
     },
+
     created() {
         if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
         } else {
             this.getBalance(this.address)
+            this.setUsrLocalStorage('lastLogin', new Date().getTime())
+            this.selectedAddress = this.address
+            for (const addr in this.coldAddresses) {
+                this.getBalance(addr)
+            }
         }
     },
+
     mounted() {
         let oldTimeout = INITIAL_SESSION_TIMEOUT
         try {
@@ -85,10 +102,11 @@ export default {
             oldTimeout = INITIAL_SESSION_TIMEOUT
         }
         setTimeout(() => {
-            console.log('clear')
+            console.log('clear sesson')
             Vue.ls.clear()
         }, oldTimeout)
     },
+
     computed: {
         address() {
             // if (Vue.ls.get('address')) {
@@ -114,6 +132,12 @@ export default {
                 return this.userInfo.avtHash
             }
         },
+        coldAddresses() {
+            if (this.userInfo && this.userInfo.coldAddresses) {
+                return JSON.parse(this.userInfo.coldAddresses)
+            }
+            return {}
+        },
         secretInfo() {
             if (this.userInfo) {
                 return JSON.parse(
@@ -124,20 +148,28 @@ export default {
             return this.seedPhrase.split(' ')
         }
     },
+
     methods: {
 
         getBalance: function(address) {
             const url = TESTNET_NODE + '/addresses/balance/' + address
             this.$http.get(url).then(response => {
+                // for testing
+                // if (this.coldAddresses[address] !== void 0) {
+                //     Vue.set(this.balance, address, response.body['balance'] + 10)
+                // } else {
+                //     Vue.set(this.balance, address, response.body['balance'] + 50)
+                // }
                 Vue.set(this.balance, address, response.body['balance'])
             }, response => {
                 Vue.set(this.balance, address, 0)
             })
         },
-        importCold(coldAddress) {
-            console.log('cold address' + coldAddress)
-            this.coldAddress = coldAddress
+        importCold(coldAddress, pubKey) {
+            Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : pubKey)
             this.getBalance(coldAddress)
+            console.log(this.coldAddresses)
+            this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
         },
         getSeedPhrase() {
             if (this.secretInfo) {
@@ -148,52 +180,27 @@ export default {
             if (this.secretInfo) {
                 return seedLib.fromExistingPhrase(this.getSeedPhrase()).keyPair.privateKey
             }
+        },
+        setUsrLocalStorage(feildname, value) {
+            Vue.set(this.userInfo, feildname, value)
+            window.localStorage.setItem(this.address, JSON.stringify(this.userInfo))
+        },
+        selectWallet(addr) {
+            if (this.selectedAddress !== addr) {
+                this.selectedAddress = addr
+                this.getBalance(addr)
+            }
         }
     },
-    data: function() {
-        return {
-            balance: {},
-            coldAddress: '',
-            items: items,
-            fields: [
-                {
-                    key: 'type',
-                    label: 'Transaction Type'
-                },
-                {
-                    key: 'title',
-                    label: 'Transaction Title'
-                },
-                {
-                    key: 'amount',
-                    label: 'Transaction Amount'
-                },
-                {
-                    key: 'action',
-                    label: 'action'
-                }
-            ],
-            currentPage: 1,
-            perPage: 5,
-            totalRows: items.length,
-            pageOptions: [ 5, 10, 15 ]
-        }
+
+    components: {
+        ImportColdWallet,
+        TransPane,
+        NavBar,
+        Asset,
+        Records
     }
 }
-const items = [
-    {
-        type: 'receive',
-        title: 'receive',
-        detail: 'from address xxxxxxx',
-        amount: '-0.11vee'
-    },
-    {
-        type: 'send',
-        title: 'send',
-        detail: 'to address yyyyyyy',
-        amount: '+0.11vee'
-    }
-]
 </script>
 <style scoped lang="less">
 @import '../assets/style/variables';
@@ -205,14 +212,14 @@ const items = [
 .trans-pane {
     height:@trxDivH;
     width: 100%;
-    border-bottom: solid 1px;
-    margin-bottom: 10px;
 }
 .assets-pane {
     border-right: 1px solid rgb(238, 238, 238);
     text-align: left;
     width: @assetsPaneW;
     height: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
     background-color: rgb(245, 245, 245);
 }
 .records-pane {
@@ -237,5 +244,23 @@ const items = [
     margin-left: auto;
     margin-right: auto;
     color: @veeColor;
+}
+.pointer {
+    cursor: pointer;
+}
+.unselectable {
+    -moz-user-select: -moz-none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+.navibar {
+    height: 64px;
+}
+.title-assets {
+    margin-left: 10px;
+    font-size: 15px;
+    font: Roboto-Regular;
 }
 </style>

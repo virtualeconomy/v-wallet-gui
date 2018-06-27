@@ -15,7 +15,7 @@
         <b-form-input id="coldAddress"
                       readonly
                       size="sm"
-                      v-model="coldAddress">
+                      v-model="coldAddresses">
         </b-form-input>
       </b-form-group>
       <b-form-group label="Public Key"
@@ -57,10 +57,10 @@ export default {
             require: true,
             default: ''
         },
-        coldAddress: {
-            type: String,
+        coldAddresses: {
+            type: Object,
             require: true,
-            default: ''
+            default: function() {}
         },
         pubKey: {
             type: String,

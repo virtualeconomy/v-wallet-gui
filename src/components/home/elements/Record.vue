@@ -4,17 +4,22 @@
     <b-row align-v="center">
       <b-col class="record-icon"
              cols="1">
-        <img src="../../../assets/imgs/logo-small.png"
+        <img v-if="txIcon==='sent'"
+             src="../../../assets/imgs/icons/ic_sent.svg"
+             width="20px"
+             height="20px">
+        <img v-else
+             src="../../../assets/imgs/icons/ic_received.svg"
              width="20px"
              height="20px">
       </b-col>
       <b-col class="record-detail"
              cols="3">
         <b-row>
-          <b-col class="title">Sent VEE</b-col>
+          <b-col class="title">{{ txType }} VEE</b-col>
         </b-row>
         <b-row>
-          <b-col class="detail">To: {{ transactionAddress }}</b-col>
+          <b-col class="detail">To: {{ txAddress }}</b-col>
         </b-row>
       </b-col>
       <b-col class="record-time"
@@ -23,7 +28,7 @@
           <b-col>&nbsp;&nbsp;&nbsp;&nbsp;</b-col>
         </b-row>
         <b-row>
-          <b-col class="record-time">| {{ transactionTime }}</b-col>
+          <b-col class="record-time">| {{ txTime }}</b-col>
         </b-row>
       </b-col>
       <b-col class="record-blank"
@@ -32,40 +37,69 @@
       <b-col class="record-amount"
              cols="2">
         <div>
-          <span>{{ transactionAmount }} VEE</span>
+          <span>{{ txAmount }} VEE</span>
         </div>
       </b-col>
       <b-col class="record-action"
              cols="1">
         <b-dropdown no-caret
                     class="more-btn"
+                    variant="link"
                     right>
-          <template slot="actions">
-            <img src="../../../assets/imgs/icons/ic_more.svg"><span class="sr-only"></span>
+          <template slot="button-content">
+            <img src="../../../assets/imgs/icons/ic_more.svg">
           </template>
-          <b-dropdown-item>TX info</b-dropdown-item>
-          <b-dropdown-item>Copy TX ID</b-dropdown-item>
+          <b-dropdown-item @click="$root.$emit('bv::show::modal', 'txInfoModal_' + txRecord.id, 'txInfoModal_' + txRecord.id)">TX info</b-dropdown-item>
+          <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
         </b-dropdown>
       </b-col>
     </b-row>
+    <TxInfoModal :modal-id="txRecord.id"></TxInfoModal>
   </b-container>
 </template>
 
 <script>
+import TxInfoModal from './TxInfoModal'
+
 export default {
     name: 'Record',
+    components: {TxInfoModal},
     props: {
-        transactionAddress: {
+        txRecord: {
+            type: Object,
+            default: function() {
+                return {
+                    txType: '',
+                    txAddress: '',
+                    txTime: '',
+                    txAmount: ''
+                }
+            }
+        },
+        address: {
             type: String,
             default: ''
+        }
+    },
+    computed: {
+        txType() {
+            return this.txRecord.sender === this.address ? 'Sent' : 'Received'
         },
-        transactionTime: {
-            type: String,
-            default: ''
+        txIcon() {
+            return this.txType.toString().toLowerCase()
         },
-        transactionAmount: {
-            type: String,
-            default: '0'
+        txAddress() {
+            return this.txType === 'Sent' ? this.txRecord.recipient : this.txRecord.sender
+        },
+        txTime() {
+            return new Date(this.txRecord.timestamp).toDateString()
+        },
+        txAmount() {
+            return this.txRecord.amount
+        }
+    },
+    methods: {
+        copyTxId: function() {
         }
     }
 }

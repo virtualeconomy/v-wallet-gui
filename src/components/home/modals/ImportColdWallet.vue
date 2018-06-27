@@ -5,6 +5,7 @@
            @cancel="importCancel"
            @hide="importClose"
            @ok="importOk"
+           @show="showingUp"
            :ok-disabled="!coldAddress || !isValidAddress"
            :cancel-disabled="qrInit"
            title="Import Cold Wallet">
@@ -59,6 +60,9 @@ export default {
         }
     },
     methods: {
+        showingUp() {
+            this.coldAddress = ''
+        },
         importClose: function(evt) {
             if (this.qrInit) {
                 evt.preventDefault()

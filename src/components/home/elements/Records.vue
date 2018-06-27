@@ -1,11 +1,14 @@
 <template>
   <div>
     <h3>Transaction Records</h3>
-    <div v-for="record in transactionRecords"
-         :key="record.transactionAddress">
-      <Record :transaction-address="record.transactionAddress"
-              transaction-time="record.transactionTime"
-              :transaction-amount="record.transactionAmount"></Record>
+    <div v-if="txRecords.length > 0"
+         v-for="record in txRecords"
+         :key="record.id">
+      <Record :tx-record="record"
+              :address="address"></Record>
+    </div>
+    <div v-else>
+      <p>There are no transaction records.</p>
     </div>
   </div>
 </template>
@@ -22,7 +25,12 @@ export default {
     },
     created() {
         if (this.address && Vue.ls.get('pwd')) {
-            this.getTransactionRecord()
+            this.getTxRecords()
+        }
+    },
+    data() {
+        return {
+            txRecords: []
         }
     },
     props: {
@@ -32,48 +40,17 @@ export default {
             require: true
         }
     },
-    data() {
-        return {
-            transactionRecords: [
-                {
-                    transactionAddress: '3N71HkihDfFQubGiQYax9JwfpZ57AcgqKY4',
-                    transactionTime: '12:23, JUN 16',
-                    transactionAmount: '-100'
-                },
-                {
-                    transactionAddress: '3N71HkihDfFQubGiQYax9JwfpZ57AcgqKY4',
-                    transactionTime: '12:23, JUN 16',
-                    transactionAmount: '-100'
-                },
-                {
-                    transactionAddress: '3N71HkihDfFQubGiQYax9JwfpZ57AcgqKY4',
-                    transactionTime: '12:23, JUN 16',
-                    transactionAmount: '-100'
-                }
-            ]
-        }
-    },
     methods: {
-        getTransactionRecord() {
+        getTxRecords() {
             const recordLimit = 2
             const url = TESTNET_NODE + '/transactions/address/' + this.address + '/limit/' + recordLimit
-
-            console.log(url)
-            this.transactionRecords = [
-                {
-                    transactionAddress: '3N71HkihDfFQubGiQYax9JwfpZ57AcgqKY4',
-                    transactionTime: '12:23, JUN 16',
-                    transactionAmount: '-100'
-                }
-            ]
-
-            console.log(this.transactionRecords)
             this.$http.get(url).then(response => {
-                console.log(response)
+                this.txRecords = response.body[0]
+                console.log(this.txRecords)
             }, response => {
                 console.log(response)
             })
-            return this.transactionRecords
+            return this.txRecords
         }
     }
 }

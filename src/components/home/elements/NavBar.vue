@@ -8,7 +8,7 @@
       <b-navbar-brand>
         <img
           class="brand-logo"
-          src="../../../assets/imgs/logo-small.png">
+          src="../../../assets/imgs/icons/11_Wallet/vee_logo_small.svg">
       </b-navbar-brand>
       <b-collapse is-nav
                   id="nav_collapse">
@@ -42,7 +42,7 @@
       </b-collapse>
     </b-navbar>
     <Account :address="address"
-             :cold-address="coldAddress"
+             :cold-addresses="coldAddresses"
              :pub-key="pubKey"
              :get-pri-key="getPriKey"
              :get-seed-phrase="getSeedPhrase"></Account>
@@ -79,10 +79,10 @@ export default {
             require: true,
             default: ''
         },
-        coldAddress: {
-            type: String,
+        coldAddresses: {
+            type: Object,
             require: true,
-            default: ''
+            default: function() {}
         },
         pubKey: {
             type: String,
@@ -120,19 +120,17 @@ export default {
 </script>
 
 <style scoped>
-.dropdown-toggle::after {
-}
 .avatar {
     border-width: 2px;
     border-style: solid;
     border-color: rgb(180, 180, 180);
     border-radius: 5px;
     padding: 0px;
-    height: 35px;
-    width: 35px;
+    height: 32px;
+    width: 32px;
 }
 .brand-logo {
-    height: 30px;
+    height: 24px;
 }
 .nav-item {
     background-color: rgb(240, 240, 240);
