@@ -1,10 +1,8 @@
 "use strict";
 // Derived from waves-api
 //
-Object.defineProperty(exports, "__esModule", { value: true });
 var constants = require("../constants");
-var config_1 = require("../config");
-function normalizeAssetId(original) {
+export function normalizeAssetId(original) {
     if (!original || original === constants.WAVES) {
         return '';
     }
@@ -12,8 +10,7 @@ function normalizeAssetId(original) {
         return original;
     }
 }
-exports.normalizeAssetId = normalizeAssetId;
-function denormalizeAssetId(original) {
+export function denormalizeAssetId(original) {
     if (!original) {
         return constants.WAVES;
     }
@@ -21,8 +18,7 @@ function denormalizeAssetId(original) {
         return original;
     }
 }
-exports.denormalizeAssetId = denormalizeAssetId;
-function removeRecipientPrefix(original) {
+export function removeRecipientPrefix(original) {
     if (original.slice(0, 8) === 'address:') {
         return original.slice(8);
     }
@@ -30,8 +26,7 @@ function removeRecipientPrefix(original) {
         return original;
     }
 }
-exports.removeRecipientPrefix = removeRecipientPrefix;
-function removeAliasPrefix(original) {
+export function removeAliasPrefix(original) {
     if (original.slice(0, 6) === 'alias:') {
         return original.slice(8); // Mind the network byte characters
     }
@@ -39,28 +34,15 @@ function removeAliasPrefix(original) {
         return original;
     }
 }
-exports.removeAliasPrefix = removeAliasPrefix;
-function addRecipientPrefix(raw) {
-    if (raw.length > 30) {
+export function addRecipientPrefix(raw) {
         return "address:" + raw;
-    }
-    else {
-        var networkCharacter = String.fromCharCode(config_1.default.getNetworkByte());
-        return "alias:" + networkCharacter + ":" + raw;
-    }
 }
-exports.addRecipientPrefix = addRecipientPrefix;
 // Adjusts user time to UTC
 // Should be used for creating transactions and requests only
-function getTimestamp(timestamp) {
-    return (timestamp || Date.now()) + config_1.default.getTimeDiff();
-}
-exports.getTimestamp = getTimestamp;
-function precisionCheck(precision) {
+export function precisionCheck(precision) {
     return (precision >= 0 && precision <= 8);
 }
-exports.precisionCheck = precisionCheck;
-function createRemapper(rules) {
+export function createRemapper(rules) {
     return function (data) {
         return Object.keys(data).reduce(function (result, key) {
             var rule = rules[key];
@@ -80,5 +62,4 @@ function createRemapper(rules) {
         }, {});
     };
 }
-exports.createRemapper = createRemapper;
 //# sourceMappingURL=remap.js.map
