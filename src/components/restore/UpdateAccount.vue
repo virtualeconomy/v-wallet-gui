@@ -1,78 +1,79 @@
 <template>
-  <div class="home">
-    <div class="login-forms">
-      <form class="text-left container">
-        <div>
-          <label>Your avatar</label>
-          <div class="avatar-group">
-            <canvas
-              class="avatar"
-              width="85"
-              height="85"
-              :data-jdenticon-hash="avatarDataHex">
-              Fallback text for browsers not supporting canvas
-            </canvas>
-          </div>
+  <div class="login-forms">
+    <form class="text-left">
+      <div>
+        <label>Your avatar</label>
+        <div class="avatar-group">
+          <canvas
+            class="avatar"
+            width="85"
+            height="85"
+            :data-jdenticon-hash="avatarDataHex">
+            Fallback text for browsers not supporting canvas
+          </canvas>
         </div>
-        <ul class="form-group error-messages">
-          <li
-            v-for="error in validator.errors"
-            :key="error.name">
-            <small
-              class="form-text text-danger">
-              {{ error.msgs[0] }}
-            </small>
-          </li>
-        </ul>
-        <div class="form-group username-form">
-          <label>Update your username</label>
-          <input
-            type="text"
-            class="form-control shadow-sm"
-            :class="{'text-danger':isUsernameErrors,'is-invalid':isUsernameErrors}"
-            v-model="username"
-            :readonly="registering"
-            @blur="checkUsername(username)">
-        </div>
-        <div class="form-group password-form">
-          <label>Set a new password</label>
-          <input
-            type="password"
-            name="password"
-            class="form-control shadow-sm"
-            :class="{'text-danger':isPassErrors,'is-invalid':isPassErrors}"
-            v-model="password"
-            :readonly="registering"
-            @input="checkPassword(password)">
+      </div>
+      <ul class="form-group error-messages">
+        <li
+          v-for="error in validator.errors"
+          :key="error.name">
           <small
-            id="emailHelp"
-            class="form-text text-muted text-right">
-            At least 8 characters
+            class="form-text text-danger">
+            {{ error.msgs[0] }}
           </small>
-        </div>
-        <div class="form-group">
-          <label>Confirm the new password</label>
-          <input
-            type="password"
-            class="form-control shadow-sm"
-            :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
-            v-model="password2"
-            :readonly="registering"
-            @input="checkPasswordMatch(password, password2)"
-            @keyup.enter="registerEnter">
-        </div>
-        <div class="form-group submit-button">
-          <b-button
-            :disabled="isSubmitDisabled"
-            :variant="'primary'"
-            :size="''"
-            :block=true
-            @click="register">
-            Update your account
-          </b-button>
-        </div>
-      </form>
-    </div>
+        </li>
+      </ul>
+      <div class="form-group username-form">
+        <label>Update your username</label>
+        <input
+          type="text"
+          class="form-control input-height"
+          :class="{'text-danger':isUsernameErrors,'is-invalid':isUsernameErrors}"
+          v-model="username"
+          placeholder="Set new name"
+          :readonly="registering"
+          @blur="checkUsername(username)">
+      </div>
+      <div class="form-group password-form">
+        <label>Set a new password</label>
+        <input
+          type="password"
+          name="password"
+          class="form-control input-height"
+          :class="{'text-danger':isPassErrors,'is-invalid':isPassErrors}"
+          v-model="password"
+          placeholder="Set new password"
+          :readonly="registering"
+          @input="checkPassword(password)">
+        <small
+          id="emailHelp"
+          class="form-text text-muted text-right">
+          At least 8 characters
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Confirm password</label>
+        <input
+          type="password"
+          class="form-control input-height"
+          :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
+          v-model="password2"
+          :readonly="registering"
+          placeholder="Set new password"
+          @input="checkPasswordMatch(password, password2)"
+          @keyup.enter="registerEnter">
+      </div>
+      <div class="form-group submit-button">
+        <b-button
+          class="input-height"
+          :disabled="isSubmitDisabled"
+          :variant="'warning'"
+          :block=true
+          @click="register">
+          Update your account
+        </b-button>
+      </div>
+    </form>
   </div>
 </template>
 
@@ -264,32 +265,18 @@ export default {
 }
 </script>
 <style scoped>
-.home {
-    width: 100%;
-    height: 100%;
-    padding-top: 10px;
-    padding-bottom: 5px;
-    border: 2px solid;
-    border-color: rgb(200, 200, 200);
-    border-bottom-left-radius: 6px;
-    border-bottom-right-radius: 6px;
-    border-top: none;
-}
-.nav {
-    width: 100%;
-    height: 86px;
-}
 .login-forms {
+    margin-top: 30px;
     width: 430px;
     max-width: 100%;
-    margin-left: auto;
-    margin-right: auto;
+    margin-left: 0px;
+    margin-right: 0px;
 }
 .submit-button {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 40px;
+    margin-top: 30px;
 }
 .password-form {
     margin-top: 10px;
@@ -301,6 +288,8 @@ export default {
     border-radius: 10px;
     margin-bottom: auto;
     margin-top: auto;
+    width: 64px;
+    height: 64px;
 }
 .avatar-group {
     margin-bottom: 0px;
@@ -313,5 +302,8 @@ export default {
 }
 #emailHelp {
     height: 0px;
+}
+.input-height {
+    height: 54px;
 }
 </style>

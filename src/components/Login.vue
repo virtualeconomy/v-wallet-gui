@@ -1,32 +1,21 @@
 <template>
-  <div class="container layout-main">
+  <div class="layout-main">
     <div class="container logo">
       <img
         class="brand-logo"
-        src="../assets/imgs/logo-small.png">
+        src="../assets/imgs/icons/signup/vee_logo.svg">
     </div>
     <div class="form-login">
       <H1>
-        Login
+        Sign in
       </H1>
-      <div class="div-link">
-        <b-button
-          class="btn-link"
-          :size="'sm'"
-          @click="changePage('/signup')"
-          variant="link">
-          Create account
-        </b-button>
-      </div>
-      <div class="div-link">
-        <b-button
-          class="btn-link"
-          :size="'sm'"
-          @click="changePage('/restore')"
-          variant="link">
-          Restore account
-        </b-button>
-      </div>
+      <p>Sign in or <b-button
+        class="blink"
+        @click="changePage('/signup')"
+        variant="link">
+        create a new account
+      </b-button>
+      </p>
       <hr class="hr-login">
       <div
         class="dropdown v-select"
@@ -96,6 +85,7 @@
       </div>
       <div class="input-pwd">
         <b-form-input
+          class="h-input"
           @input="hideErrMsg"
           @keyup.enter.native="login"
           v-model="password"
@@ -113,13 +103,23 @@
       </div>
       <div class="submit-button">
         <b-button
-          :variant="'primary'"
+          class="h-input btn-color"
+          :variant="'warning'"
           :size="'lg'"
           :block=true
           @click="login"
         ><b>Login</b>
         </b-button>
       </div>
+      <p class="flink">
+        or <b-button
+          class="blink"
+          @click="changePage('/restore')"
+          variant="link">
+          restore account
+        </b-button>
+        from backup
+      </p>
     </div>
   </div>
 </template>
@@ -313,35 +313,32 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
+@import '../assets/style/variables';
+@import '../assets/style/common';
 .layout-main {
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-    min-width: 300px;
+    width: 100%;
+    height: 100%;
+    min-width: 200px;
+    background-color: rgb(249, 249, 249);
 }
 .logo {
-    padding-top: 130px;
+    padding-top: 74px;
     width: 100%;
     vertical-align: middle;
 }
 .hr-login {
-    margin-top: 20px;
-}
-.div-link {
-    width: 100%;
-    margin-top: 10px;
-    display: inline-block;
-    height: 10px;
-}
-.btn-link {
-    float: right;
+    margin-top: 30px;
 }
 .form-login {
     margin-top: 35px;
-    max-width: 400px;
+    max-width: 560px;
     margin-left: auto;
     margin-right: auto;
+    padding: 40px 50px;
+    border:1px solid #EDEEF2;
+    border-radius: 4px;
+    background-color: white;
 }
 .addr {
     font-size: 80%;
@@ -384,7 +381,7 @@ export default {
 }
 .v-select .open-indicator {
     position: absolute;
-    bottom: 6px;
+    bottom: 15px;
     right: 10px;
     display: inline-block;
     cursor: pointer;
@@ -415,7 +412,7 @@ export default {
     opacity: 0;
 }
 .v-select.open .open-indicator {
-    bottom: 1px;
+    bottom: 9px;
 }
 .v-select .dropdown-toggle {
     -webkit-appearance: none;
@@ -427,6 +424,7 @@ export default {
     border: 1px solid rgba(60, 60, 60, .26);
     border-radius: 4px;
     white-space: normal;
+    cursor: pointer;
 }
 .v-select .dropdown-toggle:after {
     visibility: hidden;
@@ -552,7 +550,24 @@ export default {
     margin-top: 10px;
     height: 10px;
 }
+.h-input {
+    height: 58px;
+}
 .submit-button {
     margin-top: 30px;
+}
+.btn-link {
+    color: @veeColor !important;
+}
+a {
+    color: @veeColor !important;
+}
+.blink {
+    padding-top: 3px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.flink {
+    margin-top: 20px;
 }
 </style>

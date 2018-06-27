@@ -1,8 +1,8 @@
 <template>
-  <div class="container logo">
+  <div class="logo">
     <img
       class="brand-logo"
-      src="../../../assets/imgs/logo-small.png">
+      src="../../../assets/imgs/icons/signup/vee_logo.svg">
   </div>
 </template>
 
@@ -16,12 +16,10 @@ export default {
 
 <style scoped>
 .brand-logo {
-    float: left;
-    margin-left: 70px;
-    margin-top: 12px;
+    margin-left: auto;
+    margin-right: auto;
 }
 .logo {
-   width: 100%;
-   height: 100px;
+    width: 100%;
 }
 </style>

@@ -9,22 +9,21 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-Object.defineProperty(exports, "__esModule", { value: true });
+//Object.defineProperty(exports, "__esModule", { value: true });
 var bignumber_1 = require("../libs/bignumber");
 var base58_1 = require("../libs/base58");
 var convert_1 = require("../utils/convert");
 var concat_1 = require("../utils/concat");
 // var constants = require("../constants");
 // ABSTRACT PARENT
-var ByteProcessor = /** @class */ (function () {
+export var ByteProcessor = /** @class */ (function () {
     function ByteProcessor(name) {
         this.name = name;
     }
     return ByteProcessor;
 }());
-exports.ByteProcessor = ByteProcessor;
 // SIMPLE
-var Base58 = /** @class */ (function (_super) {
+export var Base58 = /** @class */ (function (_super) {
     __extends(Base58, _super);
     function Base58() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -35,8 +34,7 @@ var Base58 = /** @class */ (function (_super) {
     };
     return Base58;
 }(ByteProcessor));
-exports.Base58 = Base58;
-var Long = /** @class */ (function (_super) {
+export var Long = /** @class */ (function (_super) {
     __extends(Long, _super);
     function Long() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -47,18 +45,17 @@ var Long = /** @class */ (function (_super) {
             bytes = convert_1.default.longToByteArray(value);
         }
         else {
-            if (typeof value === 'string') {
-                value = new bignumber_1.default(value);
-            }
-            bytes = convert_1.default.bigNumberToByteArray(value);
+        if (typeof value === 'string') {
+          value = new bignumber_1.default(value);
         }
+        bytes = convert_1.default.bigNumberToByteArray(value);
+      }
         return Uint8Array.from(bytes);
     };
     return Long;
 }(ByteProcessor));
-exports.Long = Long;
 // COMPLEX
-var AssetId = /** @class */ (function (_super) {
+export var AssetId = /** @class */ (function (_super) {
     __extends(AssetId, _super);
     function AssetId() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -71,8 +68,7 @@ var AssetId = /** @class */ (function (_super) {
     };
     return AssetId;
 }(ByteProcessor));
-exports.AssetId = AssetId;
-var Attachment = /** @class */ (function (_super) {
+export var Attachment = /** @class */ (function (_super) {
     __extends(Attachment, _super);
     function Attachment() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -89,8 +85,7 @@ var Attachment = /** @class */ (function (_super) {
     };
     return Attachment;
 }(ByteProcessor));
-exports.Attachment = Attachment;
-var Recipient = /** @class */ (function (_super) {
+export var Recipient = /** @class */ (function (_super) {
     __extends(Recipient, _super);
     function Recipient() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -101,5 +96,4 @@ var Recipient = /** @class */ (function (_super) {
     };
     return Recipient;
 }(ByteProcessor));
-exports.Recipient = Recipient;
 //# sourceMappingURL=ByteProcessor.js.map

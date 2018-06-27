@@ -1,15 +1,17 @@
 <template>
   <div class="layout-main">
-    <v-header></v-header>
-    <create-account
-      v-if="pageId==='registration'"
-      @show-page="changePage"></create-account>
-    <save-backup
-      v-else-if="pageId==='saveBackup'"
-      @show-page="changePage"></save-backup>
-    <confirm-backup
-      v-else-if="pageId==='confirmBackup'"
-      @show-page="changePage"></confirm-backup>
+    <div class="center">
+      <v-header></v-header>
+      <create-account
+        v-if="pageId==='registration'"
+        @show-page="changePage"></create-account>
+      <save-backup
+        v-else-if="pageId==='saveBackup'"
+        @show-page="changePage"></save-backup>
+      <confirm-backup
+        v-else-if="pageId==='confirmBackup'"
+        @show-page="changePage"></confirm-backup>
+    </div>
   </div>
 </template>
 <script>
@@ -41,8 +43,14 @@ export default {
 
 <style scoped>
 .layout-main {
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
+    width: 100%;
+    height: 100%;
+    min-width: 200px;
+    background-color: rgb(249, 249, 249);
+}
+.center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
 }
 </style>
