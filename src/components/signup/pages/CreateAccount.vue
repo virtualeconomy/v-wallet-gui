@@ -2,12 +2,12 @@
   <div class="home">
     <div>
       <v-title
-        title="Create a new account"
-        description="signup for a new account below or you can <a href='/restore'>restore your account</a> from a backup">
+        title="Create New Account"
+        description="signup for a free account below or <a href='/restore'>restore your account</a> from a backup">
       </v-title>
     </div>
     <div class="login-forms">
-      <form class="text-left container">
+      <form class="text-left">
         <div>
           <label>Avatar</label>
           <div class="avatar-group">
@@ -23,7 +23,7 @@
               type="button"
               :disabled="!avatarCanChange||registering"
               @click="changeAvatar()">
-              change one {{ timeLeftToChangeStr }}
+              <img src="../../../assets/imgs/icons/signup/ico_refresh.svg"> Change one {{ timeLeftToChangeStr }}
             </button>
           </div>
         </div>
@@ -41,9 +41,10 @@
           <label>Username</label>
           <input
             type="text"
-            class="form-control form-control-lg shadow-sm"
+            class="form-control input-height"
             :class="{'text-danger':isUsernameErrors,'is-invalid':isUsernameErrors}"
             v-model="username"
+            placeholder="Create your account name"
             :readonly="registering"
             @blur="checkUsername(username)">
         </div>
@@ -52,11 +53,16 @@
           <input
             type="password"
             name="password"
-            class="form-control form-control-lg shadow-sm"
+            class="form-control input-height"
             :class="{'text-danger':isPassErrors,'is-invalid':isPassErrors}"
             v-model="password"
+            placeholder="Set your password"
             :readonly="registering"
             @input="checkPassword(password)">
+          <img
+            v-if="password && !isPassErrors"
+            class="check-right"
+            src="../../../assets/imgs/icons/signup/ic_check_green.svg">
           <small
             id="emailHelp"
             class="form-text text-muted text-right">
@@ -67,17 +73,19 @@
           <label>Confirm your password</label>
           <input
             type="password"
-            class="form-control form-control-lg shadow-sm"
+            class="form-control input-height"
             :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
             v-model="password2"
             :readonly="registering"
+            placeholder="Confirm your password"
             @input="checkPasswordMatch(password, password2)"
             @keyup.enter="registerEnter">
         </div>
         <div class="form-group submit-button">
           <b-button
+            class="input-height"
             :disabled="isSubmitDisabled"
-            :variant="'primary'"
+            :variant="'warning'"
             :size="'lg'"
             :block=true
             @click="register">
@@ -85,10 +93,7 @@
           </b-button>
         </div>
       </form>
-      <hr>
-      <a
-        href="/login"
-        class="footer-link"><small>Login</small></a>
+      <p class="flink">or <a href="/login">sign in</a> with a saved account</p>
     </div>
   </div>
 </template>
@@ -297,15 +302,17 @@ export default {
 </script>
 <style scoped>
 .home {
-    width: 100%;
-    height: 100%;
-}
-.nav {
-    width: 100%;
-    height: 86px;
+    margin-top: 40px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 40px 50px;
+    border:1px solid #EDEEF2;
+    border-radius: 4px;
+    background-color: white;
 }
 .login-forms {
-    width: 400px;
+    width: 560px;
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -314,10 +321,10 @@ export default {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 50px;
+    margin-top: 30px;
 }
 .password-form {
-    margin-top: 25px;
+    margin-top: 30px;
 }
 .username-form {
 }
@@ -325,28 +332,27 @@ export default {
     border-width: 2px;
     border-style: solid;
     border-color: rgb(180, 180, 180);
-    width: 120px;
-    height: 120px;
+    width: 70px;
+    height: 70px;
     border-radius: 10px;
     margin-bottom: auto;
     margin-top: auto;
 }
 .avatar-group {
     margin-bottom: 10px;
-    height: 120px;
     width: 100%;
     display: inline-flex;
 }
 .btn-change-avt {
-    color: #fff;
-    background-color: #007bff;
-    border-color: #007bff;
+    color: #FF8737;
+    background-color: #fff;
+    border-color: #FF8737;
     font-size: 0.875rem;
-    line-height: 1.5;
+    line-height: 2;
     border-radius: 0.2rem;
     margin-left: 10px;
     margin-top: auto;
-    margin-bottom: 0px;
+    margin-bottom: auto;
     cursor: pointer;
 }
 .btn-change-avt:disabled {
@@ -355,7 +361,15 @@ export default {
 .error-messages {
     margin-top: 20px;
 }
-.footer-link {
+.input-height {
+    height: 54px;
+}
+.check-right {
     float: right;
+    margin-top: -30px;
+    margin-right: 16px;
+}
+.flink {
+    margin-bottom: 0px;
 }
 </style>

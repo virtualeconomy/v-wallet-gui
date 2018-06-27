@@ -1,16 +1,20 @@
 <template>
   <div class="title-des">
-    <H1>
+    <H2 class="fsize-title">
       {{ title }}
-    </H1>
-    <span v-html="description"></span>
-    <br>
-    <b-button
-      @click="$emit('goback')"
-      v-if="gobackAct"
-      variant="link">
-      go back
-    </b-button>
+    </H2>
+    <div class="des">
+      <span
+        v-html="description">
+      </span>
+      <b-button
+        class="btn-goback"
+        @click="$emit('goback')"
+        v-if="gobackAct"
+        variant="link">
+        go back
+      </b-button>
+    </div>
     <hr>
   </div>
 </template>
@@ -39,9 +43,18 @@ export default {
 </script>
 <style scoped>
 .title-des {
-    width: 400px;
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
+}
+.des {
+    color: #9091A3;
+    padding: 0px 46px;
+}
+.btn-goback {
+    padding-left: 0px;
+}
+.fsize-title {
+    font-size: 34px;
 }
 </style>

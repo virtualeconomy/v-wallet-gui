@@ -2,7 +2,7 @@
   <div class="home">
     <v-title
       title="Save backup phrase"
-      description="Treat your backup phrase with care. You can also find these words in your private profile after logging in">
+      description="Treat your backup phrase with care!">
     </v-title>
     <textarea
       v-model="seedPhrase"
@@ -10,10 +10,9 @@
       class="hidden"
       readonly>
     </textarea>
-    <div class="backup-words-copy container">
+    <div class="backup-words-copy">
       <p>
         Please write these 15 words down in order or
-        <br>
         <b-button
           id="btn-cpy"
           :disabled="isCpyDisable"
@@ -23,7 +22,7 @@
           copy them
         </b-button>
       </p>
-      <b-jumbotron class="unselectable">
+      <div class="word-container unselectable">
         <template v-for="(word, idx) in wordList">
           <span
             :key="idx"
@@ -32,19 +31,18 @@
           </span>
           &nbsp;
         </template>
-      </b-jumbotron>
+      </div>
       <br>
       <b-button
         :disabled="isContinueDisable"
-        :variant="'primary'"
+        :variant="'warning'"
         :size="'lg'"
         :block=true
         @click="confirmPage">
         Continue to confirm {{ buttonTimeStr }}
       </b-button>
-      <hr>
-      <span @click="gotoHomePage"
-            class="footer-link">Skip this step</span>
+      <div @click="gotoHomePage"
+           class="footer-link">Skip this step</div>
     </div>
   </div>
 </template>
@@ -127,12 +125,14 @@ export default {
 </script>
 <style scoped>
 .home {
-    width: 100%;
-    height: 100%;
-}
-.nav {
-    width: 100%;
-    height: 86px;
+    margin-top: 40px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 40px 50px;
+    border:1px solid #EDEEF2;
+    border-radius: 4px;
+    background-color: white;
 }
 .hidden {
     font-size: 12pt;
@@ -144,20 +144,17 @@ export default {
     top: 0px;
 }
 .footer-link {
-    float: right;
+    margin-top: 20px;
     cursor: pointer;
     text-decoration: underline;
-    color: #007bff;
+    color: #FF8737;
 }
 .backup-words-copy {
-    width: 450px;
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
 }
 .word {
-    border: 2px solid rgb(160, 160, 160);
-    border-radius: 5px;
     font-size: 100%;
     background-color: rgb(190, 190, 190);
     color: white;
@@ -169,5 +166,14 @@ export default {
     -ms-user-select: none;
     user-select: none;
     line-height: 200%;
+}
+#btn-cpy {
+    padding-left: 0px;
+}
+.word-container {
+    padding: 30px 20px;
+    background: #FAFAFA;
+    border: 1px solid #E8E9ED;
+    border-radius: 4px;
 }
 </style>

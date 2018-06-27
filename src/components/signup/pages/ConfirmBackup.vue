@@ -11,7 +11,7 @@
       ref="wordsToCopy"
       class="hidden"
       readonly></textarea>
-    <div class="backup-words-copy container">
+    <div class="backup-words-copy">
       <p>
         Please tap the words in right order
       </p>
@@ -45,30 +45,31 @@
           &nbsp;
         </template>
       </div>
-      <div class="error-message">
+      <div
+        v-show="errorMsg"
+        class="error-message">
         {{ errorMsg }}
       </div>
       <b-button
         v-if="!isContinueDisable"
-        :variant="'primary'"
+        :variant="'warning'"
         :size="'lg'"
         :block="true"
-        href="/">
+        @click="$router.push('/')">
         Great! Go Ahead!
       </b-button>
       <b-button
         v-if="isContinueDisable"
-        :variant="'primary'"
+        :variant="'warning'"
         :size="'lg'"
         :block="true"
         @click="clearWords">
         clear and try again
       </b-button>
-      <hr>
-      <span
+      <div
         @click="$router.push('/')"
         class="footer-link">
-        Skip this step</span>
+        Skip this step</div>
     </div>
   </div>
 </template>
@@ -152,12 +153,14 @@ export default {
 </script>
 <style scoped>
 .home {
-    width: 100%;
-    height: 100%;
-}
-.nav {
-    width: 100%;
-    height: 86px;
+    margin-top: 40px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 40px 50px;
+    border:1px solid #EDEEF2;
+    border-radius: 4px;
+    background-color: white;
 }
 .hidden {
     font-size: 12pt;
@@ -169,10 +172,12 @@ export default {
     top: 0px;
 }
 .footer-link {
-    float: right;
+    margin-top: 20px;
+    cursor: pointer;
+    text-decoration: underline;
+    color: #FF8737;
 }
 .backup-words-copy {
-    width: 450px;
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -195,7 +200,7 @@ export default {
 }
 .wordarea {
     line-height: 200%;
-    margin-bottom: 20px;
+    margin-bottom: 40px;
 }
 .word-btn {
     margin-top: 10px;
