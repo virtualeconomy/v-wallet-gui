@@ -109,10 +109,10 @@ export default {
 
     computed: {
         address() {
-            // if (Vue.ls.get('address')) {
-            //     return Vue.ls.get('address')
-            // }
-            return '3P6N2EnapoRxazL7otmV3srTuJVcMW2MQWG'
+            if (Vue.ls.get('address')) {
+                return Vue.ls.get('address')
+            }
+            // return '3P6N2EnapoRxazL7otmV3srTuJVcMW2MQWG'
         },
         pubKey() {
             if (this.secretInfo) {

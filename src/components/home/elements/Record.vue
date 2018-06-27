@@ -19,7 +19,7 @@
           <b-col class="title">{{ txType }} VEE</b-col>
         </b-row>
         <b-row>
-          <b-col class="detail">To: {{ txAddress }}</b-col>
+          <b-col class="detail">{{ txIcon === 'sent' ? 'To' : 'From' }}: {{ txAddress }}</b-col>
         </b-row>
       </b-col>
       <b-col class="record-time"
@@ -54,7 +54,17 @@
         </b-dropdown>
       </b-col>
     </b-row>
-    <TxInfoModal :modal-id="txRecord.id"></TxInfoModal>
+    <textarea class="copy-txid"
+              v-model="txId"
+              ref="tId"
+              readonly></textarea>
+    <TxInfoModal :modal-id="txRecord.id"
+                 :tx-icon="txIcon"
+                 :tx-type="txType"
+                 :tx-address="txAddress"
+                 :tx-fee="txFee"
+                 :tx-amount="txAmount"
+                 :tx-block="txBlock"></TxInfoModal>
   </b-container>
 </template>
 
@@ -96,10 +106,21 @@ export default {
         },
         txAmount() {
             return this.txRecord.amount
+        },
+        txFee() {
+            return this.txRecord.fee
+        },
+        txBlock() {
+            return this.txRecord.height
+        },
+        txId() {
+            return this.txRecord.id
         }
     },
     methods: {
-        copyTxId: function() {
+        copyTxId() {
+            this.$refs.tId.select()
+            window.document.execCommand('copy')
         }
     }
 }
@@ -143,6 +164,10 @@ export default {
                 border: none;
             }
         }
+    }
+    .copy-txid {
+        position: absolute;
+        left: -999999px;
     }
 }
 
