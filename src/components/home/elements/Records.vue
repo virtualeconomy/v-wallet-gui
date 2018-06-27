@@ -1,13 +1,15 @@
 <template>
   <div>
     <h3>Transaction Records</h3>
-    <div v-if="txRecords.length > 0"
-         v-for="record in txRecords"
-         :key="record.id">
-      <Record :tx-record="record"
-              :address="address"></Record>
+    <div v-if="txRecords.length > 0">
+      <div v-for="record in txRecords"
+           :key="record.id">
+        <Record :tx-record="record"
+                :address="address"></Record>
+      </div>
     </div>
-    <div v-else>
+    <div v-else
+         class="empty">
       <p>There are no transaction records.</p>
     </div>
   </div>
@@ -56,6 +58,9 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
+.empty {
+    border-top: 1px solid #1111;
+}
 
 </style>
