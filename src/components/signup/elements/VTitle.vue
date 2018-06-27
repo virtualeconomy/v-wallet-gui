@@ -3,15 +3,18 @@
     <H1>
       {{ title }}
     </H1>
-    <span class="des"
-          v-html="description"></span>
-    <b-button
-      class="btn-goback"
-      @click="$emit('goback')"
-      v-if="gobackAct"
-      variant="link">
-      go back
-    </b-button>
+    <div class="des">
+      <span
+        v-html="description">
+      </span>
+      <b-button
+        class="btn-goback"
+        @click="$emit('goback')"
+        v-if="gobackAct"
+        variant="link">
+        go back
+      </b-button>
+    </div>
     <hr>
   </div>
 </template>
@@ -46,6 +49,7 @@ export default {
 }
 .des {
     color: #9091A3;
+    padding: 0px 46px;
 }
 .btn-goback {
     padding-left: 0px;

@@ -4,7 +4,7 @@
       <div class="container logo">
         <img
           class="brand-logo"
-          src="../assets/imgs/icons/01_Sign_up/vee_logo.svg">
+          src="../assets/imgs/icons/signup/vee_logo.svg">
       </div>
       <div class="home">
         <div>

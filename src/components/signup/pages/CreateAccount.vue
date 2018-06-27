@@ -3,7 +3,7 @@
     <div>
       <v-title
         title="Create New Account"
-        description="signup for a free account below or you can <a href='/restore'>restore your account</a> from a backup">
+        description="signup for a free account below or <a href='/restore'>restore your account</a> from a backup">
       </v-title>
     </div>
     <div class="login-forms">
@@ -23,7 +23,7 @@
               type="button"
               :disabled="!avatarCanChange||registering"
               @click="changeAvatar()">
-              <img src="../../../assets/imgs/icons/01_Sign_up/ico_refresh.svg"> Change one {{ timeLeftToChangeStr }}
+              <img src="../../../assets/imgs/icons/signup/ico_refresh.svg"> Change one {{ timeLeftToChangeStr }}
             </button>
           </div>
         </div>
@@ -59,6 +59,10 @@
             placeholder="Set your password"
             :readonly="registering"
             @input="checkPassword(password)">
+          <img
+            v-if="password && !isPassErrors"
+            class="check-right"
+            src="../../../assets/imgs/icons/signup/ic_check_green.svg">
           <small
             id="emailHelp"
             class="form-text text-muted text-right">
@@ -361,5 +365,10 @@ export default {
 }
 .input-height {
     height: 54px;
+}
+.check-right {
+    float: right;
+    margin-top: -30px;
+    margin-right: 16px;
 }
 </style>
