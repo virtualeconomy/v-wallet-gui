@@ -13,7 +13,7 @@
         <div class="col-auto assets-pane height-full">
           <div class="asset-title">
             <img
-              src="../assets/imgs/icons/11_Wallet/ic_assets_line.svg"><b class="title-assets">Assets</b>
+              src="../assets/imgs/icons/wallet/ic_assets_line.svg"><b class="title-assets">Assets</b>
           </div>
           <Asset v-if="address"
                  :address="address"
@@ -24,7 +24,7 @@
           </Asset>
           <div class="asset-title">
             <img
-              src="../assets/imgs/icons/11_Wallet/ic_wallet_line.svg"><b class="title-assets">Cold Wallet</b>
+              src="../assets/imgs/icons/wallet/ic_wallet_line.svg"><b class="title-assets">Cold Wallet</b>
           </div>
           <Asset v-if="coldAddresses"
                  v-for="(coldPubkey, coldAddress) in coldAddresses"
@@ -41,7 +41,7 @@
                  class="btn-import-cold">
             <img
               class="mb-1"
-              src="../assets/imgs/icons/11_Wallet/ic_import.svg"><b class="title-assets">Import Cold Wallet</b></b-btn>
+              src="../assets/imgs/icons/wallet/ic_import.svg"><b class="title-assets">Import Cold Wallet</b></b-btn>
           <ImportColdWallet @import-cold="importCold"
                             show="false"></ImportColdWallet>
         </div>

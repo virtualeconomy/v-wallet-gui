@@ -14,13 +14,13 @@
                 v-b-modal.sendModal>
         <img
           class="icon-btn"
-          src="../../../assets/imgs/icons/11_Wallet/ic_send.svg"><b>Send</b></b-button>
+          src="../../../assets/imgs/icons/wallet/ic_send.svg"><b>Send</b></b-button>
       <b-button variant="primary"
                 class="btn-receive"
                 v-b-modal.receiveModal>
         <img
           class="icon-btn"
-          src="../../../assets/imgs/icons/11_Wallet/ic_receive.svg"><b>Receive</b></b-button>
+          src="../../../assets/imgs/icons/wallet/ic_receive.svg"><b>Receive</b></b-button>
     </div>
     <Send show="false"></Send>
     <Receive show="false"></Receive>
