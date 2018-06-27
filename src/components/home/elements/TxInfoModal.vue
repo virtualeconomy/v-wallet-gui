@@ -5,11 +5,11 @@
       <div class="tx-title">
         <div class="tx-icon">
           <img v-if="txIcon==='sent'"
-               src="../../../assets/imgs/icons/ic_sent.svg"
+               src="../../../assets/imgs/icons/wallet/ic_sent.svg"
                width="60px"
                height="60px">
           <img v-else
-               src="../../../assets/imgs/icons/ic_received.svg"
+               src="../../../assets/imgs/icons/wallet/ic_received.svg"
                width="60px"
                height="60px">
         </div>

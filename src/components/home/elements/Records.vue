@@ -61,6 +61,8 @@ export default {
 <style scoped lang="less">
 .empty {
     border-top: 1px solid #1111;
+    padding: 24px 0;
+    background-color: #1111;
 }
 
 </style>
