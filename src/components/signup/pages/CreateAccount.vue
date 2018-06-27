@@ -300,7 +300,7 @@ export default {
 </script>
 <style scoped>
 .home {
-    margin-top: 35px;
+    margin-top: 40px;
     max-width: 560px;
     margin-left: auto;
     margin-right: auto;

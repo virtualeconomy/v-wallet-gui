@@ -45,7 +45,7 @@ export default {
 .layout-main {
     width: 100%;
     height: 100%;
-    min-width: 300px;
+    min-width: 200px;
     background-color: rgb(249, 249, 249);
 }
 .center {

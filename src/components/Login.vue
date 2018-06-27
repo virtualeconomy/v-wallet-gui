@@ -9,24 +9,13 @@
       <H1>
         Sign in
       </H1>
-      <div class="row">
-        <b-button
-          class="col-12 text-right blink"
-          :size="'sm'"
-          @click="changePage('/signup')"
-          variant="link">
-          Create account
-        </b-button>
-      </div>
-      <div class="row">
-        <b-button
-          class="col-12  text-right blink"
-          :size="'sm'"
-          @click="changePage('/restore')"
-          variant="link">
-          Restore account
-        </b-button>
-      </div>
+      <p>Sign in or <b-button
+        class="blink"
+        @click="changePage('/signup')"
+        variant="link">
+        create a new account
+      </b-button>
+      </p>
       <hr class="hr-login">
       <div
         class="dropdown v-select"
@@ -122,6 +111,15 @@
         ><b>Login</b>
         </b-button>
       </div>
+      <p class="flink">
+        or <b-button
+          class="blink"
+          @click="changePage('/restore')"
+          variant="link">
+          restore account
+        </b-button>
+        from backup
+      </p>
     </div>
   </div>
 </template>
@@ -321,7 +319,7 @@ export default {
 .layout-main {
     width: 100%;
     height: 100%;
-    min-width: 300px;
+    min-width: 200px;
     background-color: rgb(249, 249, 249);
 }
 .logo {
@@ -564,8 +562,11 @@ a {
     color: @veeColor !important;
 }
 .blink {
-    line-height: 18px;
-    padding-top: 0px;
-    padding-bottom: 0px;
+    padding-top: 3px;
+    padding-left: 0px;
+    padding-right: 0px;
+}
+.flink {
+    margin-top: 20px;
 }
 </style>

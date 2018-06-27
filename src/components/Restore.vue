@@ -1,81 +1,81 @@
 <template>
   <div class="layout-main">
-    <div class="container logo">
-      <img
-        class="brand-logo"
-        src="../assets/imgs/logo-small.png">
-    </div>
-    <div class="home">
-      <div>
-        <div class="title-des">
-          <H1>
-            Restore your account
-          </H1>
-          <div class="footer-link">
-            <a href="/login"><small>Login</small></a>
-          </div>
-          <div class="footer-link">
-            <a href="/signup"><small>Signup</small></a>
-          </div>
-          <hr>
-        </div>
+    <div class="center">
+      <div class="container logo">
+        <img
+          class="brand-logo"
+          src="../assets/imgs/icons/01_Sign_up/vee_logo.svg">
       </div>
-      <div class="login-forms">
-        <p
-          v-show="!isSeedNoErr">
-          Please enter your wallet seed here.
-        </p>
-        <p
-          class="seed-des"
-          v-show="!isSeedNoErr">
-          <small class="text-muted">
-            Wallet seed is the 15 words you are keeping as backup.
-            The words should be seperated by single space
-          </small>
-        </p>
-        <b-form-textarea
-          v-model="seedInput"
-          maxlength="150"
-          @keydown.native.enter='preventDefault($event)'
-          :state="isSeedNoErr"
-          :disabled="isSeedNoErr"
-          placeholder="Enter 15 words here"
-          :no-resize="true"
-          :rows="4"
-          :max-rows="6"
-          @input="hideErrMsg">
-        </b-form-textarea>
-        <div
-          class="msg-err text-danger"
-          v-show="showSeedErr">
-          <small>
-            Sorry, the seed is not valid.
-          </small>
+      <div class="home">
+        <div>
+          <div class="title-des">
+            <H1>
+              Restore your account
+            </H1>
+            <hr>
+          </div>
         </div>
-        <b-button
-          v-if="seedBtnUp"
-          class="btn-continue dropdown shadow-sm"
-          :disabled="showSeedErr"
-          :variant="'primary'"
-          :size="'lg'"
-          @click="checkSeed"
-          :block=true>
-          Continue
-        </b-button>
-        <b-button
-          v-else
-          class="btn-continue dropup shadow-sm"
-          :variant="'warning'"
-          :size="'sm'"
-          @click="editSeed"
-          :block=true>
-          Edit wallet seed
-        </b-button>
-        <update-account
-          class="update-form"
-          :seed-phrase="seedPhrase"
-          v-if="isSeedNoErr">
-        </update-account>
+        <div class="login-forms">
+          <p
+            class="subtit"
+            v-show="!isSeedNoErr">
+            Please enter your wallet seed here.
+          </p>
+          <p
+            class="seed-des"
+            v-show="!isSeedNoErr">
+            <small class="text-muted">
+              Wallet seed is the 15 words which you are keeping as backup,
+              the words should be seperated by single space
+            </small>
+          </p>
+          <b-form-textarea
+            class="non-square"
+            v-model="seedInput"
+            maxlength="150"
+            @keydown.native.enter='preventDefault($event)'
+            :state="isSeedNoErr"
+            :disabled="isSeedNoErr"
+            placeholder="Enter 15 words here"
+            :no-resize="true"
+            :rows="4"
+            :max-rows="6"
+            @input="hideErrMsg">
+          </b-form-textarea>
+          <div
+            class="msg-err text-danger"
+            v-show="showSeedErr">
+            <small>
+              Sorry, the seed is not valid.
+            </small>
+          </div>
+          <b-button
+            v-if="seedBtnUp"
+            class="btn-continue dropdown"
+            :disabled="showSeedErr || !seedInput"
+            :variant="'warning'"
+            :size="'lg'"
+            @click="checkSeed"
+            :block=true>
+            Continue
+          </b-button>
+          <b-button
+            v-else
+            class="dropup"
+            :size="'sm'"
+            @click="editSeed"
+            :block=true>
+            Edit wallet seed
+          </b-button>
+          <update-account
+            class="update-form"
+            :seed-phrase="seedPhrase"
+            v-if="isSeedNoErr">
+          </update-account>
+        </div>
+        <p class="flink">
+          <a href="/login">Sign in</a> or <a href="/signup">Create a new account</a>
+        </p>
       </div>
     </div>
   </div>
@@ -147,18 +147,17 @@ export default {
 
 <style scoped>
 .layout-main {
-    width: 80%;
+    width: 100%;
+    height: 100%;
+    min-width: 200px;
+    background-color: rgb(249, 249, 249);
+}
+.brand-logo {
     margin-left: auto;
     margin-right: auto;
 }
-.brand-logo {
-    float: left;
-    margin-left: 70px;
-    margin-top: 12px;
-}
 .logo {
-   width: 100%;
-   height: 100px;
+    width: 100%;
 }
 .title-des {
     width: 450px;
@@ -171,12 +170,6 @@ export default {
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
-}
-.footer-link {
-    width: 100%;
-    display: inline-block;
-    text-align: right;
-    line-height: 80%
 }
 .btn-continue {
     margin-top: 30px;
@@ -198,8 +191,10 @@ export default {
     border-left: .3em solid transparent;
 }
 .dropup {
-    border-bottom-left-radius: 0px;
-    border-bottom-right-radius: 0px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    background: #FFB637;
+    border-color: #FFB637;
 }
 .dropdown:after {
     display: inline-block;
@@ -217,6 +212,31 @@ export default {
     text-align: left;
     line-height: 120%;
 }
-.update-form {
+.home {
+    margin-top: 40px;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 40px 50px;
+    border:1px solid #EDEEF2;
+    border-radius: 4px;
+    background-color: white;
+}
+.center {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%,-50%);
+}
+.subtit {
+    margin-bottom: 5px;
+    text-align: left;
+}
+.flink {
+    margin-top: 20px;
+    margin-bottom: 0px;
+}
+.form-control:disabled, .non-square{
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
 }
 </style>
