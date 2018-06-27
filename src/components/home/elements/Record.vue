@@ -5,11 +5,11 @@
       <b-col class="record-icon"
              cols="1">
         <img v-if="txIcon==='sent'"
-             src="../../../assets/imgs/icons/ic_sent.svg"
+             src="../../../assets/imgs/icons/wallet/ic_sent.svg"
              width="20px"
              height="20px">
         <img v-else
-             src="../../../assets/imgs/icons/ic_received.svg"
+             src="../../../assets/imgs/icons/wallet/ic_received.svg"
              width="20px"
              height="20px">
       </b-col>
@@ -47,7 +47,7 @@
                     variant="link"
                     right>
           <template slot="button-content">
-            <img src="../../../assets/imgs/icons/ic_more.svg">
+            <img src="../../../assets/imgs/icons/wallet/ic_more.svg">
           </template>
           <b-dropdown-item @click="$root.$emit('bv::show::modal', 'txInfoModal_' + txRecord.id, 'txInfoModal_' + txRecord.id)">TX info</b-dropdown-item>
           <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
