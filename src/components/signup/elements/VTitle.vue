@@ -1,8 +1,8 @@
 <template>
   <div class="title-des">
-    <H1>
+    <H2 class="fsize-title">
       {{ title }}
-    </H1>
+    </H2>
     <div class="des">
       <span
         v-html="description">
@@ -53,5 +53,8 @@ export default {
 }
 .btn-goback {
     padding-left: 0px;
+}
+.fsize-title {
+    font-size: 34px;
 }
 </style>

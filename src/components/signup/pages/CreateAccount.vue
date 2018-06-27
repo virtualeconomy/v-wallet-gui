@@ -93,9 +93,7 @@
           </b-button>
         </div>
       </form>
-      <a
-        href="/login"
-        class="footer-link"><small>Login</small></a>
+      <p class="flink">or <a href="/login">sign in</a> with a saved account</p>
     </div>
   </div>
 </template>
@@ -370,5 +368,8 @@ export default {
     float: right;
     margin-top: -30px;
     margin-right: 16px;
+}
+.flink {
+    margin-bottom: 0px;
 }
 </style>
