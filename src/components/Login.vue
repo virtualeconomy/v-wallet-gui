@@ -381,7 +381,7 @@ export default {
 }
 .v-select .open-indicator {
     position: absolute;
-    bottom: 6px;
+    bottom: 15px;
     right: 10px;
     display: inline-block;
     cursor: pointer;
@@ -412,7 +412,7 @@ export default {
     opacity: 0;
 }
 .v-select.open .open-indicator {
-    bottom: 1px;
+    bottom: 9px;
 }
 .v-select .dropdown-toggle {
     -webkit-appearance: none;
@@ -424,6 +424,7 @@ export default {
     border: 1px solid rgba(60, 60, 60, .26);
     border-radius: 4px;
     white-space: normal;
+    cursor: pointer;
 }
 .v-select .dropdown-toggle:after {
     visibility: hidden;
