@@ -78,23 +78,30 @@
           </b-button>
         </b-container>
       </b-tab>
-      <b-tab title="cold wallet">
+      <b-tab title="cold wallet"
+             :disabled="noColdAddress">
         <b-container v-show="coldPageId===1">
-          <b-form-group label="coldRecipient"
+          <b-form-group label="Address"
+                        label-for="walletAddress">
+            <b-form-select id=walletAddress
+                           v-model="coldAddress"
+                           :options="options"></b-form-select>
+          </b-form-group>
+          <b-form-group label="Recipient"
                         label-for="coldRecipientInput">
             <b-form-input id="coldRecipientInput"
                           type="text"
                           v-model="coldRecipient">
             </b-form-input>
           </b-form-group>
-          <b-form-group label="coldAmount"
+          <b-form-group label="Amount"
                         label-for="coldAmountInput">
             <b-form-input id="coldAmountInput"
                           type="number"
                           v-model="coldAmount">
             </b-form-input>
           </b-form-group>
-          <b-form-group label="coldDescription"
+          <b-form-group label="Description"
                         label-for="coldDescriptionInput">
             <b-form-textarea id="coldDescriptionInput"
                              v-model="coldAttachment"
@@ -114,11 +121,11 @@
           </b-button>
         </b-container>
         <b-container v-show="coldPageId===2">
-          <Confirm :address="address"
-                   :recipient="recipient"
-                   :amount="Number(amount)"
-                   :fee="fee"
-                   :attachment="attachment">
+          <Confirm :address="coldAddress"
+                   :recipient="coldRecipient"
+                   :amount="Number(coldAmount)"
+                   :fee="coldFee"
+                   :attachment="coldAttachment">
           </Confirm>
           <b-button variant="primary"
                     size="lg"
@@ -126,8 +133,11 @@
           </b-button>
           <b-button variant="primary"
                     size="lg"
-                    @click="sendData('coldWallet')">Confirm
+                    @click="coldNextPage">Confirm
           </b-button>
+        </b-container>
+        <b-container v-show="coldPageId===3">
+          <ColdSignature></ColdSignature>
         </b-container>
       </b-tab>
     </b-tabs>
@@ -142,9 +152,17 @@ import { TESTNET_NODE, ADDRESS_LENGTH } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
+import ColdSignature from './ColdSignature'
 export default {
     name: 'Send',
-    components: {Success, Confirm},
+    components: {ColdSignature, Success, Confirm},
+    props: {
+        coldAddresses: {
+            type: Object,
+            default: function() {},
+            require: true
+        }
+    },
     data: function() {
         return {
             recipient: '',
@@ -156,7 +174,8 @@ export default {
             coldAmount: 0,
             coldAttachment: '',
             coldPageId: 1,
-            coldFee: 1
+            coldFee: 1,
+            coldAddress: ''
         }
     },
     computed: {
@@ -165,12 +184,6 @@ export default {
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.address))
-        },
-        coldAddresses() {
-            if (this.userInfo && this.userInfo.coldAddresses) {
-                return JSON.parse(this.userInfo.coldAddresses)
-            }
-            return {}
         },
         secretInfo() {
             return JSON.parse(
@@ -203,6 +216,25 @@ export default {
         },
         isColdSubmitDisabled() {
             return !(this.coldRecipient.length === ADDRESS_LENGTH && this.coldAmount > 0)
+        },
+        options() {
+            var coldOptions = []
+            console.log(this.coldAddresses)
+            if (!this.coldAddresses) return coldOptions
+            let coldAddress
+            for (coldAddress in this.coldAddresses) {
+                const option = {
+                    value: coldAddress,
+                    text: coldAddress
+                }
+                coldOptions.push(option)
+            }
+            console.log(coldOptions)
+            return coldOptions
+        },
+        noColdAddress() {
+            console.log(Object.keys(this.coldAddresses).length)
+            return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         }
     },
     methods: {
@@ -213,7 +245,7 @@ export default {
                 assetId: '',
                 amount: walletType === 'hotWallet' ? Number(this.amount) : this.coldAmount,
                 feeAssetId: '',
-                fee: 1,
+                fee: 100000,
                 attachment: walletType === 'hotWallet' ? this.attachment : this.coldAttachment,
                 timestamp: Date.now()
             }
@@ -225,7 +257,7 @@ export default {
                 this.pageId++
             }, response => {
                 console.log('failed')
-                // alert('send transaction failed!')
+                alert('send transaction failed!')
                 this.pageId++
             })
         },
@@ -236,17 +268,17 @@ export default {
             this.coldPageId++
         },
         prevPage: function() {
-            this.pageId--
-            if (this.pageId === 0) {
+            if (this.pageId === 1) {
                 this.$refs.modal.hide()
-                this.pageId = 1
+            } else {
+                this.pageId--
             }
         },
         coldPrevPage: function() {
-            this.coldPageId--
-            if (this.coldPageId === 0) {
-                this.$ref.modal.hide()
-                this.pageId = 1
+            if (this.coldPageId === 1) {
+                this.$refs.modal.hide()
+            } else {
+                this.coldPageId--
             }
         },
         resetPage: function() {

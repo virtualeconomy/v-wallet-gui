@@ -22,7 +22,8 @@
           class="icon-btn"
           src="../../../assets/imgs/icons/wallet/ic_receive.svg"><b>Receive</b></b-button>
     </div>
-    <Send show="false"></Send>
+    <Send show="false"
+          :cold-addresses="coldAddresses"></Send>
     <Receive show="false"></Receive>
   </div>
 </template>
@@ -36,6 +37,11 @@ export default {
         balance: {
             type: Number,
             default: 0,
+            require: true
+        },
+        coldAddresses: {
+            type: Object,
+            default: function() {},
             require: true
         }
     },
