@@ -10,7 +10,7 @@ import VueResource from 'vue-resource'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Storage from 'vue-ls'
-import jdenticon from '../static/libs/jdenticon-2.1.0'
+import jdenticon from '@/libs/jdenticon-2.1.0'
 
 const options = {
     namespace: 'vuejs__',
