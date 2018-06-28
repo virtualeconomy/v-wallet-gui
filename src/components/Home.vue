@@ -78,6 +78,7 @@ export default {
         return {
             balance: {},
             selectedAddress: '',
+            sessionClearTimeout: void 0,
             coldAddresses: {}
         }
     },
@@ -99,16 +100,23 @@ export default {
     },
 
     mounted() {
+        console.log('mounted')
         let oldTimeout = INITIAL_SESSION_TIMEOUT
         try {
             oldTimeout = JSON.parse(window.localStorage.getItem(this.address)).sesstionTimeout
         } catch (e) {
             oldTimeout = INITIAL_SESSION_TIMEOUT
         }
-        setTimeout(() => {
+        this.sessionClearTimeout = setTimeout(() => {
             console.log('clear sesson')
             Vue.ls.clear()
+            this.$router.push('/login')
         }, oldTimeout)
+    },
+
+    beforeDestroy() {
+        console.log('beforeDestroy')
+        clearTimeout(this.sessionClearTimeout)
     },
 
     computed: {
