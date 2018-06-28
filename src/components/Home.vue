@@ -52,17 +52,8 @@
             <div class="trans-pane">
               <trans-pane :balance="balance[selectedAddress]"></trans-pane>
             </div>
-            <h3>Transaction Records</h3>
             <div>
-              <b-table show-empty
-                       stacked="md"
-                       :items="items"
-                       :fields="fields"
-                       :current-page="currentPage"
-                       striped="striped"
-                       outlined="outlined"
-                       :per-page="perPage">
-              </b-table>
+              <Records :address="selectedAddress"></Records>
             </div>
           </div>
         </div>
@@ -79,15 +70,16 @@ import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
 import { INITIAL_SESSION_TIMEOUT, TESTNET_NODE } from '@/constants.js'
 import seedLib from '@/libs/seed.js'
+import Records from './home/elements/Records'
 
 export default {
     name: 'Home',
-
     data: function() {
         return {
             balance: {},
             selectedAddress: '',
-            sessionClearTimeout: void 0
+            sessionClearTimeout: void 0,
+            coldAddresses: {}
         }
     },
 
@@ -98,6 +90,9 @@ export default {
             this.getBalance(this.address)
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
+            if (this.userInfo && this.userInfo.coldAddresses) {
+                this.coldAddresses = JSON.parse(this.userInfo.coldAddresses)
+            }
             for (const addr in this.coldAddresses) {
                 this.getBalance(addr)
             }
@@ -129,6 +124,7 @@ export default {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
             }
+            // return '3P6N2EnapoRxazL7otmV3srTuJVcMW2MQWG'
         },
         pubKey() {
             if (this.secretInfo) {
@@ -147,12 +143,6 @@ export default {
             if (this.userInfo) {
                 return this.userInfo.avtHash
             }
-        },
-        coldAddresses() {
-            if (this.userInfo && this.userInfo.coldAddresses) {
-                return JSON.parse(this.userInfo.coldAddresses)
-            }
-            return {}
         },
         secretInfo() {
             if (this.userInfo) {
@@ -213,7 +203,8 @@ export default {
         ImportColdWallet,
         TransPane,
         NavBar,
-        Asset
+        Asset,
+        Records
     }
 }
 </script>
