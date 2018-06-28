@@ -210,9 +210,9 @@ export default {
             console.log(walletType)
             const dataInfo = {
                 recipient: walletType === 'hotWallet' ? this.recipient : this.coldRecipient,
-                assetId: 'VEE',
+                assetId: '',
                 amount: walletType === 'hotWallet' ? Number(this.amount) : this.coldAmount,
-                feeAssetId: 'VEE',
+                feeAssetId: '',
                 fee: 1,
                 attachment: walletType === 'hotWallet' ? this.attachment : this.coldAttachment,
                 timestamp: Date.now()
