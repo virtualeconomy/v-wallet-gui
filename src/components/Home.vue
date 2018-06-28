@@ -77,7 +77,8 @@ export default {
     data: function() {
         return {
             balance: {},
-            selectedAddress: ''
+            selectedAddress: '',
+            coldAddresses: {}
         }
     },
 
@@ -88,6 +89,9 @@ export default {
             this.getBalance(this.address)
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
+            if (this.userInfo && this.userInfo.coldAddresses) {
+                this.coldAddresses = JSON.parse(this.userInfo.coldAddresses)
+            }
             for (const addr in this.coldAddresses) {
                 this.getBalance(addr)
             }
@@ -131,12 +135,6 @@ export default {
             if (this.userInfo) {
                 return this.userInfo.avtHash
             }
-        },
-        coldAddresses() {
-            if (this.userInfo && this.userInfo.coldAddresses) {
-                return JSON.parse(this.userInfo.coldAddresses)
-            }
-            return {}
         },
         secretInfo() {
             if (this.userInfo) {
