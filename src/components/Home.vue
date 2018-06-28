@@ -53,7 +53,7 @@
               <trans-pane :balance="balance[selectedAddress]"></trans-pane>
             </div>
             <div>
-              <Records :address="address"></Records>
+              <Records :address="selectedAddress"></Records>
             </div>
           </div>
         </div>
