@@ -6,12 +6,12 @@
              cols="1">
         <img v-if="txIcon==='sent'"
              src="../../../assets/imgs/icons/wallet/ic_sent.svg"
-             width="20px"
-             height="20px">
+             width="32px"
+             height="32px">
         <img v-else
              src="../../../assets/imgs/icons/wallet/ic_received.svg"
-             width="20px"
-             height="20px">
+             width="32px"
+             height="32px">
       </b-col>
       <b-col class="record-detail"
              cols="3">
@@ -133,17 +133,20 @@ export default {
     vertical-align: middle;
     text-overflow: ellipsis;
     border: 1px solid #EDEDF0;
-
+    padding: 12px 0;
     .record-icon {
-        width: 10%;
+        text-align: right;
     }
     .record-detail {
         .title {
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 17px;
+            color: #181B3A;
+            letter-spacing: 0;
         }
         .detail {
-            font-size: 10px;
+            font-size: 13px;
+            color: #696B8A;
+            letter-spacing: 0;
             text-overflow: ellipsis;
             width: 200px;
             overflow: hidden;
@@ -151,11 +154,17 @@ export default {
         }
     }
     .record-time {
-        font-size: 10px;
         padding-top: 6px;
+        font-size: 12px;
+        color: #9091A3;
+        letter-spacing: 0;
     }
     .record-amount {
         padding-top: 4px;
+        font-size: 17px;
+        color: #F5354B;
+        letter-spacing: 0;
+        text-align: right;
     }
     .record-action {
         .more-btn {
