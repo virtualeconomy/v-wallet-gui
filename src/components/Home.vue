@@ -50,7 +50,8 @@
             bg-variant="white"
             border-variant="primary">
             <div class="trans-pane">
-              <trans-pane :balance="balance[selectedAddress]"></trans-pane>
+              <trans-pane :balance="balance[selectedAddress]"
+                          :address="selectedAddress"></trans-pane>
             </div>
             <div>
               <Records :address="selectedAddress"></Records>

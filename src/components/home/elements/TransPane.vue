@@ -23,7 +23,8 @@
           src="../../../assets/imgs/icons/wallet/ic_receive.svg"><b>Receive</b></b-button>
     </div>
     <Send show="false"></Send>
-    <Receive show="false"></Receive>
+    <Receive show="false"
+             :address="address"></Receive>
   </div>
 </template>
 
@@ -36,6 +37,11 @@ export default {
         balance: {
             type: Number,
             default: 0,
+            require: true
+        },
+        address: {
+            type: String,
+            default: '',
             require: true
         }
     },
