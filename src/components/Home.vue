@@ -51,6 +51,7 @@
             border-variant="primary">
             <div class="trans-pane">
               <trans-pane :balance="balance[selectedAddress]"
+                          :address="selectedAddress"></trans-pane>
                           :cold-addresses="coldAddresses"></trans-pane>
             </div>
             <div>
