@@ -287,7 +287,7 @@ export default {
                 this.pageId++
             }, response => {
                 console.log('failed')
-                alert('send transaction failed!')
+                // alert('send transaction failed!')
                 this.pageId++
             })
         },
@@ -362,13 +362,19 @@ export default {
                 console.log('kkkk')
             }
         },
+        getParamValue: function(url, key) {
+            var regex = new RegExp(key + '=([^&]*', 'i')
+            return url.match(regex)[1]
+        },
         onDecode: function(decodeString) {
             this.paused = true
-            this.recipient = decodeString
+            this.recipient = this.getParamValue(decodeString, 'recipient')
+            this.amount = this.getParamValue(decodeString, 'amount')
         },
         onColdDecode: function(decodeString) {
             this.paused = true
-            this.coldRecipient = decodeString
+            this.coldRecipient = this.getParamValue(decodeString, 'recipient')
+            this.coldAmount = this.getParamValue(decodeString, 'amount')
         },
         scanAgain: function() {
             this.paused = false
