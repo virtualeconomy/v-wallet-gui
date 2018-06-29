@@ -22,7 +22,7 @@
           class="icon-btn"
           src="../../../assets/imgs/icons/wallet/ic_receive.svg"><b>Receive</b></b-button>
     </div>
-    <Send show="false" 
+    <Send show="false"
           :cold-addresses="coldAddresses"></Send>
     <Receive show="false"
              :address="address"></Receive>
@@ -34,6 +34,10 @@ import Receive from '../modals/Receive'
 import Send from '../modals/Send'
 export default {
     name: 'TransPane',
+    components: {
+        Receive,
+        Send
+    },
     props: {
         balance: {
             type: Number,
@@ -42,16 +46,15 @@ export default {
         },
         address: {
             type: String,
-            default: '',
+            default: ''
+        },
         coldAddresses: {
             type: Object,
-            default: function() {},
+            default: function() {
+
+            },
             require: true
         }
-    },
-    components: {
-        Receive,
-        Send
     }
 }
 </script>
