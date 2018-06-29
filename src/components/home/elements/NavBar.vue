@@ -56,6 +56,7 @@
 import Settings from '../modals/Settings'
 import Account from '../modals/Account'
 import Vue from 'vue'
+import jdenticon from '@/libs/jdenticon-2.1.0'
 
 export default {
     name: 'NavBar',
@@ -105,7 +106,7 @@ export default {
         }
     },
     mounted() {
-        window.jdenticon()
+        jdenticon()
     },
     computed: {
     },
