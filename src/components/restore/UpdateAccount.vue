@@ -86,6 +86,7 @@ import converters from '@/libs/converters.js'
 import validator from 'vue-m-validator'
 import Vue from 'vue'
 import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
+import jdenticon from '@/libs/jdenticon-2.1.0'
 
 export default {
     name: 'CreateAccount',
@@ -129,7 +130,7 @@ export default {
     },
 
     mounted() {
-        window.jdenticon()
+        jdenticon()
     },
 
     methods: {

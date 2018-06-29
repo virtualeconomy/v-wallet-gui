@@ -128,6 +128,7 @@
 import Vue from 'vue'
 import { ADDRESS_LENGTH } from '../constants.js'
 import seedLib from '@/libs/seed.js'
+import jdenticon from '@/libs/jdenticon-2.1.0'
 
 export default {
     name: 'Login',
@@ -176,7 +177,7 @@ export default {
     },
 
     mounted() {
-        window.jdenticon()
+        jdenticon()
     },
 
     computed: {
@@ -202,12 +203,12 @@ export default {
         },
         mutableValue() {
             window.setTimeout(() => {
-                window.jdenticon()
+                jdenticon()
             }, 0)
         },
         dropdownOpen() {
             window.setTimeout(() => {
-                window.jdenticon()
+                jdenticon()
             }, 0)
         }
     },
