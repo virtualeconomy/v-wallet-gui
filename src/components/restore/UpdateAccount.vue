@@ -122,11 +122,10 @@ export default {
                 window.localStorage.getItem(this.seed.address)).username
             if (usr) {
                 this.username = usr
-            } else {
-                this.username = 'xxx'
+                this.isFirst.username = false
             }
         } catch (err) {
-            this.username = 'yyyy'
+            this.username = ''
         }
     },
 

@@ -61,9 +61,7 @@ export var AssetId = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     AssetId.prototype.process = function (value) {
-        value = '';
-        // We must pass bytes of `[0]` for Waves asset ID and bytes of `[1] + assetId` for other asset IDs
-        var bytes = value ? concat_1.concatUint8Arrays(Uint8Array.from([1]), base58_1.default.decode(value)) : Uint8Array.from([0]);
+        var bytes = Uint8Array.from([0]);
         return bytes;
     };
     return AssetId;
