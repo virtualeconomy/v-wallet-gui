@@ -9,19 +9,36 @@
            @hidden="resetPage">
     <b-tabs>
       <b-tab title="hot wallet"
-             active>
+             active
+             :disabled="scanShow">
         <b-container v-show="pageId===1">
           <b-form-group label="Recipient"
                         label-for="recipientInput">
-            <b-form-input id="recipientInput"
-                          type="text"
-                          v-model="recipient"
-                          :state="isValidRecipient"
-                          aria-describedby="inputLiveFeedback">
-            </b-form-input>
-            <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid recipient address.
-            </b-form-invalid-feedback>
+            <b-input-group>
+              <b-form-input id="recipientInput"
+                            type="text"
+                            v-model="recipient"
+                            :state="isValidRecipient(recipient)"
+                            aria-describedby="inputLiveFeedback">
+              </b-form-input>
+              <b-input-group-append>
+                <b-btn @click="scanChange">Button</b-btn>
+              </b-input-group-append>
+              <div v-if="scanShow"
+                   v-show="!qrInit">
+                <p class="qrInfo">Please confirm your browser's camera is available.</p>
+                <qrcode-reader @init="onInit"
+                               @decode="onDecode"
+                               :paused="paused">
+                </qrcode-reader>
+                <b-btn @click="scanAgain">Scan again</b-btn>
+                <b-btn @click="scanChange"
+                       :disabled="!recipient || !isValidRecipient(recipient)">Confirm</b-btn>
+              </div>
+              <b-form-invalid-feedback id="inputLiveFeedback">
+                Invalid recipient address.
+              </b-form-invalid-feedback>
+            </b-input-group>
           </b-form-group>
           <b-form-group label="Amount"
                         label-for="amountInput">
@@ -79,7 +96,7 @@
         </b-container>
       </b-tab>
       <b-tab title="cold wallet"
-             :disabled="noColdAddress">
+             :disabled="noColdAddress || scanShow">
         <b-container v-show="coldPageId===1">
           <b-form-group label="Address"
                         label-for="walletAddress">
@@ -89,10 +106,31 @@
           </b-form-group>
           <b-form-group label="Recipient"
                         label-for="coldRecipientInput">
-            <b-form-input id="coldRecipientInput"
-                          type="text"
-                          v-model="coldRecipient">
-            </b-form-input>
+            <b-input-group>
+              <b-form-input id="coldRecipientInput"
+                            type="text"
+                            v-model="coldRecipient"
+                            :state="isValidRecipient(coldRecipient)"
+                            aria-describedby="inputLiveFeedback">
+              </b-form-input>
+              <b-input-group-append>
+                <b-btn @click="scanChange">Button</b-btn>
+              </b-input-group-append>
+              <div v-if="scanShow"
+                   v-show="!qrInit">
+                <p class="qrInfo">Please confirm your browser's camera is available.</p>
+                <qrcode-reader @init="onInit"
+                               @decode="onColdDecode"
+                               :paused="paused">
+                </qrcode-reader>
+                <b-btn @click="scanAgain">Scan again</b-btn>
+                <b-btn @click="scanChange"
+                       :disabled="!coldRecipient || !this.isValidRecipient(coldRecipient)">Confirm</b-btn>
+              </div>
+              <b-form-invalid-feedback id="inputLiveFeedback">
+                Invalid recipient address.
+              </b-form-invalid-feedback>
+            </b-input-group>
           </b-form-group>
           <b-form-group label="Amount"
                         label-for="coldAmountInput">
@@ -148,14 +186,31 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE, ADDRESS_LENGTH } from '@/constants.js'
+import { TESTNET_NODE } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
 import ColdSignature from './ColdSignature'
+import Scan from './Scan'
+var initData = {
+    recipient: '',
+    amount: 0,
+    attachment: '',
+    pageId: 1,
+    fee: 1,
+    coldRecipient: '',
+    coldAmount: 0,
+    coldAttachment: '',
+    coldPageId: 1,
+    coldFee: 1,
+    coldAddress: '',
+    scanShow: false,
+    qrInit: false,
+    paused: false
+}
 export default {
     name: 'Send',
-    components: {ColdSignature, Success, Confirm},
+    components: {Scan, ColdSignature, Success, Confirm},
     props: {
         coldAddresses: {
             type: Object,
@@ -164,19 +219,7 @@ export default {
         }
     },
     data: function() {
-        return {
-            recipient: '',
-            amount: 0,
-            attachment: '',
-            pageId: 1,
-            fee: 1,
-            coldRecipient: '',
-            coldAmount: 0,
-            coldAttachment: '',
-            coldPageId: 1,
-            coldFee: 1,
-            coldAddress: ''
-        }
+        return initData
     },
     computed: {
         address() {
@@ -198,24 +241,11 @@ export default {
         keyPair() {
             return seedLib.fromExistingPhrase(this.seedPhrase).keyPair
         },
-        isValidRecipient() {
-            if (!this.recipient) {
-                return true
-            }
-            let isValid = false
-            try {
-                isValid = crypto.isValidAddress(this.recipient)
-            } catch (e) {
-                console.log(e)
-            }
-            console.log(isValid)
-            return isValid
-        },
         isSubmitDisabled() {
-            return !(this.recipient.length === ADDRESS_LENGTH && this.amount > 0 && this.isValidRecipient)
+            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient))
         },
         isColdSubmitDisabled() {
-            return !(this.coldRecipient.length === ADDRESS_LENGTH && this.coldAmount > 0)
+            return !(this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient))
         },
         options() {
             var coldOptions = []
@@ -284,9 +314,65 @@ export default {
         resetPage: function() {
             this.pageId = 1
             this.coldPageId = 1
+            this.scanShow = false
         },
         endSend: function() {
             this.$refs.modal.hide()
+        },
+        scanChange: function(evt) {
+            this.scanShow = !this.scanShow
+            // if (this.scanShow) {
+            //     evt.preventDefault()
+            // }
+        },
+        isValidRecipient: function(recipient) {
+            if (!recipient) {
+                return true
+            }
+            let isValid = false
+            try {
+                isValid = crypto.isValidAddress(recipient)
+            } catch (e) {
+                console.log(e)
+            }
+            console.log(isValid)
+            return isValid
+        },
+        async onInit(promise) {
+            try {
+                console.log('hhhhhh')
+                this.qrInit = true
+                await promise
+            } catch (error) {
+                if (error.name === 'NotAllowedError') {
+                    throw Error('user denied camera access permission')
+                } else if (error.name === 'NotFoundError') {
+                    throw Error('no suitable camera device installed')
+                } else if (error.name === 'NotSupportedError') {
+                    throw Error('page is not served over HTTPS (or localhost)')
+                } else if (error.name === 'NotReadableError') {
+                    throw Error('mayby camera is already in use')
+                } else if (error.name === 'OverconstarinedError') {
+                    throw Error('pass constraints do not match any camera')
+                } else {
+                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
+                }
+            } finally {
+                this.qrInit = false
+                console.log('kkkk')
+            }
+        },
+        onDecode: function(decodeString) {
+            this.paused = true
+            this.recipient = decodeString
+        },
+        onColdDecode: function(decodeString) {
+            this.paused = true
+            this.coldRecipient = decodeString
+        },
+        scanAgain: function() {
+            this.paused = false
+            this.recipient = ''
         }
     }
 }
