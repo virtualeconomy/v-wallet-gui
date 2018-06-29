@@ -11,6 +11,7 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Storage from 'vue-ls'
 import jdenticon from '@/libs/jdenticon-2.1.0'
+import jrQrcode from 'jr-qrcode'
 
 const options = {
     namespace: 'vuejs__',
@@ -24,6 +25,7 @@ Vue.use(VueQrcodeReader)
 Vue.use(VueResource)
 Vue.config.productionTip = false
 Vue.use(jdenticon)
+Vue.use(jrQrcode)
 
 /* eslint-disable no-new */
 new Vue({
