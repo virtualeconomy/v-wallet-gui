@@ -7,7 +7,8 @@
              :username="username"
              :avt-hash="avtHash"
              :get-pri-key="getPriKey"
-             :get-seed-phrase="getSeedPhrase"></nav-bar>
+             :get-seed-phrase="getSeedPhrase"
+             :set-usr-local-storage="setUsrLocalStorage"></nav-bar>
     <div class="container-fluid height-full">
       <div class="row height-full">
         <div class="col-auto assets-pane height-full">

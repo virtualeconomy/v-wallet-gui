@@ -14,7 +14,7 @@
         <b-form-select class="setting-input"
                        :options="timeoutOptions"
                        size="sm"
-                       :input="change">
+                       @input="change">
         </b-form-select>
       </div>
     </div>
@@ -24,6 +24,15 @@
 <script>
 export default {
     name: 'Settings',
+    props: {
+        setUsrLocalStorage: {
+            type: Function,
+            require: true,
+            default: function() {
+                return ''
+            }
+        }
+    },
     data() {
         return {
             selected: null,
@@ -63,7 +72,7 @@ export default {
     },
     methods: {
         change: function(selected) {
-            console.log(selected)
+            this.setUsrLocalStorage('sessionTimeout', selected)
         }
     }
 }

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <h3>Transaction Records</h3>
     <div v-if="txRecords.length > 0">
       <div v-for="record in txRecords"
            :key="record.id">

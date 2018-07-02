@@ -224,7 +224,7 @@ export default {
                 lastLogin: new Date().getTime(),
                 username: this.username,
                 avtHash: this.avatarDataHex,
-                sesstionTimeout: INITIAL_SESSION_TIMEOUT,
+                sessionTimeout: INITIAL_SESSION_TIMEOUT,
                 info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
             }
             window.localStorage.setItem(this.seed.address, JSON.stringify(savedInfo))

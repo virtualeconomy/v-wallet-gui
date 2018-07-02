@@ -34,7 +34,9 @@ export const MAINNET_API = 'http://54.152.46.6:6869'
 
 //for test
 // export const TESTNET_NODE = 'https://nodes.wavesnodes.com'
-export const TESTNET_NODE = 'http://54.152.46.6:6869'
-export const TESTNET_API = 'http://54.152.46.6:6869'
+export const TESTNET_NODE = 'http://34.229.136.59:6869'
+export const TESTNET_API = 'http://34.229.136.59:6869'
 
 export const ADDRESS_LENGTH = 35;
+
+

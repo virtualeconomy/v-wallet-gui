@@ -102,7 +102,7 @@ export default {
             return this.txType === 'Sent' ? this.txRecord.recipient : this.txRecord.sender
         },
         txTime() {
-            return new Date(this.txRecord.timestamp).toDateString()
+            return new Date(this.txRecord.timestamp / 1e6).toDateString()
         },
         txAmount() {
             return this.txRecord.amount
