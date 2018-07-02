@@ -104,7 +104,7 @@ export default {
             return this.txType === 'Sent' ? this.txRecord.recipient : this.txRecord.sender
         },
         txTime() {
-            return new Date(this.txRecord.timestamp / 1000000).toDateString()
+            return new Date(this.txRecord.timestamp / 1e6).toDateString()
         },
         txAmount() {
             return this.txRecord.amount
@@ -134,7 +134,7 @@ export default {
     text-align: left;
     vertical-align: middle;
     text-overflow: ellipsis;
-    border: 1px solid #EDEDF0;
+    border-bottom: 1px solid #EDEDF0;
     padding: 12px 0;
     .record-icon {
         text-align: right;

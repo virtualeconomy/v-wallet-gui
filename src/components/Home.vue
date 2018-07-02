@@ -242,6 +242,7 @@ export default {
 }
 .page {
     background-color: rgb(250, 250, 250);
+    padding: 0px 20px;
 }
 .asset-title {
     padding: 10px;
