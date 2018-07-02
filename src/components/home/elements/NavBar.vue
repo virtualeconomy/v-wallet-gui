@@ -46,7 +46,8 @@
              :pub-key="pubKey"
              :get-pri-key="getPriKey"
              :get-seed-phrase="getSeedPhrase"></Account>
-    <Settings :set-usr-local-storage="setUsrLocalStorage"></Settings>
+    <Settings :set-usr-local-storage="setUsrLocalStorage"
+              :address="address"></Settings>
   </div>
 
 </template>

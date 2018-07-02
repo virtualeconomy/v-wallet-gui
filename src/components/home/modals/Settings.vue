@@ -6,6 +6,7 @@
         <label>Language</label>
         <b-form-select class="setting-input"
                        :options="langOptions"
+                       v-model="selectedLang"
                        size="sm">
         </b-form-select>
       </div>
@@ -13,6 +14,7 @@
         <label>Session Timeout</label>
         <b-form-select class="setting-input"
                        :options="timeoutOptions"
+                       v-model="selectedSession"
                        size="sm"
                        @input="change">
         </b-form-select>
@@ -22,8 +24,11 @@
 </template>
 
 <script>
+import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
 export default {
     name: 'Settings',
+    created() {
+    },
     props: {
         setUsrLocalStorage: {
             type: Function,
@@ -31,11 +36,16 @@ export default {
             default: function() {
                 return ''
             }
+        },
+        address: {
+            type: String,
+            require: true,
+            default: ''
         }
     },
     data() {
         return {
-            selected: null,
+            selectedLang: 'en',
             langOptions: [
                 {
                     value: 'en',
@@ -46,25 +56,26 @@ export default {
                     text: 'CN'
                 }
             ],
+            selectedSession: this.getSelectedSession() / 1000 / 60,
             timeoutOptions: [
                 {
-                    value: '5',
+                    value: 5,
                     text: '5 min'
                 },
                 {
-                    value: '10',
+                    value: 10,
                     text: '10 min'
                 },
                 {
-                    value: '20',
+                    value: 20,
                     text: '20 min'
                 },
                 {
-                    value: '40',
+                    value: 40,
                     text: '40 min'
                 },
                 {
-                    value: '60',
+                    value: 60,
                     text: '1 hour'
                 }
             ]
@@ -72,7 +83,17 @@ export default {
     },
     methods: {
         change: function(selected) {
-            this.setUsrLocalStorage('sessionTimeout', selected)
+            this.setUsrLocalStorage('sessionTimeout', selected * 60 * 1000)
+        },
+        getSelectedSession() {
+            let oldTimeout = INITIAL_SESSION_TIMEOUT
+            try {
+                oldTimeout = JSON.parse(window.localStorage.getItem(this.address)).sessionTimeout
+            } catch (e) {
+                oldTimeout = INITIAL_SESSION_TIMEOUT
+            }
+            console.log(oldTimeout)
+            return oldTimeout
         }
     }
 }
