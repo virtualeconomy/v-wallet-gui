@@ -113,9 +113,9 @@ export default {
 
         isValidSeed(seedPhrase) {
             const wordList = seedPhrase.split(' ')
-            // if (wordList.length !== 15) {
-            //     return false
-            // }
+            if (wordList.length !== 15) {
+                return false
+            }
 
             const libSet = new Set(seedDic)
             return wordList.every(i => libSet.has(i))
