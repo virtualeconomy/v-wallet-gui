@@ -37,7 +37,8 @@
       <b-col class="record-amount"
              cols="2">
         <div>
-          <span>{{ txAmount }} VEE</span>
+          <span>{{ txIcon === 'sent' ? '-' : '+' }}</span>
+          <span>{{ txIcon === 'sent' ? txAmount + txFee : txAmount }} VEE</span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -102,7 +103,7 @@ export default {
             return this.txType === 'Sent' ? this.txRecord.recipient : this.txRecord.sender
         },
         txTime() {
-            return new Date(this.txRecord.timestamp).toDateString()
+            return new Date(this.txRecord.timestamp/1000000).toDateString()
         },
         txAmount() {
             return this.txRecord.amount

@@ -23,6 +23,7 @@ export const MINIMUM_FEE = 100000;
 export const TRANSFER_ATTACHMENT_BYTE_LIMIT = 140;
 export const DEFAULT_MIN_SEED_LENGTH = 25;
 export const DEFAULT_ORDER_EXPIRATION_DAYS = 20;
+export const TRX_RECORD_LIMIT = 10; 
 export const DEFAULT_BASIC_CONFIG = {
     requestOffset: 0,
     requestLimit: 100,
@@ -34,7 +35,6 @@ export const MAINNET_API = 'http://54.152.46.6:6869'
 
 //for test
 // export const TESTNET_NODE = 'https://nodes.wavesnodes.com'
-export const TESTNET_NODE = 'http://54.152.46.6:6869'
-export const TESTNET_API = 'http://54.152.46.6:6869'
-
+export const TESTNET_NODE = 'http://34.229.136.59:6869'
+export const TESTNET_API = 'http://34.229.136.59:6869'
 export const ADDRESS_LENGTH = 35;
