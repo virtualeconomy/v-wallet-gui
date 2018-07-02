@@ -44,6 +44,7 @@ function makeByteProviders() {
 var userData;
 // Save all needed values from user data
 function getData(transferData) {
+    userData = {}
     userData = Object.keys(storedFields).reduce(function (store, key) {
         store[key] = transferData[key];
         return store;
@@ -93,6 +94,10 @@ export default {
     prepareForAPI: function(transferData, keyPair) {
         var signature = getSignature(transferData, keyPair);
         return  __assign({}, {transactionType: constants.TRANSFER_TX_NAME}, castToAPISchema(userData), {signature: signature});
+    },
+    isValidSignature: function(transferData, signature, publicKey) {
+        getBytes(transferData)
+        return crypto_1.default.isValidTransactionSignature(userData, signature, publicKey)
     }
 };
 

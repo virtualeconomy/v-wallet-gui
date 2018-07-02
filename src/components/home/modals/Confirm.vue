@@ -54,23 +54,28 @@ export default {
     props: {
         address: {
             type: String,
-            required: true
+            required: true,
+            default: ''
         },
         recipient: {
             type: String,
-            required: true
+            required: true,
+            default: ''
         },
         amount: {
             type: Number,
-            required: true
+            required: true,
+            default: 0
         },
         fee: {
             type: Number,
-            required: true
+            required: true,
+            default: 1
         },
         attachment: {
             type: String,
-            required: true
+            required: true,
+            default: ''
         }
     }
 }

@@ -167,7 +167,7 @@
           </Confirm>
           <b-button variant="primary"
                     size="lg"
-                    @click="prevPage">Cancle
+                    @click="coldPrevPage">Cancle
           </b-button>
           <b-button variant="primary"
                     size="lg"
@@ -175,7 +175,45 @@
           </b-button>
         </b-container>
         <b-container v-show="coldPageId===3">
-          <ColdSignature></ColdSignature>
+          <ColdSignature :data-object="dataObject"
+                         :is-valid-signature="isValidSignature"
+                         :public-key="coldPublicKey"></ColdSignature>
+          <b-button variant="primary"
+                    size="lg"
+                    @click="coldPrevPage">Cancle
+          </b-button>
+          <b-button variant="primary"
+                    size="lg"
+                    @click="coldNextPage">Confirm
+          </b-button>
+        </b-container>
+        <b-container v-show="coldPageId===4">
+          <Confirm :address="coldAddress"
+                   :recipient="coldRecipient"
+                   :amount="Number(coldAmount)"
+                   :fee="coldFee"
+                   :attachment="coldAttachment">
+          </Confirm>
+          <b-button variant="primary"
+                    size="lg"
+                    @click="prevPage">Cancle
+          </b-button>
+          <b-button variant="primary"
+                    size="lg"
+                    @click="sendData('coldwallet')">Confirm
+          </b-button>
+        </b-container>
+        <b-container v-show="coldPageId===5">
+          <Success :address="coldAddress"
+                   :recipient="coldRecipient"
+                   :amount="Number(coldAmount)"
+                   :fee="coldFee"
+                   :attachment="coldAttachment">
+          </Success>
+          <b-button variant="primary"
+                    size="lg"
+                    @click="endSend">OK
+          </b-button>
         </b-container>
       </b-tab>
     </b-tabs>
@@ -206,7 +244,8 @@ var initData = {
     coldAddress: '',
     scanShow: false,
     qrInit: false,
-    paused: false
+    paused: false,
+    isValidSignature: false
 }
 export default {
     name: 'Send',
@@ -265,6 +304,21 @@ export default {
         noColdAddress() {
             console.log(Object.keys(this.coldAddresses).length)
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
+        },
+        dataObject() {
+            return {
+                senderPublicKey: this.coldAddresses[this.coldAddress],
+                assetId: '',
+                feeAssetId: '',
+                timestamp: Date.now(),
+                amount: this.coldAmount,
+                fee: this.coldFee,
+                recipient: this.coldRecipient,
+                attachment: this.coldAttachment
+            }
+        },
+        coldPublicKey() {
+            return this.coldAddresses[this.coldAddress]
         }
     },
     methods: {
