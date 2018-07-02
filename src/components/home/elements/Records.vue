@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { TESTNET_NODE } from '../../../constants'
+import { TESTNET_NODE, TRX_RECORD_LIMIT } from '../../../constants'
 import Record from './Record'
 import Vue from 'vue'
 
@@ -44,7 +44,7 @@ export default {
     },
     methods: {
         getTxRecords() {
-            const recordLimit = 2
+            const recordLimit = TRX_RECORD_LIMIT
             const url = TESTNET_NODE + '/transactions/address/' + this.address + '/limit/' + recordLimit
             this.$http.get(url).then(response => {
                 this.txRecords = response.body[0]
