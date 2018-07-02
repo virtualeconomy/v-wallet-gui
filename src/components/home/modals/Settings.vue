@@ -92,7 +92,6 @@ export default {
             } catch (e) {
                 oldTimeout = INITIAL_SESSION_TIMEOUT
             }
-            console.log(oldTimeout)
             return oldTimeout
         }
     }
