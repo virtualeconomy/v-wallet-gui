@@ -2,7 +2,7 @@
   <div class="row justify-content-between height-full">
     <div class="col-4 align-self-center text-left tran-head">
       <span class="title">
-        {{ balance }}VEE
+        {{ balance }} VEE
       </span>
       <p class="text-muted text-des mb-0">
         Balance
