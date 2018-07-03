@@ -9,19 +9,36 @@
            @hidden="resetPage">
     <b-tabs>
       <b-tab title="hot wallet"
-             active>
+             active
+             :disabled="scanShow">
         <b-container v-show="pageId===1">
           <b-form-group label="Recipient"
                         label-for="recipientInput">
-            <b-form-input id="recipientInput"
-                          type="text"
-                          v-model="recipient"
-                          :state="isValidRecipient"
-                          aria-describedby="inputLiveFeedback">
-            </b-form-input>
-            <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid recipient address.
-            </b-form-invalid-feedback>
+            <b-input-group>
+              <b-form-input id="recipientInput"
+                            type="text"
+                            v-model="recipient"
+                            :state="isValidRecipient(recipient)"
+                            aria-describedby="inputLiveFeedback">
+              </b-form-input>
+              <b-input-group-append>
+                <b-btn @click="scanChange">Button</b-btn>
+              </b-input-group-append>
+              <div v-if="scanShow"
+                   v-show="!qrInit">
+                <p class="qrInfo">Please confirm your browser's camera is available.</p>
+                <qrcode-reader @init="onInit"
+                               @decode="onDecode"
+                               :paused="paused">
+                </qrcode-reader>
+                <b-btn @click="scanAgain">Scan again</b-btn>
+                <b-btn @click="scanChange"
+                       :disabled="!recipient || !isValidRecipient(recipient)">Confirm</b-btn>
+              </div>
+              <b-form-invalid-feedback id="inputLiveFeedback">
+                Invalid recipient address.
+              </b-form-invalid-feedback>
+            </b-input-group>
           </b-form-group>
           <b-form-group label="Amount"
                         label-for="amountInput">
@@ -64,6 +81,7 @@
                     size="lg"
                     @click="sendData('hotWallet')">Confirm
           </b-button>
+          <p v-show="sendError">Sorry, transaction send failed!</p>
         </b-container>
         <b-container v-show="pageId===3">
           <Success :address="address"
@@ -79,7 +97,7 @@
         </b-container>
       </b-tab>
       <b-tab title="cold wallet"
-             :disabled="noColdAddress">
+             :disabled="noColdAddress || scanShow">
         <b-container v-show="coldPageId===1">
           <b-form-group label="Address"
                         label-for="walletAddress">
@@ -89,10 +107,31 @@
           </b-form-group>
           <b-form-group label="Recipient"
                         label-for="coldRecipientInput">
-            <b-form-input id="coldRecipientInput"
-                          type="text"
-                          v-model="coldRecipient">
-            </b-form-input>
+            <b-input-group>
+              <b-form-input id="coldRecipientInput"
+                            type="text"
+                            v-model="coldRecipient"
+                            :state="isValidRecipient(coldRecipient)"
+                            aria-describedby="inputLiveFeedback">
+              </b-form-input>
+              <b-input-group-append>
+                <b-btn @click="scanChange">Button</b-btn>
+              </b-input-group-append>
+              <div v-if="scanShow"
+                   v-show="!qrInit">
+                <p class="qrInfo">Please confirm your browser's camera is available.</p>
+                <qrcode-reader @init="onInit"
+                               @decode="onColdDecode"
+                               :paused="paused">
+                </qrcode-reader>
+                <b-btn @click="scanAgain">Scan again</b-btn>
+                <b-btn @click="scanChange"
+                       :disabled="!coldRecipient || !this.isValidRecipient(coldRecipient)">Confirm</b-btn>
+              </div>
+              <b-form-invalid-feedback id="inputLiveFeedback">
+                Invalid recipient address.
+              </b-form-invalid-feedback>
+            </b-input-group>
           </b-form-group>
           <b-form-group label="Amount"
                         label-for="coldAmountInput">
@@ -129,7 +168,7 @@
           </Confirm>
           <b-button variant="primary"
                     size="lg"
-                    @click="prevPage">Cancle
+                    @click="coldPrevPage">Cancle
           </b-button>
           <b-button variant="primary"
                     size="lg"
@@ -137,7 +176,47 @@
           </b-button>
         </b-container>
         <b-container v-show="coldPageId===3">
-          <ColdSignature></ColdSignature>
+          <ColdSignature :data-object="dataObject"
+                         :is-valid-signature="isValidSignature"
+                         :public-key="coldPublicKey"
+                         v-if="coldPageId===3"></ColdSignature>
+          <b-button variant="primary"
+                    size="lg"
+                    @click="coldPrevPage">Cancle
+          </b-button>
+          <b-button variant="primary"
+                    size="lg"
+                    @click="coldNextPage"
+                    :disabled="!isValidSignature">Confirm
+          </b-button>
+        </b-container>
+        <b-container v-show="coldPageId===4">
+          <Confirm :address="coldAddress"
+                   :recipient="coldRecipient"
+                   :amount="Number(coldAmount)"
+                   :fee="coldFee"
+                   :attachment="coldAttachment">
+          </Confirm>
+          <b-button variant="primary"
+                    size="lg"
+                    @click="prevPage">Cancle
+          </b-button>
+          <b-button variant="primary"
+                    size="lg"
+                    @click="sendData('coldwallet')">Confirm
+          </b-button>
+        </b-container>
+        <b-container v-show="coldPageId===5">
+          <Success :address="coldAddress"
+                   :recipient="coldRecipient"
+                   :amount="Number(coldAmount)"
+                   :fee="coldFee"
+                   :attachment="coldAttachment">
+          </Success>
+          <b-button variant="primary"
+                    size="lg"
+                    @click="endSend">OK
+          </b-button>
         </b-container>
       </b-tab>
     </b-tabs>
@@ -148,11 +227,29 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE, ADDRESS_LENGTH } from '@/constants.js'
+import { TESTNET_NODE } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
 import ColdSignature from './ColdSignature'
+var initData = {
+    recipient: '',
+    amount: 0,
+    attachment: '',
+    pageId: 1,
+    fee: 1,
+    coldRecipient: '',
+    coldAmount: 0,
+    coldAttachment: '',
+    coldPageId: 1,
+    coldFee: 1,
+    coldAddress: '',
+    scanShow: false,
+    qrInit: false,
+    paused: false,
+    isValidSignature: false,
+    sendError: false
+}
 export default {
     name: 'Send',
     components: {ColdSignature, Success, Confirm},
@@ -164,19 +261,7 @@ export default {
         }
     },
     data: function() {
-        return {
-            recipient: '',
-            amount: 0,
-            attachment: '',
-            pageId: 1,
-            fee: 1,
-            coldRecipient: '',
-            coldAmount: 0,
-            coldAttachment: '',
-            coldPageId: 1,
-            coldFee: 1,
-            coldAddress: ''
-        }
+        return initData
     },
     computed: {
         address() {
@@ -198,28 +283,14 @@ export default {
         keyPair() {
             return seedLib.fromExistingPhrase(this.seedPhrase).keyPair
         },
-        isValidRecipient() {
-            if (!this.recipient) {
-                return true
-            }
-            let isValid = false
-            try {
-                isValid = crypto.isValidAddress(this.recipient)
-            } catch (e) {
-                console.log(e)
-            }
-            console.log(isValid)
-            return isValid
-        },
         isSubmitDisabled() {
-            return !(this.recipient.length === ADDRESS_LENGTH && this.amount > 0 && this.isValidRecipient)
+            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient))
         },
         isColdSubmitDisabled() {
-            return !(this.coldRecipient.length === ADDRESS_LENGTH && this.coldAmount > 0)
+            return !(this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient))
         },
         options() {
             var coldOptions = []
-            console.log(this.coldAddresses)
             if (!this.coldAddresses) return coldOptions
             let coldAddress
             for (coldAddress in this.coldAddresses) {
@@ -229,17 +300,29 @@ export default {
                 }
                 coldOptions.push(option)
             }
-            console.log(coldOptions)
             return coldOptions
         },
         noColdAddress() {
-            console.log(Object.keys(this.coldAddresses).length)
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
+        },
+        dataObject() {
+            return {
+                senderPublicKey: this.coldAddresses[this.coldAddress],
+                assetId: '',
+                feeAssetId: '',
+                timestamp: Date.now(),
+                amount: this.coldAmount,
+                fee: this.coldFee,
+                recipient: this.coldRecipient,
+                attachment: this.coldAttachment
+            }
+        },
+        coldPublicKey() {
+            return this.coldAddresses[this.coldAddress]
         }
     },
     methods: {
         sendData: function(walletType) {
-            console.log(walletType)
             const dataInfo = {
                 recipient: walletType === 'hotWallet' ? this.recipient : this.coldRecipient,
                 assetId: '',
@@ -247,18 +330,14 @@ export default {
                 feeAssetId: '',
                 fee: 100000,
                 attachment: walletType === 'hotWallet' ? this.attachment : this.coldAttachment,
-                timestamp: Date.now()
+                timestamp: (Date.now() - 1) * 1e6
             }
             const apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair)
-            console.log(JSON.stringify(apiSchema))
             const url = TESTNET_NODE + '/assets/broadcast/transfer'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
-                console.log('success')
                 this.pageId++
             }, response => {
-                console.log('failed')
-                alert('send transaction failed!')
-                this.pageId++
+                this.sendError = true
             })
         },
         nextPage: function() {
@@ -284,9 +363,68 @@ export default {
         resetPage: function() {
             this.pageId = 1
             this.coldPageId = 1
+            this.scanShow = false
+            this.recipient = ''
+            this.amount = ''
+            this.attachment = ''
         },
         endSend: function() {
             this.$refs.modal.hide()
+        },
+        scanChange: function(evt) {
+            this.scanShow = !this.scanShow
+        },
+        isValidRecipient: function(recipient) {
+            if (!recipient) {
+                return true
+            }
+            let isValid = false
+            try {
+                isValid = crypto.isValidAddress(recipient)
+            } catch (e) {
+                console.log(e)
+            }
+            return isValid
+        },
+        async onInit(promise) {
+            try {
+                this.qrInit = true
+                await promise
+            } catch (error) {
+                if (error.name === 'NotAllowedError') {
+                    throw Error('user denied camera access permission')
+                } else if (error.name === 'NotFoundError') {
+                    throw Error('no suitable camera device installed')
+                } else if (error.name === 'NotSupportedError') {
+                    throw Error('page is not served over HTTPS (or localhost)')
+                } else if (error.name === 'NotReadableError') {
+                    throw Error('mayby camera is already in use')
+                } else if (error.name === 'OverconstarinedError') {
+                    throw Error('pass constraints do not match any camera')
+                } else {
+                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
+                }
+            } finally {
+                this.qrInit = false
+            }
+        },
+        getParamValue: function(url, key) {
+            var regex = new RegExp(key + '=([^&]*', 'i')
+            return url.match(regex)[1]
+        },
+        onDecode: function(decodeString) {
+            this.paused = true
+            this.recipient = this.getParamValue(decodeString, 'recipient')
+            this.amount = this.getParamValue(decodeString, 'amount')
+        },
+        onColdDecode: function(decodeString) {
+            this.paused = true
+            this.coldRecipient = this.getParamValue(decodeString, 'recipient')
+            this.coldAmount = this.getParamValue(decodeString, 'amount')
+        },
+        scanAgain: function() {
+            this.paused = false
+            this.recipient = ''
         }
     }
 }
