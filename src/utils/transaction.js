@@ -56,6 +56,7 @@ function getBytes(transferData) {
     if (transferData === void 0) { transferData = {}; }
     // Save all needed values from user data
     getData(transferData);
+    console.log(byteProviders)
     var _dataHolders = byteProviders.map(function (provider) {
         if (typeof provider === 'function') {
             return provider(userData);
@@ -93,11 +94,8 @@ function castToAPISchema(data) {
 export default {
     prepareForAPI: function(transferData, keyPair) {
         var signature = getSignature(transferData, keyPair);
+        console.log('signatureValid:' + crypto_1.default.isValidTransactionSignature(getBytes(__assign({}, transferData, { senderPublicKey: keyPair.publicKey })), signature, keyPair.publicKey))
         return  __assign({}, {transactionType: constants.TRANSFER_TX_NAME}, castToAPISchema(userData), {signature: signature});
-    },
-    isValidSignature: function(transferData, signature, publicKey) {
-        getBytes(transferData)
-        return crypto_1.default.isValidTransactionSignature(userData, signature, publicKey)
     }
 };
 

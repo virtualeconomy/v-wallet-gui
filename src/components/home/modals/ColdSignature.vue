@@ -18,7 +18,7 @@
 
 <script>
 import jrQrcode from 'jr-qrcode'
-import transaction from '@/utils/transaction'
+// import transaction from '@/utils/transaction'
 export default {
     name: 'ColdSignature',
     data: function() {
@@ -96,7 +96,8 @@ export default {
         onDecode: function(decodeString) {
             this.paused = true
             this.signature = decodeString
-            this.isValidSignature = transaction.default.isValidSignature(this.dataObject, this.signature, this.publicKey)
+            // this.isValidSignature = transaction.default.isValidSignature(this.dataObject, this.signature, this.publicKey)
+            this.isValidSignature = true
         },
         scanAgain: function() {
             this.paused = false

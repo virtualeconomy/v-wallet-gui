@@ -81,6 +81,7 @@
                     size="lg"
                     @click="sendData('hotWallet')">Confirm
           </b-button>
+          <p v-show="sendError">Sorry, transaction send failed!</p>
         </b-container>
         <b-container v-show="pageId===3">
           <Success :address="address"
@@ -177,14 +178,16 @@
         <b-container v-show="coldPageId===3">
           <ColdSignature :data-object="dataObject"
                          :is-valid-signature="isValidSignature"
-                         :public-key="coldPublicKey"></ColdSignature>
+                         :public-key="coldPublicKey"
+                         v-if="coldPageId===3"></ColdSignature>
           <b-button variant="primary"
                     size="lg"
                     @click="coldPrevPage">Cancle
           </b-button>
           <b-button variant="primary"
                     size="lg"
-                    @click="coldNextPage">Confirm
+                    @click="coldNextPage"
+                    :disabled="!isValidSignature">Confirm
           </b-button>
         </b-container>
         <b-container v-show="coldPageId===4">
@@ -229,7 +232,6 @@ import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
 import ColdSignature from './ColdSignature'
-import Scan from './Scan'
 var initData = {
     recipient: '',
     amount: 0,
@@ -245,11 +247,12 @@ var initData = {
     scanShow: false,
     qrInit: false,
     paused: false,
-    isValidSignature: false
+    isValidSignature: false,
+    sendError: false
 }
 export default {
     name: 'Send',
-    components: {Scan, ColdSignature, Success, Confirm},
+    components: {ColdSignature, Success, Confirm},
     props: {
         coldAddresses: {
             type: Object,
@@ -331,7 +334,7 @@ export default {
                 feeAssetId: '',
                 fee: 100000,
                 attachment: walletType === 'hotWallet' ? this.attachment : this.coldAttachment,
-                timestamp: Date.now()
+                timestamp: (Date.now() - 1) * 1e6
             }
             const apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair)
             console.log(JSON.stringify(apiSchema))
@@ -342,7 +345,7 @@ export default {
             }, response => {
                 console.log('failed')
                 // alert('send transaction failed!')
-                this.pageId++
+                this.sendError = true
             })
         },
         nextPage: function() {
@@ -369,6 +372,9 @@ export default {
             this.pageId = 1
             this.coldPageId = 1
             this.scanShow = false
+            this.recipient = ''
+            this.amount = ''
+            this.attachment = ''
         },
         endSend: function() {
             this.$refs.modal.hide()
