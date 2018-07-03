@@ -29,7 +29,8 @@
                      @decode="onDecode"
                      :paused="paused">
       </qrcode-reader>
-      <b-btn @click="scanAgain">Scan again</b-btn>
+      <b-btn class="scan-again-btn"
+             @click="scanAgain">Scan again</b-btn>
     </b-container>
   </b-modal>
 </template>
@@ -128,5 +129,8 @@ export default {
 <style scoped>
 .qrInfo {
     margin-bottom: 20px;
+}
+.scan-again-btn {
+    margin-top: 10px;
 }
 </style>

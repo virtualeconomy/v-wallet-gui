@@ -46,7 +46,8 @@
              :pub-key="pubKey"
              :get-pri-key="getPriKey"
              :get-seed-phrase="getSeedPhrase"></Account>
-    <Settings></Settings>
+    <Settings :set-usr-local-storage="setUsrLocalStorage"
+              :address="address"></Settings>
   </div>
 
 </template>
@@ -98,6 +99,13 @@ export default {
             }
         },
         getSeedPhrase: {
+            type: Function,
+            require: true,
+            default: function() {
+                return ''
+            }
+        },
+        setUsrLocalStorage: {
             type: Function,
             require: true,
             default: function() {
