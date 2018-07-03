@@ -23,7 +23,7 @@ export const MINIMUM_FEE = 100000;
 export const TRANSFER_ATTACHMENT_BYTE_LIMIT = 140;
 export const DEFAULT_MIN_SEED_LENGTH = 25;
 export const DEFAULT_ORDER_EXPIRATION_DAYS = 20;
-export const TRX_RECORD_LIMIT = 10;
+export const TRX_RECORD_LIMIT = 30; 
 export const DEFAULT_BASIC_CONFIG = {
     requestOffset: 0,
     requestLimit: 100,
