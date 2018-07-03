@@ -291,7 +291,6 @@ export default {
         },
         options() {
             var coldOptions = []
-            console.log(this.coldAddresses)
             if (!this.coldAddresses) return coldOptions
             let coldAddress
             for (coldAddress in this.coldAddresses) {
@@ -301,11 +300,9 @@ export default {
                 }
                 coldOptions.push(option)
             }
-            console.log(coldOptions)
             return coldOptions
         },
         noColdAddress() {
-            console.log(Object.keys(this.coldAddresses).length)
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         dataObject() {
@@ -326,7 +323,6 @@ export default {
     },
     methods: {
         sendData: function(walletType) {
-            console.log(walletType)
             const dataInfo = {
                 recipient: walletType === 'hotWallet' ? this.recipient : this.coldRecipient,
                 assetId: '',
@@ -337,14 +333,10 @@ export default {
                 timestamp: (Date.now() - 1) * 1e6
             }
             const apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair)
-            console.log(JSON.stringify(apiSchema))
             const url = TESTNET_NODE + '/assets/broadcast/transfer'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
-                console.log('success')
                 this.pageId++
             }, response => {
-                console.log('failed')
-                // alert('send transaction failed!')
                 this.sendError = true
             })
         },
@@ -381,9 +373,6 @@ export default {
         },
         scanChange: function(evt) {
             this.scanShow = !this.scanShow
-            // if (this.scanShow) {
-            //     evt.preventDefault()
-            // }
         },
         isValidRecipient: function(recipient) {
             if (!recipient) {
@@ -395,12 +384,10 @@ export default {
             } catch (e) {
                 console.log(e)
             }
-            console.log(isValid)
             return isValid
         },
         async onInit(promise) {
             try {
-                console.log('hhhhhh')
                 this.qrInit = true
                 await promise
             } catch (error) {
@@ -419,7 +406,6 @@ export default {
                 }
             } finally {
                 this.qrInit = false
-                console.log('kkkk')
             }
         },
         getParamValue: function(url, key) {
