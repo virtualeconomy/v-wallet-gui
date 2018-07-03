@@ -25,7 +25,8 @@ export default {
         return {
             qrInit: false,
             paused: false,
-            signature: ''
+            signature: '',
+            scanShow: false
         }
     },
     props: {
@@ -56,19 +57,13 @@ export default {
                 background: '#ffffff',
                 foreground: '#000000'
             }
-            console.log(JSON.stringify(this.dataObject))
             const imgBase64 = jrQrcode.getQrBase64(JSON.stringify(this.dataObject), options)
-            console.log(imgBase64)
             return imgBase64
-        },
-        scanShow() {
-            return !this.isValidSignature
         }
     },
     methods: {
         async onInit(promise) {
             try {
-                console.log('hhhhhh')
                 this.qrInit = true
                 await promise
             } catch (error) {
@@ -87,7 +82,6 @@ export default {
                 }
             } finally {
                 this.qrInit = false
-                console.log('kkkk')
             }
         },
         scanChange: function() {
@@ -96,7 +90,6 @@ export default {
         onDecode: function(decodeString) {
             this.paused = true
             this.signature = decodeString
-            // this.isValidSignature = transaction.default.isValidSignature(this.dataObject, this.signature, this.publicKey)
             this.isValidSignature = true
         },
         scanAgain: function() {
