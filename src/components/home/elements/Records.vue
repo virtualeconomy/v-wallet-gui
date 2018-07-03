@@ -88,7 +88,8 @@ export default {
 }
 .scroll {
     height: inherit;
-    overflow: scroll;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 .monthTtl {
     height: 44px;
