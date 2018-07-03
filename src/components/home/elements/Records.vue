@@ -15,7 +15,7 @@
   </div>
   <div v-else
        class="empty">
-    <p>There are no transaction records.</p>
+    <span>There are no transaction records.</span>
   </div>
 </template>
 
@@ -30,6 +30,7 @@ export default {
         Record
     },
     created() {
+        console.log(this.address)
         if (this.address && Vue.ls.get('pwd')) {
             this.getTxRecords()
         }
@@ -42,8 +43,17 @@ export default {
     props: {
         address: {
             type: String,
-            default: '3N71HkihDfFQubGiQYax9JwfpZ57AcgqKY4',
+            default: '',
             require: true
+        }
+    },
+    watch: {
+        address(newAddr, oldAddr) {
+            console.log(newAddr, oldAddr)
+            this.txRecords = {}
+            if (this.address && Vue.ls.get('pwd')) {
+                this.getTxRecords()
+            }
         }
     },
     methods: {
@@ -53,21 +63,23 @@ export default {
             return monthNames[d.getMonth()] + ', ' + d.getFullYear()
         },
         getTxRecords() {
-            const recordLimit = TRX_RECORD_LIMIT
-            const url = TESTNET_NODE + '/transactions/address/' + this.address + '/limit/' + recordLimit
-            this.$http.get(url).then(response => {
-                this.txRecords = response.body[0].reduce((rv, x) => {
-                    const aa = this.getMonthYearStr(x['timestamp'])
-                    if (!rv[aa]) {
-                        Vue.set(rv, aa, [])
-                    }
-                    rv[aa].push(x)
-                    return rv
-                }, {})
-                console.log(this.txRecords)
-            }, response => {
-                console.log(response)
-            })
+            if (this.address) {
+                const recordLimit = TRX_RECORD_LIMIT
+                const url = TESTNET_NODE + '/transactions/address/' + this.address + '/limit/' + recordLimit
+                this.$http.get(url).then(response => {
+                    this.txRecords = response.body[0].reduce((rv, x) => {
+                        const aa = this.getMonthYearStr(x['timestamp'])
+                        if (!rv[aa]) {
+                            Vue.set(rv, aa, [])
+                        }
+                        rv[aa].push(x)
+                        return rv
+                    }, {})
+                    console.log(this.txRecords)
+                }, response => {
+                    console.log(response)
+                })
+            }
         }
     }
 }

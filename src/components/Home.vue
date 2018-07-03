@@ -8,7 +8,8 @@
              :avt-hash="avtHash"
              :get-pri-key="getPriKey"
              :get-seed-phrase="getSeedPhrase"
-             :set-usr-local-storage="setUsrLocalStorage"></nav-bar>
+             :set-usr-local-storage="setUsrLocalStorage"
+             @delete-cold="deleteCold"></nav-bar>
     <div class="container-fluid height-full contents">
       <div class="row height-full div-main">
         <div class="col-auto assets-pane height-full">
@@ -212,6 +213,10 @@ export default {
                 this.selectedAddress = addr
                 this.getBalance(addr)
             }
+        },
+        deleteCold(addr) {
+            Vue.delete(this.coldAddresses, addr)
+            this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
         }
     },
 
