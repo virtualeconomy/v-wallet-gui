@@ -1,6 +1,7 @@
 <template>
-  <div class="records">
-    <div v-if="Object.keys(txRecords).length > 0">
+  <div v-if="Object.keys(txRecords).length > 0"
+       class="records">
+    <div class="scroll">
       <template v-for="(records, monthYear) in txRecords">
         <div :key="monthYear"
              class="monthTtl">{{ monthYear }}</div>
@@ -11,10 +12,10 @@
         </div>
       </template>
     </div>
-    <div v-else
-         class="empty">
-      <p>There are no transaction records.</p>
-    </div>
+  </div>
+  <div v-else
+       class="empty">
+    <p>There are no transaction records.</p>
   </div>
 </template>
 
@@ -83,6 +84,11 @@ export default {
     border: 1px solid #E8E9ED;
     border-radius: 4px;
     margin: 0px 0px;
+    height: inherit;
+}
+.scroll {
+    height: inherit;
+    overflow: scroll;
 }
 .monthTtl {
     height: 44px;

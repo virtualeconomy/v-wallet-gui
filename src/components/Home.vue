@@ -8,8 +8,8 @@
              :avt-hash="avtHash"
              :get-pri-key="getPriKey"
              :get-seed-phrase="getSeedPhrase"></nav-bar>
-    <div class="container-fluid height-full">
-      <div class="row height-full">
+    <div class="container-fluid height-full contents">
+      <div class="row height-full div-main">
         <div class="col-auto assets-pane height-full">
           <div class="asset-title">
             <img
@@ -47,6 +47,7 @@
         </div>
         <div class="col page container">
           <div
+            class="height-full"
             bg-variant="white"
             border-variant="primary">
             <div class="trans-pane">
@@ -54,7 +55,7 @@
                           :address="selectedAddress"
                           :cold-addresses="coldAddresses"></trans-pane>
             </div>
-            <div>
+            <div class="f-records">
               <Records :address="selectedAddress"></Records>
             </div>
           </div>
@@ -238,7 +239,8 @@ export default {
     }
 }
 .height-full {
-   height: 100%;
+    max-height: 100%;
+    height: inherit;
 }
 .page {
     background-color: rgb(250, 250, 250);
@@ -266,10 +268,24 @@ export default {
 }
 .navibar {
     height: 64px;
+    width: 100%;
+    position: fixed;
+    z-index:99999;
 }
 .title-assets {
     margin-left: 10px;
     font-size: 15px;
     font: Roboto-Regular;
+}
+.contents {
+    padding-top: 64px;
+    overflow: hidden;
+}
+.div-main {
+    border-top: 1px solid rgb(232, 232, 236);
+}
+.f-records {
+    height: -webkit-fill-available;
+    padding-bottom: 150px;
 }
 </style>
