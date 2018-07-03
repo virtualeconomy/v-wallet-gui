@@ -7,7 +7,8 @@
              :username="username"
              :avt-hash="avtHash"
              :get-pri-key="getPriKey"
-             :get-seed-phrase="getSeedPhrase"></nav-bar>
+             :get-seed-phrase="getSeedPhrase"
+             :set-usr-local-storage="setUsrLocalStorage"></nav-bar>
     <div class="container-fluid height-full contents">
       <div class="row height-full div-main">
         <div class="col-auto assets-pane height-full">
@@ -106,7 +107,7 @@ export default {
         console.log('mounted')
         let oldTimeout = INITIAL_SESSION_TIMEOUT
         try {
-            oldTimeout = JSON.parse(window.localStorage.getItem(this.address)).sesstionTimeout
+            oldTimeout = JSON.parse(window.localStorage.getItem(this.address)).sessionTimeout
         } catch (e) {
             oldTimeout = INITIAL_SESSION_TIMEOUT
         }
