@@ -288,7 +288,7 @@ export default {
     height: 64px;
     width: 100%;
     position: fixed;
-    z-index:99999;
+    z-index:1000;
 }
 .title-assets {
     margin-left: 10px;

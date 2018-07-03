@@ -16,7 +16,7 @@
       <b-form-group label="Cold Wallet Address">
         <b-input-group
           class="mb-2"
-          v-if="Object.keys(coldAddresses).length > 0"
+          v-if="coldWalletNum > 0"
           v-for="(pubkey, addr) in coldAddresses"
           :key="addr">
           <b-dropdown
@@ -46,12 +46,13 @@
               size="sm">×</b-btn>
           </b-input-group-append>
         </b-input-group>
-        <b-form-textarea
-          v-else
+        <b-form-input
+          v-if="coldWalletNum == 0"
           readonly
           no-resize
+          size="sm"
           value="No cold wallet imported">
-        </b-form-textarea>
+        </b-form-input>
       </b-form-group>
       <b-form-group label="Public Key"
                     label-for="pubKey">
@@ -160,6 +161,14 @@ export default {
             tagOfColdWallet: {}
         }
     },
+    created() {
+        this.coldWalletNum = Object.keys(this.coldAddresses).length
+    },
+    watch: {
+        coldAddresses() {
+            this.coldWalletNum = Object.keys(this.coldAddresses).length
+        }
+    },
     methods: {
         showSeed() {
             setTimeout(() => {
@@ -187,6 +196,7 @@ export default {
             this.seedHidden = true
             this.privateKeyHidden = true
             this.tagOfColdWallet = {}
+            this.coldWalletNum = Object.keys(this.coldAddresses).length
         },
         showAddr(addr) {
             Vue.set(this.tagOfColdWallet, addr, false)
