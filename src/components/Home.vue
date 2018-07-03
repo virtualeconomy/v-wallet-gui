@@ -107,7 +107,8 @@ export default {
         console.log('mounted')
         let oldTimeout = INITIAL_SESSION_TIMEOUT
         try {
-            oldTimeout = JSON.parse(window.localStorage.getItem(this.address)).sessionTimeout
+            newTimeout = JSON.parse(window.localStorage.getItem(this.address)).sessionTimeout
+            oldTimeout = newTimeout ? newTimeout : oldTimeout
         } catch (e) {
             oldTimeout = INITIAL_SESSION_TIMEOUT
         }
