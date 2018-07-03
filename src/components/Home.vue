@@ -105,20 +105,12 @@ export default {
 
     mounted() {
         console.log('mounted')
-        let oldTimeout = INITIAL_SESSION_TIMEOUT
-        try {
-            newTimeout = JSON.parse(window.localStorage.getItem(this.address)).sessionTimeout
-            oldTimeout = newTimeout ? newTimeout : oldTimeout
-        } catch (e) {
-            oldTimeout = INITIAL_SESSION_TIMEOUT
-        }
-        this.sessionClearTimeout = setTimeout(() => {
-            console.log('clear sesson')
-            Vue.ls.clear()
-            this.$router.push('/login')
-        }, oldTimeout)
+        this.setSessionClearTimeout()
     },
-
+    updated() {
+        console.log('updated')
+        this.resetSessionClearTimeout()
+    },
     beforeDestroy() {
         console.log('beforeDestroy')
         clearTimeout(this.sessionClearTimeout)
@@ -161,6 +153,25 @@ export default {
     },
 
     methods: {
+        setSessionClearTimeout() {
+            let oldTimeout = INITIAL_SESSION_TIMEOUT
+            try {
+                const newTimeout = JSON.parse(window.localStorage.getItem(this.address)).sessionTimeout
+                oldTimeout = newTimeout || oldTimeout
+            } catch (e) {
+                oldTimeout = INITIAL_SESSION_TIMEOUT
+            }
+            this.sessionClearTimeout = setTimeout(() => {
+                console.log('clear sesson')
+                Vue.ls.clear()
+                this.$router.push('/login')
+            }, oldTimeout)
+        },
+
+        resetSessionClearTimeout() {
+            clearTimeout(this.sessionClearTimeout)
+            this.setSessionClearTimeout()
+        },
 
         getBalance: function(address) {
             const url = TESTNET_NODE + '/addresses/balance/' + address

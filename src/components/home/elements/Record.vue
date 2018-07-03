@@ -161,7 +161,7 @@ export default {
         .detail-3 {
             background: #E8E9ED;
             padding: 0px;
-            padding-left: 1px; 
+            padding-left: 1px;
         }
         .detail-4 {
             font-size: 12px;
