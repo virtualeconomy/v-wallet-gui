@@ -20,8 +20,8 @@
         <span>{{ txAddress }}</span>
       </div>
       <div class="tx-block">
-        <label>Block</label>
-        <span>{{ txBlock }}</span>
+        <label>Timestamp</label>
+        <span>{{ new Date(txTime / 1000000).toGMTString() }}</span>
       </div>
       <div class="tx-fee">
         <label>Fee</label>
@@ -60,6 +60,10 @@ export default {
             default: 0
         },
         txBlock: {
+            type: Number,
+            default: 0
+        },
+        txTime: {
             type: Number,
             default: 0
         }
