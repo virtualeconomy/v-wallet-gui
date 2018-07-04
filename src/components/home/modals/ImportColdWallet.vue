@@ -43,7 +43,8 @@ export default {
         return {
             qrInit: false,
             paused: false,
-            coldAddress: ''
+            coldAddress: '',
+            coldPubKey: ''
         }
     },
     computed: {
@@ -102,7 +103,7 @@ export default {
                 } else if (error.name === 'NotSupportedError') {
                     throw Error('page is not served over HTTPS (or localhost)')
                 } else if (error.name === 'NotReadableError') {
-                    throw Error('mayby camera is already in use')
+                    throw Error('maybe camera is already in use')
                 } else if (error.name === 'OverconstarinedError') {
                     throw Error('pass constraints do not match any camera')
                 } else {
@@ -115,8 +116,16 @@ export default {
         },
         onDecode: function(decodeString) {
             this.paused = true
-            this.coldAddress = decodeString
+            let start = decodeString.indexOf('address')
+            let end = decodeString.indexOf('&')
+            this.coldAddress = decodeString.substring(start + 8, end)
+
+            start = decodeString.indexOf('publicKey')
+            end = decodeString.length
+            this.coldPubKey = decodeString.substring(start + 10, end)
             console.log(decodeString)
+            console.log(this.coldAddress)
+            console.log(this.coldPubKey)
         },
         scanAgain: function() {
             this.paused = false
