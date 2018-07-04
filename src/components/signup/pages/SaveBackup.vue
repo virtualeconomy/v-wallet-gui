@@ -26,7 +26,7 @@
         <template v-for="(word, idx) in wordList">
           <span
             :key="idx"
-            class="word container shadow">
+            class="word">
             {{ word }}
           </span>
           &nbsp;
@@ -155,9 +155,8 @@ export default {
     margin-right: auto;
 }
 .word {
-    font-size: 100%;
-    background-color: rgb(190, 190, 190);
-    color: white;
+    font-size: 17px;
+    color: #181B3A;
 }
 .unselectable {
     -moz-user-select: -moz-none;
