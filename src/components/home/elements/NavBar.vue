@@ -45,7 +45,8 @@
              :cold-addresses="coldAddresses"
              :pub-key="pubKey"
              :get-pri-key="getPriKey"
-             :get-seed-phrase="getSeedPhrase"></Account>
+             :get-seed-phrase="getSeedPhrase"
+             @delete-cold="deleteCold"></Account>
     <Settings :set-usr-local-storage="setUsrLocalStorage"
               :address="address"></Settings>
   </div>
@@ -123,6 +124,9 @@ export default {
             console.log('logout')
             Vue.ls.clear()
             this.$router.push('/login')
+        },
+        deleteCold(addr) {
+            this.$emit('delete-cold', addr)
         }
     }
 }

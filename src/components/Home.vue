@@ -8,7 +8,8 @@
              :avt-hash="avtHash"
              :get-pri-key="getPriKey"
              :get-seed-phrase="getSeedPhrase"
-             :set-usr-local-storage="setUsrLocalStorage"></nav-bar>
+             :set-usr-local-storage="setUsrLocalStorage"
+             @delete-cold="deleteCold"></nav-bar>
     <div class="container-fluid height-full contents">
       <div class="row height-full div-main">
         <div class="col-auto assets-pane height-full">
@@ -105,19 +106,12 @@ export default {
 
     mounted() {
         console.log('mounted')
-        let oldTimeout = INITIAL_SESSION_TIMEOUT
-        try {
-            oldTimeout = JSON.parse(window.localStorage.getItem(this.address)).sessionTimeout
-        } catch (e) {
-            oldTimeout = INITIAL_SESSION_TIMEOUT
-        }
-        this.sessionClearTimeout = setTimeout(() => {
-            console.log('clear sesson')
-            Vue.ls.clear()
-            this.$router.push('/login')
-        }, oldTimeout)
+        this.setSessionClearTimeout()
     },
-
+    updated() {
+        console.log('updated')
+        this.resetSessionClearTimeout()
+    },
     beforeDestroy() {
         console.log('beforeDestroy')
         clearTimeout(this.sessionClearTimeout)
@@ -160,6 +154,25 @@ export default {
     },
 
     methods: {
+        setSessionClearTimeout() {
+            let oldTimeout = INITIAL_SESSION_TIMEOUT
+            try {
+                const newTimeout = JSON.parse(window.localStorage.getItem(this.address)).sessionTimeout
+                oldTimeout = newTimeout || oldTimeout
+            } catch (e) {
+                oldTimeout = INITIAL_SESSION_TIMEOUT
+            }
+            this.sessionClearTimeout = setTimeout(() => {
+                console.log('clear sesson')
+                Vue.ls.clear()
+                this.$router.push('/login')
+            }, oldTimeout)
+        },
+
+        resetSessionClearTimeout() {
+            clearTimeout(this.sessionClearTimeout)
+            this.setSessionClearTimeout()
+        },
 
         getBalance: function(address) {
             const url = TESTNET_NODE + '/addresses/balance/' + address
@@ -200,6 +213,10 @@ export default {
                 this.selectedAddress = addr
                 this.getBalance(addr)
             }
+        },
+        deleteCold(addr) {
+            Vue.delete(this.coldAddresses, addr)
+            this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
         }
     },
 
@@ -271,7 +288,7 @@ export default {
     height: 64px;
     width: 100%;
     position: fixed;
-    z-index:99999;
+    z-index:1000;
 }
 .title-assets {
     margin-left: 10px;
