@@ -24,6 +24,20 @@
           Invalid cold wallet address. <span v-if="addressExisted">The address has existed.</span>
         </b-form-invalid-feedback>
       </b-form-group>
+      <b-form-group label="Cold Wallet Public Key"
+                    label-for="coldPubKey"
+                    description="Please input your cold wallet public key encoded with Base58.">
+        <b-form-input id="coldPubKey"
+                      type="text"
+                      v-model="coldPubKey"
+                      :state="isValidPubKey"
+                      aria-describedby="inputLiveHelp inputLiveFeedback"
+                      placeholder="cold wallet public key">
+        </b-form-input>
+        <b-form-invalid-feedback id="inputLiveFeedback">
+          Invalid cold wallet public key.
+        </b-form-invalid-feedback>
+      </b-form-group>
       <p class="qrInfo">Please confirm your browser's camera is available.</p>
       <qrcode-reader @init="onInit"
                      @decode="onDecode"
@@ -37,6 +51,7 @@
 
 <script>
 import crypto from '@/utils/crypto'
+import { PUBLIC_KEY_LENGTH } from '@/constants.js'
 export default {
     name: 'ImportColdWallet',
     props: {
@@ -70,6 +85,12 @@ export default {
             }
             return isValid
         },
+        isValidPubKey: function() {
+            if (!this.coldPubKey) {
+                return true
+            }
+            return this.coldPubKey.length === PUBLIC_KEY_LENGTH
+        },
         addressExisted: function() {
             if (this.coldAddress === this.address) {
                 return true
@@ -87,7 +108,7 @@ export default {
             }
         },
         importOk: function(evt) {
-            if (this.qrInit || !this.coldAddress || !this.isValidAddress) {
+            if (this.qrInit || !this.coldAddress || !this.isValidAddress || !this.coldPubKey || !this.isValidPubKey) {
                 evt.preventDefault()
             } else {
                 this.$emit('import-cold', this.coldAddress, this.coldPubKey)
