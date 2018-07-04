@@ -45,7 +45,8 @@
               class="mb-1"
               src="../assets/imgs/icons/wallet/ic_import.svg"><b class="title-assets">Import Cold Wallet</b></b-btn>
           <ImportColdWallet @import-cold="importCold"
-                            show="false"></ImportColdWallet>
+                            show="false"
+                            :address="address"></ImportColdWallet>
         </div>
         <div class="col page container">
           <div
@@ -122,7 +123,6 @@ export default {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
             }
-            // return '3P6N2EnapoRxazL7otmV3srTuJVcMW2MQWG'
         },
         pubKey() {
             if (this.secretInfo) {

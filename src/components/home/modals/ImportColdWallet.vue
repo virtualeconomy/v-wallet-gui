@@ -39,6 +39,13 @@
 import crypto from '@/utils/crypto'
 export default {
     name: 'ImportColdWallet',
+    props: {
+        address: {
+            type: String,
+            default: '',
+            require: true
+        }
+    },
     data: function() {
         return {
             qrInit: false,
@@ -49,6 +56,9 @@ export default {
     },
     computed: {
         isValidAddress: function() {
+            if (this.coldAddress === this.address) {
+                return false
+            }
             if (!this.coldAddress) {
                 return true
             }
@@ -69,7 +79,6 @@ export default {
             if (this.qrInit) {
                 evt.preventDefault()
             }
-            console.log('close')
         },
         importOk: function(evt) {
             if (this.qrInit || !this.coldAddress || !this.isValidAddress) {
