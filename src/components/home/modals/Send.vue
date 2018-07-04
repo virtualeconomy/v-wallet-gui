@@ -73,6 +73,7 @@
                    :fee="fee"
                    :attachment="attachment">
           </Confirm>
+          <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-button variant="primary"
                     size="lg"
                     @click="prevPage">Cancle
@@ -81,7 +82,6 @@
                     size="lg"
                     @click="sendData('hotWallet')">Confirm
           </b-button>
-          <p v-show="sendError">Sorry, transaction send failed!</p>
         </b-container>
         <b-container v-show="pageId===3">
           <Success :address="address"
@@ -177,9 +177,9 @@
         </b-container>
         <b-container v-show="coldPageId===3">
           <ColdSignature :data-object="dataObject"
-                         :is-valid-signature="isValidSignature"
                          :public-key="coldPublicKey"
-                         v-if="coldPageId===3"></ColdSignature>
+                         v-if="coldPageId===3"
+                         @get-signature="verifySignature"></ColdSignature>
           <b-button variant="primary"
                     size="lg"
                     @click="coldPrevPage">Cancle
@@ -197,6 +197,7 @@
                    :fee="coldFee"
                    :attachment="coldAttachment">
           </Confirm>
+          <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-button variant="primary"
                     size="lg"
                     @click="prevPage">Cancle
@@ -248,7 +249,8 @@ var initData = {
     qrInit: false,
     paused: false,
     isValidSignature: false,
-    sendError: false
+    sendError: false,
+    coldSignature: ''
 }
 export default {
     name: 'Send',
@@ -310,7 +312,7 @@ export default {
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 assetId: '',
                 feeAssetId: '',
-                timestamp: Date.now(),
+                timestamp: Date.now() * 1e6,
                 amount: this.coldAmount,
                 fee: this.coldFee,
                 recipient: this.coldRecipient,
@@ -323,22 +325,29 @@ export default {
     },
     methods: {
         sendData: function(walletType) {
-            const dataInfo = {
-                recipient: walletType === 'hotWallet' ? this.recipient : this.coldRecipient,
-                assetId: '',
-                amount: walletType === 'hotWallet' ? Number(this.amount) : this.coldAmount,
-                feeAssetId: '',
-                fee: 100000,
-                attachment: walletType === 'hotWallet' ? this.attachment : this.coldAttachment,
-                timestamp: (Date.now() - 1) * 1e6
+            var apiSchema
+            if (walletType === 'hotWallet') {
+                const dataInfo = {
+                    recipient: this.recipient,
+                    assetId: '',
+                    amount: Number(this.amount),
+                    feeAssetId: '',
+                    fee: 100000,
+                    attachment: this.attachment,
+                    timestamp: (Date.now() - 1) * 1e6
+                }
+                apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair)
+            } else if (walletType === 'coldWallet') {
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.signature)
             }
-            const apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair)
             const url = TESTNET_NODE + '/assets/broadcast/transfer'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 this.pageId++
             }, response => {
                 this.sendError = true
             })
+        },
+        sendColdData: function() {
         },
         nextPage: function() {
             this.pageId++
@@ -398,7 +407,7 @@ export default {
                 } else if (error.name === 'NotSupportedError') {
                     throw Error('page is not served over HTTPS (or localhost)')
                 } else if (error.name === 'NotReadableError') {
-                    throw Error('mayby camera is already in use')
+                    throw Error('maybe camera is already in use')
                 } else if (error.name === 'OverconstarinedError') {
                     throw Error('pass constraints do not match any camera')
                 } else {
@@ -408,23 +417,42 @@ export default {
                 this.qrInit = false
             }
         },
-        getParamValue: function(url, key) {
-            var regex = new RegExp(key + '=([^&]*', 'i')
-            return url.match(regex)[1]
+        getParmFromUrl: function(key, url) {
+            var regex = new RegExp(key + '=([^&]*)', 'i')
+            if (url.match(regex)) {
+                return url.match(regex)[1]
+            } else {
+                if (key === 'recipient') {
+                    return ''
+                } else if (key === 'amount') {
+                    return 0
+                }
+            }
         },
         onDecode: function(decodeString) {
             this.paused = true
-            this.recipient = this.getParamValue(decodeString, 'recipient')
-            this.amount = this.getParamValue(decodeString, 'amount')
+            this.recipient = this.getParmFromUrl('recipient', decodeString)
+            this.amount = this.getParmFromUrl('amount', decodeString)
+            if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
+                this.paused = false
+            }
         },
         onColdDecode: function(decodeString) {
             this.paused = true
-            this.coldRecipient = this.getParamValue(decodeString, 'recipient')
-            this.coldAmount = this.getParamValue(decodeString, 'amount')
+            this.coldRecipient = this.getParmFromUrl('recipient', decodeString)
+            this.coldAmount = this.getParmFromUrl('amount', decodeString)
+            if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
+                this.paused = false
+            }
         },
         scanAgain: function() {
             this.paused = false
             this.recipient = ''
+            this.amount = 0
+        },
+        verifySignature: function(signature) {
+            this.coldSignature = signature
+            this.isValidSignature = transaction.default.isValidSignature(this.dataObject, signature)
         }
     }
 }
