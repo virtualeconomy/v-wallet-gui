@@ -120,11 +120,9 @@ export default {
     },
     watch: {
         address(newAddr, oldAddr) {
-            console.log(newAddr, oldAddr)
             this.txRecords = {}
             this.response = void 0
             this.changeShowDisable = false
-            // TO BE DETERMINED
             this.showingNum = 10
             if (this.address && Vue.ls.get('pwd')) {
                 this.getTxRecords()
@@ -149,7 +147,6 @@ export default {
                 const recordLimit = this.showingNum
                 const url = TESTNET_NODE + '/transactions/address/' + addr + '/limit/' + recordLimit
                 this.$http.get(url).then(response => {
-                    console.log(addr, this.address)
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
                         this.txRecords = response.body[0].reduce((rv, x) => {
@@ -163,7 +160,6 @@ export default {
                         this.changeShowDisable = false
                     }
                 }, response => {
-                    console.log(response)
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.changeShowDisable = false
                     }

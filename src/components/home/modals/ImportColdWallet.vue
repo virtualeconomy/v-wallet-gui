@@ -69,7 +69,6 @@ export default {
             if (this.qrInit) {
                 evt.preventDefault()
             }
-            console.log('close')
         },
         importOk: function(evt) {
             if (this.qrInit || !this.coldAddress || !this.isValidAddress) {
@@ -92,7 +91,6 @@ export default {
         },
         async onInit(promise) {
             try {
-                console.log(promise)
                 this.qrInit = true
                 await promise
             } catch (error) {
@@ -111,7 +109,6 @@ export default {
                 }
             } finally {
                 this.qrInit = false
-                console.log('onInit')
             }
         },
         onDecode: function(decodeString) {
@@ -123,9 +120,6 @@ export default {
             start = decodeString.indexOf('publicKey')
             end = decodeString.length
             this.coldPubKey = decodeString.substring(start + 10, end)
-            console.log(decodeString)
-            console.log(this.coldAddress)
-            console.log(this.coldPubKey)
         },
         scanAgain: function() {
             this.paused = false

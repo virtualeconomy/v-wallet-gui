@@ -72,7 +72,7 @@ export default {
         setTimeout(() => {
             clearInterval(interval)
             this.isContinueDisable = false
-        }, this.timeToContinue * 1000)
+        }, this.timeToContinue * 1000 + 100)
     },
 
     computed: {
