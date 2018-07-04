@@ -26,6 +26,7 @@
           <img src="../../../assets/imgs/icons/signup/ic_arrow_down.svg">
         </template>
         <b-dropdown-item
+          class="selection"
           v-for="num in showNums"
           :key="num"
           @click="changeShowNum(num)">Show {{ num }} records</b-dropdown-item>
@@ -257,5 +258,10 @@ export default {
     height: 36px;
     z-index: 100;
     background-color: #FFF;
+}
+.selection {
+    font-size: 15px;
+    color: #696B8A;
+    letter-spacing: 0;
 }
 </style>
