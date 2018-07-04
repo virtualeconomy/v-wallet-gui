@@ -4,9 +4,32 @@
     <div
       class="tittle-records">
       <span>Transaction Record</span>
-      <b-btn
+      <b-dropdown
         class="pd-select"
-        variant="light">Latest 10 Records</b-btn>
+        router-tag="div"
+        no-caret
+        :disabled="changeShowDisable"
+        variant="light">
+        <template
+          slot="button-content">
+          <div style="display:inline-block; margin-right: 10px;">
+            <img
+              v-if="!changeShowDisable"
+              src="../../../assets/imgs/icons/wallet/ic_filter.svg">
+            <img
+              height="16"
+              width="16"
+              v-if="changeShowDisable"
+              src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+            <span class="m-1">Latest {{ showingNum }} Records </span>
+          </div>
+          <img src="../../../assets/imgs/icons/signup/ic_arrow_down.svg">
+        </template>
+        <b-dropdown-item
+          v-for="num in showNums"
+          :key="num"
+          @click="changeShowNum(num)">Show {{ num }} records</b-dropdown-item>
+      </b-dropdown>
       <b-btn
         class="btn-export"
         variant="light"><img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
@@ -33,12 +56,17 @@
   </div>
   <div v-else
        class="empty">
-    <span>There are no transaction records.</span>
+    <img
+      height="50"
+      width="50"
+      v-if="changeShowDisable"
+      src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+    <span v-if="!changeShowDisable">There are no transaction records.</span>
   </div>
 </template>
 
 <script>
-import { TESTNET_NODE, TRX_RECORD_LIMIT } from '../../../constants'
+import { TESTNET_NODE } from '../../../constants'
 import Record from './Record'
 import Vue from 'vue'
 
@@ -48,18 +76,16 @@ export default {
         Record
     },
     created() {
-        console.log(this.address)
         if (this.address && Vue.ls.get('pwd')) {
             this.getTxRecords()
         }
     },
-    updated() {
-        console.log(this.$refs[0][0].offsetTop)
-        console.log(this.$refs[1][0].offsetTop)
-    },
     data() {
         return {
-            txRecords: {}
+            txRecords: {},
+            showNums: [10, 50, 100, 200, 500, 1000],
+            showingNum: 10,
+            changeShowDisable: false
         }
     },
     props: {
@@ -91,9 +117,11 @@ export default {
         },
         getTxRecords() {
             if (this.address) {
-                const recordLimit = TRX_RECORD_LIMIT
+                this.changeShowDisable = true
+                const recordLimit = this.showingNum
                 const url = TESTNET_NODE + '/transactions/address/' + this.address + '/limit/' + recordLimit
                 this.$http.get(url).then(response => {
+                    console.log(response)
                     this.txRecords = response.body[0].reduce((rv, x) => {
                         const aa = this.getMonthYearStr(x['timestamp'])
                         if (!rv[aa]) {
@@ -102,9 +130,19 @@ export default {
                         rv[aa].push(x)
                         return rv
                     }, {})
+                    this.changeShowDisable = false
                 }, response => {
                     console.log(response)
+                    this.changeShowDisable = false
                 })
+            }
+        },
+        changeShowNum(newNum) {
+            if (!this.changeShowDisable) {
+                this.showingNum = newNum
+                if (this.address && Vue.ls.get('pwd')) {
+                    this.getTxRecords()
+                }
             }
         }
     }
@@ -179,15 +217,9 @@ export default {
 .pd-select {
     position: absolute;
     right: 166px;
-    width: 176px;
+    display: flex;
     height: 36px;
     z-index: 100;
     background-color: #FFF;
-    border-color: #E8E9ED;
-    font-size: 15px;
-    color: #696B8A;
-    letter-spacing: 0;
-    align-items: Center;
-    display: flex;
 }
 </style>
