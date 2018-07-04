@@ -42,7 +42,7 @@
         Continue to confirm {{ buttonTimeStr }}
       </b-button>
       <div @click="gotoHomePage"
-           class="footer-link">Skip this step</div>
+           class="footer-link">skip this step</div>
     </div>
   </div>
 </template>
@@ -146,8 +146,11 @@ export default {
 .footer-link {
     margin-top: 20px;
     cursor: pointer;
-    text-decoration: underline;
     color: #FF8737;
+    display: -webkit-inline-box;
+}
+.footer-link:hover {
+    text-decoration: underline;
 }
 .backup-words-copy {
     max-width: 100%;

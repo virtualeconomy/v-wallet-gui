@@ -74,7 +74,11 @@
           </update-account>
         </div>
         <p class="flink">
-          <a href="/login">Sign in</a> or <a href="/signup">Create a new account</a>
+          <a
+            class='vee-color'
+            href="/login">Sign in</a> or <a
+              class='vee-color'
+              href="/signup">Create a new account</a>
         </p>
       </div>
     </div>
