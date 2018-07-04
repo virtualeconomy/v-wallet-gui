@@ -160,7 +160,7 @@ export default {
             setTimeout(() => {
                 this.avatarCanChange = true
                 clearInterval(avtChangeTimer)
-            }, this.timeLeftToChange * 1000)
+            }, this.timeLeftToChange * 1000 + 100)
         },
         notFirst(field) {
             this.isFirst[field] = false
@@ -271,6 +271,8 @@ export default {
         timeLeftToChangeStr() {
             if (this.timeLeftToChange) {
                 return '(' + this.timeLeftToChange + ')'
+            } else {
+                return ''
             }
         },
         avatarDataHex() {
@@ -347,7 +349,6 @@ export default {
 .btn-change-avt {
     color: #FF8737;
     background-color: #fff;
-    border-color: #FF8737;
     font-size: 0.875rem;
     line-height: 2;
     border-radius: 0.2rem;
@@ -355,6 +356,7 @@ export default {
     margin-top: auto;
     margin-bottom: auto;
     cursor: pointer;
+    border: 1px solid #FF8737;
 }
 .btn-change-avt:disabled {
     opacity: 0.65;
