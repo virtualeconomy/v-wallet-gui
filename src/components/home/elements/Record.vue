@@ -88,7 +88,7 @@ export default {
     },
     computed: {
         txType() {
-            return this.txRecord.sender === this.address ? 'Sent' : 'Received'
+            return this.txRecord.sender === this.address && this.txRecord['type'] !== 11 ? 'Sent' : 'Received'
         },
         txIcon() {
             return this.txType.toString().toLowerCase()
