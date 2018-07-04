@@ -110,8 +110,10 @@ export default {
         this.setSessionClearTimeout()
     },
     updated() {
-        console.log('updated')
-        this.resetSessionClearTimeout()
+        let _self = this
+        document.body.addEventListener('mousemove', function() {
+            _self.resetSessionClearTimeout()
+        }, false)
     },
     beforeDestroy() {
         console.log('beforeDestroy')
