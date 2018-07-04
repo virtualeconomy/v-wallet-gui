@@ -21,7 +21,7 @@
                       placeholder="cold wallet address">
         </b-form-input>
         <b-form-invalid-feedback id="inputLiveFeedback">
-          Invalid cold wallet address.
+          Invalid cold wallet address. <span v-if="addressExisted">The address has existed.</span>
         </b-form-invalid-feedback>
       </b-form-group>
       <p class="qrInfo">Please confirm your browser's camera is available.</p>
@@ -69,6 +69,12 @@ export default {
                 console.log(e)
             }
             return isValid
+        },
+        addressExisted: function() {
+            if (this.coldAddress === this.address) {
+                return true
+            }
+            return false
         }
     },
     methods: {
@@ -120,7 +126,6 @@ export default {
                 }
             } finally {
                 this.qrInit = false
-                console.log('onInit')
             }
         },
         onDecode: function(decodeString) {
@@ -132,9 +137,6 @@ export default {
             start = decodeString.indexOf('publicKey')
             end = decodeString.length
             this.coldPubKey = decodeString.substring(start + 10, end)
-            console.log(decodeString)
-            console.log(this.coldAddress)
-            console.log(this.coldPubKey)
         },
         scanAgain: function() {
             this.paused = false
