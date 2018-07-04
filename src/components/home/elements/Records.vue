@@ -30,9 +30,17 @@
           :key="num"
           @click="changeShowNum(num)">Show {{ num }} records</b-dropdown-item>
       </b-dropdown>
-      <b-btn
-        class="btn-export"
-        variant="light"><img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
+      <json-excel
+        class="csv-export"
+        :data="response"
+        :fields="resFields"
+        :type="downloadFileType"
+        :name="'txs_' + address + '.' + downloadFileType">
+        <b-btn
+          class="btn-export"
+          :disabled="changeShowDisable"
+          variant="light"><img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
+      </json-excel>
     </div>
     <div class="inherit-height">
       <div
@@ -69,11 +77,13 @@
 import { TESTNET_NODE } from '../../../constants'
 import Record from './Record'
 import Vue from 'vue'
+import JsonExcel from 'vue-json-excel'
 
 export default {
     name: 'Records',
     components: {
-        Record
+        Record,
+        JsonExcel
     },
     created() {
         if (this.address && Vue.ls.get('pwd')) {
@@ -85,7 +95,20 @@ export default {
             txRecords: {},
             showNums: [10, 50, 100, 200, 500, 1000],
             showingNum: 10,
-            changeShowDisable: false
+            changeShowDisable: false,
+            response: void 0,
+            downloadFileType: 'csv',
+            resFields: {
+                transaction_id: 'id',
+                sender_address: 'sender',
+                sender_public_key: 'senderPublicKey',
+                transaction_fee: 'fee',
+                'timestamp(in nano second)': 'timestamp',
+                signature: 'signature',
+                recipient_address: 'recipient',
+                amount: 'amount',
+                attachment: 'attachment'
+            }
         }
     },
     props: {
@@ -99,6 +122,10 @@ export default {
         address(newAddr, oldAddr) {
             console.log(newAddr, oldAddr)
             this.txRecords = {}
+            this.response = void 0
+            this.changeShowDisable = false
+            // TO BE DETERMINED
+            this.showingNum = 10
             if (this.address && Vue.ls.get('pwd')) {
                 this.getTxRecords()
             }
@@ -117,23 +144,29 @@ export default {
         },
         getTxRecords() {
             if (this.address) {
+                const addr = this.address
                 this.changeShowDisable = true
                 const recordLimit = this.showingNum
-                const url = TESTNET_NODE + '/transactions/address/' + this.address + '/limit/' + recordLimit
+                const url = TESTNET_NODE + '/transactions/address/' + addr + '/limit/' + recordLimit
                 this.$http.get(url).then(response => {
-                    console.log(response)
-                    this.txRecords = response.body[0].reduce((rv, x) => {
-                        const aa = this.getMonthYearStr(x['timestamp'])
-                        if (!rv[aa]) {
-                            Vue.set(rv, aa, [])
-                        }
-                        rv[aa].push(x)
-                        return rv
-                    }, {})
-                    this.changeShowDisable = false
+                    console.log(addr, this.address)
+                    if (addr === this.address && recordLimit === this.showingNum) {
+                        this.response = response.body[0]
+                        this.txRecords = response.body[0].reduce((rv, x) => {
+                            const aa = this.getMonthYearStr(x['timestamp'])
+                            if (!rv[aa]) {
+                                Vue.set(rv, aa, [])
+                            }
+                            rv[aa].push(x)
+                            return rv
+                        }, {})
+                        this.changeShowDisable = false
+                    }
                 }, response => {
                     console.log(response)
-                    this.changeShowDisable = false
+                    if (addr === this.address && recordLimit === this.showingNum) {
+                        this.changeShowDisable = false
+                    }
                 })
             }
         },
@@ -143,6 +176,11 @@ export default {
                 if (this.address && Vue.ls.get('pwd')) {
                     this.getTxRecords()
                 }
+            }
+        },
+        exportRecords() {
+            if (this.response) {
+
             }
         }
     }
@@ -196,12 +234,14 @@ export default {
     display: flex;
     align-items: Center;
 }
-.btn-export {
+.csv-export {
     position: absolute;
     right: 40px;
+    z-index: 100;
+}
+.btn-export {
     width: 116px;
     height: 36px;
-    z-index: 100;
     background-color: #FFF;
     border-color: #E8E9ED;
     font-size: 15px;
