@@ -94,8 +94,14 @@ function castToAPISchema(data) {
 export default {
     prepareForAPI: function(transferData, keyPair) {
         var signature = getSignature(transferData, keyPair);
-        console.log('signatureValid:' + crypto_1.default.isValidTransactionSignature(getBytes(__assign({}, transferData, { senderPublicKey: keyPair.publicKey })), signature, keyPair.publicKey))
         return  __assign({}, {transactionType: constants.TRANSFER_TX_NAME}, castToAPISchema(userData), {signature: signature});
+    },
+    isValidSignature: function(data, signature) {
+        return crypto_1.default.isValidTransactionSignature(getBytes(data), signature, data.publicKey)
+    },
+    prepareColdForAPI: function(transferData, signature) {
+        getData(transferData);
+        return __assign({}, {transactionType: constants.TRANSFER_TX_NAME}, castToAPISchema(userData), {signature:signature})
     }
 };
 
