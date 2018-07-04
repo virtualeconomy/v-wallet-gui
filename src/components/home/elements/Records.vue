@@ -4,12 +4,43 @@
     <div
       class="tittle-records">
       <span>Transaction Record</span>
-      <b-btn
+      <b-dropdown
         class="pd-select"
-        variant="light">Latest 10 Records</b-btn>
-      <b-btn
-        class="btn-export"
-        variant="light"><img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
+        router-tag="div"
+        no-caret
+        :disabled="changeShowDisable"
+        variant="light">
+        <template
+          slot="button-content">
+          <div style="display:inline-block; margin-right: 10px;">
+            <img
+              v-if="!changeShowDisable"
+              src="../../../assets/imgs/icons/wallet/ic_filter.svg">
+            <img
+              height="16"
+              width="16"
+              v-if="changeShowDisable"
+              src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+            <span class="m-1">Latest {{ showingNum }} Records </span>
+          </div>
+          <img src="../../../assets/imgs/icons/signup/ic_arrow_down.svg">
+        </template>
+        <b-dropdown-item
+          v-for="num in showNums"
+          :key="num"
+          @click="changeShowNum(num)">Show {{ num }} records</b-dropdown-item>
+      </b-dropdown>
+      <json-excel
+        class="csv-export"
+        :data="response"
+        :fields="resFields"
+        :type="downloadFileType"
+        :name="'txs_' + address + '.' + downloadFileType">
+        <b-btn
+          class="btn-export"
+          :disabled="changeShowDisable"
+          variant="light"><img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
+      </json-excel>
     </div>
     <div class="inherit-height">
       <div
@@ -33,33 +64,51 @@
   </div>
   <div v-else
        class="empty">
-    <span>There are no transaction records.</span>
+    <img
+      height="50"
+      width="50"
+      v-if="changeShowDisable"
+      src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+    <span v-if="!changeShowDisable">There are no transaction records.</span>
   </div>
 </template>
 
 <script>
-import { TESTNET_NODE, TRX_RECORD_LIMIT } from '../../../constants'
+import { TESTNET_NODE } from '../../../constants'
 import Record from './Record'
 import Vue from 'vue'
+import JsonExcel from 'vue-json-excel'
 
 export default {
     name: 'Records',
     components: {
-        Record
+        Record,
+        JsonExcel
     },
     created() {
-        console.log(this.address)
         if (this.address && Vue.ls.get('pwd')) {
             this.getTxRecords()
         }
     },
-    updated() {
-        console.log(this.$refs[0][0].offsetTop)
-        console.log(this.$refs[1][0].offsetTop)
-    },
     data() {
         return {
-            txRecords: {}
+            txRecords: {},
+            showNums: [10, 50, 100, 200, 500, 1000],
+            showingNum: 10,
+            changeShowDisable: false,
+            response: void 0,
+            downloadFileType: 'csv',
+            resFields: {
+                transaction_id: 'id',
+                sender_address: 'sender',
+                sender_public_key: 'senderPublicKey',
+                transaction_fee: 'fee',
+                'timestamp(in nano second)': 'timestamp',
+                signature: 'signature',
+                recipient_address: 'recipient',
+                amount: 'amount',
+                attachment: 'attachment'
+            }
         }
     },
     props: {
@@ -73,6 +122,10 @@ export default {
         address(newAddr, oldAddr) {
             console.log(newAddr, oldAddr)
             this.txRecords = {}
+            this.response = void 0
+            this.changeShowDisable = false
+            // TO BE DETERMINED
+            this.showingNum = 10
             if (this.address && Vue.ls.get('pwd')) {
                 this.getTxRecords()
             }
@@ -91,20 +144,43 @@ export default {
         },
         getTxRecords() {
             if (this.address) {
-                const recordLimit = TRX_RECORD_LIMIT
-                const url = TESTNET_NODE + '/transactions/address/' + this.address + '/limit/' + recordLimit
+                const addr = this.address
+                this.changeShowDisable = true
+                const recordLimit = this.showingNum
+                const url = TESTNET_NODE + '/transactions/address/' + addr + '/limit/' + recordLimit
                 this.$http.get(url).then(response => {
-                    this.txRecords = response.body[0].reduce((rv, x) => {
-                        const aa = this.getMonthYearStr(x['timestamp'])
-                        if (!rv[aa]) {
-                            Vue.set(rv, aa, [])
-                        }
-                        rv[aa].push(x)
-                        return rv
-                    }, {})
+                    console.log(addr, this.address)
+                    if (addr === this.address && recordLimit === this.showingNum) {
+                        this.response = response.body[0]
+                        this.txRecords = response.body[0].reduce((rv, x) => {
+                            const aa = this.getMonthYearStr(x['timestamp'])
+                            if (!rv[aa]) {
+                                Vue.set(rv, aa, [])
+                            }
+                            rv[aa].push(x)
+                            return rv
+                        }, {})
+                        this.changeShowDisable = false
+                    }
                 }, response => {
                     console.log(response)
+                    if (addr === this.address && recordLimit === this.showingNum) {
+                        this.changeShowDisable = false
+                    }
                 })
+            }
+        },
+        changeShowNum(newNum) {
+            if (!this.changeShowDisable) {
+                this.showingNum = newNum
+                if (this.address && Vue.ls.get('pwd')) {
+                    this.getTxRecords()
+                }
+            }
+        },
+        exportRecords() {
+            if (this.response) {
+
             }
         }
     }
@@ -158,12 +234,14 @@ export default {
     display: flex;
     align-items: Center;
 }
-.btn-export {
+.csv-export {
     position: absolute;
     right: 40px;
+    z-index: 100;
+}
+.btn-export {
     width: 116px;
     height: 36px;
-    z-index: 100;
     background-color: #FFF;
     border-color: #E8E9ED;
     font-size: 15px;
@@ -179,15 +257,9 @@ export default {
 .pd-select {
     position: absolute;
     right: 166px;
-    width: 176px;
+    display: flex;
     height: 36px;
     z-index: 100;
     background-color: #FFF;
-    border-color: #E8E9ED;
-    font-size: 15px;
-    color: #696B8A;
-    letter-spacing: 0;
-    align-items: Center;
-    display: flex;
 }
 </style>

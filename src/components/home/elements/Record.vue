@@ -97,9 +97,11 @@ export default {
             return this.txType === 'Sent' ? this.txRecord.recipient : this.txRecord.sender
         },
         txAddressShow() {
-            const addrChars = this.txAddress.split('')
-            addrChars.splice(6, 23, '******')
-            return addrChars.join('')
+            if (this.txAddress) {
+                const addrChars = this.txAddress.split('')
+                addrChars.splice(6, 23, '******')
+                return addrChars.join('')
+            }
         },
         txTime() {
             return new Date(this.txRecord.timestamp / 1e6).toDateString()
@@ -183,6 +185,7 @@ export default {
             letter-spacing: 0;
             padding-left: 4px;
             padding-right: 10px;
+            min-width: 145px;
         }
         .detail-3 {
             background: #E8E9ED;
