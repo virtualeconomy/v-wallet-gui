@@ -35,6 +35,14 @@ html, body, #app {
     padding-left: 10px !important;
     padding-right:10px !important;
 }
+.pd-select2 .btn { 
+    border-color: #ced4da !important;
+    font-size: 15px !important;
+    color: #696B8A !important;
+    letter-spacing: 0 !important;
+    align-items: Center !important;
+    background-color: #fff !important;
+}
 :focus {
 	outline: none;
 }
@@ -44,12 +52,12 @@ html, body, #app {
 .dropdown-item:focus {
     color: #696B8A;
     text-decoration: none;
-    background-color: rgba(254, 124, 59, 0.2);
+    background-color: #FAFAFA;
 }
 .dropdown-item:active {
     text-decoration: none;
-    background-color: rgba(254, 124, 59, 0.7);
-    color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.1);
+    color: rgba(0, 0, 0, 1) !important;
 }
 .form-control:focus {
 	border-color: #FF8737;
@@ -89,4 +97,30 @@ html, body, #app {
     input::placeholder {
         font-size: 12px;
     }
+}
+button:focus {
+	outline: none !important;
+    box-shadow: none !important;
+}
+input:focus {
+  	caret-color: #FF8737 !important;
+}
+textarea:focus {
+  	caret-color: #FF8737 !important;
+}
+.btn-light:hover, .btn-light:active {
+    background-color: #FAFAFA !important;
+}
+.show > .btn-light {
+    background-color: #FAFAFA !important;
+}
+.form-control[readonly] {
+    background-color: #fafafa;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    -khtml-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    color: #696B8A;
 }

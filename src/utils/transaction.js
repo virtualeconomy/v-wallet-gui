@@ -99,9 +99,9 @@ export default {
     isValidSignature: function(data, signature) {
         return crypto_1.default.isValidTransactionSignature(getBytes(data), signature, data.publicKey)
     },
-    prepareColdForAPI: function(transferData, signature) {
+    prepareColdForAPI: function(transferData, signature, timestamp) {
         getData(transferData);
-        return __assign({}, {transactionType: constants.TRANSFER_TX_NAME}, castToAPISchema(userData), {signature:signature})
+        return __assign({}, {transactionType: constants.TRANSFER_TX_NAME}, castToAPISchema(userData), {signature:signature}, {timestamp: timestamp})
     }
 };
 

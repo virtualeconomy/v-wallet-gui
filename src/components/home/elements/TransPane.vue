@@ -1,6 +1,6 @@
 <template>
   <div class="row justify-content-between height-full">
-    <div class="col-4 align-self-center text-left tran-head">
+    <div class="col-auto align-self-center text-left tran-head">
       <span class="title">
         {{ balance }} VEE
       </span>
@@ -8,7 +8,7 @@
         Balance
       </p>
     </div>
-    <div class="col-8 align-self-center text-right">
+    <div class="col align-self-center text-right">
       <b-button variant="dark"
                 class="btn-send"
                 v-b-modal.sendModal>
@@ -76,6 +76,10 @@ export default {
     width: 124px;
     height: 42px;
 }
+.btn-send:active, .btn-send:hover{
+    background-color: #E03146 !important;
+    border: 1px solid #E03146 !important;
+};
 .btn-receive {
     margin-left: 15px;
     background-color: @receiveColor;
@@ -83,6 +87,10 @@ export default {
     border: 1px solid @receiveColor;
     width: 124px;
     height: 42px;
+}
+.btn-receive:active, .btn-receive:hover {
+    background-color: #1F8F7C !important;
+    border: 1px solid #1F8F7C !important;
 }
 .tran-head {
     padding-left: 38px;

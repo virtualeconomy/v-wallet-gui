@@ -82,7 +82,8 @@ export default {
         onDecode: function(decodeString) {
             this.paused = true
             var signature = JSON.parse(decodeString).recipient
-            this.$emit('get-signature', signature)
+            var coldTimestamp = JSON.parse(decodeString).timeStamp
+            this.$emit('get-signature', signature, coldTimestamp)
         },
         scanAgain: function() {
             this.paused = false
