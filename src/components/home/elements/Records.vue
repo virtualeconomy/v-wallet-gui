@@ -259,6 +259,9 @@ export default {
     z-index: 100;
     background-color: #FFF;
 }
+.pd-select:hover, .pd-select:active {
+    background-color: #FAFAFA !important;
+}
 .selection {
     font-size: 15px;
     color: #696B8A;

@@ -1,6 +1,7 @@
 <template>
   <b-modal id="accountModal"
            title="Account"
+           hide-footer
            @hidden="resetData"
            size="md"
            ok-only>
@@ -21,8 +22,8 @@
           :key="addr">
           <b-dropdown
             :text="tagOfColdWallet[addr] ? 'public key' : 'address'"
-            class="dropt"
-            variant="secondary"
+            class="pd-select2"
+            variant="light"
             size="sm"
             slot="prepend">
             <b-dropdown-item
@@ -39,9 +40,9 @@
           </b-form-input>
           <b-input-group-append>
             <b-btn
-              variant="dark"
-              v-b-tooltip.hover
-              title="Delete the coldwallet"
+              variant="danger"
+              v-b-tooltip.hover.topleft
+              title="WARN! To delete the coldwallet"
               @click="deleteCold(addr)"
               size="sm">×</b-btn>
           </b-input-group-append>

@@ -121,7 +121,6 @@ export default {
     },
     methods: {
         logout() {
-            console.log('logout')
             Vue.ls.clear()
             this.$router.push('/login')
         },

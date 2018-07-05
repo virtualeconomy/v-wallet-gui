@@ -164,7 +164,6 @@ export default {
         },
 
         resetSessionClearTimeout() {
-            console.log('reset session')
             clearTimeout(this.sessionClearTimeout)
             this.setSessionClearTimeout()
         },
@@ -199,8 +198,14 @@ export default {
         selectWallet(addr) {
             if (this.selectedAddress !== addr) {
                 this.selectedAddress = addr
-                this.getBalance(addr)
             }
+            else {
+                this.selectedAddress = ''
+                setTimeout(() => {
+                    this.selectedAddress = addr
+                }, 0)
+            }
+            this.getBalance(addr)
         },
         deleteCold(addr) {
             Vue.delete(this.coldAddresses, addr)
@@ -223,6 +228,7 @@ export default {
 .home {
     width: 100%;
     height: 100%;
+    min-width: 1000px;
 }
 .trans-pane {
     height:@trxDivH;
