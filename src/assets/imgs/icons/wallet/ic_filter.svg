@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_filter</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="00A_Export" transform="translate(-49.000000, -68.000000)">
+            <g id="ic_filter" transform="translate(49.000000, 68.000000)">
+                <rect id="Guide" fill-opacity="0" fill="#FFFFFF" x="0" y="0" width="16" height="16"></rect>
+                <path d="M2.5678688,2 L6.8838688,7.18 C6.9598688,7.27 7.0008688,7.383 7.0008688,7.5 L7.0008688,13.806 L9.0008688,13.14 L9.0008688,7.5 C9.0008688,7.383 9.0418688,7.27 9.1168688,7.18 L13.4328688,2 L2.5678688,2 Z M6.5008688,15 C6.3968688,15 6.2948688,14.968 6.2088688,14.906 C6.0778688,14.812 6.0008688,14.661 6.0008688,14.5 L6.0008688,7.681 L1.1168688,1.82 C0.9918688,1.671 0.9648688,1.463 1.0468688,1.288 C1.1308688,1.112 1.3058688,1 1.5008688,1 L14.5008688,1 C14.6948688,1 14.8708688,1.112 14.9538688,1.288 C15.0358688,1.463 15.0088688,1.671 14.8838688,1.82 L10.0008688,7.681 L10.0008688,13.5 C10.0008688,13.715 9.8628688,13.906 9.6588688,13.974 L6.6588688,14.974 C6.6068688,14.992 6.5528688,15 6.5008688,15 Z" id="Fill-1" fill="#9091A3"></path>
+                <rect id="Overlay" x="0" y="0" width="16" height="16"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

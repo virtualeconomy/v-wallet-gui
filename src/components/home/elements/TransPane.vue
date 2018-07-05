@@ -2,20 +2,20 @@
   <div class="row justify-content-between height-full">
     <div class="col-4 align-self-center text-left tran-head">
       <span class="title">
-        {{ balance }}VEE
+        {{ balance }} VEE
       </span>
       <p class="text-muted text-des mb-0">
         Balance
       </p>
     </div>
     <div class="col-8 align-self-center text-right">
-      <b-button variant="primary"
+      <b-button variant="dark"
                 class="btn-send"
                 v-b-modal.sendModal>
         <img
           class="icon-btn"
           src="../../../assets/imgs/icons/wallet/ic_send.svg"><b>Send</b></b-button>
-      <b-button variant="primary"
+      <b-button variant="dark"
                 class="btn-receive"
                 v-b-modal.receiveModal>
         <img

@@ -21,7 +21,21 @@
                       placeholder="cold wallet address">
         </b-form-input>
         <b-form-invalid-feedback id="inputLiveFeedback">
-          Invalid cold wallet address.
+          Invalid cold wallet address. <span v-if="addressExisted">The address has existed.</span>
+        </b-form-invalid-feedback>
+      </b-form-group>
+      <b-form-group label="Cold Wallet Public Key"
+                    label-for="coldPubKey"
+                    description="Please input your cold wallet public key encoded with Base58.">
+        <b-form-input id="coldPubKey"
+                      type="text"
+                      v-model="coldPubKey"
+                      :state="isValidPubKey"
+                      aria-describedby="inputLiveHelp inputLiveFeedback"
+                      placeholder="cold wallet public key">
+        </b-form-input>
+        <b-form-invalid-feedback id="inputLiveFeedback">
+          Invalid cold wallet public key.
         </b-form-invalid-feedback>
       </b-form-group>
       <p class="qrInfo">Please confirm your browser's camera is available.</p>
@@ -37,19 +51,31 @@
 
 <script>
 import crypto from '@/utils/crypto'
+import { PUBLIC_KEY_LENGTH } from '@/constants.js'
 export default {
     name: 'ImportColdWallet',
+    props: {
+        address: {
+            type: String,
+            default: '',
+            require: true
+        }
+    },
     data: function() {
         return {
             qrInit: false,
             paused: false,
-            coldAddress: ''
+            coldAddress: '',
+            coldPubKey: ''
         }
     },
     computed: {
         isValidAddress: function() {
+            if (this.coldAddress === this.address) {
+                return false
+            }
             if (!this.coldAddress) {
-                return true
+                return void 0
             }
             let isValid = false
             try {
@@ -58,6 +84,15 @@ export default {
                 console.log(e)
             }
             return isValid
+        },
+        isValidPubKey: function() {
+            if (!this.coldPubKey) {
+                return void 0
+            }
+            return this.coldPubKey.length === PUBLIC_KEY_LENGTH
+        },
+        addressExisted: function() {
+            return this.coldAddress === this.address
         }
     },
     methods: {
@@ -68,10 +103,9 @@ export default {
             if (this.qrInit) {
                 evt.preventDefault()
             }
-            console.log('close')
         },
         importOk: function(evt) {
-            if (this.qrInit || !this.coldAddress || !this.isValidAddress) {
+            if (this.qrInit || !this.coldAddress || !this.isValidAddress || !this.coldPubKey || !this.isValidPubKey) {
                 evt.preventDefault()
             } else {
                 this.$emit('import-cold', this.coldAddress, this.coldPubKey)
@@ -91,7 +125,6 @@ export default {
         },
         async onInit(promise) {
             try {
-                console.log(promise)
                 this.qrInit = true
                 await promise
             } catch (error) {
@@ -102,7 +135,7 @@ export default {
                 } else if (error.name === 'NotSupportedError') {
                     throw Error('page is not served over HTTPS (or localhost)')
                 } else if (error.name === 'NotReadableError') {
-                    throw Error('mayby camera is already in use')
+                    throw Error('maybe camera is already in use')
                 } else if (error.name === 'OverconstarinedError') {
                     throw Error('pass constraints do not match any camera')
                 } else {
@@ -110,13 +143,17 @@ export default {
                 }
             } finally {
                 this.qrInit = false
-                console.log('onInit')
             }
         },
         onDecode: function(decodeString) {
             this.paused = true
-            this.coldAddress = decodeString
-            console.log(decodeString)
+            let start = decodeString.indexOf('address')
+            let end = decodeString.indexOf('&')
+            this.coldAddress = decodeString.substring(start + 8, end)
+
+            start = decodeString.indexOf('publicKey')
+            end = decodeString.length
+            this.coldPubKey = decodeString.substring(start + 10, end)
         },
         scanAgain: function() {
             this.paused = false

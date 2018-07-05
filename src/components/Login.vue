@@ -98,7 +98,10 @@
         class="msg-err text-danger"
         v-show="isPwdError">
         <small>
-          Password is wrong.<a href="/restore"> Forget your password? </a>
+          Password is wrong.
+          <a
+            class='vee-color'
+            href="/restore"> Forget your password? </a>
         </small>
       </div>
       <div class="submit-button">
@@ -492,8 +495,11 @@ export default {
     background: rgba(50, 50, 50, .1);
 }
 .v-select .dropdown-menu > .highlight > a {
-    background: #5897fb;
-    color: #fff;
+    background: rgba(254, 124, 59, 0.4);
+    color: rgba(0, 0, 0, 0.7);
+}
+.v-select .dropdown-menu > .highlight > a .addr {
+    color: rgba(0, 0, 0, 0.4);
 }
 .v-select .highlight:not(:last-child) {
     margin-bottom: 0; /* Fixes Bulma Margin */
@@ -558,9 +564,6 @@ export default {
     margin-top: 30px;
 }
 .btn-link {
-    color: @veeColor !important;
-}
-a {
     color: @veeColor !important;
 }
 .blink {

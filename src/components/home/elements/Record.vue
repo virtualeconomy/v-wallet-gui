@@ -24,7 +24,7 @@
           <b-col class="detail-2">{{ txAddressShow }}</b-col>
           <b-col class="detail-3"
                  cols="auto"></b-col>
-          <b-col class="detail-4">{{ txTime }}</b-col>
+          <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
         </b-row>
       </b-col>
       <b-col class="record-blank"></b-col>
@@ -88,7 +88,7 @@ export default {
     },
     computed: {
         txType() {
-            return this.txRecord.sender === this.address ? 'Sent' : 'Received'
+            return this.txRecord.sender === this.address && this.txRecord['type'] !== 11 ? 'Sent' : 'Received'
         },
         txIcon() {
             return this.txType.toString().toLowerCase()
@@ -97,12 +97,40 @@ export default {
             return this.txType === 'Sent' ? this.txRecord.recipient : this.txRecord.sender
         },
         txAddressShow() {
-            const addrChars = this.txAddress.split('')
-            addrChars.splice(6, 23, '******')
-            return addrChars.join('')
+            if (this.txAddress) {
+                const addrChars = this.txAddress.split('')
+                addrChars.splice(6, 23, '******')
+                return addrChars.join('')
+            }
         },
         txTime() {
             return new Date(this.txRecord.timestamp / 1e6).toDateString()
+        },
+        txHourStr() {
+            const hour = new Date(this.txRecord.timestamp / 1e6).getHours()
+            if (hour < 10) {
+                return '0' + hour
+            }
+            return hour.toString()
+        },
+        txMinuteStr() {
+            const minute = new Date(this.txRecord.timestamp / 1e6).getMinutes()
+            if (minute < 10) {
+                return '0' + minute
+            }
+            return minute.toString()
+        },
+        txMonthStr() {
+            const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+            const d = new Date(this.txRecord.timestamp / 1e6)
+            return monthNames[d.getMonth()]
+        },
+        txDayStr() {
+            const date = new Date(this.txRecord.timestamp / 1e6).getDate()
+            if (date < 10) {
+                return '0' + date
+            }
+            return date.toString()
         },
         txAmount() {
             return this.txRecord.amount
@@ -157,11 +185,12 @@ export default {
             letter-spacing: 0;
             padding-left: 4px;
             padding-right: 10px;
+            min-width: 145px;
         }
         .detail-3 {
             background: #E8E9ED;
             padding: 0px;
-            padding-left: 1px; 
+            padding-left: 1px;
         }
         .detail-4 {
             font-size: 12px;
