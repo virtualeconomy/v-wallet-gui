@@ -92,4 +92,7 @@ export default {
 .selected-asset .balance {
     color: white;
 }
+.asset:not(.selected-asset):hover {
+    background-color: #FAFAFA;
+}
 </style>
