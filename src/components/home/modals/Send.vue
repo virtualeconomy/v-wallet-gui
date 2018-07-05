@@ -58,7 +58,9 @@
                         label-for="descriptionInput">
             <b-form-textarea id="descriptionInput"
                              v-model="attachment"
-                             :rows="3">
+                             :rows="3"
+                             :no-resize="true"
+                             :state="isValidAttachment">
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Fee: 100000">
@@ -163,7 +165,9 @@
                         label-for="coldDescriptionInput">
             <b-form-textarea id="coldDescriptionInput"
                              v-model="coldAttachment"
-                             :rows="3">
+                             :rows="3"
+                             :no-resize="true"
+                             :state="isValidColdAttachment">
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Fee: 100000">
@@ -247,7 +251,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE } from '@/constants.js'
+import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
@@ -306,10 +310,10 @@ export default {
             return seedLib.fromExistingPhrase(this.seedPhrase).keyPair
         },
         isSubmitDisabled() {
-            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient))
+            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isValidAttachment)
         },
         isColdSubmitDisabled() {
-            return !(this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient))
+            return !(this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient) && this.isValidColdAttachment)
         },
         options() {
             var coldOptions = []
@@ -340,6 +344,12 @@ export default {
         },
         coldPublicKey() {
             return this.coldAddresses[this.coldAddress]
+        },
+        isValidAttachment() {
+            return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+        },
+        isValidColdAttachment() {
+            return this.coldAttachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         }
     },
     methods: {
@@ -367,12 +377,15 @@ export default {
             })
         },
         nextPage: function() {
+            this.sendError = false
             this.pageId++
         },
         coldNextPage: function() {
+            this.sendError = false
             this.coldPageId++
         },
         prevPage: function() {
+            this.sendError = false
             if (this.pageId === 1) {
                 this.$refs.modal.hide()
             } else {
@@ -380,6 +393,7 @@ export default {
             }
         },
         coldPrevPage: function() {
+            this.sendError = false
             if (this.coldPageId === 1) {
                 this.$refs.modal.hide()
             } else {
@@ -387,6 +401,7 @@ export default {
             }
         },
         resetPage: function() {
+            this.sendError = false
             this.pageId = 1
             this.coldPageId = 1
             this.scanShow = false
