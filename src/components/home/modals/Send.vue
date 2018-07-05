@@ -22,7 +22,12 @@
                             aria-describedby="inputLiveFeedback">
               </b-form-input>
               <b-input-group-append>
-                <b-btn @click="scanChange">Button</b-btn>
+                <img src="../../../assets/imgs/icons/operate/ic_qr_code.svg"
+                     width="36"
+                     height="36"
+                     v-b-tooltip.hover
+                     title="scan qr-code"
+                     @click="scanChange">
               </b-input-group-append>
               <div v-if="scanShow"
                    v-show="!qrInit">
@@ -31,8 +36,10 @@
                                @decode="onDecode"
                                :paused="paused">
                 </qrcode-reader>
-                <b-btn @click="scanAgain">Scan again</b-btn>
+                <b-btn @click="scanAgain"
+                       class="scan-again-btn">Scan again</b-btn>
                 <b-btn @click="scanChange"
+                       class="scan-ok-btn"
                        :disabled="!recipient || !isValidRecipient(recipient)">Confirm</b-btn>
               </div>
               <b-form-invalid-feedback id="inputLiveFeedback">
@@ -115,7 +122,12 @@
                             aria-describedby="inputLiveFeedback">
               </b-form-input>
               <b-input-group-append>
-                <b-btn @click="scanChange">Button</b-btn>
+                <img src="../../../assets/imgs/icons/operate/ic_qr_code.svg"
+                     width="36"
+                     height="36"
+                     v-b-tooltip.hover
+                     title="scan qr-code"
+                     @click="scanChange">
               </b-input-group-append>
               <div v-if="scanShow"
                    v-show="!qrInit">
@@ -123,9 +135,16 @@
                 <qrcode-reader @init="onInit"
                                @decode="onColdDecode"
                                :paused="paused">
+                  <img v-if="qrInit"
+                       class="qrcode-waiting"
+                       height="100"
+                       width="100"
+                       src="../../../assets/imgs/icons/wallet/ic_wait.svg">
                 </qrcode-reader>
-                <b-btn @click="scanAgain">Scan again</b-btn>
+                <b-btn @click="scanAgain"
+                       class="scan-again-btn">Scan again</b-btn>
                 <b-btn @click="scanChange"
+                       class="scan-ok-btn"
                        :disabled="!coldRecipient || !this.isValidRecipient(coldRecipient)">Confirm</b-btn>
               </div>
               <b-form-invalid-feedback id="inputLiveFeedback">
@@ -458,6 +477,8 @@ export default {
 }
 </script>
 
-<style scoped>
-
+<style scoped lang="less">
+.scan-ok-btn, .scan-again-btn {
+    margin-top: 10px;
+}
 </style>
