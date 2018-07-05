@@ -40,16 +40,8 @@ export var Long = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     Long.prototype.process = function (value) {
-        var bytes;
-        if (typeof value === 'number') {
-            bytes = convert_1.default.longToByteArray(value);
-        }
-        else {
-        if (typeof value === 'string') {
-          value = new bignumber_1.default(value);
-        }
-        bytes = convert_1.default.bigNumberToByteArray(value);
-      }
+        value = new bignumber_1.default(value);
+        var bytes = convert_1.default.bigNumberToByteArray(value);
         return Uint8Array.from(bytes);
     };
     return Long;
