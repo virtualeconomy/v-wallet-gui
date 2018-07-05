@@ -74,7 +74,11 @@
           </update-account>
         </div>
         <p class="flink">
-          <a href="/login">Sign in</a> or <a href="/signup">Create a new account</a>
+          <a
+            class='vee-color'
+            href="/login">Sign in</a> or <a
+              class='vee-color'
+              href="/signup">Create a new account</a>
         </p>
       </div>
     </div>
@@ -113,9 +117,9 @@ export default {
 
         isValidSeed(seedPhrase) {
             const wordList = seedPhrase.split(' ')
-            if (wordList.length !== 15) {
-                return false
-            }
+            // if (wordList.length !== 15) {
+            //     return false
+            // }
 
             const libSet = new Set(seedDic)
             return wordList.every(i => libSet.has(i))

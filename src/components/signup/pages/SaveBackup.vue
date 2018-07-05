@@ -26,7 +26,7 @@
         <template v-for="(word, idx) in wordList">
           <span
             :key="idx"
-            class="word container shadow">
+            class="word">
             {{ word }}
           </span>
           &nbsp;
@@ -42,7 +42,7 @@
         Continue to confirm {{ buttonTimeStr }}
       </b-button>
       <div @click="gotoHomePage"
-           class="footer-link">Skip this step</div>
+           class="footer-link">skip this step</div>
     </div>
   </div>
 </template>
@@ -72,7 +72,7 @@ export default {
         setTimeout(() => {
             clearInterval(interval)
             this.isContinueDisable = false
-        }, this.timeToContinue * 1000)
+        }, this.timeToContinue * 1000 + 100)
     },
 
     computed: {
@@ -146,8 +146,11 @@ export default {
 .footer-link {
     margin-top: 20px;
     cursor: pointer;
-    text-decoration: underline;
     color: #FF8737;
+    display: -webkit-inline-box;
+}
+.footer-link:hover {
+    text-decoration: underline;
 }
 .backup-words-copy {
     max-width: 100%;
@@ -155,9 +158,8 @@ export default {
     margin-right: auto;
 }
 .word {
-    font-size: 100%;
-    background-color: rgb(190, 190, 190);
-    color: white;
+    font-size: 17px;
+    color: #181B3A;
 }
 .unselectable {
     -moz-user-select: -moz-none;

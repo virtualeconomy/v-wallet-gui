@@ -106,7 +106,6 @@ export default {
     },
 
     mounted() {
-        console.log('mounted')
         this.setSessionClearTimeout()
     },
     updated() {
@@ -116,7 +115,6 @@ export default {
         }, false)
     },
     beforeDestroy() {
-        console.log('beforeDestroy')
         clearTimeout(this.sessionClearTimeout)
     },
 
@@ -165,7 +163,6 @@ export default {
                 oldTimeout = INITIAL_SESSION_TIMEOUT
             }
             this.sessionClearTimeout = setTimeout(() => {
-                console.log('clear sesson')
                 Vue.ls.clear()
                 this.$router.push('/login')
             }, oldTimeout)
@@ -179,12 +176,6 @@ export default {
         getBalance: function(address) {
             const url = TESTNET_NODE + '/addresses/balance/' + address
             this.$http.get(url).then(response => {
-                // for testing
-                // if (this.coldAddresses[address] !== void 0) {
-                //     Vue.set(this.balance, address, response.body['balance'] + 10)
-                // } else {
-                //     Vue.set(this.balance, address, response.body['balance'] + 50)
-                // }
                 Vue.set(this.balance, address, response.body['balance'])
             }, response => {
                 Vue.set(this.balance, address, 0)
@@ -193,7 +184,6 @@ export default {
         importCold(coldAddress, pubKey) {
             Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : pubKey)
             this.getBalance(coldAddress)
-            console.log(this.coldAddresses)
             this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
         },
         getSeedPhrase() {

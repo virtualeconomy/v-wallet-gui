@@ -10,15 +10,12 @@
                      :paused="paused">
       </qrcode-reader>
       <b-btn @click="scanAgain">Scan again</b-btn>
-      <b-btn @click="scanChange"
-             :disabled="!isValidSignature">Confirm</b-btn>
     </div>
   </div>
 </template>
 
 <script>
 import jrQrcode from 'jr-qrcode'
-// import transaction from '@/utils/transaction'
 export default {
     name: 'ColdSignature',
     data: function() {
@@ -34,11 +31,6 @@ export default {
             type: Object,
             require: true,
             default: function() {}
-        },
-        isValidSignature: {
-            type: Boolean,
-            require: true,
-            default: false
         },
         publicKey: {
             type: String,
@@ -74,7 +66,7 @@ export default {
                 } else if (error.name === 'NotSupportedError') {
                     throw Error('page is not served over HTTPS (or localhost)')
                 } else if (error.name === 'NotReadableError') {
-                    throw Error('mayby camera is already in use')
+                    throw Error('maybe camera is already in use')
                 } else if (error.name === 'OverconstarinedError') {
                     throw Error('pass constraints do not match any camera')
                 } else {
@@ -89,8 +81,8 @@ export default {
         },
         onDecode: function(decodeString) {
             this.paused = true
-            this.signature = decodeString
-            this.isValidSignature = true
+            var signature = JSON.parse(decodeString).recipient
+            this.$emit('get-signature', signature)
         },
         scanAgain: function() {
             this.paused = false
