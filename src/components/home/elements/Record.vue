@@ -149,8 +149,6 @@ export default {
             return this.txRecord.id
         },
         txAttachment() {
-            // var bytes = base58.default.decode(this.txRecord.attachment)
-            // return String.fromCharCode()
             var value = this.txRecord.attachment === void 0 ? '' : this.txRecord.attachment
             var bytes = base58.decode(value)
             try {
