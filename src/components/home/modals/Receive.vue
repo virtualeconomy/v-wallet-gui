@@ -1,6 +1,7 @@
 <template>
   <b-modal id="receiveModal"
            centered
+           ok-only
            lazy
            title="Receive">
     <b-container fluid>
