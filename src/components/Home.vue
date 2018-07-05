@@ -1,5 +1,6 @@
 <template>
-  <div class="home">
+  <div class="home"
+       @mousemove=resetSessionClearTimeout>
     <nav-bar :address="address"
              class="navibar"
              :cold-addresses="coldAddresses"
@@ -109,12 +110,6 @@ export default {
         console.log('mounted')
         this.setSessionClearTimeout()
     },
-    updated() {
-        let _self = this
-        document.body.addEventListener('mousemove', function() {
-            _self.resetSessionClearTimeout()
-        }, false)
-    },
     beforeDestroy() {
         console.log('beforeDestroy')
         clearTimeout(this.sessionClearTimeout)
@@ -172,6 +167,7 @@ export default {
         },
 
         resetSessionClearTimeout() {
+            console.log('reset session')
             clearTimeout(this.sessionClearTimeout)
             this.setSessionClearTimeout()
         },
