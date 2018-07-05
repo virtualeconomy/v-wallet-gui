@@ -19,7 +19,7 @@
         <template v-for="(word, idx) in selectedWords">
           <span
             :key="idx + word + '-selected'"
-            class="word container shadow">{{ word }}</span>
+            class="word">{{ word }}</span>
           &nbsp;
         </template>
       </b-jumbotron>
@@ -30,7 +30,7 @@
             v-if="tagFlag[idx]"
             :variant="'warning'"
             :size="'sm'"
-            class="shadow-sm unselectable word-btn"
+            class="unselectable word-btn"
             @click='tapWord(idx)'>
             {{ word }}
           </b-button>
@@ -38,7 +38,7 @@
             :key="idx"
             v-else
             :size="'sm'"
-            class="shadow-sm unselectable word-btn"
+            class="unselectable word-btn"
             :disabled="true">
             {{ word }}
           </b-button>
@@ -69,7 +69,7 @@
       <div
         @click="$router.push('/')"
         class="footer-link">
-        Skip this step</div>
+        skip this step</div>
     </div>
   </div>
 </template>
@@ -174,8 +174,11 @@ export default {
 .footer-link {
     margin-top: 20px;
     cursor: pointer;
-    text-decoration: underline;
     color: #FF8737;
+    display: -webkit-inline-box;
+}
+.footer-link:hover {
+    text-decoration: underline;
 }
 .backup-words-copy {
     max-width: 100%;
@@ -183,9 +186,14 @@ export default {
     margin-right: auto;
 }
 .word {
-    font-size: 100%;
-    background-color: rgb(120, 190, 190);
-    color: white;
+    background: #FFFFFF;
+    box-shadow: 0 1px 3px 0 rgba(194,197,207,0.50);
+    border-radius: 4px;
+    font-size: 15px;
+    color: #181B3A;
+    letter-spacing: 0;
+    padding: 9px 15px;
+    line-height: 45px;
 }
 .unselectable {
     -moz-user-select: -moz-none;
@@ -197,6 +205,9 @@ export default {
 .wordpad {
     line-height: 210%;
     min-height: 180px;
+    background: #FAFAFA;
+    border: 1px solid #E8E9ED;
+    padding: 40px;
 }
 .wordarea {
     line-height: 200%;
@@ -204,6 +215,10 @@ export default {
 }
 .word-btn {
     margin-top: 10px;
+    height: 36px;
+    font-size: 15px;
+    color: #FFFFFF;
+    letter-spacing: 0;
 }
 .error-message {
     width: 100%;
