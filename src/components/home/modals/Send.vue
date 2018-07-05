@@ -51,7 +51,9 @@
                         label-for="amountInput">
             <b-form-input id="amountInput"
                           type="number"
-                          v-model="amount">
+                          v-model="amount"
+                          min="0"
+                          onkeypress="return event.charCode >= 48 && event.charCode <= 57">
             </b-form-input>
           </b-form-group>
           <b-form-group label="Description"
@@ -158,7 +160,9 @@
                         label-for="coldAmountInput">
             <b-form-input id="coldAmountInput"
                           type="number"
-                          v-model="coldAmount">
+                          v-model="coldAmount"
+                          min="0"
+                          onkeypress="return event.charCode >= 48 && event.charCode <= 57">
             </b-form-input>
           </b-form-group>
           <b-form-group label="Description"
