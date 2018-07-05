@@ -75,7 +75,7 @@ export default {
                 return false
             }
             if (!this.coldAddress) {
-                return true
+                return void 0
             }
             let isValid = false
             try {
@@ -87,15 +87,12 @@ export default {
         },
         isValidPubKey: function() {
             if (!this.coldPubKey) {
-                return true
+                return void 0
             }
             return this.coldPubKey.length === PUBLIC_KEY_LENGTH
         },
         addressExisted: function() {
-            if (this.coldAddress === this.address) {
-                return true
-            }
-            return false
+            return this.coldAddress === this.address
         }
     },
     methods: {
@@ -128,7 +125,6 @@ export default {
         },
         async onInit(promise) {
             try {
-                console.log(promise)
                 this.qrInit = true
                 await promise
             } catch (error) {
