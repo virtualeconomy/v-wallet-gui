@@ -54,7 +54,7 @@
                              :rows="3">
             </b-form-textarea>
           </b-form-group>
-          <b-form-group label="Fee: 1">
+          <b-form-group label="Fee: 100000">
           </b-form-group>
           <b-button variant="primary"
                     size="lg"
@@ -147,7 +147,7 @@
                              :rows="3">
             </b-form-textarea>
           </b-form-group>
-          <b-form-group label="Fee: 1">
+          <b-form-group label="Fee: 100000">
           </b-form-group>
           <b-button variant="primary"
                     size="lg"
@@ -179,7 +179,7 @@
           <ColdSignature :data-object="dataObject"
                          :public-key="coldPublicKey"
                          v-if="coldPageId===3"
-                         @get-signature="verifySignature"></ColdSignature>
+                         @get-signature="getSignature"></ColdSignature>
           <b-button variant="primary"
                     size="lg"
                     @click="coldPrevPage">Cancle
@@ -238,19 +238,20 @@ var initData = {
     amount: 0,
     attachment: '',
     pageId: 1,
-    fee: 1,
+    fee: 100000,
     coldRecipient: '',
     coldAmount: 0,
     coldAttachment: '',
     coldPageId: 1,
-    coldFee: 1,
+    coldFee: 100000,
     coldAddress: '',
     scanShow: false,
     qrInit: false,
     paused: false,
     isValidSignature: false,
     sendError: false,
-    coldSignature: ''
+    coldSignature: '',
+    coldTimestamp: 0
 }
 export default {
     name: 'Send',
@@ -312,7 +313,6 @@ export default {
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 assetId: '',
                 feeAssetId: '',
-                timestamp: Date.now() * 1e6,
                 amount: this.coldAmount,
                 fee: this.coldFee,
                 recipient: this.coldRecipient,
@@ -338,7 +338,7 @@ export default {
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.signature)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldTimestamp)
             }
             const url = TESTNET_NODE + '/assets/broadcast/transfer'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
@@ -346,8 +346,6 @@ export default {
             }, response => {
                 this.sendError = true
             })
-        },
-        sendColdData: function() {
         },
         nextPage: function() {
             this.pageId++
@@ -449,10 +447,13 @@ export default {
             this.paused = false
             this.recipient = ''
             this.amount = 0
+            this.coldRecipient = ''
+            this.coldAmount = 0
         },
-        verifySignature: function(signature) {
+        getSignature: function(signature, timestamp) {
             this.coldSignature = signature
-            this.isValidSignature = transaction.default.isValidSignature(this.dataObject, signature)
+            this.coldTimestamp = timestamp
+            this.isValidSignature = transaction.default.isValidSignature(this.dataObject, signature, timestamp)
         }
     }
 }
