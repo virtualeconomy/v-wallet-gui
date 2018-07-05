@@ -1,5 +1,6 @@
 <template>
-  <div class="home">
+  <div class="home"
+       @mousemove=resetSessionClearTimeout>
     <nav-bar :address="address"
              class="navibar"
              :cold-addresses="coldAddresses"
@@ -45,7 +46,8 @@
               class="mb-1"
               src="../assets/imgs/icons/wallet/ic_import.svg"><b class="title-assets">Import Cold Wallet</b></b-btn>
           <ImportColdWallet @import-cold="importCold"
-                            show="false"></ImportColdWallet>
+                            show="false"
+                            :address="address"></ImportColdWallet>
         </div>
         <div class="col page container">
           <div
@@ -107,9 +109,6 @@ export default {
     mounted() {
         this.setSessionClearTimeout()
     },
-    updated() {
-        this.resetSessionClearTimeout()
-    },
     beforeDestroy() {
         clearTimeout(this.sessionClearTimeout)
     },
@@ -165,6 +164,7 @@ export default {
         },
 
         resetSessionClearTimeout() {
+            console.log('reset session')
             clearTimeout(this.sessionClearTimeout)
             this.setSessionClearTimeout()
         },
