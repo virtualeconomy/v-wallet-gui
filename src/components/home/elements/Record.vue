@@ -68,12 +68,15 @@
                  :tx-time="txRecord.timestamp"
                  :tx-fee="txFee"
                  :tx-amount="txAmount"
-                 :tx-block="txBlock"></TxInfoModal>
+                 :tx-block="txBlock"
+                 :tx-attachment="txAttachment"></TxInfoModal>
   </b-container>
 </template>
 
 <script>
 import TxInfoModal from './TxInfoModal'
+import base58 from '@/libs/base58'
+import converters from '@/libs/converters'
 
 export default {
     name: 'Record',
@@ -91,7 +94,8 @@ export default {
                     txType: '',
                     txAddress: '',
                     txTime: '',
-                    txAmount: ''
+                    txAmount: '',
+                    txAttachment: ''
                 }
             }
         },
@@ -157,6 +161,15 @@ export default {
         },
         txId() {
             return this.txRecord.id
+        },
+        txAttachment() {
+            var value = this.txRecord.attachment === void 0 ? '' : this.txRecord.attachment
+            var bytes = base58.decode(value)
+            try {
+                return converters.byteArrayToString(bytes)
+            } catch (e) {
+                return ''
+            }
         }
     },
     methods: {
