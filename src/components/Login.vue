@@ -51,7 +51,7 @@
           <ul
             ref="dropdownMenu"
             v-if="dropdownOpen"
-            class="dropdown-menu">
+            class="dropdown-menu fadeInDown animated">
             <li
               v-for="(option, index) in usrOptions"
               :key="index"
