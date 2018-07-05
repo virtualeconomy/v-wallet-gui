@@ -198,8 +198,7 @@ export default {
         selectWallet(addr) {
             if (this.selectedAddress !== addr) {
                 this.selectedAddress = addr
-            }
-            else {
+            } else {
                 this.selectedAddress = ''
                 setTimeout(() => {
                     this.selectedAddress = addr

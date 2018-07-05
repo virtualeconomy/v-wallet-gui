@@ -1,6 +1,8 @@
 <template>
   <b-modal :id="'txInfoModal_' + modalId"
-           class="tx-modal">
+           class="tx-modal"
+           hide-header
+           ok-only>
     <div>
       <div class="tx-title">
         <div class="tx-icon">

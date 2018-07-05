@@ -63,14 +63,17 @@
       </div>
     </div>
   </div>
-  <div v-else
-       class="empty">
+  <div v-else>
     <img
       height="50"
       width="50"
       v-if="changeShowDisable"
       src="../../../assets/imgs/icons/wallet/ic_wait.svg">
-    <span v-if="!changeShowDisable">There are no transaction records.</span>
+    <div
+      v-if="!changeShowDisable"
+      class="empty">
+      There are no transaction records.
+    </div>
   </div>
 </template>
 
@@ -186,7 +189,6 @@ export default {
 
 <style scoped lang="less">
 .empty {
-    border-top: 1px solid #1111;
     padding: 24px 0;
     background-color: #1111;
 }

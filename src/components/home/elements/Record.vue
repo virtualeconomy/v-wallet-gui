@@ -41,7 +41,16 @@
                     variant="link"
                     right>
           <template slot="button-content">
-            <img src="../../../assets/imgs/icons/wallet/ic_more.svg">
+            <div
+              @mouseover="hoverIco"
+              @mouseout="unhoverIco">
+              <img
+                v-if="hovered"
+                src="../../../assets/imgs/icons/wallet/ic_more_hover.svg">
+              <img
+                v-if="!hovered"
+                src="../../../assets/imgs/icons/wallet/ic_more.svg">
+            </div>
           </template>
           <b-dropdown-item @click="$root.$emit('bv::show::modal', 'txInfoModal_' + txRecord.id, 'txInfoModal_' + txRecord.id)">TX info</b-dropdown-item>
           <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
@@ -72,6 +81,11 @@ import converters from '@/libs/converters'
 export default {
     name: 'Record',
     components: {TxInfoModal},
+    data: function() {
+        return {
+            hovered: false
+        }
+    },
     props: {
         txRecord: {
             type: Object,
@@ -162,6 +176,12 @@ export default {
         copyTxId() {
             this.$refs.tId.select()
             window.document.execCommand('copy')
+        },
+        hoverIco() {
+            this.hovered = true
+        },
+        unhoverIco() {
+            this.hovered = false
         }
     }
 }
