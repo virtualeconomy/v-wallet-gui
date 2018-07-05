@@ -7,13 +7,13 @@ html, body, #app {
 	font-family: 'Roboto-Regular', sans-serif !important;
 	letter-spacing: 0 !important;
 }
-a {
+.vee-color {
     color: #FF8737 !important;
 }
 
 .btn-warning {
-    color: #fff !important;
-    background-color: #FF8737 !important;
+    color: #fff;
+    background-color: #FF8737;
     border-color: #FF8737 !important;
 }
 
@@ -34,4 +34,42 @@ a {
     background-color: #fff !important;
     padding-left: 10px !important;
     padding-right:10px !important;
+}
+:focus {
+	outline: none;
+}
+.dropdown-item {
+    color: #696B8A;
+}
+.dropdown-item:focus {
+    color: #696B8A;
+    text-decoration: none;
+    background-color: rgba(254, 124, 59, 0.2);
+}
+.dropdown-item:active {
+    text-decoration: none;
+    background-color: rgba(254, 124, 59, 0.7);
+    color: rgba(0, 0, 0, 0.4);
+}
+.form-control:focus {
+	border-color: #FF8737;
+	box-shadow: none;
+}
+.btn-warning:focus {
+    box-shadow: none;
+}
+.btn-warning:hover {
+	background-color: #EB7D34;
+    box-shadow: none;
+    color: #FFF;
+}
+.btn-warning:not(:disabled):not(.disabled):active, .btn-warning:not(:disabled):not(.disabled).active, .show > .btn-warning.dropdown-toggle {
+	background-color: #EB7D34;
+    box-shadow: none;
+    color: #FFF;
+}
+.btn-warning.disabled, .btn-warning:disabled {
+    color: #FFF;
+    background-color: #FF8737;
+    border-color: #ffc107;
 }
