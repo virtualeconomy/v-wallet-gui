@@ -21,31 +21,28 @@
                             :state="isValidRecipient(recipient)"
                             aria-describedby="inputLiveFeedback">
               </b-form-input>
-              <b-input-group-append>
-                <img src="../../../assets/imgs/icons/operate/ic_qr_code.svg"
-                     width="36"
-                     height="36"
-                     v-b-tooltip.hover
-                     title="scan qr-code"
-                     @click="scanChange">
-              </b-input-group-append>
-              <div v-if="scanShow"
-                   v-show="!qrInit">
-                <p class="qrInfo">Please confirm your browser's camera is available.</p>
-                <qrcode-reader @init="onInit"
-                               @decode="onDecode"
-                               :paused="paused">
-                </qrcode-reader>
-                <b-btn @click="scanAgain"
-                       class="scan-again-btn">Scan again</b-btn>
-                <b-btn @click="scanChange"
-                       class="scan-ok-btn"
-                       :disabled="!recipient || !isValidRecipient(recipient)">Confirm</b-btn>
-              </div>
+              <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
+                   v-b-tooltip.hover
+                   class="qr-code"
+                   @click="scanChange"
+                   title="scan qr-code">
               <b-form-invalid-feedback id="inputLiveFeedback">
                 Invalid recipient address.
               </b-form-invalid-feedback>
             </b-input-group>
+            <div v-if="scanShow"
+                 v-show="!qrInit">
+              <p class="qrInfo">Please confirm your browser's camera is available.</p>
+              <qrcode-reader @init="onInit"
+                             @decode="onDecode"
+                             :paused="paused">
+              </qrcode-reader>
+              <b-btn @click="scanAgain"
+                     class="scan-again-btn">Scan again</b-btn>
+              <b-btn @click="scanChange"
+                     class="scan-ok-btn"
+                     :disabled="!recipient || !isValidRecipient(recipient)">Confirm</b-btn>
+            </div>
           </b-form-group>
           <b-form-group label="Amount"
                         label-for="amountInput">
@@ -122,12 +119,15 @@
                             aria-describedby="inputLiveFeedback">
               </b-form-input>
               <b-input-group-append>
-                <img src="../../../assets/imgs/icons/operate/ic_qr_code.svg"
-                     width="36"
-                     height="36"
-                     v-b-tooltip.hover
-                     title="scan qr-code"
-                     @click="scanChange">
+                <b-btn
+                  variant="light"
+                  @click="scanChange">
+                  <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
+                       width="36"
+                       height="36"
+                       v-b-tooltip.hover
+                       title="scan qr-code">
+                </b-btn>
               </b-input-group-append>
               <div v-if="scanShow"
                    v-show="!qrInit">
@@ -481,5 +481,8 @@ export default {
 <style scoped lang="less">
 .scan-ok-btn, .scan-again-btn {
     margin-top: 10px;
+}
+.qr-code {
+    cursor: pointer;
 }
 </style>
