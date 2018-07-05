@@ -343,9 +343,15 @@ export default {
             return this.coldAddresses[this.coldAddress]
         },
         isValidAttachment() {
+            if (!this.attachment) {
+                return void 0
+            }
             return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         isValidColdAttachment() {
+            if (!this.coldAttachment) {
+                return void 0
+            }
             return this.coldAttachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         }
     },
@@ -414,7 +420,7 @@ export default {
         },
         isValidRecipient: function(recipient) {
             if (!recipient) {
-                return true
+                return void 0
             }
             let isValid = false
             try {
