@@ -1,6 +1,8 @@
 <template>
   <b-modal :id="'txInfoModal_' + modalId"
-           class="tx-modal">
+           class="tx-modal"
+           hide-header
+           ok-only>
     <div>
       <div class="tx-title">
         <div class="tx-icon">
@@ -26,6 +28,10 @@
       <div class="tx-fee">
         <label>Fee</label>
         <span>{{ txFee }}</span>
+      </div>
+      <div class="tx-attachment">
+        <label>Attachment</label>
+        <span>{{ txAttachment }}</span>
       </div>
     </div>
   </b-modal>
@@ -66,6 +72,10 @@ export default {
         txTime: {
             type: Number,
             default: 0
+        },
+        txAttachment: {
+            type: String,
+            default: ''
         }
     }
 }
@@ -99,6 +109,14 @@ export default {
         }
     }
     .tx-fee {
+        text-align: left;
+        border-top: 1px dotted #1111;
+        padding-top: 10px;
+        span {
+            float: right;
+        }
+    }
+    .tx-attachment {
         text-align: left;
         border-top: 1px dotted #1111;
         padding-top: 10px;

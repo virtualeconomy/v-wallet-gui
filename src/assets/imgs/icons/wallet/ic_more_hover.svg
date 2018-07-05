@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_more_hover</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="00A_Export" transform="translate(-78.000000, -43.000000)">
+            <g id="ic_more_hover" transform="translate(78.000000, 43.000000)">
+                <rect id="Guide" fill-opacity="0" fill="#FFFFFF" x="0" y="0" width="16" height="16"></rect>
+                <path d="M8,4.5 C7.17157288,4.5 6.5,3.82842712 6.5,3 C6.5,2.17157288 7.17157288,1.5 8,1.5 C8.82842712,1.5 9.5,2.17157288 9.5,3 C9.5,3.82842712 8.82842712,4.5 8,4.5 Z M8,9.5 C7.17157288,9.5 6.5,8.82842712 6.5,8 C6.5,7.17157288 7.17157288,6.5 8,6.5 C8.82842712,6.5 9.5,7.17157288 9.5,8 C9.5,8.82842712 8.82842712,9.5 8,9.5 Z M8,14.5 C7.17157288,14.5 6.5,13.8284271 6.5,13 C6.5,12.1715729 7.17157288,11.5 8,11.5 C8.82842712,11.5 9.5,12.1715729 9.5,13 C9.5,13.8284271 8.82842712,14.5 8,14.5 Z" id="Combined-Shape" fill="#181B3A"></path>
+                <rect id="Overlay" x="0" y="0" width="16" height="16"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

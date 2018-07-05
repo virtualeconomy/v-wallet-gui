@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="20px" height="20px" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_qr_code_line</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="00A_Export" transform="translate(-720.000000, -91.000000)">
+            <g id="ic_qr_code_line" transform="translate(720.000000, 91.000000)">
+                <path d="M1,9.001 L9,9.001 L9,1 L1,1 L1,9.001 Z M2,8 L2,2.001 L8,2.001 L8,8 L2,8 Z M11,9.001 L11,1 L19.001,1 L19.001,9.001 L11,9.001 Z M12,8 L17.999,8 L17.999,2.001 L12,2.001 L12,8 Z M1,19.001 L1,11.001 L9,11.001 L9,19.001 L1,19.001 Z M2,18.001 L8,18.001 L8,12.001 L2,12.001 L2,18.001 Z M15,11.0011 L19,11.0011 L19,16.0011 L18,16.0011 L18,12.0011 L16,12.0011 L16,14.0011 L11,14.0011 L11,11.0011 L12,11.0011 L12,13.0011 L15,13.0011 L15,11.0011 Z M11.0004,16.0013 L12.0004,16.0013 L12.0004,18.0013 L19.0004,18.0013 L19.0004,19.0013 L11.0004,19.0013 L11.0004,16.0013 Z M14,6.001 L14,4.001 L16,4.001 L16,6.001 L14,6.001 Z M4,16.001 L4,14.001 L6,14.001 L6,16.001 L4,16.001 Z M4,6.001 L6,6.001 L6,4.001 L4,4.001 L4,6.001 Z" id="Combined-Shape" fill="#4F515E"></path>
+                <rect id="Overlay" x="0" y="0" width="20" height="20"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -41,7 +41,16 @@
                     variant="link"
                     right>
           <template slot="button-content">
-            <img src="../../../assets/imgs/icons/wallet/ic_more.svg">
+            <div
+              @mouseover="hoverIco"
+              @mouseout="unhoverIco">
+              <img
+                v-if="hovered"
+                src="../../../assets/imgs/icons/wallet/ic_more_hover.svg">
+              <img
+                v-if="!hovered"
+                src="../../../assets/imgs/icons/wallet/ic_more.svg">
+            </div>
           </template>
           <b-dropdown-item @click="$root.$emit('bv::show::modal', 'txInfoModal_' + txRecord.id, 'txInfoModal_' + txRecord.id)">TX info</b-dropdown-item>
           <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
@@ -59,16 +68,24 @@
                  :tx-time="txRecord.timestamp"
                  :tx-fee="txFee"
                  :tx-amount="txAmount"
-                 :tx-block="txBlock"></TxInfoModal>
+                 :tx-block="txBlock"
+                 :tx-attachment="txAttachment"></TxInfoModal>
   </b-container>
 </template>
 
 <script>
 import TxInfoModal from './TxInfoModal'
+import base58 from '@/libs/base58'
+import converters from '@/libs/converters'
 
 export default {
     name: 'Record',
     components: {TxInfoModal},
+    data: function() {
+        return {
+            hovered: false
+        }
+    },
     props: {
         txRecord: {
             type: Object,
@@ -77,7 +94,8 @@ export default {
                     txType: '',
                     txAddress: '',
                     txTime: '',
-                    txAmount: ''
+                    txAmount: '',
+                    txAttachment: ''
                 }
             }
         },
@@ -143,12 +161,27 @@ export default {
         },
         txId() {
             return this.txRecord.id
+        },
+        txAttachment() {
+            var value = this.txRecord.attachment === void 0 ? '' : this.txRecord.attachment
+            var bytes = base58.decode(value)
+            try {
+                return converters.byteArrayToString(bytes)
+            } catch (e) {
+                return ''
+            }
         }
     },
     methods: {
         copyTxId() {
             this.$refs.tId.select()
             window.document.execCommand('copy')
+        },
+        hoverIco() {
+            this.hovered = true
+        },
+        unhoverIco() {
+            this.hovered = false
         }
     }
 }
