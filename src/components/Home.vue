@@ -57,6 +57,7 @@
             <div class="trans-pane">
               <trans-pane :balance="balance[selectedAddress]"
                           :address="selectedAddress"
+                          :balances="balance"
                           :cold-addresses="coldAddresses"></trans-pane>
             </div>
             <div class="f-records">

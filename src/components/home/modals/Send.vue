@@ -4,19 +4,46 @@
            lazy
            title="Send"
            hide-footer
-           ref="modal"
+           hide-header
+           ref="sendModal"
            :busy="true"
            @hidden="resetPage">
-    <b-tabs>
-      <b-tab title="hot wallet"
-             active
-             :disabled="scanShow">
+    <button
+      :disabled="qrInit"
+      class="close btn-close"
+      @click="endSend">
+      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+    </button>
+    <b-tabs @input="hideQrScan">
+      <b-tab title="Hot Wallet"
+             :disabled="qrInit && !pageId"
+             active>
         <b-container
           class="text-left"
-          v-show="pageId===1">
+          v-if="pageId===1">
+          <b-form-group label="Wallet Address"
+                        label-for="address-input">
+            <b-form-input
+              id="address-input"
+              type="text"
+              :value="address"
+              class="addr-input"
+              readonly>
+            </b-form-input>
+            <b-btn
+              block
+              variant="light"
+              disabled
+              class="balance-input"
+              readonly>
+              <span class="balance-title">Balance</span>
+              <span class="balance">{{ balances[address] }} VEE</span>
+            </b-btn>
+          </b-form-group>
           <b-form-group label="Recipient"
-                        label-for="recipientInput">
-            <b-form-input id="recipientInput"
+                        label-for="recipient-input">
+            <b-form-input id="recipient-input"
+                          class="recipient-input"
                           type="text"
                           v-model="recipient"
                           :state="isValidRecipient(recipient)"
@@ -30,23 +57,27 @@
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address.
             </b-form-invalid-feedback>
-            <div v-if="scanShow"
-                 v-show="!qrInit">
-              <p class="qrInfo">Please confirm your browser's camera is available.</p>
-              <qrcode-reader @init="onInit"
-                             @decode="onDecode"
-                             :paused="paused">
-              </qrcode-reader>
-              <b-btn @click="scanAgain"
-                     class="scan-again-btn">Scan again</b-btn>
-              <b-btn @click="scanChange"
-                     class="scan-ok-btn"
-                     :disabled="!recipient || !isValidRecipient(recipient)">Confirm</b-btn>
+            <div v-if="scanShow">
+              <div class="qr-info">Please confirm your browser's camera is available.</div>
+              <div class="qr-window">
+                <qrcode-reader @init="onInit"
+                               @decode="onDecode"
+                               :track="repaintLocation"
+                               :paused="paused">
+                  <img v-if="qrInit"
+                       class="qrcode-waiting center"
+                       height="70"
+                       width="70"
+                       src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+                </qrcode-reader>
+              </div>
+              <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
             </div>
           </b-form-group>
           <b-form-group label="Amount"
-                        label-for="amountInput">
-            <b-form-input id="amountInput"
+                        label-for="amount-input">
+            <b-form-input id="amount-input"
+                          class="amount-input"
                           type="number"
                           v-model="amount"
                           min="0"
@@ -62,61 +93,87 @@
                              :state="isValidAttachment">
             </b-form-textarea>
           </b-form-group>
-          <b-form-group label="Fee: 100000">
+          <b-form-group
+            class="fee-remark"
+            label="Transaction Fee 100000 VEE">
           </b-form-group>
-          <b-button variant="primary"
+          <b-button variant="warning"
+                    class="btn-continue"
                     size="lg"
-                    @click="prevPage">Cancle
-          </b-button>
-          <b-button variant="primary"
-                    size="lg"
+                    block
                     :disabled="isSubmitDisabled"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
-        <b-container v-show="pageId===2">
+        <b-container v-if="pageId===2">
           <Confirm :address="address"
                    :recipient="recipient"
                    :amount="Number(amount)"
                    :fee="fee"
                    :attachment="attachment">
           </Confirm>
-          <p v-show="sendError">Sorry, transaction send failed!</p>
-          <b-button variant="primary"
-                    size="lg"
-                    @click="prevPage">Cancle
-          </b-button>
-          <b-button variant="primary"
-                    size="lg"
-                    @click="sendData('hotWallet')">Confirm
-          </b-button>
+          <p
+            v-show="sendError"
+            class="text-danger"><small>Sorry, transaction send failed!</small></p>
+          <b-row>
+            <b-col class="col-lef">
+              <b-button
+                class="btn-back"
+                block
+                variant="light"
+                size="lg"
+                @click="prevPage">Back
+              </b-button>
+            </b-col>
+            <b-col class="col-rit">
+              <b-button
+                block
+                class="btn-confirm"
+                variant="warning"
+                size="lg"
+                @click="sendData('hotWallet')">Confirm
+              </b-button>
+            </b-col>
+          </b-row>
         </b-container>
-        <b-container v-show="pageId===3">
+        <b-container v-if="pageId===3">
           <Success :address="address"
                    :recipient="recipient"
                    :amount="Number(amount)"
                    :fee="fee"
                    :attachment="attachment">
           </Success>
-          <b-button variant="primary"
+          <b-button variant="warning"
+                    block
                     size="lg"
                     @click="endSend">OK
           </b-button>
         </b-container>
       </b-tab>
-      <b-tab title="cold wallet"
-             :disabled="noColdAddress || scanShow">
-        <b-container v-show="coldPageId===1"
+      <b-tab title="Cold Wallet"
+             :disabled="noColdAddress || (qrInit && !coldPageId)">
+        <b-container v-if="coldPageId===1"
                      class="text-left">
-          <b-form-group label="Address"
-                        label-for="walletAddress">
-            <b-form-select id=walletAddress
+          <b-form-group label="Wallet Address"
+                        label-for="wallet-address">
+            <b-form-select id=wallet-address
+                           class="addr-input"
                            v-model="coldAddress"
                            :options="options"></b-form-select>
+            <b-btn
+              block
+              variant="light"
+              disabled
+              class="balance-input"
+              readonly>
+              <span class="balance-title">Balance</span>
+              <span class="balance">{{ balances[coldAddress] }} VEE</span>
+            </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
-                        label-for="coldRecipientInput">
-            <b-form-input id="coldRecipientInput"
+                        label-for="cold-recipient-input">
+            <b-form-input id="cold-recipient-input"
+                          class="recipient-input"
                           type="text"
                           v-model="coldRecipient"
                           :state="isValidRecipient(coldRecipient)"
@@ -130,28 +187,27 @@
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address.
             </b-form-invalid-feedback>
-            <div v-if="scanShow"
-                 v-show="!qrInit">
-              <p class="qrInfo">Please confirm your browser's camera is available.</p>
-              <qrcode-reader @init="onInit"
-                             @decode="onColdDecode"
-                             :paused="paused">
-                <img v-if="qrInit"
-                     class="qrcode-waiting"
-                     height="100"
-                     width="100"
-                     src="../../../assets/imgs/icons/wallet/ic_wait.svg">
-              </qrcode-reader>
-              <b-btn @click="scanAgain"
-                     class="scan-again-btn">Scan again</b-btn>
-              <b-btn @click="scanChange"
-                     class="scan-ok-btn"
-                     :disabled="!coldRecipient || !this.isValidRecipient(coldRecipient)">Confirm</b-btn>
+            <div v-if="scanShow">
+              <div class="qr-info">Please confirm your browser's camera is available.</div>
+              <div class="qr-window">
+                <qrcode-reader @init="onInit"
+                               @decode="onColdDecode"
+                               :track="repaintLocation"
+                               :paused="paused">
+                  <img v-if="qrInit"
+                       class="qrcode-waiting center"
+                       height="70"
+                       width="70"
+                       src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+                </qrcode-reader>
+              </div>
+              <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
             </div>
           </b-form-group>
           <b-form-group label="Amount"
-                        label-for="coldAmountInput">
-            <b-form-input id="coldAmountInput"
+                        label-for="cold-amount-input">
+            <b-form-input id="cold-amount-input"
+                          class="amount-input"
                           type="number"
                           v-model="coldAmount"
                           min="0"
@@ -167,35 +223,47 @@
                              :state="isValidColdAttachment">
             </b-form-textarea>
           </b-form-group>
-          <b-form-group label="Fee: 100000">
+          <b-form-group
+            class="fee-remark"
+            label="Transaction Fee 100000 VEE">
           </b-form-group>
-          <b-button variant="primary"
-                    size="lg"
-                    @click="coldPrevPage">Cancle
-          </b-button>
-          <b-button variant="primary"
+          <b-button variant="warning"
+                    class="btn-continue"
+                    block
                     size="lg"
                     :disabled="isColdSubmitDisabled"
                     @click="coldNextPage">Continue
           </b-button>
         </b-container>
-        <b-container v-show="coldPageId===2">
+        <b-container v-if="coldPageId===2">
           <Confirm :address="coldAddress"
                    :recipient="coldRecipient"
                    :amount="Number(coldAmount)"
                    :fee="coldFee"
                    :attachment="coldAttachment">
           </Confirm>
-          <b-button variant="primary"
-                    size="lg"
-                    @click="coldPrevPage">Cancle
-          </b-button>
-          <b-button variant="primary"
-                    size="lg"
-                    @click="coldNextPage">Confirm
-          </b-button>
+          <b-row>
+            <b-col class="col-lef">
+              <b-button
+                class="btn-back"
+                block
+                variant="light"
+                size="lg"
+                @click="coldPrevPage">Back
+              </b-button>
+            </b-col>
+            <b-col class="col-rit">
+              <b-button
+                block
+                class="btn-confirm"
+                variant="warning"
+                size="lg"
+                @click="coldNextPage">Confirm
+              </b-button>
+            </b-col>
+          </b-row>
         </b-container>
-        <b-container v-show="coldPageId===3">
+        <b-container v-if="coldPageId===3">
           <ColdSignature :data-object="dataObject"
                          :public-key="coldPublicKey"
                          v-if="coldPageId===3"
@@ -257,12 +325,12 @@ var initData = {
     recipient: '',
     amount: 0,
     attachment: '',
-    pageId: 1,
+    pageId: 0,
     fee: 100000,
     coldRecipient: '',
     coldAmount: 0,
     coldAttachment: '',
-    coldPageId: 1,
+    coldPageId: 0,
     coldFee: 100000,
     coldAddress: '',
     scanShow: false,
@@ -271,12 +339,18 @@ var initData = {
     isValidSignature: false,
     sendError: false,
     coldSignature: '',
-    coldTimestamp: 0
+    coldTimestamp: 0,
+    qrErrMsg: void 0
 }
 export default {
     name: 'Send',
     components: {ColdSignature, Success, Confirm},
     props: {
+        balances: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
         coldAddresses: {
             type: Object,
             default: function() {},
@@ -307,23 +381,16 @@ export default {
             return seedLib.fromExistingPhrase(this.seedPhrase).keyPair
         },
         isSubmitDisabled() {
-            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isValidAttachment)
+            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment))
         },
         isColdSubmitDisabled() {
-            return !(this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient) && this.isValidColdAttachment)
+            return !(this.coldAddress && this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient) && (this.isValidColdAttachment || !this.coldAttachment))
         },
         options() {
-            var coldOptions = []
-            if (!this.coldAddresses) return coldOptions
-            let coldAddress
-            for (coldAddress in this.coldAddresses) {
-                const option = {
-                    value: coldAddress,
-                    text: coldAddress
-                }
-                coldOptions.push(option)
-            }
-            return coldOptions
+            return Object.keys(this.coldAddresses).reduce((options, coldAddress) => {
+                options.push({ value: coldAddress, text: coldAddress })
+                return options
+            }, [{ value: '', text: '<span class="text-muted">Please select a cold wallet address</span>', disabled: true }])
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -390,7 +457,7 @@ export default {
         prevPage: function() {
             this.sendError = false
             if (this.pageId === 1) {
-                this.$refs.modal.hide()
+                this.$refs.sendModal.hide()
             } else {
                 this.pageId--
             }
@@ -398,25 +465,37 @@ export default {
         coldPrevPage: function() {
             this.sendError = false
             if (this.coldPageId === 1) {
-                this.$refs.modal.hide()
+                this.$refs.sendModal.hide()
             } else {
                 this.coldPageId--
             }
         },
         resetPage: function() {
-            this.sendError = false
-            this.pageId = 1
-            this.coldPageId = 1
-            this.scanShow = false
             this.recipient = ''
-            this.amount = ''
+            this.amount = 0
             this.attachment = ''
+            this.pageId = 0
+            this.coldRecipient = ''
+            this.coldAmount = 0
+            this.coldAttachment = ''
+            this.coldPageId = 0
+            this.coldAddress = ''
+            this.scanShow = false
+            this.qrInit = false
+            this.paused = false
+            this.isValidSignature = false
+            this.sendError = false
+            this.coldSignature = ''
+            this.coldTimestamp = 0
+            this.qrErrMsg = void 0
         },
         endSend: function() {
-            this.$refs.modal.hide()
+            this.$refs.sendModal.hide()
         },
         scanChange: function(evt) {
-            this.scanShow = !this.scanShow
+            if (!this.qrInit) {
+                this.scanShow = !this.scanShow
+            }
         },
         isValidRecipient: function(recipient) {
             if (!recipient) {
@@ -433,6 +512,7 @@ export default {
         async onInit(promise) {
             try {
                 this.qrInit = true
+                this.qrErrMsg = void 0
                 await promise
             } catch (error) {
                 if (error.name === 'NotAllowedError') {
@@ -465,32 +545,64 @@ export default {
             }
         },
         onDecode: function(decodeString) {
+            console.log('aaaaa')
+            this.qrErrMsg = void 0
             this.paused = true
-            this.recipient = this.getParmFromUrl('recipient', decodeString)
+            this.recipient = this.getParmFromUrl('recipient', decodeString) || decodeString
             this.amount = this.getParmFromUrl('amount', decodeString)
             if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                 this.paused = false
+                this.qrErrMsg = 'Sorry, your QR code seems unavalible.'
+            } else {
+                this.scanShow = false
             }
         },
         onColdDecode: function(decodeString) {
+            console.log('bbbbb')
+            this.qrErrMsg = void 0
             this.paused = true
-            this.coldRecipient = this.getParmFromUrl('recipient', decodeString)
+            this.coldRecipient = this.getParmFromUrl('recipient', decodeString) || decodeString
             this.coldAmount = this.getParmFromUrl('amount', decodeString)
             if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
+                this.qrErrMsg = 'Sorry, your QR code seems unavalible.'
                 this.paused = false
+            } else {
+                this.scanShow = false
             }
-        },
-        scanAgain: function() {
-            this.paused = false
-            this.recipient = ''
-            this.amount = 0
-            this.coldRecipient = ''
-            this.coldAmount = 0
         },
         getSignature: function(signature, timestamp) {
             this.coldSignature = signature
             this.coldTimestamp = timestamp
             this.isValidSignature = transaction.default.isValidSignature(this.dataObject, signature, timestamp)
+        },
+        repaintLocation(location, ctx) {
+            if (location !== null) {
+                const {
+                    topLeftCorner,
+                    topRightCorner,
+                    bottomLeftCorner,
+                    bottomRightCorner
+                } = location
+                ctx.strokeStyle = 'orange' // instead of red
+                ctx.beginPath()
+                ctx.moveTo(topLeftCorner.x, topLeftCorner.y)
+                ctx.lineTo(bottomLeftCorner.x, bottomLeftCorner.y)
+                ctx.lineTo(bottomRightCorner.x, bottomRightCorner.y)
+                ctx.lineTo(topRightCorner.x, topRightCorner.y)
+                ctx.lineTo(topLeftCorner.x, topLeftCorner.y)
+                ctx.closePath()
+                ctx.stroke()
+            }
+        },
+        hideQrScan(tabIndex) {
+            if (tabIndex === 0) {
+                this.resetPage()
+                this.pageId = 1
+            } else {
+                this.resetPage()
+                this.coldPageId = 1
+            }
+            this.scanShow = false
         }
     }
 }
@@ -501,9 +613,105 @@ export default {
     margin-top: 10px;
 }
 .qr-code {
+    width: 26px;
     cursor: pointer;
     float: right;
-    margin-top: -29px;
+    margin-top: -37px;
     margin-right: 10px;
+}
+.qr-info {
+    text-align: left;
+    color: #9091a3;
+}
+.addr-input {
+    border: 1px solid #E8E9ED;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+    background-color: #FFF;
+    font-size: 15px;
+    color: #181B3A;
+    letter-spacing: 0;
+    height: 48px !important;
+}
+.recipient-input {
+    height: 48px;
+}
+.amount-input {
+    height: 48px;
+}
+.balance-title {
+    float: left;
+    font-size: 15px;
+    color: #9091A3;
+    letter-spacing: 0;
+}
+.balance {
+    float: right;
+    font-size: 15px;
+    color: #FF8737;
+    letter-spacing: 0;
+    text-align: right;
+}
+.balance-input {
+    border: 1px solid #E8E9ED;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    opacity: 1;
+    background-color: #FAFAFA;
+    height: 37px;
+}
+.btn-close {
+    position: absolute;
+    right: 0;
+    margin-right: 20px;
+    margin-top: 20px;
+}
+.btn-continue {
+    font-size: 17px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    text-align: center;
+    height: 50px;
+}
+.fee-remark {
+    font-size: 13px;
+    color: #9091A3;
+    letter-spacing: 0;
+}
+.center {
+    text-align: center;
+}
+.qrcode-waiting {
+    vertical-align: middle;
+    display: flex;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 20px;
+}
+.qr-window {
+    padding: 0 100px;
+}
+.btn-confirm {
+    height: 44px;
+    font-size: 17px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    text-align: center;
+}
+.btn-back {
+    background: #FAFAFA;
+    border: 1px solid #E8E9ED;
+    border-radius: 4px;
+    font-size: 17px;
+    color: #4F515E;
+    letter-spacing: 0;
+    text-align: center;
+}
+.col-lef {
+    padding-right: 10px;
+}
+.col-rit {
+    padding-left: 10px;
 }
 </style>
