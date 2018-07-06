@@ -1,6 +1,7 @@
 <template>
   <b-modal :id="'txInfoModal_' + modalId"
            class="tx-modal"
+           centered
            hide-header
            ok-only>
     <div>
@@ -15,7 +16,7 @@
                width="60px"
                height="60px">
         </div>
-        <div>{{ txIcon === 'sent' ? '-' : '+' }}{{ txAmount }} vee</div>
+        <div :class="txIcon === 'sent' ? 'sent-amount' : 'received-amount'">{{ txIcon === 'sent' ? '-' : '+' }}{{ txAmount }} vee</div>
       </div>
       <div class="tx-address">
         <label>{{ txIcon === 'sent' ? 'To' : 'From' }}</label>
@@ -123,6 +124,18 @@ export default {
         span {
             float: right;
         }
+    }
+    .sent-amount {
+        font-size: 28px;
+        color: #F5354B;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .received-amount {
+        font-size: 28px;
+        color: #23A28C;
+        letter-spacing: 0;
+        text-align: center;
     }
 }
 </style>
