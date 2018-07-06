@@ -150,12 +150,12 @@ export default {
 .div-set {
     padding-top: 24px;
     margin-bottom: 40px;
+    margin-left: 15px;
+    margin-right: 15px;
 }
 .div-t {
     text-align: left;
     margin-bottom: 1rem;
-    margin-left: 15px;
-    margin-right: 15px;
 }
 .col-lef {
     padding-right: 10px;
