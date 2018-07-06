@@ -184,5 +184,11 @@ export default {
 }
 .scan-again-btn {
     margin-top: 10px;
+    background: rgba(255,135,55,0.00);
+    border: 1px solid #FF8737;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #FF8737;
+    letter-spacing: 0;
 }
 </style>
