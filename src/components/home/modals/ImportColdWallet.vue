@@ -37,16 +37,19 @@
         </b-form-invalid-feedback>
       </b-form-group>
       <p class="qrInfo">Tips: Please confirm your browser's camera is available.</p>
-      <qrcode-reader @init="onInit"
-                     @decode="onDecode"
-                     :paused="paused">
-        <img v-if="qrInit"
-             class="qrcode-waiting"
-             height="100"
-             width="100"
-             src="../../../assets/imgs/icons/wallet/ic_wait.svg">
-      </qrcode-reader>
+      <div class="scan-pane">
+        <qrcode-reader @init="onInit"
+                       @decode="onDecode"
+                       :paused="paused">
+          <img v-if="qrInit"
+               class="qrcode-waiting"
+               height="100"
+               width="100"
+               src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+        </qrcode-reader>
+      </div>
       <b-btn class="scan-again-btn"
+             variant="warning"
              @click="scanAgain">Scan again</b-btn>
     </b-container>
   </b-modal>
@@ -101,6 +104,7 @@ export default {
     methods: {
         showingUp() {
             this.coldAddress = ''
+            this.coldPubKey = ''
         },
         importClose: function(evt) {
             if (this.qrInit) {
@@ -167,6 +171,10 @@ export default {
 </script>
 
 <style scoped>
+.scan-pane {
+    width: 320px;
+    margin: auto;
+}
 .qrcode-waiting {
     margin-left: 100px;
 }
@@ -176,5 +184,11 @@ export default {
 }
 .scan-again-btn {
     margin-top: 10px;
+    background: rgba(255,135,55,0.00);
+    border: 1px solid #FF8737;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #FF8737;
+    letter-spacing: 0;
 }
 </style>
