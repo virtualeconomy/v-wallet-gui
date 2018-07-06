@@ -63,10 +63,35 @@ export default {
 .no-left-padding {
     padding-left: 0px;
 }
-.selected-asset {
-    background-color: @veeColor;
-    color: white;
+
+@-webkit-keyframes assetFadeIn {
+    from {
+        background-color: white;
+    }
+
+    to {
+        background-color: @veeColor;
+    }
 }
+@keyframes assetFadeIn {
+    from {
+        background-color: white;
+    }
+
+    to {
+        background-color: @veeColor;
+    }
+}
+.selected-asset {
+    color: white;
+    -webkit-animation-name: assetFadeIn;
+    animation-name: assetFadeIn;
+    -webkit-animation-duration: 0.5s;
+    animation-duration: 0.5s;
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+}
+
 .asset-title {
     font-size: 13px;
     color: #9091A3;
