@@ -32,7 +32,7 @@
           v-model="username"
           placeholder="Set new name"
           :readonly="registering"
-          @blur="checkUsername(username)">
+          @input="checkUsername(username)">
       </div>
       <div class="form-group password-form">
         <label>Set a new password</label>

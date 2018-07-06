@@ -46,7 +46,7 @@
             v-model="username"
             placeholder="Create your account name"
             :readonly="registering"
-            @blur="checkUsername(username)">
+            @input="checkUsername(username)">
         </div>
         <div class="form-group password-form">
           <label>Password</label>
