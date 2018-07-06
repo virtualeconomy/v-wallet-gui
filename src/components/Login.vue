@@ -50,8 +50,9 @@
         <transition name="fade">
           <ul
             ref="dropdownMenu"
-            v-if="dropdownOpen"
-            class="dropdown-menu fadeInDown animated">
+            v-show="dropdownOpen"
+            class="dropdown-menu animated"
+            :class="faded">
             <li
               v-for="(option, index) in usrOptions"
               :key="index"
@@ -143,7 +144,8 @@ export default {
             dropdownOpen: false,
             typeAheadPointer: -1,
             isPwdError: false,
-            password: void 0
+            password: void 0,
+            faded: 'slideInDown'
         }
     },
 
@@ -223,6 +225,7 @@ export default {
         },
 
         toggleDropdown(e) {
+            this.faded = (this.dropdownOpen ? 'slideOutUp' : 'slideInDown')
             this.dropdownOpen = !this.dropdownOpen
         },
 
