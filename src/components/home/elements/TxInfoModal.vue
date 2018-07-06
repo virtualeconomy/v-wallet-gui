@@ -188,7 +188,7 @@ export default {
         text-align: center;
     }
     .md-content {
-        padding: 24px;
+        padding: 40px 24px;
         padding-top: 0;
     }
 }
