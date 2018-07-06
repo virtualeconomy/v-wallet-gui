@@ -23,6 +23,7 @@
           src="../../../assets/imgs/icons/wallet/ic_receive.svg"><b>Receive</b></b-button>
     </div>
     <Send show="false"
+          :balances="balances"
           :cold-addresses="coldAddresses"></Send>
     <Receive show="false"
              :address="address"></Receive>
@@ -50,9 +51,12 @@ export default {
         },
         coldAddresses: {
             type: Object,
-            default: function() {
-
-            },
+            default: function() {},
+            require: true
+        },
+        balances: {
+            type: Object,
+            default: function() {},
             require: true
         }
     }
