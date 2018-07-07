@@ -36,7 +36,7 @@
           block
           variant="light"
           size="lg"
-          @click="closeModal">Cancle
+          @click="closeModal">Cancel
         </b-button>
       </b-col>
       <b-col class="col-rit">
