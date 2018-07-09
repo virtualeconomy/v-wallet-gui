@@ -51,7 +51,8 @@
         <b-form-input id="amountInput"
                       class="input-t"
                       type="number"
-                      v-model="amount">
+                      v-model="amount"
+                      min="0">
         </b-form-input>
         <div id="address-qrcode">
           <img :src="getQrCodeImg">

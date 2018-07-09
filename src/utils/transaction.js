@@ -56,7 +56,6 @@ function getBytes(transferData) {
     if (transferData === void 0) { transferData = {}; }
     // Save all needed values from user data
     getData(transferData);
-    console.log(byteProviders)
     var _dataHolders = byteProviders.map(function (provider) {
         if (typeof provider === 'function') {
             return provider(userData);

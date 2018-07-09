@@ -17,13 +17,15 @@ export const INITIAL_NONCE = 0;
 export const ADDRESS_VERSION = 1;
 export const TRANSFER_TX = 4;
 export const TRANSFER_TX_NAME = 'transfer';
-export const PRIVATE_KEY_LENGTH = 32;
-export const PUBLIC_KEY_LENGTH = 32;
+export const PRIVATE_KEY_BYTE_LENGTH = 32;
+export const PUBLIC_KEY_BYTE_LENGTH = 32;
+export const PUBLIC_KEY_LENGTH = 44;
+export const PRIVATE_KEY_LENGTH = 44;
 export const MINIMUM_FEE = 100000;
 export const TRANSFER_ATTACHMENT_BYTE_LIMIT = 140;
 export const DEFAULT_MIN_SEED_LENGTH = 25;
 export const DEFAULT_ORDER_EXPIRATION_DAYS = 20;
-export const TRX_RECORD_LIMIT = 30; 
+export const TRX_RECORD_LIMIT = 30;
 export const DEFAULT_BASIC_CONFIG = {
     requestOffset: 0,
     requestLimit: 100,
