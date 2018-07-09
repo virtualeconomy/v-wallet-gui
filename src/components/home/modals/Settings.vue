@@ -4,7 +4,8 @@
            ref="settingModal"
            centered
            hide-header
-           hide-footer>
+           hide-footer
+           @hide="resetSession">
     <button
       class="close btn-close"
       @click="closeModal">
@@ -129,6 +130,9 @@ export default {
         confirm() {
             this.changeSession()
             this.$refs.settingModal.hide()
+        },
+        resetSession() {
+            this.selectedSession = this.getSelectedSession() / 1000 / 60
         }
     }
 }
