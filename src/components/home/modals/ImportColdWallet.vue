@@ -8,8 +8,18 @@
            @show="showingUp"
            :ok-disabled="!coldAddress || !isValidAddress"
            :cancel-disabled="qrInit"
-           title="Import Cold Wallet">
-    <b-container fluid>
+           title="Import Cold Wallet"
+           hide-header
+           hide-footer
+           ref="importModal">
+    <button
+      :disabled="qrInit"
+      class="close btn-close"
+      @click="closeModal">
+      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+    </button>
+    <b-container fluid
+                 class="c-import">
       <b-form-group label="Cold Wallet Adress"
                     label-for="coldAddress">
         <b-form-input id="coldAddress"
@@ -30,7 +40,7 @@
                       v-model="coldPubKey"
                       :state="isValidPubKey"
                       aria-describedby="inputLiveHelp inputLiveFeedback"
-                      placeholder="Please input Base58-encoded public key of cold wallet.">
+                      placeholder="Please input public key of cold wallet.">
         </b-form-input>
         <b-form-invalid-feedback id="inputLiveFeedback">
           Invalid cold wallet public key.
@@ -47,11 +57,32 @@
                width="100"
                src="../../../assets/imgs/icons/wallet/ic_wait.svg">
         </qrcode-reader>
+        <b-btn class="scan-again-btn"
+               variant="warning"
+               @click="scanAgain"
+               centered>Scan again</b-btn>
       </div>
-      <b-btn class="scan-again-btn"
-             variant="warning"
-             @click="scanAgain">Scan again</b-btn>
     </b-container>
+    <b-row class="btn-bottom">
+      <b-col class="col-lef">
+        <b-button
+          class="btn-back"
+          block
+          variant="light"
+          size="lg"
+          @click="closeModal">Cancel
+        </b-button>
+      </b-col>
+      <b-col class="col-rit">
+        <b-button
+          block
+          class="btn-confirm"
+          variant="warning"
+          size="lg"
+          @click="importOk">Confirm
+        </b-button>
+      </b-col>
+    </b-row>
   </b-modal>
 </template>
 
@@ -123,13 +154,6 @@ export default {
                 evt.preventDefault()
             }
         },
-        saveCold: function() {
-            const savedInfo = {
-                coldAddress: this.coldAddress,
-                coldPubKey: this.coldPubKey ? this.coldPubKey : ''
-            }
-            window.localStorage.setItem(this.hotAddress, JSON.stringify(savedInfo))
-        },
         async onInit(promise) {
             try {
                 this.qrInit = true
@@ -165,6 +189,9 @@ export default {
         scanAgain: function() {
             this.paused = false
             this.coldAddress = ''
+        },
+        closeModal: function() {
+            this.$refs.importModal.hide()
         }
     }
 }
@@ -190,5 +217,45 @@ export default {
     font-size: 13px;
     color: #FF8737;
     letter-spacing: 0;
+    width: 100px;
+    margin-left: 110px;
+}
+.btn-close {
+    position: absolute;
+    right: 0;
+    margin-right: 20px;
+    margin-top: 4px;
+}
+.c-import {
+    padding-top: 24px;
+    margin-bottom: 40px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+.btn-bottom {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+.btn-confirm {
+    height: 44px;
+    font-size: 17px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    text-align: center;
+}
+.btn-back {
+    background: #FAFAFA;
+    border: 1px solid #E8E9ED;
+    border-radius: 4px;
+    font-size: 17px;
+    color: #4F515E;
+    letter-spacing: 0;
+    text-align: center;
+}
+.col-lef {
+    padding-right: 10px;
+}
+.col-rit {
+    padding-left: 10px;
 }
 </style>

@@ -11,7 +11,7 @@ var secure_random_1 = require("../libs/secure-random");
 var sha3_1 = require("../libs/sha3");
 var concat_1 = require("./concat");
 var constants = require("../constants");
-var NETWORK_BYTE = 'T'.charCodeAt(0) //Todo: import env varible, 
+var NETWORK_BYTE = 'T'.charCodeAt(0) //Todo: import env varible,
 
 function sha256(input) {
     var bytes;
@@ -55,7 +55,7 @@ exports.default = {
             throw new Error('Missing or invalid private key');
         }
         var privateKeyBytes = base58_1.default.decode(privateKey);
-        if (privateKeyBytes.length !== constants.PRIVATE_KEY_LENGTH) {
+        if (privateKeyBytes.length !== constants.PRIVATE_KEY_BYTE_LENGTH) {
             throw new Error('Invalid private key');
         }
         var signature = axlsign_1.default.sign(privateKeyBytes, dataBytes, secure_random_1.default.randomUint8Array(64));
@@ -73,7 +73,7 @@ exports.default = {
         }
         var signatureBytes = base58_1.default.decode(signature);
         var publicKeyBytes = base58_1.default.decode(publicKey);
-        if (publicKeyBytes.length !== constants.PUBLIC_KEY_LENGTH) {
+        if (publicKeyBytes.length !== constants.PUBLIC_KEY_BYTE_LENGTH) {
             throw new Error('Invalid public key');
         }
         return axlsign_1.default.verify(publicKeyBytes, dataBytes, signatureBytes);
@@ -116,7 +116,7 @@ exports.default = {
         return true;
     },
     buildRawAddress: function (publicKeyBytes) {
-        if (!publicKeyBytes || publicKeyBytes.length !== constants.PUBLIC_KEY_LENGTH || !(publicKeyBytes instanceof Uint8Array)) {
+        if (!publicKeyBytes || publicKeyBytes.length !== constants.PUBLIC_KEY_BYTE_LENGTH || !(publicKeyBytes instanceof Uint8Array)) {
             throw new Error('Missing or invalid public key');
         }
         var prefix = Uint8Array.from([constants.ADDRESS_VERSION, NETWORK_BYTE]);
