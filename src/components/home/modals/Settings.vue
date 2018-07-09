@@ -29,7 +29,7 @@
         </b-form-select>
       </div>
     </div>
-    <b-row>
+    <b-row class="btn-bottom">
       <b-col class="col-lef">
         <b-button
           class="btn-back"
@@ -179,5 +179,8 @@ export default {
     letter-spacing: 0;
     text-align: center;
 }
-
+.btn-bottom {
+    margin-left: 0px;
+    margin-right: 0px;
+}
 </style>
