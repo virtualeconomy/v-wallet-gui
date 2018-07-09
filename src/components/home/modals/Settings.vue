@@ -1,8 +1,17 @@
 <template>
   <b-modal id="settingsModal"
-           title="Settings">
-    <div>
-      <div class="lang-setting">
+           title="Settings"
+           ref="settingModal"
+           centered
+           hide-header
+           hide-footer>
+    <button
+      class="close btn-close"
+      @click="closeModal">
+      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+    </button>
+    <div class="div-set">
+      <div class="lang-setting div-t">
         <label>Language</label>
         <b-form-select class="setting-input"
                        :options="langOptions"
@@ -11,16 +20,35 @@
                        size="sm">
         </b-form-select>
       </div>
-      <div class="timeout-setting">
+      <div class="timeout-setting div-t">
         <label>Session Timeout</label>
         <b-form-select class="setting-input"
                        :options="timeoutOptions"
                        v-model="selectedSession"
-                       size="sm"
-                       @input="change">
+                       size="sm">
         </b-form-select>
       </div>
     </div>
+    <b-row>
+      <b-col class="col-lef">
+        <b-button
+          class="btn-back"
+          block
+          variant="light"
+          size="lg"
+          @click="closeModal">Cancel
+        </b-button>
+      </b-col>
+      <b-col class="col-rit">
+        <b-button
+          block
+          class="btn-confirm"
+          variant="warning"
+          size="lg"
+          @click="confirm">Confirm
+        </b-button>
+      </b-col>
+    </b-row>
   </b-modal>
 </template>
 
@@ -83,8 +111,8 @@ export default {
         }
     },
     methods: {
-        change: function(selected) {
-            this.setUsrLocalStorage('sessionTimeout', selected * 60 * 1000)
+        changeSession: function() {
+            this.setUsrLocalStorage('sessionTimeout', this.selectedSession * 60 * 1000)
         },
         getSelectedSession() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT
@@ -94,15 +122,62 @@ export default {
                 oldTimeout = INITIAL_SESSION_TIMEOUT
             }
             return oldTimeout
+        },
+        closeModal() {
+            this.$refs.settingModal.hide()
+        },
+        confirm() {
+            this.changeSession()
+            this.$refs.settingModal.hide()
         }
     }
 }
 </script>
 
 <style scoped>
-. setting-input {
-    width: 100px;
-    margin-left: 20px;
+.setting-input {
+    height: 48px !important;
+    font-size: 15px;
+    color: #181B3A;
+    letter-spacing: 0;
+}
+.btn-close {
+    position: absolute;
+    right: 0;
+    margin-right: 20px;
+    margin-top: 4px;
+}
+.div-set {
+    padding-top: 24px;
+    margin-bottom: 40px;
+    margin-left: 15px;
+    margin-right: 15px;
+}
+.div-t {
+    text-align: left;
+    margin-bottom: 1rem;
+}
+.col-lef {
+    padding-right: 10px;
+}
+.col-rit {
+    padding-left: 10px;
+}
+.btn-confirm {
+    height: 44px;
+    font-size: 17px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    text-align: center;
+}
+.btn-back {
+    background: #FAFAFA;
+    border: 1px solid #E8E9ED;
+    border-radius: 4px;
+    font-size: 17px;
+    color: #4F515E;
+    letter-spacing: 0;
+    text-align: center;
 }
 
 </style>
