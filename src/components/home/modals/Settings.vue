@@ -12,7 +12,7 @@
     </button>
     <div class="div-set">
       <div class="lang-setting div-t">
-        <label>Language</label>
+        <label class="label-st">Language</label>
         <b-form-select class="setting-input"
                        :options="langOptions"
                        v-model="selectedLang"
@@ -21,7 +21,7 @@
         </b-form-select>
       </div>
       <div class="timeout-setting div-t">
-        <label>Session Timeout</label>
+        <label class="label-st">Session Timeout</label>
         <b-form-select class="setting-input"
                        :options="timeoutOptions"
                        v-model="selectedSession"
@@ -29,7 +29,7 @@
         </b-form-select>
       </div>
     </div>
-    <b-row>
+    <b-row class="btn-bottom">
       <b-col class="col-lef">
         <b-button
           class="btn-back"
@@ -155,7 +155,7 @@ export default {
 }
 .div-t {
     text-align: left;
-    margin-bottom: 1rem;
+    margin-bottom: 30px;
 }
 .col-lef {
     padding-right: 10px;
@@ -179,5 +179,13 @@ export default {
     letter-spacing: 0;
     text-align: center;
 }
-
+.btn-bottom {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+.label-st {
+    font-size: 15px;
+    color: #9091A3;
+    letter-spacing: 0;
+}
 </style>
