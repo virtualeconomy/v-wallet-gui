@@ -30,6 +30,20 @@
                       readonly
                       v-model="address">
         </b-form-input>
+        <textarea
+          v-model="address"
+          ref="addrToCopy"
+          class="hidden"
+          readonly>
+        </textarea>
+        <b-btn
+          id="btn-cpy"
+          class="btn-copy"
+          v-b-popover.click.topright="'Copied!'"
+          @click="copyAddr"
+          variant="link">
+          <img src="../../../assets/imgs/icons/operate/ic_copy.svg">
+        </b-btn>
       </b-form-group>
       <b-form-group label="Amount"
                     class="forms"
@@ -37,7 +51,8 @@
         <b-form-input id="amountInput"
                       class="input-t"
                       type="number"
-                      v-model="amount">
+                      v-model="amount"
+                      min="0">
         </b-form-input>
         <div id="address-qrcode">
           <img :src="getQrCodeImg">
@@ -87,6 +102,16 @@ export default {
     methods: {
         closeModal() {
             this.$refs.receiveModal.hide()
+        },
+        copyAddr() {
+            this.$refs.addrToCopy.select()
+            window.document.execCommand('copy')
+            this.$root.$emit('bv::show::popover', 'btn-cpy')
+            this.isCpyDisable = true
+            setTimeout(() => {
+                this.$root.$emit('bv::hide::popover', 'btn-cpy')
+                this.isCpyDisable = false
+            }, 400)
         }
     }
 }
@@ -122,5 +147,20 @@ export default {
     letter-spacing: 0;
     text-align: center;
     height: 44px;
+}
+.btn-copy {
+    position: absolute;
+    right:0;
+    margin-right: 30px;
+    margin-top: -43px;
+}
+.hidden {
+    font-size: 12pt;
+    border: 0px;
+    padding: 0px;
+    margin: 0px;
+    position: absolute;
+    left: -9999px;
+    top: 0px;
 }
 </style>
