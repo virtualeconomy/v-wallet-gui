@@ -16,7 +16,11 @@ export const TESTNET_BYTE = 'T'.charCodeAt(0);
 export const INITIAL_NONCE = 0;
 export const ADDRESS_VERSION = 1;
 export const TRANSFER_TX = 4;
+export const LEASE_TX = 8;
+export const CANCEL_LEASE_TX = 9;
 export const TRANSFER_TX_NAME = 'transfer';
+export const LEASE_TX_NAME = 'lease';
+export const CANCEL_LEASE_TX_NAME = 'cancelLeasing';
 export const PRIVATE_KEY_BYTE_LENGTH = 32;
 export const PUBLIC_KEY_BYTE_LENGTH = 32;
 export const PUBLIC_KEY_LENGTH = 44;
@@ -41,5 +45,8 @@ export const TESTNET_NODE = 'http://34.229.136.59:6869'
 export const TESTNET_API = 'http://34.229.136.59:6869'
 
 export const ADDRESS_LENGTH = 35;
+
+export const TX_FEE = 0.001
+export const VEE_PRECISION = 1e8
 
 
