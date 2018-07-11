@@ -3,7 +3,8 @@
            ref="leaseModal"
            centered
            hide-header
-           hide-footer>
+           hide-footer
+           @hide="resetPage">
     <button
       class="close btn-close"
       @click="closeModal">
@@ -13,7 +14,10 @@
       <b-tab title="Hot Wallet"
              active>
         <LeaseInput :balances="balances"
-                    @get-data="getData"></LeaseInput>
+                    @get-data="getData"
+                    v-if="pageId===1"></LeaseInput>
+        <Confirm v-else-if="pageId===2"
+                 :tx-type="'lease'"></Confirm>
       </b-tab>
       <b-tab title="Cold Wallet">
       </b-tab>
@@ -24,14 +28,15 @@
 <script>
 // import { TX_FEE } from '@/constants'
 import LeaseInput from './LeaseInput'
+import Confirm from './Confirm'
 export default {
     name: 'Lease',
-    components: { LeaseInput },
+    components: { Confirm, LeaseInput },
     data: function() {
         return {
             amount: 0,
             recipient: '',
-            pageId: 0
+            pageId: 1
         }
     },
     props: {
@@ -45,10 +50,13 @@ export default {
         closeModal() {
             this.$refs.leaseModal.hide()
         },
-        getData(data) {
-            this.amount = data.amount
-            this.recipient = data.recipient
+        getData(recipient, amount) {
+            this.recipient = recipient
+            this.amount = amount
             this.pageId++
+        },
+        resetPage() {
+            this.pageId = 1
         }
     }
 }

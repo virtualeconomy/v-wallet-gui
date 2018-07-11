@@ -91,6 +91,7 @@
 <script>
 import Vue from 'vue'
 import { TX_FEE } from '@/constants'
+import crypto from '@/utils/crypto'
 
 export default {
     name: 'LeaseInput',
@@ -114,6 +115,9 @@ export default {
     computed: {
         address() {
             return Vue.ls.get('address')
+        },
+        isSubmitDisabled() {
+            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid('hot'))
         }
     },
     methods: {
@@ -187,11 +191,8 @@ export default {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
             return amount > balance - TX_FEE
         },
-        isSubmitDisabled() {
-            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid('hot'))
-        },
         nextPage() {
-            this.$emit('getData', this.a)
+            this.$emit('get-data', this.recipient, this.amount)
         }
 
     }

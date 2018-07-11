@@ -110,7 +110,8 @@
                    :recipient="recipient"
                    :amount="Number(amount)"
                    :fee="fee"
-                   :attachment="attachment">
+                   :attachment="attachment"
+                   :tx-type="'transfer'">
           </Confirm>
           <p
             v-show="sendError"
@@ -240,7 +241,8 @@
                    :recipient="coldRecipient"
                    :amount="Number(coldAmount)"
                    :fee="coldFee"
-                   :attachment="coldAttachment">
+                   :attachment="coldAttachment"
+                   :tx-type="'transfer'">
           </Confirm>
           <b-row>
             <b-col class="col-lef">
@@ -283,7 +285,8 @@
                    :recipient="coldRecipient"
                    :amount="Number(coldAmount)"
                    :fee="coldFee"
-                   :attachment="coldAttachment">
+                   :attachment="coldAttachment"
+                   :tx-type="'transfer'">
           </Confirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-button variant="primary"
