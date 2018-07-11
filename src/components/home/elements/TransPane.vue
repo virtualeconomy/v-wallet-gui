@@ -21,21 +21,31 @@
         <img
           class="icon-btn"
           src="../../../assets/imgs/icons/wallet/ic_receive.svg"><b>Receive</b></b-button>
+      <b-button variant="dark"
+                class="btn-send"
+                v-b-modal.leaseModal>
+        <img
+          class="icon-btn"
+          src="../../../assets/imgs/icons/wallet/ic_receive.svg"><b>Start Lease</b></b-button>
     </div>
     <Send show="false"
           :balances="balances"
           :cold-addresses="coldAddresses"></Send>
     <Receive show="false"
              :address="address"></Receive>
+    <Lease show="false"
+           :balances="balances"></Lease>
   </div>
 </template>
 
 <script>
 import Receive from '../modals/Receive'
 import Send from '../modals/Send'
+import Lease from '../modals/Lease'
 export default {
     name: 'TransPane',
     components: {
+        Lease,
         Receive,
         Send
     },

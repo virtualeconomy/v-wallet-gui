@@ -316,7 +316,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants.js'
+import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, TRANSFER_TX, LEASE_TX } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
@@ -426,20 +426,28 @@ export default {
         sendData: function(walletType) {
             var apiSchema
             if (walletType === 'hotWallet') {
+                // const dataInfo = {
+                //     recipient: this.recipient,
+                //     assetId: '',
+                //     amount: Number(this.amount),
+                //     feeAssetId: '',
+                //     fee: this.fee,
+                //     attachment: this.attachment,
+                //     timestamp: (Date.now() - 1) * 1e6
+                // }
                 const dataInfo = {
                     recipient: this.recipient,
-                    assetId: '',
                     amount: Number(this.amount),
-                    feeAssetId: '',
-                    fee: 100000,
-                    attachment: this.attachment,
+                    fee: this.fee,
                     timestamp: (Date.now() - 1) * 1e6
                 }
-                apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair)
+                apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair, LEASE_TX)
+                // apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair, TRANSFER_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldTimestamp)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldTimestamp, TRANSFER_TX)
             }
-            const url = TESTNET_NODE + '/assets/broadcast/transfer'
+            // const url = TESTNET_NODE + '/assets/broadcast/transfer'
+            const url = TESTNET_NODE + '/leasing/boradcast/lease'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 this.pageId++
             }, response => {
@@ -545,7 +553,6 @@ export default {
             }
         },
         onDecode: function(decodeString) {
-            console.log('aaaaa')
             this.qrErrMsg = void 0
             this.paused = true
             this.recipient = this.getParmFromUrl('recipient', decodeString) || decodeString
@@ -558,7 +565,6 @@ export default {
             }
         },
         onColdDecode: function(decodeString) {
-            console.log('bbbbb')
             this.qrErrMsg = void 0
             this.paused = true
             this.coldRecipient = this.getParmFromUrl('recipient', decodeString) || decodeString
