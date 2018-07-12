@@ -86,7 +86,7 @@ export default {
                     text: 'CN'
                 }
             ],
-            selectedSession: this.getSelectedSession() / 1000 / 60,
+            selectedSession: this.getSelectedSession(),
             timeoutOptions: [
                 {
                     value: 5,
@@ -113,7 +113,7 @@ export default {
     },
     methods: {
         changeSession: function() {
-            this.setUsrLocalStorage('sessionTimeout', this.selectedSession * 60 * 1000)
+            this.setUsrLocalStorage('sessionTimeout', this.selectedSession)
         },
         getSelectedSession() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT
@@ -132,7 +132,7 @@ export default {
             this.$refs.settingModal.hide()
         },
         resetSession() {
-            this.selectedSession = this.getSelectedSession() / 1000 / 60
+            this.selectedSession = this.getSelectedSession()
         }
     }
 }

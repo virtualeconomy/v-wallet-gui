@@ -10,7 +10,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     return t;
 };
 
-export const INITIAL_SESSION_TIMEOUT = 5*60*1000
+export const INITIAL_SESSION_TIMEOUT = 5
 export const MAINNET_BYTE = 'W'.charCodeAt(0);
 export const TESTNET_BYTE = 'T'.charCodeAt(0);
 export const INITIAL_NONCE = 0;

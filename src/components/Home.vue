@@ -161,7 +161,7 @@ export default {
             this.sessionClearTimeout = setTimeout(() => {
                 Vue.ls.clear()
                 this.$router.push('/login')
-            }, oldTimeout)
+            }, oldTimeout * 60 * 1000)
         },
 
         resetSessionClearTimeout() {
