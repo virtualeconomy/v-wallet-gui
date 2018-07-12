@@ -47,7 +47,8 @@
                           type="text"
                           v-model="recipient"
                           :state="isValidRecipient(recipient)"
-                          aria-describedby="inputLiveFeedback">
+                          aria-describedby="inputLiveFeedback"
+                          placeholder="Paste or scan an address.">
             </b-form-input>
             <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
@@ -80,9 +81,20 @@
                           class="amount-input"
                           type="number"
                           v-model="amount"
+                          aria-describedby="inputLiveFeedback"
                           min="0"
-                          onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                          step="1e-8"
+                          :state="isAmountValid('hot')"
+                          onfocus="this.select()">
             </b-form-input>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-if="isWrongFormat(amount)">
+              The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isInsufficient(amount, 'hot')">
+              Insufficient funds
+            </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group label="Description"
                         label-for="descriptionInput">
@@ -95,7 +107,7 @@
           </b-form-group>
           <b-form-group
             class="fee-remark"
-            label="Transaction Fee 100000 VEE">
+            label="Transaction Fee 0.001 VEE">
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -178,7 +190,8 @@
                           type="text"
                           v-model="coldRecipient"
                           :state="isValidRecipient(coldRecipient)"
-                          aria-describedby="inputLiveFeedback">
+                          aria-describedby="inputLiveFeedback"
+                          placeholder="Paste or scan an address.">
             </b-form-input>
             <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
@@ -211,9 +224,19 @@
                           class="amount-input"
                           type="number"
                           v-model="coldAmount"
+                          aria-describedby="inputLiveFeedback"
                           min="0"
-                          onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                          :state="isAmountValid('cold')"
+                          onfocus="this.select()">
             </b-form-input>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-if="isWrongFormat(coldAmount)">
+              The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isInsufficient(coldAmount, 'cold')">
+              Insufficient funds
+            </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group label="Description"
                         label-for="coldDescriptionInput">
@@ -226,7 +249,7 @@
           </b-form-group>
           <b-form-group
             class="fee-remark"
-            label="Transaction Fee 100000 VEE">
+            label="Transaction Fee 0.001 VEE">
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -319,7 +342,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, TRANSFER_TX, LEASE_TX } from '@/constants.js'
+import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VEE_PRECISION, TX_FEE, TRANSFER_TX } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
@@ -329,12 +352,12 @@ var initData = {
     amount: 0,
     attachment: '',
     pageId: 0,
-    fee: 100000,
+    fee: TX_FEE,
     coldRecipient: '',
     coldAmount: 0,
     coldAttachment: '',
     coldPageId: 0,
-    coldFee: 100000,
+    coldFee: TX_FEE,
     coldAddress: '',
     scanShow: false,
     qrInit: false,
@@ -384,10 +407,10 @@ export default {
             return seedLib.fromExistingPhrase(this.seedPhrase).keyPair
         },
         isSubmitDisabled() {
-            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment))
+            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot'))
         },
         isColdSubmitDisabled() {
-            return !(this.coldAddress && this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient) && (this.isValidColdAttachment || !this.coldAttachment))
+            return !(this.coldAddress && this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient) && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold'))
         },
         options() {
             return Object.keys(this.coldAddresses).reduce((options, coldAddress) => {
@@ -403,8 +426,8 @@ export default {
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 assetId: '',
                 feeAssetId: '',
-                amount: this.coldAmount,
-                fee: this.coldFee,
+                amount: this.coldAmount * VEE_PRECISION,
+                fee: this.coldFee * VEE_PRECISION,
                 recipient: this.coldRecipient,
                 attachment: this.coldAttachment
             }
@@ -429,28 +452,20 @@ export default {
         sendData: function(walletType) {
             var apiSchema
             if (walletType === 'hotWallet') {
-                // const dataInfo = {
-                //     recipient: this.recipient,
-                //     assetId: '',
-                //     amount: Number(this.amount),
-                //     feeAssetId: '',
-                //     fee: this.fee,
-                //     attachment: this.attachment,
-                //     timestamp: (Date.now() - 1) * 1e6
-                // }
                 const dataInfo = {
                     recipient: this.recipient,
-                    amount: Number(this.amount),
-                    fee: this.fee,
+                    assetId: '',
+                    amount: Number(this.amount) * VEE_PRECISION,
+                    feeAssetId: '',
+                    fee: TX_FEE * VEE_PRECISION,
+                    attachment: this.attachment,
                     timestamp: (Date.now() - 1) * 1e6
                 }
-                apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair, LEASE_TX)
-                // apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair, TRANSFER_TX)
+                apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair, TRANSFER_TX)
             } else if (walletType === 'coldWallet') {
                 apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldTimestamp, TRANSFER_TX)
             }
-            // const url = TESTNET_NODE + '/assets/broadcast/transfer'
-            const url = TESTNET_NODE + '/leasing/boradcast/lease'
+            const url = TESTNET_NODE + '/assets/broadcast/transfer'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 this.pageId++
             }, response => {
@@ -612,6 +627,24 @@ export default {
                 this.coldPageId = 1
             }
             this.scanShow = false
+        },
+        isAmountValid(type) {
+            var amount = type === 'hot' ? this.amount : this.coldAmount
+            if (amount === 0) {
+                return void 0
+            }
+            return !this.isWrongFormat(amount) && !this.isInsufficient(amount, type)
+        },
+        isWrongFormat(amount) {
+            if (amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) {
+                return true
+            } else {
+                return false
+            }
+        },
+        isInsufficient(amount, type) {
+            var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
+            return amount > balance - TX_FEE
         }
     }
 }

@@ -116,14 +116,20 @@ function transformRecipient() {
 }
 
 function castToAPISchema(data, tx_type) {
-    return __assign(data, tx_type === 'TRANSFER_TX' ? { attachment: transformAttachment() } : {}, { recipient: transformRecipient() });
+    var apiSchema = data
+
+    if (tx_type === constants.TRANSFER_TX) {
+        __assign(apiSchema, {attachment: transformAttachment()})
+    }
+    __assign(apiSchema, { recipient : transformRecipient() })
+    return apiSchema
 }
 
 export default {
     prepareForAPI: function(transferData, keyPair, tx_type) {
         getFields(tx_type)
         var signature = getSignature(transferData, keyPair, tx_type);
-        return  __assign({}, {transactionType: constants.LEASE_TX_NAME}, castToAPISchema(userData, tx_type), {signature: signature});
+        return  __assign({}, (tx_type ? {transactionType: tx_type} : {}), castToAPISchema(userData, tx_type), {signature: signature});
     },
     isValidSignature: function(data, signature) {
         return crypto_1.default.isValidTransactionSignature(getBytes(data), signature, data.publicKey)
@@ -131,7 +137,7 @@ export default {
     prepareColdForAPI: function(transferData, signature, timestamp, tx_type) {
         getFields(tx_type)
         getData(transferData);
-        return __assign({}, {transactionType: constants.TRANSFER_TX_NAME}, castToAPISchema(userData), {signature:signature}, {timestamp: timestamp})
+        return __assign({}, (tx_type ? {transactionType: tx_type} : {}), castToAPISchema(userData, tx_type), {signature:signature}, {timestamp: timestamp})
     }
 };
 

@@ -89,7 +89,6 @@
 </template>
 
 <script>
-import Vue from 'vue'
 import { TX_FEE } from '@/constants'
 import crypto from '@/utils/crypto'
 
@@ -110,12 +109,14 @@ export default {
             type: Object,
             default: function() {},
             require: true
+        },
+        address: {
+            type: String,
+            default: '',
+            require: true
         }
     },
     computed: {
-        address() {
-            return Vue.ls.get('address')
-        },
         isSubmitDisabled() {
             return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid('hot'))
         }

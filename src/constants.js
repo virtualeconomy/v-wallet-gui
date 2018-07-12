@@ -46,7 +46,7 @@ export const TESTNET_API = 'http://34.229.136.59:6869'
 
 export const ADDRESS_LENGTH = 35;
 
-export const TX_FEE = 0.001
 export const VEE_PRECISION = 1e8
+export const TX_FEE = 0.001
 
 
