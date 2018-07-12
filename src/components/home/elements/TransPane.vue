@@ -34,7 +34,8 @@
     <Receive show="false"
              :address="address"></Receive>
     <Lease show="false"
-           :balances="balances"></Lease>
+           :balances="balances"
+           :cold-addresses="coldAddresses"></Lease>
   </div>
 </template>
 

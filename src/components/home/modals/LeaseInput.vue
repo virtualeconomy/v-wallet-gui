@@ -6,8 +6,15 @@
                     type="text"
                     :value="address"
                     class="addr-input"
-                    readonly>
+                    readonly
+                    v-if="walletType==='hot'">
       </b-form-input>
+      <b-form-select id="address-input"
+                     class="addr-input"
+                     v-model="coldAddress"
+                     :options="options"
+                     v-else-if="walletType==='cold'">
+      </b-form-select>
       <b-btn
         block
         variant="light"
@@ -15,12 +22,15 @@
         class="balance-input"
         readonly>
         <span class="balance-title">Balance</span>
-        <span class="balance">{{ balances[address] }}</span>
+        <span class="balance"
+              v-if="walletType==='hot'">{{ balances[address] }}</span>
+        <span class="balance"
+              v-else-if="walletType==='cold'">{{ balances[coldAddress] }}</span>
       </b-btn>
     </b-form-group>
     <b-form-group label="Recipient"
-                  label-for="recipient-input">
-      <b-form-input id="recipient-input"
+                  :label-for="'recipient-input' + walletType">
+      <b-form-input :id="'lease-recipient-input' + walletType"
                     class="recipient-input"
                     type="text"
                     v-model="recipient"
@@ -100,8 +110,9 @@ export default {
             amount: 0,
             scanShow: false,
             qrInit: false,
-            qrErrMsg: void 0,
-            paused: false
+            qrError: void 0,
+            paused: false,
+            coldAddress: ''
         }
     },
     props: {
@@ -112,13 +123,27 @@ export default {
         },
         address: {
             type: String,
+            default: ''
+        },
+        walletType: {
+            type: String,
             default: '',
             require: true
+        },
+        coldAddresses: {
+            type: Object,
+            default: function() {}
         }
     },
     computed: {
         isSubmitDisabled() {
             return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid('hot'))
+        },
+        options() {
+            return Object.keys(this.coldAddresses).reduce((options, coldAddress) => {
+                options.push({ value: coldAddress, text: coldAddress })
+                return options
+            }, [{ value: '', text: '<span class="text-muted">Please select a cold wallet address</span>', disabled: true }])
         }
     },
     methods: {
@@ -193,7 +218,11 @@ export default {
             return amount > balance - TX_FEE
         },
         nextPage() {
-            this.$emit('get-data', this.recipient, this.amount)
+            if (this.walletType === 'hot') {
+                this.$emit('get-data', this.recipient, this.amount)
+            } else if (this.walletType === 'cold') {
+                this.$emit('get-cold-data', this.recipient, this.amount, this.coldAddress)
+            }
         }
 
     }
@@ -261,5 +290,16 @@ export default {
     font-size: 13px;
     color: #9091A3;
     letter-spacing: 0;
+}
+.addr-input {
+    border: 1px solid #E8E9ED;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+    background-color: #FFF;
+    font-size: 15px;
+    color: #181B3A;
+    letter-spacing: 0;
+    height: 48px !important;
 }
 </style>

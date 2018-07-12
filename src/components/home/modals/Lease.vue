@@ -16,7 +16,8 @@
         <LeaseInput :balances="balances"
                     @get-data="getData"
                     v-if="pageId===1"
-                    :address="address"></LeaseInput>
+                    :address="address"
+                    :wallet-type="'hot'"></LeaseInput>
         <b-container v-else-if="pageId===2">
           <Confirm :tx-type="'lease'"
                    :amount="Number(amount)"
@@ -52,6 +53,74 @@
                       :amount="amount"></LeaseSuccess>
       </b-tab>
       <b-tab title="Cold Wallet">
+        <LeaseInput :balances="balances"
+                    @get-cold-data="getColdData"
+                    v-if="coldPageId===1"
+                    :wallet-type="'cold'"
+                    :cold-addresses="coldAddresses"></LeaseInput>
+        <b-container v-else-if="coldPageId===2">
+          <Confirm :tx-type="'lease'"
+                   :amount="Number(coldAmount)"
+                   :address="coldAddress"
+                   :recipient="coldRecipient"
+                   :fee="fee"></Confirm>
+          <b-row>
+            <b-col class="col-lef">
+              <b-button
+                class="btn-back"
+                block
+                variant="light"
+                size="lg"
+                @click="prevColdPage">Back
+              </b-button>
+            </b-col>
+            <b-col class="col-rit">
+              <b-button
+                block
+                class="btn-confirm"
+                variant="warning"
+                size="lg"
+                @click=nextColdPage>Confirm
+              </b-button>
+            </b-col>
+          </b-row>
+        </b-container>
+        <ColdSignature :data-object="dataObject"
+                       v-if="coldPageId===3"
+                       @get-signature="getSignature"></ColdSignature>
+        <b-container v-else-if="coldPageId===4">
+          <Confirm :tx-type="'lease'"
+                   :amount="Number(coldAmount)"
+                   :address="coldAddress"
+                   :recipient="coldRecipient"
+                   :fee="fee"></Confirm>
+          <p v-show="sendError"
+             class="text-danger">
+            <small>Sorry, transaction send failed!</small>
+          </p>
+          <b-row>
+            <b-col class="col-lef">
+              <b-button
+                class="btn-back"
+                block
+                variant="light"
+                size="lg"
+                @click="prevColdPage">Back
+              </b-button>
+            </b-col>
+            <b-col class="col-rit">
+              <b-button
+                block
+                class="btn-confirm"
+                variant="warning"
+                size="lg"
+                @click="sendData('coldWallet')">Confirm
+              </b-button>
+            </b-col>
+          </b-row>
+        </b-container>
+        <LeaseSuccess v-else-if="coldPageId===5"
+                      :amount="coldAmount"></LeaseSuccess>
       </b-tab>
     </b-tabs>
   </b-modal>
@@ -61,6 +130,7 @@
 // import { TX_FEE } from '@/constants'
 import LeaseInput from './LeaseInput'
 import Confirm from './Confirm'
+import ColdSignature from './ColdSignature'
 import Vue from 'vue'
 import { TX_FEE, VEE_PRECISION, LEASE_TX, TESTNET_NODE } from '@/constants'
 import transaction from '@/utils/transaction'
@@ -68,18 +138,29 @@ import seedLib from '@/libs/seed'
 import LeaseSuccess from './LeaseSuccess'
 export default {
     name: 'Lease',
-    components: { LeaseSuccess, Confirm, LeaseInput },
+    components: { LeaseSuccess, Confirm, LeaseInput, ColdSignature },
     data: function() {
         return {
             amount: 0,
+            coldAmount: 0,
             recipient: '',
-            pageId: 3,
+            coldRecipient: '',
+            pageId: 1,
+            coldPageId: 1,
             fee: TX_FEE,
-            sendError: false
+            sendError: false,
+            coldSignature: '',
+            coldTimestamp: 0,
+            coldAddress: ''
         }
     },
     props: {
         balances: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        coldAddresses: {
             type: Object,
             default: function() {},
             require: true
@@ -104,6 +185,15 @@ export default {
         },
         keyPair() {
             return seedLib.fromExistingPhrase(this.seedPhrase).keyPair
+        },
+        dataObject() {
+            return {
+                transactionType: LEASE_TX,
+                senderPublicKey: this.coldAddresses[this.coldAddress],
+                amount: this.coldAmount * VEE_PRECISION,
+                fee: this.coldFee * VEE_PRECISION,
+                recipient: this.coldRecipient
+            }
         }
     },
     methods: {
@@ -115,12 +205,36 @@ export default {
             this.amount = amount
             this.pageId++
         },
+        getColdData(recipient, amount, coldAddress) {
+            this.coldRecipient = recipient
+            this.coldAmount = amount
+            this.coldAddress = coldAddress
+            this.coldPageId++
+        },
         resetPage() {
+            this.amount = 0
+            this.coldAmount = 0
+            this.recipient = ''
+            this.coldRecipient = ''
             this.pageId = 1
+            this.coldPageId = 1
+            this.fee = TX_FEE
+            this.sendError = false
+            this.coldSignature = ''
+            this.coldTimestamp = 0
+            this.coldAddress = ''
         },
         prevPage() {
             this.sendError = false
             this.pageId--
+        },
+        prevColdPage() {
+            this.sendError = false
+            this.coldPageId--
+        },
+        nextColdPage() {
+            this.sendError = false
+            this.coldPageId++
         },
         sendData(walletType) {
             var apiSchema
@@ -132,6 +246,8 @@ export default {
                     timestamp: Date.now() * 1e6
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair, LEASE_TX)
+            } else if (walletType === 'coldWallet') {
+                apiSchema = transaction.prepareForAPI(this.dataObject, this.coldSignature, this.coldTimestamp)
             }
             const url = TESTNET_NODE + '/leasing/broadcast/lease'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
@@ -139,6 +255,11 @@ export default {
             }, response => {
                 this.sendError = true
             })
+        },
+        getSignature(signature, timestamp) {
+            this.coldSignature = signature
+            this.coldTimestamp = timestamp
+            this.coldPageId++
         }
     }
 }
