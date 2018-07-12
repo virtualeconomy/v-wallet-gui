@@ -5,8 +5,8 @@
       <b-form-group horizontal
                     class="form-line"
                     label="Amount"
-                    label-for="amount">
-        <b-form-input id="amount"
+                    label-for="amount_confirm">
+        <b-form-input id="amount_confirm"
                       :value="amount + ' VEE'"
                       class="amount"
                       readonly
@@ -16,8 +16,8 @@
       <b-form-group horizontal
                     class="form-line"
                     label="From"
-                    label-for="walletAddress">
-        <b-form-input id="walletAddress"
+                    label-for="walletAddress_confirm">
+        <b-form-input id="walletAddress_confirm"
                       v-model="address"
                       class="addr"
                       readonly
@@ -27,8 +27,8 @@
       <b-form-group horizontal
                     class="form-line"
                     label="To"
-                    label-for="recipientAddress">
-        <b-form-input id="recipientAddress"
+                    label-for="recipientAddress_confirm">
+        <b-form-input id="recipientAddress_confirm"
                       v-model="recipient"
                       class="addr"
                       readonly
@@ -38,8 +38,8 @@
       <b-form-group horizontal
                     class="form-line"
                     label="Description"
-                    label-for="attachment">
-        <b-form-input id="attachment"
+                    label-for="attachment_confirm">
+        <b-form-input id="attachment_confirm"
                       v-model="attachment"
                       class="des"
                       readonly
@@ -49,8 +49,8 @@
       <b-form-group horizontal
                     class="form-line"
                     label="Fee"
-                    label-for="fee">
-        <b-form-input id="fee"
+                    label-for="fee_confirm">
+        <b-form-input id="fee_confirm"
                       :value="fee + 'vee'"
                       class="fee"
                       readonly
