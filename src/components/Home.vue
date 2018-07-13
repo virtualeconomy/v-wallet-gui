@@ -202,11 +202,9 @@ export default {
         },
         onTransTabClick() {
             this.transActive = true
-            console.log(this.transActive)
         },
         onLeaseTabClick() {
             this.transActive = false
-            console.log(this.transActive)
         },
         resetSessionClearTimeout() {
             clearTimeout(this.sessionClearTimeout)

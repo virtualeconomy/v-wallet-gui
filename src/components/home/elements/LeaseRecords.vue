@@ -137,7 +137,6 @@ export default {
                             }
                         })
                         this.changeShowDisable = false
-                        console.log(this.leaseRecords)
                     }
                 }, response => {
                     if (addr === this.address && recordLimit === this.showingNum) {

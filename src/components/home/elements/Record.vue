@@ -143,7 +143,6 @@ export default {
     },
     computed: {
         txType() {
-            console.log(this.txRecord)
             if (this.txRecord['type'] === 4) {
                 if (this.txRecord.sender === this.address) {
                     return 'Sent'
