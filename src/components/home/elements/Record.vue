@@ -54,6 +54,7 @@
           </template>
           <b-dropdown-item @click="$root.$emit('bv::show::modal', 'txInfoModal_' + txRecord.id, 'txInfoModal_' + txRecord.id)">TX info</b-dropdown-item>
           <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
+          <b-dropdown-item @click="$root.$emit('bv::show::modal', 'cancelLeaseModal_' + txRecord.id, 'cancelLeaseModal_' + txRecord.id)">Cancel Lease</b-dropdown-item>
         </b-dropdown>
       </b-col>
     </b-row>
@@ -70,6 +71,11 @@
                  :tx-amount="txAmount"
                  :tx-block="txBlock"
                  :tx-attachment="txAttachment"></TxInfoModal>
+    <CancelLease :modal-id="txRecord.id"
+                 :wallet-type="walletType"
+                 :address="txAddress"
+                 :amount="txAmount">
+    </CancelLease>
   </b-container>
 </template>
 
@@ -78,10 +84,11 @@ import TxInfoModal from './TxInfoModal'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import { VEE_PRECISION } from '@/constants'
+import CancelLease from '../modals/CancelLease'
 
 export default {
     name: 'Record',
-    components: {TxInfoModal},
+    components: { CancelLease, TxInfoModal },
     data: function() {
         return {
             hovered: false
@@ -101,6 +108,10 @@ export default {
             }
         },
         address: {
+            type: String,
+            default: ''
+        },
+        walletType: {
             type: String,
             default: ''
         }

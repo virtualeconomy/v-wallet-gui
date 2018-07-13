@@ -23,7 +23,7 @@
                  :balance="balance[address]"
                  :selected="address === selectedAddress"
                  class="pointer unselectable"
-                 @click.native="selectWallet(address)">
+                 @click.native="selectWallet(address, 'hotWallet')">
           </Asset>
           <div class="asset-title">
             <img
@@ -36,7 +36,7 @@
                  :balance="balance[coldAddress]"
                  :selected="coldAddress === selectedAddress"
                  class="pointer unselectable"
-                 @click.native="selectWallet(coldAddress)">
+                 @click.native="selectWallet(coldAddress, 'coldWallet')">
           </Asset>
           <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
                  size="sm"
@@ -61,7 +61,8 @@
                           :cold-addresses="coldAddresses"></trans-pane>
             </div>
             <div class="f-records">
-              <Records :address="selectedAddress"></Records>
+              <Records :address="selectedAddress"
+                       :wallet-type="walletType"></Records>
             </div>
           </div>
         </div>
@@ -87,7 +88,8 @@ export default {
             balance: {},
             selectedAddress: '',
             sessionClearTimeout: void 0,
-            coldAddresses: {}
+            coldAddresses: {},
+            walletType: ''
         }
     },
 
@@ -196,7 +198,8 @@ export default {
             Vue.set(this.userInfo, feildname, value)
             window.localStorage.setItem(this.address, JSON.stringify(this.userInfo))
         },
-        selectWallet(addr) {
+        selectWallet(addr, type) {
+            this.walletType = type
             if (this.selectedAddress !== addr) {
                 this.selectedAddress = addr
             } else {

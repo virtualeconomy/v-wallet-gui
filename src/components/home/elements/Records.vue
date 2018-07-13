@@ -56,7 +56,8 @@
             <div v-for="record in records"
                  :key="record.id">
               <Record :tx-record="record"
-                      :address="address"></Record>
+                      :address="address"
+                      :wallet-type="walletType"></Record>
             </div>
           </div>
         </template>
@@ -120,6 +121,10 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        walletType: {
+            type: String,
+            default: ''
         }
     },
     watch: {
