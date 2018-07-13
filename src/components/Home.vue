@@ -54,16 +54,49 @@
             class="height-full"
             bg-variant="white"
             border-variant="primary">
-            <div class="trans-pane">
-              <trans-pane :balance="balance[selectedAddress]"
-                          :address="selectedAddress"
-                          :balances="balance"
-                          :cold-addresses="coldAddresses"></trans-pane>
-            </div>
-            <div class="f-records">
-              <Records :address="selectedAddress"
-                       :wallet-type="walletType"></Records>
-            </div>
+            <b-tabs>
+              <b-tab>
+                <template slot="title">
+                  <div @click="onTransTabClick">
+                    <div v-if="transActive">
+                      <img src="../assets/imgs/icons/wallet/ic_transaction_solid.svg"><span class="tab-title">Transaction</span>
+                    </div>
+                    <div v-if="!transActive">
+                      <img src="../assets/imgs/icons/wallet/ic_transaction_line.svg"><span class="tab-title">Transaction</span>
+                    </div>
+                  </div>
+                </template>
+                <div class="trans-pane">
+                  <trans-pane :balance="balance[selectedAddress]"
+                              :address="selectedAddress"
+                              :balances="balance"
+                              :cold-addresses="coldAddresses"></trans-pane>
+                </div>
+                <div class="f-records">
+                  <Records :address="selectedAddress"></Records>
+                </div>
+              </b-tab>
+              <b-tab>
+                <template slot="title">
+                  <div @click="onLeaseTabClick">
+                    <div v-if="!transActive">
+                      <img src="../assets/imgs/icons/wallet/ic_card_solid.svg"><span class="tab-title">Leasing</span>
+                    </div>
+                    <div v-if="transActive">
+                      <img src="../assets/imgs/icons/wallet/ic_card_line.svg"><span class="tab-title">Leasing</span>
+                    </div>
+                  </div>
+                </template>
+                <div class="lease-pane">
+                  <LeasePane :address="selectedAddress"
+                             :cold-addresses="coldAddresses">
+                  </LeasePane>
+                </div>
+                <div class="f-records">
+                  <LeaseRecords :address="selectedAddress"></LeaseRecords>
+                </div>
+              </b-tab>
+            </b-tabs>
           </div>
         </div>
       </div>
@@ -80,6 +113,8 @@ import Vue from 'vue'
 import { INITIAL_SESSION_TIMEOUT, TESTNET_NODE, VEE_PRECISION } from '@/constants.js'
 import seedLib from '@/libs/seed.js'
 import Records from './home/elements/Records'
+import LeasePane from './home/elements/LeasePane'
+import LeaseRecords from './home/elements/LeaseRecords'
 
 export default {
     name: 'Home',
@@ -89,7 +124,8 @@ export default {
             selectedAddress: '',
             sessionClearTimeout: void 0,
             coldAddresses: {},
-            walletType: ''
+            walletType: '',
+            transActive: true
         }
     },
 
@@ -165,7 +201,12 @@ export default {
                 this.$router.push('/login')
             }, oldTimeout * 60 * 1000)
         },
-
+        onTransTabClick() {
+            this.transActive = true
+        },
+        onLeaseTabClick() {
+            this.transActive = false
+        },
         resetSessionClearTimeout() {
             clearTimeout(this.sessionClearTimeout)
             this.setSessionClearTimeout()
@@ -221,7 +262,9 @@ export default {
         TransPane,
         NavBar,
         Asset,
-        Records
+        Records,
+        LeaseRecords,
+        LeasePane
     }
 }
 </script>
@@ -233,7 +276,7 @@ export default {
     height: 100%;
     min-width: 1000px;
 }
-.trans-pane {
+.trans-pane, .lease-pane {
     height:@trxDivH;
     width: 100%;
 }
@@ -292,6 +335,10 @@ export default {
     font-size: 15px;
     font: Roboto-Regular;
 }
+.tab-title {
+    margin-left: 8px;
+}
+
 .contents {
     padding-top: 64px;
     overflow: hidden;
