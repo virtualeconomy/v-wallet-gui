@@ -73,8 +73,7 @@
                               :cold-addresses="coldAddresses"></trans-pane>
                 </div>
                 <div class="f-records">
-                  <Records :address="selectedAddress"
-                           type="transfer"></Records>
+                  <Records :address="selectedAddress"></Records>
                 </div>
               </b-tab>
               <b-tab>
@@ -94,8 +93,7 @@
                   </LeasePane>
                 </div>
                 <div class="f-records">
-                  <Records :address="selectedAddress"
-                           :type="lease"></Records>
+                  <LeaseRecords :address="selectedAddress"></LeaseRecords>
                 </div>
               </b-tab>
             </b-tabs>
@@ -126,9 +124,7 @@ export default {
             selectedAddress: '',
             sessionClearTimeout: void 0,
             coldAddresses: {},
-            transActive: true,
-            lease: 'lease',
-            transfer: 'transfer'
+            transActive: true
         }
     },
 

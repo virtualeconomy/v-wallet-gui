@@ -2,7 +2,7 @@
   <div v-if="Object.keys(txRecords).length > 0"
        class="records">
     <div
-      class="tittle-records">
+      class="title-records">
       <span>Transaction Record</span>
       <b-dropdown
         class="pd-select"
@@ -56,7 +56,8 @@
             <div v-for="record in records"
                  :key="record.id">
               <Record :tx-record="record"
-                      :address="address"></Record>
+                      :address="address"
+                      :type="type"></Record>
             </div>
           </div>
         </template>
@@ -78,7 +79,7 @@
 </template>
 
 <script>
-import { TESTNET_NODE, TYPE_LEASE, TYPE_CANCEL_LEASE } from '../../../constants'
+import { TESTNET_NODE } from '../../../constants'
 import Record from './Record'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
@@ -97,7 +98,6 @@ export default {
     data() {
         return {
             txRecords: {},
-            leasingRecords: {},
             showNums: [10, 50, 100, 200, 500, 1000],
             showingNum: 10,
             changeShowDisable: false,
@@ -113,7 +113,8 @@ export default {
                 recipient_address: 'recipient',
                 amount: 'amount',
                 attachment: 'attachment'
-            }
+            },
+            type: 'transfer'
         }
     },
     props: {
@@ -121,11 +122,6 @@ export default {
             type: String,
             default: '',
             require: true
-        },
-        type: {
-            type: String,
-            default: 'transfer',
-            require: ''
         }
     },
     watch: {
@@ -160,9 +156,6 @@ export default {
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
                         this.txRecords = response.body[0].reduce((rv, x) => {
-                            if (x.type === TYPE_LEASE || x.type === TYPE_CANCEL_LEASE) {
-                                // this.leasingRecords
-                            }
                             const aa = this.getMonthYearStr(x['timestamp'])
                             if (!rv[aa]) {
                                 Vue.set(rv, aa, [])
@@ -170,7 +163,6 @@ export default {
                             rv[aa].push(x)
                             return rv
                         }, {})
-                        console.log(this.txRecords)
                         this.changeShowDisable = false
                     }
                 }, response => {
@@ -231,7 +223,7 @@ export default {
     padding-top: 52px;
     top: -52px;
 }
-.tittle-records {
+.title-records {
     background: #FAFAFA;
     padding: 8px 20px;
     border-bottom: 1px solid #EDEDF0;

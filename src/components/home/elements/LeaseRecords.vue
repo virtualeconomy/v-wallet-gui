@@ -1,5 +1,5 @@
 <template>
-  <div v-if="Object.keys(txRecords).length > 0"
+  <div v-if="leaseRecords.length > 0"
        class="records">
     <div class="title-records">
       <span>Leasing Records</span>
@@ -41,19 +41,12 @@
 
     <div class="inherit-height">
       <div class="scroll">
-        <template v-for="(records, monthYear, idx) in txRecords">
-          <div :key="monthYear"
-               :ref="idx"
-               class="monthTtl">{{ monthYear }}</div>
-          <div :key="monthYear+'c'"
-               class="record-content">
-            <div v-for="record in records"
-                 :key="record.id">
-              <LeaseRecord :tx-record="record"
-                           :address="address"></LeaseRecord>
-            </div>
-          </div>
-        </template>
+        <div v-for="record in leaseRecords"
+             :key="record.id">
+          <Record :tx-record="record"
+                  :address="address"
+                  :type="type"></Record>
+        </div>
       </div>
     </div>
   </div>
@@ -71,30 +64,42 @@
 
 <script>
 
-import LeaseRecord from './LeaseRecord'
-import { TESTNET_NODE } from '../../../constants'
+import {TESTNET_NODE, TYPE_LEASE, TYPE_CANCEL_LEASE} from '../../../constants'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
+import Record from './Record'
 
 export default {
     name: 'LeaseRecords',
     components: {
-        LeaseRecord,
+        Record,
         JsonExcel
     },
     created() {
         if (this.address && Vue.ls.get('pwd')) {
-            this.getTxRecords()
+            this.getLeaseRecords()
         }
     },
     data() {
         return {
-            txRecords: {},
+            leaseRecords: [],
             showNums: [10, 50, 100, 200, 500, 1000],
             showingNum: 10,
             changeShowDisable: false,
             response: void 0,
-            downloadFileType: 'csv'
+            downloadFileType: 'csv',
+            resFields: {
+                transaction_id: 'id',
+                sender_address: 'sender',
+                sender_public_key: 'senderPublicKey',
+                transaction_fee: 'fee',
+                'timestamp(in nano second)': 'timestamp',
+                signature: 'signature',
+                recipient_address: 'recipient',
+                amount: 'amount',
+                attachment: 'attachment'
+            },
+            type: 'lease'
         }
     },
     props: {
@@ -106,39 +111,33 @@ export default {
     },
     watch: {
         address() {
-            this.txRecords = {}
+            this.leaseRecords = {}
             this.response = void 0
             this.changeShowDisable = false
             this.showingNum = 10
             if (this.address && Vue.ls.get('pwd')) {
-                this.getTxRecords()
+                this.getLeaseRecords()
             }
         }
     },
     methods: {
-        getMonthYearStr(date) {
-            const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-            const d = new Date(date / 1e6)
-            return monthNames[d.getMonth()] + ', ' + d.getFullYear()
-        },
-        getTxRecords() {
+        getLeaseRecords() {
             if (this.address) {
                 const addr = this.address
                 this.changeShowDisable = true
                 const recordLimit = this.showingNum
                 const url = TESTNET_NODE + '/transactions/address/' + addr + '/limit/' + recordLimit
+                let self = this
                 this.$http.get(url).then(response => {
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
-                        this.txRecords = response.body[0].reduce((rv, x) => {
-                            const aa = this.getMonthYearStr(x['timestamp'])
-                            if (!rv[aa]) {
-                                Vue.set(rv, aa, [])
+                        this.response.forEach(function(v, i) {
+                            if (v.type === TYPE_LEASE || v.type === TYPE_CANCEL_LEASE) {
+                                self.leaseRecords.push(v)
                             }
-                            rv[aa].push(x)
-                            return rv
-                        }, {})
+                        })
                         this.changeShowDisable = false
+                        console.log(this.leaseRecords)
                     }
                 }, response => {
                     if (addr === this.address && recordLimit === this.showingNum) {
@@ -151,7 +150,7 @@ export default {
             if (!this.changeShowDisable) {
                 this.showingNum = newNum
                 if (this.address && Vue.ls.get('pwd')) {
-                    this.getTxRecords()
+                    this.getLeaseRecords()
                 }
             }
         }
@@ -193,7 +192,7 @@ export default {
     padding-top: 52px;
     top: -52px;
 }
-.tittle-records {
+.title-records {
     background: #FAFAFA;
     padding: 8px 20px;
     border-bottom: 1px solid #EDEDF0;
