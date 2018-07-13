@@ -26,7 +26,7 @@
           block
           variant="light"
           size="lg"
-          @click="prevPage">Back
+          @click="closeModal">Back
         </b-button>
       </b-col>
       <b-col class="col-rit">
@@ -34,8 +34,7 @@
           block
           class="btn-confirm"
           variant="warning"
-          size="lg"
-          @click="sendData('hotWallet')">Confirm
+          size="lg">Confirm
         </b-button>
       </b-col>
     </b-row>

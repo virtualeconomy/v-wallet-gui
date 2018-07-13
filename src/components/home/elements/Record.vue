@@ -83,9 +83,9 @@
             </div>
           </template>
           <b-dropdown-item @click="$root.$emit('bv::show::modal', 'txInfoModal_' + txRecord.id, 'txInfoModal_' + txRecord.id)">TX info</b-dropdown-item>
-          <b-dropdown-item v-if="type==='lease'">Cancel Leasing</b-dropdown-item>
+          <b-dropdown-item v-if="type==='lease'"
+                           @click="$root.$emit('bv::show::modal', 'cancelLeaseModal_' + txRecord.id, 'cancelLeaseModal_' + txRecord.id)">Cancel Leasing</b-dropdown-item>
           <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
-          <b-dropdown-item @click="$root.$emit('bv::show::modal', 'cancelLeaseModal_' + txRecord.id, 'cancelLeaseModal_' + txRecord.id)">Cancel Lease</b-dropdown-item>
         </b-dropdown>
       </b-col>
     </b-row>
