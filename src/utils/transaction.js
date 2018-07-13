@@ -15,20 +15,49 @@ var remap_1 = require("./remap");
 var constants = require("../constants");
 
 // Fields of the original data object
-var storedFields = { senderPublicKey: new ByteProcessor_1.Base58('senderPublicKey'),
-                    assetId: new ByteProcessor_1.AssetId('assetId'),
-                    feeAssetId: new ByteProcessor_1.AssetId('feeAssetId'),
-                    timestamp: new ByteProcessor_1.Long('timestamp'),
-                    amount: new ByteProcessor_1.Long('amount'),
-                    fee: new ByteProcessor_1.Long('fee'),
-                    recipient: new ByteProcessor_1.Recipient('recipient'),
-                    attachment: new ByteProcessor_1.Attachment('attachment')
+var transferField = {
+    senderPublicKey: new ByteProcessor_1.Base58('senderPublicKey'),
+    assetId: new ByteProcessor_1.AssetId('assetId'),
+    feeAssetId: new ByteProcessor_1.AssetId('feeAssetId'),
+    timestamp: new ByteProcessor_1.Long('timestamp'),
+    amount: new ByteProcessor_1.Long('amount'),
+    fee: new ByteProcessor_1.Long('fee'),
+    recipient: new ByteProcessor_1.Recipient('recipient'),
+    attachment: new ByteProcessor_1.Attachment('attachment')
+}
+var leaseField = {
+    senderPublicKey: new ByteProcessor_1.Base58('senderPublicKey'),
+    recipient: new ByteProcessor_1.Recipient('recipient'),
+    amount: new ByteProcessor_1.Long('amount'),
+    fee: new ByteProcessor_1.Long('fee'),
+    timestamp: new ByteProcessor_1.Long('timestamp'),
+}
+var cancelLeasingField = {
+    senderPublicKey: new ByteProcessor_1.Base58('senderPublicKey'),
+    fee: new ByteProcessor_1.Long('fee'),
+    timestamp: new ByteProcessor_1.Long('timestamp'),
+    transactionId: new ByteProcessor_1.Base58('transactionId')
 }
 
+var storedFields = {};
 
-function makeByteProviders() {
+function getFields(type) {
+    switch (type) {
+        case constants.TRANSFER_TX:
+            storedFields = transferField;
+            break;
+        case constants.LEASE_TX:
+            storedFields = leaseField;
+            break;
+        case constants.CANCEL_LEASE_TX:
+            storedFields = cancelLeasingField;
+            break;
+    }
+}
+
+function makeByteProviders(tx_type) {
     var byteProviders = [];
-    byteProviders.push(Uint8Array.from([constants.TRANSFER_TX]));
+    byteProviders.push(Uint8Array.from([tx_type]));
     for(let name in storedFields) {
         if (storedFields[name] instanceof ByteProcessor_1.ByteProcessor) {
             // All user data must be represented as bytes
@@ -51,8 +80,8 @@ function getData(transferData) {
     }, {});
 }
 
-function getBytes(transferData) {
-    var byteProviders = makeByteProviders();
+function getBytes(transferData, tx_type) {
+    var byteProviders = makeByteProviders(tx_type);
     if (transferData === void 0) { transferData = {}; }
     // Save all needed values from user data
     getData(transferData);
@@ -74,8 +103,8 @@ function getExactBytes(fieldName) {
     return storedFields[fieldName].process(userData[fieldName]);
 }
 
-function getSignature(transferData, keyPair) {
-    return crypto_1.default.buildTransactionSignature(getBytes(__assign({}, transferData, { senderPublicKey: keyPair.publicKey })), keyPair.privateKey);
+function getSignature(transferData, keyPair, tx_type) {
+    return crypto_1.default.buildTransactionSignature(getBytes(__assign({}, transferData, { senderPublicKey: keyPair.publicKey }), tx_type), keyPair.privateKey);
 }
 
 function transformAttachment() {
@@ -86,21 +115,29 @@ function transformRecipient() {
     return remap_1.addRecipientPrefix(userData['recipient']);
 }
 
-function castToAPISchema(data) {
-    return __assign(data, { attachment: transformAttachment(), recipient: transformRecipient()});
+function castToAPISchema(data, tx_type) {
+    var apiSchema = data
+
+    if (tx_type === constants.TRANSFER_TX) {
+        __assign(apiSchema, {attachment: transformAttachment()})
+    }
+    __assign(apiSchema, { recipient : transformRecipient() })
+    return apiSchema
 }
 
 export default {
-    prepareForAPI: function(transferData, keyPair) {
-        var signature = getSignature(transferData, keyPair);
-        return  __assign({}, {transactionType: constants.TRANSFER_TX_NAME}, castToAPISchema(userData), {signature: signature});
+    prepareForAPI: function(transferData, keyPair, tx_type) {
+        getFields(tx_type)
+        var signature = getSignature(transferData, keyPair, tx_type);
+        return  __assign({}, (tx_type ? {transactionType: tx_type} : {}), castToAPISchema(userData, tx_type), {signature: signature});
     },
     isValidSignature: function(data, signature) {
         return crypto_1.default.isValidTransactionSignature(getBytes(data), signature, data.publicKey)
     },
-    prepareColdForAPI: function(transferData, signature, timestamp) {
+    prepareColdForAPI: function(transferData, signature, timestamp, tx_type) {
+        getFields(tx_type)
         getData(transferData);
-        return __assign({}, {transactionType: constants.TRANSFER_TX_NAME}, castToAPISchema(userData), {signature:signature}, {timestamp: timestamp})
+        return __assign({}, (tx_type ? {transactionType: tx_type} : {}), castToAPISchema(userData, tx_type), {signature:signature}, {timestamp: timestamp})
     }
 };
 

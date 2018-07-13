@@ -108,6 +108,7 @@
 import TxInfoModal from './TxInfoModal'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
+import { VEE_PRECISION } from '@/constants'
 
 export default {
     name: 'Record',
@@ -215,10 +216,10 @@ export default {
             return date.toString()
         },
         txAmount() {
-            return this.txRecord.amount
+            return this.txRecord.amount / VEE_PRECISION
         },
         txFee() {
-            return this.txRecord.fee
+            return this.txRecord.fee / VEE_PRECISION
         },
         txBlock() {
             return this.txRecord.height
