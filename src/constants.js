@@ -42,4 +42,7 @@ export const TESTNET_API = 'http://34.229.136.59:6869'
 
 export const ADDRESS_LENGTH = 35;
 
+export const TYPE_MINT = 11;
+export const TYPE_LEASE = 8;
+export const TYPE_CANCEL_LEASE = 9;
 
