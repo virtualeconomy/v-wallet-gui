@@ -148,6 +148,7 @@ export default {
             } else {
                 this.$emit('import-cold', this.coldAddress, this.coldPubKey)
             }
+            this.closeModal()
         },
         importCancel: function(evt) {
             if (this.qrInit) {

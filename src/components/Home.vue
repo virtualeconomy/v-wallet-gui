@@ -76,7 +76,7 @@ import TransPane from './home/elements/TransPane'
 import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
-import { INITIAL_SESSION_TIMEOUT, TESTNET_NODE } from '@/constants.js'
+import { INITIAL_SESSION_TIMEOUT, TESTNET_NODE, VEE_PRECISION } from '@/constants.js'
 import seedLib from '@/libs/seed.js'
 import Records from './home/elements/Records'
 
@@ -161,7 +161,7 @@ export default {
             this.sessionClearTimeout = setTimeout(() => {
                 Vue.ls.clear()
                 this.$router.push('/login')
-            }, oldTimeout)
+            }, oldTimeout * 60 * 1000)
         },
 
         resetSessionClearTimeout() {
@@ -172,7 +172,7 @@ export default {
         getBalance: function(address) {
             const url = TESTNET_NODE + '/addresses/balance/' + address
             this.$http.get(url).then(response => {
-                Vue.set(this.balance, address, response.body['balance'])
+                Vue.set(this.balance, address, response.body['balance'] / VEE_PRECISION)
             }, response => {
                 Vue.set(this.balance, address, 0)
             })

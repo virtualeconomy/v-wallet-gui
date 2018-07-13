@@ -47,7 +47,8 @@
                           type="text"
                           v-model="recipient"
                           :state="isValidRecipient(recipient)"
-                          aria-describedby="inputLiveFeedback">
+                          aria-describedby="inputLiveFeedback"
+                          placeholder="Paste or scan an address.">
             </b-form-input>
             <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
@@ -71,7 +72,6 @@
                        src="../../../assets/imgs/icons/wallet/ic_wait.svg">
                 </qrcode-reader>
               </div>
-              <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
             </div>
           </b-form-group>
           <b-form-group label="Amount"
@@ -80,9 +80,20 @@
                           class="amount-input"
                           type="number"
                           v-model="amount"
+                          aria-describedby="inputLiveFeedback"
                           min="0"
-                          onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                          step="1e-8"
+                          :state="isAmountValid('hot')"
+                          onfocus="this.select()">
             </b-form-input>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-if="isWrongFormat(amount)">
+              The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isInsufficient(amount, 'hot')">
+              Insufficient funds
+            </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group label="Description"
                         label-for="descriptionInput">
@@ -95,7 +106,7 @@
           </b-form-group>
           <b-form-group
             class="fee-remark"
-            label="Transaction Fee 100000 VEE">
+            label="Transaction Fee 0.001 VEE">
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -110,7 +121,8 @@
                    :recipient="recipient"
                    :amount="Number(amount)"
                    :fee="fee"
-                   :attachment="attachment">
+                   :attachment="attachment"
+                   :tx-type="'transfer'">
           </Confirm>
           <p
             v-show="sendError"
@@ -177,7 +189,8 @@
                           type="text"
                           v-model="coldRecipient"
                           :state="isValidRecipient(coldRecipient)"
-                          aria-describedby="inputLiveFeedback">
+                          aria-describedby="inputLiveFeedback"
+                          placeholder="Paste or scan an address.">
             </b-form-input>
             <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
@@ -201,7 +214,6 @@
                        src="../../../assets/imgs/icons/wallet/ic_wait.svg">
                 </qrcode-reader>
               </div>
-              <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
             </div>
           </b-form-group>
           <b-form-group label="Amount"
@@ -210,9 +222,19 @@
                           class="amount-input"
                           type="number"
                           v-model="coldAmount"
+                          aria-describedby="inputLiveFeedback"
                           min="0"
-                          onkeypress="return event.charCode >= 48 && event.charCode <= 57">
+                          :state="isAmountValid('cold')"
+                          onfocus="this.select()">
             </b-form-input>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-if="isWrongFormat(coldAmount)">
+              The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isInsufficient(coldAmount, 'cold')">
+              Insufficient funds
+            </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group label="Description"
                         label-for="coldDescriptionInput">
@@ -225,7 +247,7 @@
           </b-form-group>
           <b-form-group
             class="fee-remark"
-            label="Transaction Fee 100000 VEE">
+            label="Transaction Fee 0.001 VEE">
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -240,7 +262,8 @@
                    :recipient="coldRecipient"
                    :amount="Number(coldAmount)"
                    :fee="coldFee"
-                   :attachment="coldAttachment">
+                   :attachment="coldAttachment"
+                   :tx-type="'transfer'">
           </Confirm>
           <b-row>
             <b-col class="col-lef">
@@ -265,25 +288,18 @@
         </b-container>
         <b-container v-if="coldPageId===3">
           <ColdSignature :data-object="dataObject"
-                         :public-key="coldPublicKey"
                          v-if="coldPageId===3"
-                         @get-signature="getSignature"></ColdSignature>
-          <b-button variant="primary"
-                    size="lg"
-                    @click="coldPrevPage">Cancle
-          </b-button>
-          <b-button variant="primary"
-                    size="lg"
-                    @click="coldNextPage"
-                    :disabled="!isValidSignature">Confirm
-          </b-button>
+                         @get-signature="getSignature"
+                         @next-page="coldNextPage"
+                         @prev-page="coldPrevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
           <Confirm :address="coldAddress"
                    :recipient="coldRecipient"
                    :amount="Number(coldAmount)"
                    :fee="coldFee"
-                   :attachment="coldAttachment">
+                   :attachment="coldAttachment"
+                   :tx-type="'transfer'">
           </Confirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-button variant="primary"
@@ -316,7 +332,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants.js'
+import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VEE_PRECISION, TX_FEE, TRANSFER_TX } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
@@ -325,22 +341,20 @@ var initData = {
     recipient: '',
     amount: 0,
     attachment: '',
-    pageId: 0,
-    fee: 100000,
+    pageId: 1,
+    fee: TX_FEE,
     coldRecipient: '',
     coldAmount: 0,
     coldAttachment: '',
-    coldPageId: 0,
-    coldFee: 100000,
+    coldPageId: 1,
+    coldFee: TX_FEE,
     coldAddress: '',
     scanShow: false,
     qrInit: false,
     paused: false,
-    isValidSignature: false,
     sendError: false,
     coldSignature: '',
-    coldTimestamp: 0,
-    qrErrMsg: void 0
+    coldTimestamp: 0
 }
 export default {
     name: 'Send',
@@ -381,10 +395,10 @@ export default {
             return seedLib.fromExistingPhrase(this.seedPhrase).keyPair
         },
         isSubmitDisabled() {
-            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment))
+            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot'))
         },
         isColdSubmitDisabled() {
-            return !(this.coldAddress && this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient) && (this.isValidColdAttachment || !this.coldAttachment))
+            return !(this.coldAddress && this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient) && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold'))
         },
         options() {
             return Object.keys(this.coldAddresses).reduce((options, coldAddress) => {
@@ -397,11 +411,12 @@ export default {
         },
         dataObject() {
             return {
+                transactionType: TRANSFER_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 assetId: '',
                 feeAssetId: '',
-                amount: this.coldAmount,
-                fee: this.coldFee,
+                amount: this.coldAmount * VEE_PRECISION,
+                fee: this.coldFee * VEE_PRECISION,
                 recipient: this.coldRecipient,
                 attachment: this.coldAttachment
             }
@@ -429,19 +444,23 @@ export default {
                 const dataInfo = {
                     recipient: this.recipient,
                     assetId: '',
-                    amount: Number(this.amount),
+                    amount: Number(this.amount) * VEE_PRECISION,
                     feeAssetId: '',
-                    fee: 100000,
+                    fee: TX_FEE * VEE_PRECISION,
                     attachment: this.attachment,
                     timestamp: (Date.now() - 1) * 1e6
                 }
-                apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair)
+                apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair, TRANSFER_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldTimestamp)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldTimestamp, TRANSFER_TX)
             }
             const url = TESTNET_NODE + '/assets/broadcast/transfer'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
-                this.pageId++
+                if (walletType === 'hotWallet') {
+                    this.pageId++
+                } else {
+                    this.coldPageId++
+                }
             }, response => {
                 this.sendError = true
             })
@@ -474,20 +493,18 @@ export default {
             this.recipient = ''
             this.amount = 0
             this.attachment = ''
-            this.pageId = 0
+            this.pageId = 1
             this.coldRecipient = ''
             this.coldAmount = 0
             this.coldAttachment = ''
-            this.coldPageId = 0
+            this.coldPageId = 1
             this.coldAddress = ''
             this.scanShow = false
             this.qrInit = false
             this.paused = false
-            this.isValidSignature = false
             this.sendError = false
             this.coldSignature = ''
             this.coldTimestamp = 0
-            this.qrErrMsg = void 0
         },
         endSend: function() {
             this.$refs.sendModal.hide()
@@ -512,7 +529,6 @@ export default {
         async onInit(promise) {
             try {
                 this.qrInit = true
-                this.qrErrMsg = void 0
                 await promise
             } catch (error) {
                 if (error.name === 'NotAllowedError') {
@@ -545,26 +561,20 @@ export default {
             }
         },
         onDecode: function(decodeString) {
-            console.log('aaaaa')
-            this.qrErrMsg = void 0
             this.paused = true
             this.recipient = this.getParmFromUrl('recipient', decodeString) || decodeString
             this.amount = this.getParmFromUrl('amount', decodeString)
             if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                 this.paused = false
-                this.qrErrMsg = 'Sorry, your QR code seems unavalible.'
             } else {
                 this.scanShow = false
             }
         },
         onColdDecode: function(decodeString) {
-            console.log('bbbbb')
-            this.qrErrMsg = void 0
             this.paused = true
             this.coldRecipient = this.getParmFromUrl('recipient', decodeString) || decodeString
             this.coldAmount = this.getParmFromUrl('amount', decodeString)
             if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
-                this.qrErrMsg = 'Sorry, your QR code seems unavalible.'
                 this.paused = false
             } else {
                 this.scanShow = false
@@ -573,7 +583,7 @@ export default {
         getSignature: function(signature, timestamp) {
             this.coldSignature = signature
             this.coldTimestamp = timestamp
-            this.isValidSignature = transaction.default.isValidSignature(this.dataObject, signature, timestamp)
+            this.coldPageId++
         },
         repaintLocation(location, ctx) {
             if (location !== null) {
@@ -603,6 +613,24 @@ export default {
                 this.coldPageId = 1
             }
             this.scanShow = false
+        },
+        isAmountValid(type) {
+            var amount = type === 'hot' ? this.amount : this.coldAmount
+            if (amount === 0) {
+                return void 0
+            }
+            return !this.isWrongFormat(amount) && !this.isInsufficient(amount, type)
+        },
+        isWrongFormat(amount) {
+            if (amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) {
+                return true
+            } else {
+                return false
+            }
+        },
+        isInsufficient(amount, type) {
+            var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
+            return amount > balance - TX_FEE
         }
     }
 }
