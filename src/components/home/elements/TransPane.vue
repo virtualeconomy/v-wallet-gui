@@ -33,11 +33,9 @@
 <script>
 import Receive from '../modals/Receive'
 import Send from '../modals/Send'
-import Lease from '../modals/Lease'
 export default {
     name: 'TransPane',
     components: {
-        Lease,
         Receive,
         Send
     },
