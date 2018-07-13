@@ -43,7 +43,8 @@
                       v-model="attachment"
                       class="des"
                       readonly
-                      :plaintext="true">
+                      :plaintext="true"
+                      v-if="txType==='transfer'">
         </b-form-input>
       </b-form-group>
       <b-form-group horizontal
@@ -87,7 +88,11 @@ export default {
         },
         attachment: {
             type: String,
-            required: true,
+            default: ''
+        },
+        txType: {
+            type: String,
+            require: true,
             default: ''
         }
     }

@@ -1,6 +1,9 @@
 <template>
   <div>
-    <img src="../../../assets/imgs/icons/operate/ic_sent_big.svg">
+    <img v-if="txType==='transfer'"
+         src="../../../assets/imgs/icons/operate/ic_sent_big.svg">
+    <img v-else-if="txType==='lease'"
+         src="../../../assets/imgs/icons/operate/ic_leasing_big.svg">
     <div class="infos">
       <b-form-group horizontal
                     class="form-line"
@@ -38,6 +41,7 @@
       <b-form-group horizontal
                     class="form-line"
                     label="Description"
+                    v-if="txType==='transfer'"
                     label-for="attachment_confirm">
         <b-form-input id="attachment_confirm"
                       v-model="attachment"
@@ -86,6 +90,10 @@ export default {
             default: 1
         },
         attachment: {
+            type: String,
+            default: ''
+        },
+        txType: {
             type: String,
             required: true,
             default: ''
