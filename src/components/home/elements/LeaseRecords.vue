@@ -64,7 +64,7 @@
 
 <script>
 
-import {TESTNET_NODE, TYPE_LEASE, TYPE_CANCEL_LEASE} from '../../../constants'
+import {TESTNET_NODE, LEASE_TX, CANCEL_LEASE_TX} from '../../../constants'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
 import Record from './Record'
@@ -132,7 +132,7 @@ export default {
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
                         this.response.forEach(function(v, i) {
-                            if (v.type === TYPE_LEASE || v.type === TYPE_CANCEL_LEASE) {
+                            if (v.type === LEASE_TX || v.type === CANCEL_LEASE_TX) {
                                 self.leaseRecords.push(v)
                             }
                         })
