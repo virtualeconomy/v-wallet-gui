@@ -8,12 +8,25 @@
              src="../../../assets/imgs/icons/wallet/ic_sent.svg"
              width="32px"
              height="32px">
-        <img v-else
+        <img v-else-if="txIcon==='received'"
              src="../../../assets/imgs/icons/wallet/ic_received.svg"
+             width="32px"
+             height="32px">
+        <img v-else-if="txIcon==='leasedin'"
+             src="../../../assets/imgs/icons/wallet/ic_leasing_reverse.svg"
+             width="32px"
+             height="32px">
+        <img v-else-if="txIcon==='leasedout'"
+             src="../../../assets/imgs/icons/wallet/ic_leasing.svg"
+             width="32px"
+             height="32px">
+        <img v-else-if="txIcon==='cancelleasing'"
+             src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
              width="32px"
              height="32px">
       </b-col>
       <b-col class="record-detail"
+             v-if="type==='transfer'"
              cols="auto">
         <b-row>
           <b-col class="title">{{ txType }} VEE</b-col>
@@ -27,11 +40,28 @@
           <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
         </b-row>
       </b-col>
+      <b-col class="record-detail"
+             v-if="type==='lease'"
+             cols="auto">
+        <b-row>
+          <b-col class="title">{{ txTitle }}</b-col>
+        </b-row>
+        <b-row>
+          <b-col class="detail-1"
+                 cols="auto">{{ txIcon === 'leasedout' ? 'To' : 'From' }}:</b-col>
+          <b-col class="detail-2">{{ txAddressShow }}</b-col>
+          <b-col class="detail-3"
+                 cols="auto"></b-col>
+          <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
+        </b-row>
+      </b-col>
       <b-col class="record-blank"></b-col>
       <b-col :class="txIcon === 'sent' ? 'record-amount-s' : 'record-amount-r'"
              cols="auto">
         <div>
-          <span>{{ txIcon === 'sent' ? '-' : '+' }}{{ txIcon === 'sent' ? txAmount + txFee : txAmount }} VEE</span>
+          <span v-if="type==='transfer'">{{ txIcon === 'sent' ? '-' : '+' }}{{ txIcon === 'sent' ? txAmount + txFee : txAmount }}</span>
+          <span v-if="type==='lease'">{{ txIcon === 'leasedOut' ? txAmount + txFee : txAmount }}</span>
+          <span> VEE</span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -53,6 +83,7 @@
             </div>
           </template>
           <b-dropdown-item @click="$root.$emit('bv::show::modal', 'txInfoModal_' + txRecord.id, 'txInfoModal_' + txRecord.id)">TX info</b-dropdown-item>
+          <b-dropdown-item v-if="type==='lease'">Cancel Leasing</b-dropdown-item>
           <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
         </b-dropdown>
       </b-col>
@@ -103,11 +134,34 @@ export default {
         address: {
             type: String,
             default: ''
+        },
+        type: {
+            type: String,
+            default: 'transfer',
+            require: true
         }
     },
     computed: {
         txType() {
-            return this.txRecord.sender === this.address && this.txRecord['type'] !== 11 ? 'Sent' : 'Received'
+            if (this.txRecord['type'] === 4) {
+                if (this.txRecord.sender === this.address) {
+                    return 'Sent'
+                } else {
+                    return 'Received'
+                }
+            } else if (this.txRecord['type'] === 11) {
+                return 'Received'
+            } else if (this.txRecord['type'] === 8) {
+                if (this.txRecord.sender === this.address) {
+                    return 'LeasedOut'
+                } else {
+                    return 'LeasedIn'
+                }
+            } else if (this.txRecord['type'] === 9) {
+                return 'CancelLeasing'
+            } else {
+                return ''
+            }
         },
         txIcon() {
             return this.txType.toString().toLowerCase()
@@ -120,6 +174,15 @@ export default {
                 const addrChars = this.txAddress.split('')
                 addrChars.splice(6, 23, '******')
                 return addrChars.join('')
+            }
+        },
+        txTitle() {
+            if (this.txType === 'LeasedOut') {
+                return 'Start Leasing'
+            } else if (this.txType === 'LeasedIn') {
+                return 'Incoming Leasing'
+            } else if (this.txType === 'CancelLeasing') {
+                return 'Cancel Leasing'
             }
         },
         txTime() {

@@ -1,103 +1,88 @@
 <template>
-  <div v-if="Object.keys(txRecords).length > 0"
+  <div v-if="leaseRecords.length > 0"
        class="records">
-    <div
-      class="title-records">
-      <span>Transaction Record</span>
-      <b-dropdown
-        class="pd-select"
-        router-tag="div"
-        no-caret
-        :disabled="changeShowDisable"
-        variant="light">
-        <template
-          slot="button-content">
-          <div style="display:inline-block; margin-right: 10px;">
-            <img
-              v-if="!changeShowDisable"
-              src="../../../assets/imgs/icons/wallet/ic_filter.svg">
-            <img
-              height="16"
-              width="16"
-              v-if="changeShowDisable"
-              src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+    <div class="title-records">
+      <span>Leasing Records</span>
+      <b-dropdown class="pd-select"
+                  router-tag="div"
+                  no-caret
+                  :disable="changeShowDisable"
+                  variant="light">
+        <template slot="button-content">
+          <div style="display: inline-block; margin-right: 10px">
+            <img v-if="!changeShowDisable"
+                 src="../../../assets/imgs/icons/wallet/ic_filter.svg">
+            <img v-if="changeShowDisable"
+                 width="16"
+                 height="16"
+                 src="../../../assets/imgs/icons/wallet/ic_wait.svg">
             <span class="m-1">Latest {{ showingNum }} Records </span>
           </div>
           <img src="../../../assets/imgs/icons/signup/ic_arrow_down.svg">
         </template>
-        <b-dropdown-item
-          class="selection"
-          v-for="num in showNums"
-          :key="num"
-          @click="changeShowNum(num)">Show {{ num }} records</b-dropdown-item>
+        <b-dropdown-item class="selection"
+                         @click="changeShowNum(num)"
+                         v-for="num in showNums"
+                         :key="num">
+          Show {{ num }} records
+        </b-dropdown-item>
       </b-dropdown>
-      <json-excel
-        class="csv-export"
-        :data="response"
-        :fields="resFields"
-        :type="downloadFileType"
-        :name="'txs_' + address + '.' + downloadFileType">
-        <b-btn
-          class="btn-export"
-          :disabled="changeShowDisable"
-          variant="light"><img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
+      <json-excel class="csv-export"
+                  :data="response"
+                  :fields="resFields"
+                  :type="downloadFileType"
+                  :name="'txs_' + address + '.' + downloadFileType">
+        <b-btn class="btn-export"
+               :disabled="changeShowDisable"
+               variant="light">
+        <img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
       </json-excel>
     </div>
+
     <div class="inherit-height">
-      <div
-        class="scroll">
-        <template v-for="(records, monthYear, idx) in txRecords">
-          <div :key="monthYear"
-               :ref="idx"
-               class="monthTtl">{{ monthYear }}</div>
-          <div
-            :key="monthYear+'c'"
-            class="record-content">
-            <div v-for="record in records"
-                 :key="record.id">
-              <Record :tx-record="record"
-                      :address="address"
-                      :type="type"></Record>
-            </div>
-          </div>
-        </template>
+      <div class="scroll">
+        <div v-for="record in leaseRecords"
+             :key="record.id">
+          <Record :tx-record="record"
+                  :address="address"
+                  :type="type"></Record>
+        </div>
       </div>
     </div>
   </div>
   <div v-else>
-    <img
-      height="50"
-      width="50"
-      v-if="changeShowDisable"
-      src="../../../assets/imgs/icons/wallet/ic_wait.svg">
-    <div
-      v-if="!changeShowDisable"
-      class="empty">
+    <img height="50"
+         width="50"
+         v-if="changeShowDisable"
+         src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+    <div v-if="!changeShowDisable"
+         class="empty">
       There are no transaction records.
     </div>
   </div>
 </template>
 
 <script>
-import { TESTNET_NODE } from '../../../constants'
-import Record from './Record'
+
+import {TESTNET_NODE, LEASE_TX, CANCEL_LEASE_TX} from '../../../constants'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
+import Record from './Record'
 
 export default {
-    name: 'Records',
+    name: 'LeaseRecords',
     components: {
         Record,
         JsonExcel
     },
     created() {
         if (this.address && Vue.ls.get('pwd')) {
-            this.getTxRecords()
+            this.getLeaseRecords()
         }
     },
     data() {
         return {
-            txRecords: {},
+            leaseRecords: [],
             showNums: [10, 50, 100, 200, 500, 1000],
             showingNum: 10,
             changeShowDisable: false,
@@ -114,7 +99,7 @@ export default {
                 amount: 'amount',
                 attachment: 'attachment'
             },
-            type: 'transfer'
+            type: 'lease'
         }
     },
     props: {
@@ -125,44 +110,32 @@ export default {
         }
     },
     watch: {
-        address(newAddr, oldAddr) {
-            this.txRecords = {}
+        address() {
+            this.leaseRecords = {}
             this.response = void 0
             this.changeShowDisable = false
             this.showingNum = 10
             if (this.address && Vue.ls.get('pwd')) {
-                this.getTxRecords()
+                this.getLeaseRecords()
             }
         }
     },
-    computed: {
-        monthCounts() {
-            return Object.keys(this.txRecords).length
-        }
-    },
     methods: {
-        getMonthYearStr(date) {
-            const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-            const d = new Date(date / 1e6)
-            return monthNames[d.getMonth()] + ', ' + d.getFullYear()
-        },
-        getTxRecords() {
+        getLeaseRecords() {
             if (this.address) {
                 const addr = this.address
                 this.changeShowDisable = true
                 const recordLimit = this.showingNum
                 const url = TESTNET_NODE + '/transactions/address/' + addr + '/limit/' + recordLimit
+                let self = this
                 this.$http.get(url).then(response => {
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
-                        this.txRecords = response.body[0].reduce((rv, x) => {
-                            const aa = this.getMonthYearStr(x['timestamp'])
-                            if (!rv[aa]) {
-                                Vue.set(rv, aa, [])
+                        this.response.forEach(function(v, i) {
+                            if (v.type === LEASE_TX || v.type === CANCEL_LEASE_TX) {
+                                self.leaseRecords.push(v)
                             }
-                            rv[aa].push(x)
-                            return rv
-                        }, {})
+                        })
                         this.changeShowDisable = false
                     }
                 }, response => {
@@ -176,13 +149,8 @@ export default {
             if (!this.changeShowDisable) {
                 this.showingNum = newNum
                 if (this.address && Vue.ls.get('pwd')) {
-                    this.getTxRecords()
+                    this.getLeaseRecords()
                 }
-            }
-        },
-        exportRecords() {
-            if (this.response) {
-
             }
         }
     }

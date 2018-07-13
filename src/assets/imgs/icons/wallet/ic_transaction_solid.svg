@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="24px" height="24px" viewBox="0 0 24 24" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_transaction_solid</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="00A_Export" transform="translate(-213.000000, -63.000000)">
+            <g id="ic_transaction_solid" transform="translate(213.000000, 63.000000)">
+                <rect id="Gudie" fill-opacity="0" fill="#D8D8D8" x="0" y="0" width="24" height="24"></rect>
+                <g id="Shape" transform="translate(1.000000, 1.000000)" fill="#FF8737" fill-rule="nonzero">
+                    <path d="M11,0 C13.9173814,0 16.7152744,1.15892524 18.7781746,3.22182541 C20.8410748,5.28472557 22,8.0826186 22,11 C22,17.0751322 17.0751322,22 11,22 C4.92486775,22 0,17.0751322 0,11 C0,4.92486775 4.92486775,0 11,0 Z M13.462,5.809 C13.385,5.622 13.202,5.5 13,5.5 L9,5.5 C8.724,5.5 8.5,5.724 8.5,6 C8.5,6.277 8.724,6.5 9,6.5 L11.793,6.5 L5.647,12.647 C5.451,12.842 5.451,13.159 5.647,13.354 C5.744,13.452 5.872,13.5 6,13.5 C6.128,13.5 6.256,13.452 6.354,13.354 L13.354,6.354 C13.497,6.211 13.54,5.996 13.462,5.809 Z M16.3536,8.6469 C16.1586,8.4519 15.8416,8.4519 15.6466,8.6469 L8.6466,15.6469 C8.5036,15.7899 8.4606,16.0049 8.5386,16.1919 C8.6156,16.3789 8.7976,16.5009 8.9996,16.5009 L12.9996,16.5009 C13.2766,16.5009 13.4996,16.2769 13.4996,16.0009 C13.4996,15.7239 13.2766,15.5009 12.9996,15.5009 L10.2076,15.5009 L16.3536,9.3539 C16.5486,9.1589 16.5486,8.8419 16.3536,8.6469 Z" id="Combined-Shape"></path>
+                </g>
+                <rect id="Overlay" x="0" y="0" width="24" height="24"></rect>
+            </g>
+        </g>
+    </g>
+</svg>
