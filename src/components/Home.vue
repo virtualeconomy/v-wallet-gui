@@ -350,4 +350,7 @@ export default {
     height: -webkit-fill-available;
     padding-bottom: 150px;
 }
+.tab-pane {
+    padding: 0 !important;
+}
 </style>

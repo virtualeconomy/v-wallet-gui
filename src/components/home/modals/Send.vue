@@ -36,7 +36,11 @@
               disabled
               class="balance-input"
               readonly>
-              <span class="balance-title">Balance</span>
+              <span class="balance-title">
+                <img src="../../../assets/imgs/icons/wallet/Symbol_Gray.svg"
+                     width="20"
+                     height="20"> VEE
+              </span>
               <span class="balance">{{ balances[address] }} VEE</span>
             </b-btn>
           </b-form-group>
@@ -677,7 +681,7 @@ export default {
 .balance {
     float: right;
     font-size: 15px;
-    color: #FF8737;
+    color: gray;
     letter-spacing: 0;
     text-align: right;
 }
