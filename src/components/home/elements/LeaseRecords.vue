@@ -126,6 +126,7 @@ export default {
                 const addr = this.address
                 this.changeShowDisable = true
                 const recordLimit = this.showingNum
+                this.leaseRecords = []
                 const url = TESTNET_NODE + '/transactions/address/' + addr + '/limit/' + recordLimit
                 let self = this
                 this.$http.get(url).then(response => {

@@ -35,7 +35,7 @@
     <div class="col align-self-center text-right">
       <b-button variant="dark"
                 class="btn-leasing"
-                v-b-modal.startLeasingModal>
+                v-b-modal.leaseModal>
         <b>Start Leasing</b>
       </b-button>
       <b-button variant="dark"
@@ -43,21 +43,21 @@
         <img src="../../../assets/imgs/icons/wallet/ic_help.svg">
       </b-button>
     </div>
-    <Leasing show="false"
-             :address="address"
-             :cold-addresses="coldAddresses"></Leasing>
+    <Lease show="false"
+           :balances="balance"
+           :cold-addresses="coldAddresses"></Lease>
   </div>
 </template>
 
 <script>
-import Leasing from '../modals/Leasing'
+import Lease from '../modals/Lease'
 import { TESTNET_NODE } from '@/constants.js'
 import Vue from 'vue'
 
 export default {
     name: 'LeasePane',
     components: {
-        Leasing
+        Lease
     },
     data() {
         return {
