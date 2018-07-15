@@ -93,7 +93,10 @@
                   </LeasePane>
                 </div>
                 <div class="f-records">
-                  <LeaseRecords :address="selectedAddress"></LeaseRecords>
+                  <LeaseRecords :address="selectedAddress"
+                                :wallet-type="walletType"
+                                :cold-public-key="coldPubKey"
+                                :key-pair="keyPair"></LeaseRecords>
                 </div>
               </b-tab>
             </b-tabs>
@@ -182,8 +185,16 @@ export default {
                     seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
             }
         },
-        wordList() {
-            return this.seedPhrase.split(' ')
+        coldPubKey() {
+            if (this.walletType === 'coldWallet') {
+                return this.coldAddresses[this.selectedAddress]
+            }
+        },
+        keyPair() {
+            var seedPhrase = this.getSeedPhrase()
+            if (seedPhrase) {
+                return seedLib.fromExistingPhrase(seedPhrase).keyPair
+            }
         }
     },
 

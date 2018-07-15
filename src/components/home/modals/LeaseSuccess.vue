@@ -1,8 +1,13 @@
 <template>
   <div>
     <img src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
-    <p class="p-tips">Your transaction is on the way!</p>
-    <p class="p-info">You have leased {{ amount }} VEE</p>
+    <div v-if="txType==='lease'">
+      <p class="p-tips">Your transaction is on the way!</p>
+      <p class="p-info">You have leased {{ amount }} VEE</p>
+    </div>
+    <div v-else-if="txType==='cancelLease'">
+      <p class="p-tips">Your transaction has been cancelled!</p>
+    </div>
     <b-button variant="warning"
               class="btn-detail">View Details</b-button>
   </div>
@@ -13,8 +18,12 @@ export default {
     props: {
         amount: {
             type: Number,
-            require: true,
             default: 0
+        },
+        txType: {
+            type: String,
+            require: true,
+            default: ''
         }
     }
 }

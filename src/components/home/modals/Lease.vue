@@ -120,14 +120,14 @@
           </b-row>
         </b-container>
         <LeaseSuccess v-else-if="coldPageId===5"
-                      :amount="coldAmount"></LeaseSuccess>
+                      :amount="coldAmount"
+                      :tx-type="'lease'"></LeaseSuccess>
       </b-tab>
     </b-tabs>
   </b-modal>
 </template>
 
 <script>
-// import { TX_FEE } from '@/constants'
 import LeaseInput from './LeaseInput'
 import Confirm from './Confirm'
 import ColdSignature from './ColdSignature'

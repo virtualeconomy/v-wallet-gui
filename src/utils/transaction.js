@@ -36,7 +36,7 @@ var cancelLeasingField = {
     senderPublicKey: new ByteProcessor_1.Base58('senderPublicKey'),
     fee: new ByteProcessor_1.Long('fee'),
     timestamp: new ByteProcessor_1.Long('timestamp'),
-    transactionId: new ByteProcessor_1.Base58('transactionId')
+    txId: new ByteProcessor_1.Base58('transactionId')
 }
 
 var storedFields = {};
@@ -81,6 +81,7 @@ function getData(transferData) {
 }
 
 function getBytes(transferData, tx_type) {
+    console.log(transferData)
     var byteProviders = makeByteProviders(tx_type);
     if (transferData === void 0) { transferData = {}; }
     // Save all needed values from user data

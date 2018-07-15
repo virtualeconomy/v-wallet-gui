@@ -45,7 +45,9 @@
              :key="record.id">
           <Record :tx-record="record"
                   :address="address"
-                  :type="type"></Record>
+                  :type="type"
+                  :cold-pub-key="coldPubKey"
+                  :key-pair="keyPair"></Record>
         </div>
       </div>
     </div>
@@ -107,6 +109,14 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        coldPubKey: {
+            type: String,
+            default: ''
+        },
+        keyPair: {
+            type: Object,
+            default: function() {}
         }
     },
     watch: {

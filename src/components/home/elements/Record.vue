@@ -105,7 +105,11 @@
     <CancelLease :modal-id="txRecord.id"
                  :wallet-type="walletType"
                  :address="txAddress"
-                 :amount="txAmount">
+                 :amount="txAmount"
+                 :fee="txFee"
+                 :cold-pub-key="coldPubKey"
+                 :tx-id="txId"
+                 :key-pair="keyPair">
     </CancelLease>
   </b-container>
 </template>
@@ -151,7 +155,16 @@ export default {
             type: String,
             default: 'transfer',
             require: true
+        },
+        coldPubKey: {
+            type: String,
+            default: ''
+        },
+        keyPair: {
+            type: Object,
+            default: function() {}
         }
+
     },
     computed: {
         txType() {
