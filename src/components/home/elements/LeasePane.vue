@@ -76,7 +76,7 @@
 
 <script>
 import Lease from '../modals/Lease'
-import { TESTNET_NODE } from '@/constants.js'
+import { TESTNET_NODE, VEE_PRECISION } from '@/constants.js'
 import Vue from 'vue'
 
 export default {
@@ -115,10 +115,10 @@ export default {
             this.$http.get(url).then(response => {
                 Vue.set(this.balance, address, response.body)
                 this.balance = response.body
-                this.total = this.balance.regular
-                this.available = this.balance.available
-                this.leasedOut = this.balance.regular - this.balance.available
-                this.leasedIn = this.balance.effective - this.balance.available
+                this.total = this.balance.regular / VEE_PRECISION
+                this.available = this.balance.available / VEE_PRECISION
+                this.leasedOut = (this.balance.regular - this.balance.available) / VEE_PRECISION
+                this.leasedIn = (this.balance.effective - this.balance.available) / VEE_PRECISION
             }, response => {
                 Vue.set(this.balance, address, 0)
             })

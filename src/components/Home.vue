@@ -225,11 +225,10 @@ export default {
             clearTimeout(this.sessionClearTimeout)
             this.setSessionClearTimeout()
         },
-
         getBalance: function(address) {
-            const url = TESTNET_NODE + '/addresses/balance/' + address
+            const url = TESTNET_NODE + '/addresses/balance/details/' + address
             this.$http.get(url).then(response => {
-                Vue.set(this.balance, address, response.body['balance'] / VEE_PRECISION)
+                Vue.set(this.balance, address, response.body['available'] / VEE_PRECISION)
             }, response => {
                 Vue.set(this.balance, address, 0)
             })
