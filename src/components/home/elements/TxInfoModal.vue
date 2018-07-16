@@ -1,5 +1,5 @@
 <template>
-  <b-modal :id="'txInfoModal_' + modalId + (transType === 'lease' ? '_l' : '')"
+  <b-modal :id="'txInfoModal_' + transType + modalId"
            ref="infoModal"
            class="tx-modal"
            lazy

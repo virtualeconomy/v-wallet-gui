@@ -251,11 +251,7 @@ export default {
             this.hovered = false
         },
         showModal() {
-            if (this.transType === 'lease') {
-                this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.txRecord.id + '_l')
-            } else {
-                this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.txRecord.id)
-            }
+            this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.transType + this.txRecord.id)
         }
     }
 }
@@ -268,6 +264,7 @@ export default {
     vertical-align: middle;
     text-overflow: ellipsis;
     border-bottom: 1px solid #EDEDF0;
+    border-left: 2px solid white;
     padding: 12px 0;
     .record-icon {
         margin-left: 20px;
@@ -334,6 +331,10 @@ export default {
         position: absolute;
         left: -999999px;
     }
+}
+.record-unit:hover, .record-unit:active {
+    background-color: #f8f9fa;
+    border-left: 2px solid #1f5af6;
 }
 
 </style>
