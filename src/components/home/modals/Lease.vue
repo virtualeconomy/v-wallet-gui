@@ -127,7 +127,6 @@
 </template>
 
 <script>
-// import { TX_FEE } from '@/constants'
 import LeaseInput from './LeaseInput'
 import Confirm from './Confirm'
 import ColdSignature from './ColdSignature'

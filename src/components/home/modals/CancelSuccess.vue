@@ -1,27 +1,27 @@
 <template>
-  <div>
+  <div class="div-cancel">
     <img src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
     <div>
       <p class="p-tips">Your transaction is on the way!</p>
-      <p class="p-info">You have leased {{ amount }} VEE</p>
+      <p class="p-info">You have canceled a leasing transaction</p>
     </div>
     <b-button variant="warning"
               class="btn-detail">View Details</b-button>
   </div>
 </template>
+
 <script>
+import TxInfoModal from '../elements/TxInfoModal'
 export default {
-    name: 'LeaseSuccess',
-    props: {
-        amount: {
-            type: Number,
-            default: 0
-        }
-    }
+    name: 'CancelSuccess',
+    components: { TxInfoModal }
 }
 </script>
 
 <style scoped>
+.div-cancel {
+    padding-top: 40px;
+}
 .p-tips {
     font-size: 28px;
     color: #181B3A;

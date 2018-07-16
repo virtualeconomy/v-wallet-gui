@@ -102,6 +102,15 @@
                  :tx-block="txBlock"
                  :tx-attachment="txAttachment"
                  :trans-type="transType"></TxInfoModal>
+    <CancelLease :modal-id="txRecord.id"
+                 :wallet-type="walletType"
+                 :address="txAddress"
+                 :amount="txAmount"
+                 :fee="txFee"
+                 :cold-pub-key="coldPubKey"
+                 :tx-id="txId"
+                 :key-pair="keyPair">
+    </CancelLease>
   </b-container>
 </template>
 
@@ -110,10 +119,11 @@ import TxInfoModal from './TxInfoModal'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import { VEE_PRECISION } from '@/constants'
+import CancelLease from '../modals/CancelLease'
 
 export default {
     name: 'Record',
-    components: {TxInfoModal},
+    components: { CancelLease, TxInfoModal },
     data: function() {
         return {
             hovered: false
@@ -136,11 +146,25 @@ export default {
             type: String,
             default: ''
         },
+        walletType: {
+            type: String,
+            default: '',
+            require: true
+        },
         transType: {
             type: String,
             default: 'transfer',
             require: true
+        },
+        coldPubKey: {
+            type: String,
+            default: ''
+        },
+        keyPair: {
+            type: Object,
+            default: function() {}
         }
+
     },
     computed: {
         txType() {

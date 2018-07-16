@@ -23,7 +23,7 @@
                  :balance="balance[address]"
                  :selected="address === selectedAddress"
                  class="pointer unselectable"
-                 @click.native="selectWallet(address)">
+                 @click.native="selectWallet(address, 'hotWallet')">
           </Asset>
           <div class="asset-title">
             <img
@@ -36,7 +36,7 @@
                  :balance="balance[coldAddress]"
                  :selected="coldAddress === selectedAddress"
                  class="pointer unselectable"
-                 @click.native="selectWallet(coldAddress)">
+                 @click.native="selectWallet(coldAddress, 'coldWallet')">
           </Asset>
           <b-btn @click="$root.$emit('bv::show::modal', 'importModal', 'importModal')"
                  size="sm"
@@ -95,7 +95,10 @@
                   </LeasePane>
                 </div>
                 <div class="f-records">
-                  <LeaseRecords :address="selectedAddress"></LeaseRecords>
+                  <LeaseRecords :address="selectedAddress"
+                                :wallet-type="walletType"
+                                :cold-public-key="coldPubKey"
+                                :key-pair="keyPair"></LeaseRecords>
                 </div>
               </b-tab>
             </b-tabs>
@@ -126,6 +129,7 @@ export default {
             selectedAddress: '',
             sessionClearTimeout: void 0,
             coldAddresses: {},
+            walletType: '',
             transActive: 'trans'
         }
     },
@@ -183,8 +187,16 @@ export default {
                     seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
             }
         },
-        wordList() {
-            return this.seedPhrase.split(' ')
+        coldPubKey() {
+            if (this.walletType === 'coldWallet') {
+                return this.coldAddresses[this.selectedAddress]
+            }
+        },
+        keyPair() {
+            var seedPhrase = this.getSeedPhrase()
+            if (seedPhrase) {
+                return seedLib.fromExistingPhrase(seedPhrase).keyPair
+            }
         }
     },
 
@@ -241,7 +253,8 @@ export default {
             Vue.set(this.userInfo, feildname, value)
             window.localStorage.setItem(this.address, JSON.stringify(this.userInfo))
         },
-        selectWallet(addr) {
+        selectWallet(addr, type) {
+            this.walletType = type
             if (this.selectedAddress !== addr) {
                 this.selectedAddress = addr
             } else {

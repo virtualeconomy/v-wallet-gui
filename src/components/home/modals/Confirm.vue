@@ -41,7 +41,6 @@
       <b-form-group horizontal
                     class="form-line"
                     label="Description"
-                    v-if="txType==='transfer'"
                     label-for="attachment_confirm">
         <b-form-input id="attachment_confirm"
                       v-model="attachment"
@@ -71,22 +70,22 @@ export default {
     props: {
         address: {
             type: String,
-            required: true,
+            require: true,
             default: ''
         },
         recipient: {
             type: String,
-            required: true,
+            require: true,
             default: ''
         },
         amount: {
             type: Number,
-            required: true,
+            require: true,
             default: 0
         },
         fee: {
             type: Number,
-            required: true,
+            require: true,
             default: 1
         },
         attachment: {
@@ -95,7 +94,7 @@ export default {
         },
         txType: {
             type: String,
-            required: true,
+            require: true,
             default: ''
         }
     }

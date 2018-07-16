@@ -57,6 +57,7 @@
                  :key="record.id">
               <Record :tx-record="record"
                       :address="address"
+                      :wallet-type="walletType"
                       :trans-type="transType"></Record>
             </div>
           </div>
@@ -122,6 +123,10 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        walletType: {
+            type: String,
+            default: ''
         }
     },
     watch: {
