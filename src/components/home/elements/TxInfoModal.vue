@@ -35,10 +35,10 @@
                width="60px"
                height="60px">
         </div>
-        <div :class="txIcon === 'sent' ? 'sent-amount' : 'received-amount'">{{ txIcon === 'sent' ? '-' : '+' }}{{ txAmount }} vee</div>
+        <div :class="txIcon + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ txAmount }} vee</div>
       </div>
       <div class="tx-address">
-        <label>{{ txIcon === 'sent' ? 'To' : 'From' }}</label>
+        <label>{{ txIcon === 'received' ? 'From' : 'To' }}</label>
         <span>{{ txAddress }}</span>
       </div>
       <div class="tx-block">
@@ -197,6 +197,18 @@ export default {
     .received-amount {
         font-size: 28px;
         color: #23A28C;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedin-amount {
+        font-size: 28px;
+        color: rgb(183,215,247);
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedout-amount {
+        font-size: 28px;
+        color: rgb(181,224,171);
         letter-spacing: 0;
         text-align: center;
     }

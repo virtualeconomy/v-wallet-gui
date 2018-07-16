@@ -59,9 +59,8 @@
       <b-col :class="txIcon === 'sent' ? 'record-amount-s' : 'record-amount-r'"
              cols="auto">
         <div>
-          <span v-if="transType==='transfer'">{{ txIcon === 'sent' ? '-' : '+' }}{{ txIcon === 'sent' ? txAmount + txFee : txAmount }}</span>
-          <span v-if="transType==='lease'">{{ txAmount }}</span>
-          <span> VEE</span>
+          <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
+          <span v-if="txIcon !== 'cancelleasing'">{{ txIcon === 'sent' ? txAmount + txFee : txAmount }} VEE</span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -83,7 +82,8 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">TX info</b-dropdown-item>
-          <b-dropdown-item v-if="transType==='lease'">Cancel Leasing</b-dropdown-item>
+          <b-dropdown-item v-if="transType==='lease'"
+                           @click="cancelLeasing">Cancel Leasing</b-dropdown-item>
           <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
         </b-dropdown>
       </b-col>
@@ -194,7 +194,7 @@ export default {
             return this.txType.toString().toLowerCase()
         },
         txAddress() {
-            return this.txType === 'Sent' ? this.txRecord.recipient : this.txRecord.sender
+            return ((this.txType === 'Received' || this.txType === 'LeasedIn') ? this.txRecord.sender : this.txRecord.recipient)
         },
         txAddressShow() {
             if (this.txAddress) {
@@ -276,6 +276,9 @@ export default {
         },
         showModal() {
             this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.transType + this.txRecord.id)
+        },
+        cancelLeasing() {
+            this.$root.$emit('bv::show::modal', 'cancelLeaseModal_' + this.txRecord.id)
         }
     }
 }
