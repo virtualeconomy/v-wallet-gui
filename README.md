@@ -1,6 +1,6 @@
 # Vee Wallet Gui
 
-vee wallet gui based on the basic wallet and clod wallet.
+vee wallet gui based on the basic wallet and cold wallet.
 
 ### Directory Structure
 
