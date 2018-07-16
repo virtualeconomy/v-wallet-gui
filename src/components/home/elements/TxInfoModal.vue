@@ -5,8 +5,7 @@
            lazy
            centered
            hide-header
-           hide-footer
-           @hide="hidden">
+           hide-footer>
     <div class="md-content">
       <button
         class="close btn-close"
@@ -229,13 +228,13 @@ export default {
     }
     .leasedin-amount {
         font-size: 28px;
-        color: rgb(183,215,247);
+        color: #86BEF7;
         letter-spacing: 0;
         text-align: center;
     }
     .leasedout-amount {
         font-size: 28px;
-        color: rgb(181,224,171);
+        color: #73CC5A;
         letter-spacing: 0;
         text-align: center;
     }
