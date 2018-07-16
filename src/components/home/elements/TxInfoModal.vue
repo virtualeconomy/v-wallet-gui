@@ -2,6 +2,7 @@
   <b-modal :id="'txInfoModal_' + modalId"
            ref="infoModal"
            class="tx-modal"
+           lazy
            centered
            hide-header
            hide-footer>

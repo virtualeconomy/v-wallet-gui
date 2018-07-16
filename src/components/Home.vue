@@ -58,10 +58,10 @@
               <b-tab>
                 <template slot="title">
                   <div @click="onTransTabClick">
-                    <div v-if="transActive">
+                    <div v-if="isTransActive">
                       <img src="../assets/imgs/icons/wallet/ic_transaction_solid.svg"><span class="tab-title">Transaction</span>
                     </div>
-                    <div v-if="!transActive">
+                    <div v-if="!isTransActive">
                       <img src="../assets/imgs/icons/wallet/ic_transaction_line.svg"><span class="tab-title">Transaction</span>
                     </div>
                   </div>
@@ -79,10 +79,10 @@
               <b-tab>
                 <template slot="title">
                   <div @click="onLeaseTabClick">
-                    <div v-if="!transActive">
+                    <div v-if="!isTransActive">
                       <img src="../assets/imgs/icons/wallet/ic_card_solid.svg"><span class="tab-title">Leasing</span>
                     </div>
-                    <div v-if="transActive">
+                    <div v-if="isTransActive">
                       <img src="../assets/imgs/icons/wallet/ic_card_line.svg"><span class="tab-title">Leasing</span>
                     </div>
                   </div>
@@ -183,6 +183,10 @@ export default {
         },
         wordList() {
             return this.seedPhrase.split(' ')
+        },
+        isTransActive() {
+            console.log(this.transActive)
+            return this.transActive
         }
     },
 
