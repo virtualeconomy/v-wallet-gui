@@ -120,8 +120,7 @@
           </b-row>
         </b-container>
         <LeaseSuccess v-else-if="coldPageId===5"
-                      :amount="coldAmount"
-                      :tx-type="'lease'"></LeaseSuccess>
+                      :amount="coldAmount"></LeaseSuccess>
       </b-tab>
     </b-tabs>
   </b-modal>

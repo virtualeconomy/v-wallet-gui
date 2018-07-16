@@ -81,7 +81,6 @@ function getData(transferData) {
 }
 
 function getBytes(transferData, tx_type) {
-    console.log(transferData)
     var byteProviders = makeByteProviders(tx_type);
     if (transferData === void 0) { transferData = {}; }
     // Save all needed values from user data

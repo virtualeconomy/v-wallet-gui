@@ -56,10 +56,6 @@ export default {
             type: String,
             default: ''
         },
-        txType: {
-            type: String,
-            default: ''
-        },
         txAddress: {
             type: String,
             default: ''

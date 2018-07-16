@@ -6,13 +6,13 @@
            ref="cancelLeaseModal"
            @hidden="resetPage"
            class="cl-modal">
+    <button
+      class="close btn-close"
+      @click="closeModal">
+      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+    </button>
     <b-container v-if="page==='confirm'">
       <div class="md-content">
-        <button
-          class="close btn-close"
-          @click="closeModal">
-          <img src="../../../assets/imgs/icons/operate/ic_close.svg">
-        </button>
         <div class="cl-title">
           <div class="cl-icon">
             <img src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
@@ -30,6 +30,10 @@
           <span>{{ fee }} vee</span>
         </div>
       </div>
+      <p v-show="sendError"
+         class="text-danger">
+        <small>Sorry, transaction send failed!</small>
+      </p>
       <b-row>
         <b-col class="col-lef">
           <b-button
@@ -52,11 +56,7 @@
       </b-row>
     </b-container>
     <b-container v-else-if="page==='success'">
-      <LeaseSuccess :tx-type="'cancelLease'"></LeaseSuccess>
-      <p v-show="sendError"
-         class="text-danger">
-        <small>Sorry, transaction send failed!</small>
-      </p>
+      <CancelSuccess></CancelSuccess>
     </b-container>
     <b-container v-else-if="page==='cold'">
       <ColdSignature :data-object="dataObject"
@@ -70,11 +70,11 @@
 import Confirm from './Confirm'
 import { CANCEL_LEASE_TX, VEE_PRECISION, TESTNET_NODE } from '../../../constants'
 import transaction from '@/utils/transaction'
-import LeaseSuccess from './LeaseSuccess'
 import ColdSignature from './ColdSignature'
+import CancelSuccess from './CancelSuccess'
 export default {
     name: 'CancelLease',
-    components: { ColdSignature, LeaseSuccess, Confirm },
+    components: { CancelSuccess, ColdSignature, Confirm },
     data: function() {
         return {
             page: 'confirm',

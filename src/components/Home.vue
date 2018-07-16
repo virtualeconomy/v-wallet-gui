@@ -54,16 +54,17 @@
             class="height-full"
             bg-variant="white"
             border-variant="primary">
-            <b-tabs>
-              <b-tab>
+            <b-tabs @input="tranTabChange">
+              <b-tab active>
                 <template slot="title">
-                  <div @click="onTransTabClick">
-                    <div v-if="transActive">
-                      <img src="../assets/imgs/icons/wallet/ic_transaction_solid.svg"><span class="tab-title">Transaction</span>
-                    </div>
-                    <div v-if="!transActive">
-                      <img src="../assets/imgs/icons/wallet/ic_transaction_line.svg"><span class="tab-title">Transaction</span>
-                    </div>
+                  <div>
+                    <img
+                      class="img-active"
+                      src="../assets/imgs/icons/wallet/ic_transaction_solid.svg">
+                    <img
+                      class="img-nonactive"
+                      src="../assets/imgs/icons/wallet/ic_transaction_line.svg">
+                    <span class="tab-title">Transaction</span>
                   </div>
                 </template>
                 <div class="trans-pane">
@@ -78,13 +79,14 @@
               </b-tab>
               <b-tab>
                 <template slot="title">
-                  <div @click="onLeaseTabClick">
-                    <div v-if="!transActive">
-                      <img src="../assets/imgs/icons/wallet/ic_card_solid.svg"><span class="tab-title">Leasing</span>
-                    </div>
-                    <div v-if="transActive">
-                      <img src="../assets/imgs/icons/wallet/ic_card_line.svg"><span class="tab-title">Leasing</span>
-                    </div>
+                  <div>
+                    <img
+                      class="img-active"
+                      src="../assets/imgs/icons/wallet/ic_card_solid.svg">
+                    <img
+                      class="img-nonactive"
+                      src="../assets/imgs/icons/wallet/ic_card_line.svg">
+                    <span class="tab-title">Leasing</span>
                   </div>
                 </template>
                 <div class="lease-pane">
@@ -128,7 +130,7 @@ export default {
             sessionClearTimeout: void 0,
             coldAddresses: {},
             walletType: '',
-            transActive: true
+            transActive: 'trans'
         }
     },
 
@@ -212,11 +214,13 @@ export default {
                 this.$router.push('/login')
             }, oldTimeout * 60 * 1000)
         },
-        onTransTabClick() {
-            this.transActive = true
-        },
-        onLeaseTabClick() {
-            this.transActive = false
+        tranTabChange(tabIndex) {
+            console.log(tabIndex)
+            if (tabIndex === 0) {
+                this.transActive = 'trans'
+            } else if (tabIndex === 1) {
+                this.transActive = 'lease'
+            }
         },
         resetSessionClearTimeout() {
             clearTimeout(this.sessionClearTimeout)
