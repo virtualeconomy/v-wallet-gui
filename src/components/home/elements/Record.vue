@@ -100,7 +100,8 @@
                  :tx-fee="txFee"
                  :tx-amount="txAmount"
                  :tx-block="txBlock"
-                 :tx-attachment="txAttachment"></TxInfoModal>
+                 :tx-attachment="txAttachment"
+                 :trans-type="transType"></TxInfoModal>
   </b-container>
 </template>
 
@@ -159,6 +160,8 @@ export default {
                 }
             } else if (this.txRecord['type'] === 9) {
                 return 'CancelLeasing'
+            } else if (this.txRecord['type'] === 1) {
+                return 'Received'
             } else {
                 return ''
             }
@@ -248,7 +251,11 @@ export default {
             this.hovered = false
         },
         showModal() {
-            this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.txRecord.id)
+            if (this.transType === 'lease') {
+                this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.txRecord.id + '_l')
+            } else {
+                this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.txRecord.id)
+            }
         }
     }
 }

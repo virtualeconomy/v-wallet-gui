@@ -1,5 +1,5 @@
 <template>
-  <b-modal :id="'txInfoModal_' + modalId"
+  <b-modal :id="'txInfoModal_' + modalId + (transType === 'lease' ? '_l' : '')"
            ref="infoModal"
            class="tx-modal"
            lazy
@@ -18,8 +18,20 @@
                src="../../../assets/imgs/icons/wallet/ic_sent.svg"
                width="60px"
                height="60px">
-          <img v-else
+          <img v-else-if="txIcon==='received'"
                src="../../../assets/imgs/icons/wallet/ic_received.svg"
+               width="60px"
+               height="60px">
+          <img v-else-if="txIcon==='leasedin'"
+               src="../../../assets/imgs/icons/wallet/ic_leasing_reverse.svg"
+               width="60px"
+               height="60px">
+          <img v-else-if="txIcon==='leasedout'"
+               src="../../../assets/imgs/icons/wallet/ic_leasing.svg"
+               width="60px"
+               height="60px">
+          <img v-else-if="txIcon==='cancelleasing'"
+               src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
                width="60px"
                height="60px">
         </div>
@@ -84,6 +96,10 @@ export default {
         txAttachment: {
             type: String,
             default: ''
+        },
+        transType: {
+            type: String,
+            default: 'transfer'
         }
     },
     methods: {
