@@ -57,7 +57,7 @@
                  :key="record.id">
               <Record :tx-record="record"
                       :address="address"
-                      :type="type"></Record>
+                      :trans-type="transType"></Record>
             </div>
           </div>
         </template>
@@ -114,7 +114,7 @@ export default {
                 amount: 'amount',
                 attachment: 'attachment'
             },
-            type: 'transfer'
+            transType: 'transfer'
         }
     },
     props: {
