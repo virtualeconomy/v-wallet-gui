@@ -56,7 +56,7 @@
       </b-row>
     </b-container>
     <b-container v-else-if="page==='success'">
-      <CancelSuccess></CancelSuccess>
+      <CancelSuccess @show-details="showDetails"></CancelSuccess>
     </b-container>
     <b-container v-else-if="page==='cold'">
       <ColdSignature :data-object="dataObject"
@@ -68,13 +68,14 @@
 
 <script>
 import Confirm from './Confirm'
-import { CANCEL_LEASE_TX, VEE_PRECISION, TESTNET_NODE } from '../../../constants'
+import {CANCEL_LEASE_TX, VEE_PRECISION, TESTNET_NODE, TX_FEE} from '../../../constants'
 import transaction from '@/utils/transaction'
 import ColdSignature from './ColdSignature'
 import CancelSuccess from './CancelSuccess'
+import TxInfoModal from '../elements/TxInfoModal'
 export default {
     name: 'CancelLease',
-    components: { CancelSuccess, ColdSignature, Confirm },
+    components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm },
     data: function() {
         return {
             page: 'confirm',
@@ -102,7 +103,7 @@ export default {
         },
         fee: {
             type: Number,
-            default: 0,
+            default: TX_FEE,
             require: true
         },
         recipient: {
@@ -123,13 +124,14 @@ export default {
             type: String,
             default: ''
         },
-        txId: {
-            type: String,
-            default: ''
-        },
         keyPair: {
             type: Object,
             default: function() {}
+        },
+        txTimestamp: {
+            type: Number,
+            default: 0,
+            require: true
         }
     },
     computed: {
@@ -138,7 +140,7 @@ export default {
                 transactionType: CANCEL_LEASE_TX,
                 senderPublicKey: this.coldPubKey,
                 fee: this.fee * VEE_PRECISION,
-                txId: this.txId
+                txId: this.modalId
             }
         }
     },
@@ -163,7 +165,7 @@ export default {
                 }
             } else {
                 const dataInfo = {
-                    txId: this.txId,
+                    txId: this.modalId,
                     fee: this.fee * VEE_PRECISION,
                     timestamp: Date.now() * 1e6
                 }
@@ -184,6 +186,9 @@ export default {
             this.coldTimestamp = timestamp
             this.signed = true
             this.page = 'confirm'
+        },
+        showDetails() {
+            this.$emit('show-details')
         }
     }
 }

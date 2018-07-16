@@ -102,14 +102,20 @@
                  :tx-block="txBlock"
                  :tx-attachment="txAttachment"
                  :trans-type="transType"></TxInfoModal>
+    <TxInfoModal :modal-id="txRecord.id"
+                 :tx-fee="txFee"
+                 :timestamp="txRecord.timestamp"
+                 :tx-icon="'cancelleasing'"
+                 :trans-type="'cancelLease'"></TxInfoModal>
     <CancelLease :modal-id="txRecord.id"
                  :wallet-type="walletType"
                  :address="txAddress"
                  :amount="txAmount"
                  :fee="txFee"
                  :cold-pub-key="coldPubKey"
-                 :tx-id="txId"
-                 :key-pair="keyPair">
+                 :key-pair="keyPair"
+                 :tx-timestamp="txRecord.timestamp"
+                 @show-details="showDetails">
     </CancelLease>
   </b-container>
 </template>
@@ -279,6 +285,9 @@ export default {
         },
         cancelLeasing() {
             this.$root.$emit('bv::show::modal', 'cancelLeaseModal_' + this.txRecord.id)
+        },
+        showDetails() {
+            this.$root.$emit('bv::show::modal', 'txInfoModal_cancelLease' + this.txId)
         }
     }
 }
