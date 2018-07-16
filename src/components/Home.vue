@@ -215,7 +215,6 @@ export default {
             }, oldTimeout * 60 * 1000)
         },
         tranTabChange(tabIndex) {
-            console.log(tabIndex)
             if (tabIndex === 0) {
                 this.transActive = 'trans'
             } else if (tabIndex === 1) {

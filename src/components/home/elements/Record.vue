@@ -26,7 +26,7 @@
              height="32px">
       </b-col>
       <b-col class="record-detail"
-             v-if="type==='transfer'"
+             v-if="transType==='transfer'"
              cols="auto">
         <b-row>
           <b-col class="title">{{ txType }} VEE</b-col>
@@ -41,7 +41,7 @@
         </b-row>
       </b-col>
       <b-col class="record-detail"
-             v-if="type==='lease'"
+             v-if="transType==='lease'"
              cols="auto">
         <b-row>
           <b-col class="title">{{ txTitle }}</b-col>
@@ -59,8 +59,8 @@
       <b-col :class="txIcon === 'sent' ? 'record-amount-s' : 'record-amount-r'"
              cols="auto">
         <div>
-          <span v-if="type==='transfer'">{{ txIcon === 'sent' ? '-' : '+' }}{{ txIcon === 'sent' ? txAmount + txFee : txAmount }}</span>
-          <span v-if="type==='lease'">{{ txIcon === 'leasedOut' ? txAmount + txFee : txAmount }}</span>
+          <span v-if="transType==='transfer'">{{ txIcon === 'sent' ? '-' : '+' }}{{ txIcon === 'sent' ? txAmount + txFee : txAmount }}</span>
+          <span v-if="transType==='lease'">{{ txAmount }}</span>
           <span> VEE</span>
         </div>
       </b-col>
@@ -82,9 +82,8 @@
                 src="../../../assets/imgs/icons/wallet/ic_more.svg">
             </div>
           </template>
-          <b-dropdown-item @click="$root.$emit('bv::show::modal', 'txInfoModal_' + txRecord.id, 'txInfoModal_' + txRecord.id)">TX info</b-dropdown-item>
-          <b-dropdown-item v-if="type==='lease'"
-                           @click="$root.$emit('bv::show::modal', 'cancelLeaseModal_' + txRecord.id, 'cancelLeaseModal_' + txRecord.id)">Cancel Leasing</b-dropdown-item>
+          <b-dropdown-item @click="showModal">TX info</b-dropdown-item>
+          <b-dropdown-item v-if="transType==='lease'">Cancel Leasing</b-dropdown-item>
           <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
         </b-dropdown>
       </b-col>
@@ -101,7 +100,8 @@
                  :tx-fee="txFee"
                  :tx-amount="txAmount"
                  :tx-block="txBlock"
-                 :tx-attachment="txAttachment"></TxInfoModal>
+                 :tx-attachment="txAttachment"
+                 :trans-type="transType"></TxInfoModal>
     <CancelLease :modal-id="txRecord.id"
                  :wallet-type="walletType"
                  :address="txAddress"
@@ -151,7 +151,7 @@ export default {
             default: '',
             require: true
         },
-        type: {
+        transType: {
             type: String,
             default: 'transfer',
             require: true
@@ -184,6 +184,8 @@ export default {
                 }
             } else if (this.txRecord['type'] === 9) {
                 return 'CancelLeasing'
+            } else if (this.txRecord['type'] === 1) {
+                return 'Received'
             } else {
                 return ''
             }
@@ -271,6 +273,13 @@ export default {
         },
         unhoverIco() {
             this.hovered = false
+        },
+        showModal() {
+            if (this.transType === 'lease') {
+                this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.txRecord.id + '_l')
+            } else {
+                this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.txRecord.id)
+            }
         }
     }
 }

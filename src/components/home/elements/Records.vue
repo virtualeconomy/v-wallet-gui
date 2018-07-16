@@ -58,7 +58,7 @@
               <Record :tx-record="record"
                       :address="address"
                       :wallet-type="walletType"
-                      :type="type"></Record>
+                      :trans-type="transType"></Record>
             </div>
           </div>
         </template>
@@ -115,7 +115,7 @@ export default {
                 amount: 'amount',
                 attachment: 'attachment'
             },
-            type: 'transfer'
+            transType: 'transfer'
         }
     },
     props: {
