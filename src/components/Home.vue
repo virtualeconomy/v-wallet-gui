@@ -349,7 +349,7 @@ export default {
 }
 .f-records {
     height: -webkit-fill-available;
-    padding-bottom: 150px;
+    padding-bottom: 180px;
 }
 .tab-pane {
     padding: 0 !important;
