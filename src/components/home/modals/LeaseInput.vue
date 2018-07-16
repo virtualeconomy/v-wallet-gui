@@ -1,5 +1,5 @@
 <template>
-  <div class="text-left">
+  <b-container class="text-left">
     <b-form-group label="Wallet Address"
                   label-for="address-input">
       <b-form-input id="address-input"
@@ -95,7 +95,7 @@
               :disabled="isSubmitDisabled"
               @click="nextPage">Continue
     </b-button>
-  </div>
+  </b-container>
 </template>
 
 <script>
