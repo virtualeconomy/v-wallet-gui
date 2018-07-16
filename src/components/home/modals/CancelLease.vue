@@ -6,7 +6,7 @@
            ref="cancelLeaseModal"
            @hidden="resetPage"
            class="cl-modal">
-    <b-container v-if="pageId===1">
+    <b-container v-if="page==='confirm'">
       <div class="md-content">
         <button
           class="close btn-close"
@@ -51,11 +51,18 @@
         </b-col>
       </b-row>
     </b-container>
-    <LeaseSuccess :tx-type="'cancelLease'"
-                  v-else-if="pageId===2"></LeaseSuccess>
-    <ColdSignature :data-object="dataObject"
-                   @get-signature="getSignature"
-                   @prev-page="prevPage"></ColdSignature>
+    <b-container v-else-if="page==='success'">
+      <LeaseSuccess :tx-type="'cancelLease'"></LeaseSuccess>
+      <p v-show="sendError"
+         class="text-danger">
+        <small>Sorry, transaction send failed!</small>
+      </p>
+    </b-container>
+    <b-container v-else-if="page==='cold'">
+      <ColdSignature :data-object="dataObject"
+                     @get-signature="getSignature"
+                     @prev-page="prevPage"></ColdSignature>
+    </b-container>
   </b-modal>
 </template>
 
@@ -70,8 +77,11 @@ export default {
     components: { ColdSignature, LeaseSuccess, Confirm },
     data: function() {
         return {
-            pageId: 1,
-            coldPageId: 1
+            page: 'confirm',
+            coldSignature: '',
+            coldTimestamp: 0,
+            sendError: false,
+            signed: false
         }
     },
     props: {
@@ -134,6 +144,11 @@ export default {
     },
     methods: {
         resetPage() {
+            this.page = 'confirm'
+            this.signed = false
+            this.sendError = false
+            this.coldSignature = ''
+            this.coldTimestamp = 0
         },
         closeModal() {
             this.$refs.cancelLeaseModal.hide()
@@ -141,21 +156,34 @@ export default {
         sendCancelLease() {
             var apiSchema
             if (this.walletType === 'coldWallet') {
+                if (!this.signed) {
+                    this.page = 'cold'
+                } else {
+                    apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldTimestamp)
+                }
             } else {
                 const dataInfo = {
                     txId: this.txId,
                     fee: this.fee * VEE_PRECISION,
                     timestamp: Date.now() * 1e6
                 }
-                console.log(this.keyPair)
                 apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair, CANCEL_LEASE_TX)
             }
             const url = TESTNET_NODE + '/leasing/broadcast/cancel'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
-                this.pageId++
+                this.page = 'success'
             }, response => {
                 this.sendError = true
             })
+        },
+        prevPage() {
+            this.page = 'confirm'
+        },
+        getSignature(signature, timestamp) {
+            this.coldSignature = signature
+            this.coldTimestamp = timestamp
+            this.signed = true
+            this.page = 'confirm'
         }
     }
 }
