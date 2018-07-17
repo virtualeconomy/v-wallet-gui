@@ -79,6 +79,7 @@ export default {
     data: function() {
         return {
             page: 'confirm',
+            timestamp: 0,
             coldSignature: '',
             coldTimestamp: 0,
             sendError: false,
@@ -161,6 +162,7 @@ export default {
                 if (!this.signed) {
                     this.page = 'cold'
                 } else {
+                    this.timestamp = this.coldTimestamp
                     apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldTimestamp)
                 }
             } else {
@@ -169,6 +171,7 @@ export default {
                     fee: this.fee * VEE_PRECISION,
                     timestamp: Date.now() * 1e6
                 }
+                this.timestamp = dataInfo.timestamp
                 apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair, CANCEL_LEASE_TX)
             }
             const url = TESTNET_NODE + '/leasing/broadcast/cancel'
@@ -188,7 +191,7 @@ export default {
             this.page = 'confirm'
         },
         showDetails() {
-            this.$emit('show-details')
+            this.$emit('show-details', this.timestamp)
         }
     }
 }

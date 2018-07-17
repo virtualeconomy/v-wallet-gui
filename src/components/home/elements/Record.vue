@@ -33,8 +33,12 @@
         </b-row>
         <b-row>
           <b-col class="detail-1"
-                 cols="auto">{{ txIcon === 'sent' ? 'To' : 'From' }}:</b-col>
-          <b-col class="detail-2">{{ txAddressShow }}</b-col>
+                 cols="auto"
+                 v-if="txIcon !== 'cancelleasing'">{{ (txIcon === 'sent' || txIcon === 'leasedout') ? 'To' : 'From' }}:</b-col>
+          <b-col class="detail-1"
+                 cols="auto"
+                 v-if="txIcon === 'cancelleasing'">TX:</b-col>
+          <b-col class="detail-2">{{ txIcon === 'cancelleasing' ? txIdShow : txAddressShow }}</b-col>
           <b-col class="detail-3"
                  cols="auto"></b-col>
           <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
@@ -48,8 +52,8 @@
         </b-row>
         <b-row>
           <b-col class="detail-1"
-                 cols="auto">{{ txIcon === 'leasedout' ? 'To' : 'From' }}:</b-col>
-          <b-col class="detail-2">{{ txAddressShow }}</b-col>
+                 cols="auto">{{ txIcon === 'leasedout' ? 'To' : txIcon === 'leasedin' ? 'From' : 'TX' }}:</b-col>
+          <b-col class="detail-2">{{ txIcon === 'cancelleasing' ? txIdShow : txAddressShow }}</b-col>
           <b-col class="detail-3"
                  cols="auto"></b-col>
           <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
@@ -104,7 +108,7 @@
                  :trans-type="transType"></TxInfoModal>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-fee="txFee"
-                 :timestamp="txRecord.timestamp"
+                 :tx-time="cancelTime"
                  :tx-icon="'cancelleasing'"
                  :trans-type="'cancelLease'"></TxInfoModal>
     <CancelLease :modal-id="txRecord.id"
@@ -132,7 +136,8 @@ export default {
     components: { CancelLease, TxInfoModal },
     data: function() {
         return {
-            hovered: false
+            hovered: false,
+            cancelTime: 0
         }
     },
     props: {
@@ -207,6 +212,13 @@ export default {
                 const addrChars = this.txAddress.split('')
                 addrChars.splice(6, 23, '******')
                 return addrChars.join('')
+            }
+        },
+        txIdShow() {
+            if (this.txId) {
+                const idChars = this.txId.split('')
+                idChars.splice(6, 32, '******')
+                return idChars.join('')
             }
         },
         txTitle() {
@@ -286,7 +298,8 @@ export default {
         cancelLeasing() {
             this.$root.$emit('bv::show::modal', 'cancelLeaseModal_' + this.txRecord.id)
         },
-        showDetails() {
+        showDetails(cancelTime) {
+            this.cancelTime = cancelTime
             this.$root.$emit('bv::show::modal', 'txInfoModal_cancelLease' + this.txId)
         }
     }
