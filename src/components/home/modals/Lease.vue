@@ -266,12 +266,10 @@ export default {
             }
             const url = TESTNET_NODE + '/leasing/broadcast/lease'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
-                console.log(response)
                 this.txId = response.body.id
                 this.txAddress = response.body.recipient
                 this.txTimestamp = response.body.timestamp
                 this.txAmount = response.body.amount / VEE_PRECISION
-                console.log(this.txId)
                 this.pageId++
             }, response => {
                 this.sendError = true
@@ -283,7 +281,6 @@ export default {
             this.coldPageId++
         },
         showDetails() {
-            console.log('here!')
             this.$root.$emit('bv::show::modal', 'txInfoModal_lease' + this.txId)
         }
     }
