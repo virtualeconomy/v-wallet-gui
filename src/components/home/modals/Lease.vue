@@ -206,7 +206,7 @@ export default {
                 transactionType: LEASE_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 amount: this.coldAmount * VEE_PRECISION,
-                fee: this.coldFee * VEE_PRECISION,
+                fee: this.fee * VEE_PRECISION,
                 recipient: this.coldRecipient
             }
         }
