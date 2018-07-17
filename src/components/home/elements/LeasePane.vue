@@ -76,27 +76,11 @@
 
 <script>
 import Lease from '../modals/Lease'
-import { TESTNET_NODE, VEE_PRECISION } from '@/constants.js'
-import Vue from 'vue'
 
 export default {
     name: 'LeasePane',
     components: {
         Lease
-    },
-    data() {
-        return {
-            balance: {},
-            available: 0,
-            leasedIn: 0,
-            leasedOut: 0,
-            total: 0
-        }
-    },
-    created() {
-        if (this.address) {
-            this.getBalanceDetail(this.address)
-        }
     },
     props: {
         address: {
@@ -106,22 +90,33 @@ export default {
         },
         coldAddresses: {
             type: Object,
-            default: function() {}
-        }
-    },
-    methods: {
-        getBalanceDetail: function(address) {
-            const url = TESTNET_NODE + '/addresses/balance/details/' + address
-            this.$http.get(url).then(response => {
-                Vue.set(this.balance, address, response.body)
-                this.balance = response.body
-                this.total = this.balance.regular / VEE_PRECISION
-                this.available = this.balance.available / VEE_PRECISION
-                this.leasedOut = (this.balance.regular - this.balance.available) / VEE_PRECISION
-                this.leasedIn = (this.balance.effective - this.balance.available) / VEE_PRECISION
-            }, response => {
-                Vue.set(this.balance, address, 0)
-            })
+            default: function() {},
+            require: true
+        },
+        balance: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        available: {
+            type: Number,
+            default: 0,
+            require: true
+        },
+        leasedIn: {
+            type: Number,
+            default: 0,
+            require: true
+        },
+        leasedOut: {
+            type: Number,
+            default: 0,
+            require: true
+        },
+        total: {
+            type: Number,
+            default: 0,
+            require: true
         }
     }
 }
