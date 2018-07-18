@@ -117,8 +117,8 @@
                  :amount="txAmount"
                  :fee="txFee"
                  :cold-pub-key="coldPubKey"
-                 :key-pair="keyPair"
                  :tx-timestamp="txRecord.timestamp"
+                 :address-index="addressIndex"
                  @show-details="showDetails">
     </CancelLease>
   </b-container>
@@ -171,9 +171,9 @@ export default {
             type: String,
             default: ''
         },
-        keyPair: {
-            type: Object,
-            default: function() {}
+        addressIndex: {
+            type: Number,
+            default: 0
         }
 
     },

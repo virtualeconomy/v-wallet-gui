@@ -105,7 +105,8 @@
                 <div class="f-records">
                   <LeaseRecords :address="selectedAddress"
                                 :wallet-type="walletType"
-                                :cold-public-key="coldPubKey"></LeaseRecords>
+                                :cold-public-key="coldPubKey"
+                                :address-index="addresses[address]"></LeaseRecords>
                 </div>
               </b-tab>
             </b-tabs>
@@ -153,10 +154,8 @@ export default {
             this.getBalance(this.address)
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
-            if (this.userInfo) {
-                if (this.userInfo.coldAddresses) {
-                    this.coldAddresses = JSON.parse(this.userInfo.coldAddresses)
-                }
+            if (this.userInfo && this.userInfo.coldAddresses) {
+                this.coldAddresses = JSON.parse(this.userInfo.coldAddresses)
             }
             this.getAddresses()
             for (const addr in this.addresses) {
