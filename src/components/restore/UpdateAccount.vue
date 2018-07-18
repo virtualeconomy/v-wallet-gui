@@ -278,7 +278,6 @@ export default {
             if (wordList.length === 16) {
                 const lastWord = wordList[wordList.length - 1]
                 if (this.addressNumber[lastWord]) {
-                    wordList = wordList.splice(0, wordList.length - 1)
                     return this.addressNumber[lastWord]
                 }
             }
