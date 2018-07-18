@@ -48,6 +48,23 @@
             :readonly="registering"
             @input="checkUsername(username)">
         </div>
+        <div class="form-group amount-form">
+          <label>Amount of address</label>
+          <p class="amount-tip">You can create 1-10 addresses at a time</p>
+          <div>
+            <b-btn variant="warning"
+                   class="bar-minus"
+                   @click="minus">-</b-btn>
+            <b-progress :value="addressAmount"
+                        :max="max"
+                        variant="warning"
+                        class="pg-bar"
+                        show-value></b-progress>
+            <b-btn variant="warning"
+                   class="bar-plus"
+                   @click="plus">+</b-btn>
+          </div>
+        </div>
         <div class="form-group password-form">
           <label>Password</label>
           <input
@@ -116,6 +133,8 @@ export default {
 
     data: function() {
         return {
+            addressAmount: 1,
+            max: 10,
             vTitleTitle: 'CreateAccount',
             vTitleDescription: '',
             isFirstRun: true,
@@ -252,6 +271,7 @@ export default {
             }
             const savedInfo = {
                 lastLogin: new Date().getTime(),
+                walletAmount: this.addressAmount,
                 username: this.username,
                 avtHash: this.avatarDataHex,
                 sessionTimeout: INITIAL_SESSION_TIMEOUT,
@@ -266,6 +286,16 @@ export default {
         },
         registerEnter() {
             this.register()
+        },
+        minus() {
+            if (this.addressAmount > 1) {
+                this.addressAmount--
+            }
+        },
+        plus() {
+            if (this.addressAmount < 10) {
+                this.addressAmount++
+            }
         }
     },
 
@@ -305,7 +335,7 @@ export default {
     }
 }
 </script>
-<style scoped>
+<style scoped lang="less">
 .home {
     margin-top: 40px;
     max-width: 560px;
@@ -376,5 +406,32 @@ export default {
 }
 .flink {
     margin-bottom: 0px;
+}
+.amount-tip {
+    font-size: 13px;
+    color: #9091A3;
+    letter-spacing: 0;
+}
+.btn {
+    padding: 0 !important;
+}
+.pg-bar {
+    width: 360px;
+    margin-left: 40px;
+}
+.bar-minus {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    border-radius: 50%;
+    margin-top: -4px;
+}
+.bar-plus {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    margin-left: 420px;
+    margin-top: -20px;
+    border-radius: 50%;
 }
 </style>
