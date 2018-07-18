@@ -25,7 +25,7 @@
             class="seed-des"
             v-show="!isSeedNoErr">
             <small class="text-muted">
-              Wallet seed is the 15 words which you are keeping as backup,
+              Wallet seed is the words which you are keeping as backup,
               the words should be seperated by single space
             </small>
           </p>
@@ -36,7 +36,7 @@
             @keydown.native.enter='preventDefault($event)'
             :state="isSeedNoErr"
             :disabled="isSeedNoErr"
-            placeholder="Enter 15 words here"
+            placeholder="Enter seed phrase here"
             :no-resize="true"
             :rows="4"
             :max-rows="6"
@@ -86,7 +86,6 @@
 </template>
 
 <script>
-import seedDic from '@/libs/seedDictionary.js'
 import UpdateAccount from '@/components/restore/UpdateAccount'
 
 export default {
@@ -102,27 +101,13 @@ export default {
             seedPhrase: ''
         }
     },
-
     methods: {
 
         checkSeed() {
-            const isOk = this.isValidSeed(this.seedInput.trim())
-            this.showSeedErr = !isOk
-            this.isSeedNoErr = isOk
-            this.seedBtnUp = !isOk
-            if (isOk) {
-                this.seedPhrase = this.seedInput.trim()
-            }
-        },
-
-        isValidSeed(seedPhrase) {
-            const wordList = seedPhrase.split(' ')
-            // if (wordList.length !== 15) {
-            //     return false
-            // }
-
-            const libSet = new Set(seedDic)
-            return wordList.every(i => libSet.has(i))
+            this.showSeedErr = false
+            this.isSeedNoErr = true
+            this.seedBtnUp = false
+            this.seedPhrase = this.seedInput.trim()
         },
 
         preventDefault(event) {
