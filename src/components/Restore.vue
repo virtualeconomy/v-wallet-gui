@@ -133,10 +133,12 @@ export default {
 
         isValidSeed(seedPhrase) {
             let wordList = seedPhrase.split(' ')
-            const lastWord = wordList[wordList.length - 1]
-            if (this.addressNumber[lastWord]) {
-                wordList = wordList.splice(0, wordList.length - 1)
-                this.addressAmount = this.addressNumber[lastWord]
+            if (wordList.length === 16) {
+                const lastWord = wordList[wordList.length - 1]
+                if (this.addressNumber[lastWord]) {
+                    wordList = wordList.splice(0, wordList.length - 1)
+                    this.addressAmount = this.addressNumber[lastWord]
+                }
             }
             const libSet = new Set(seedDic)
             return wordList.every(i => libSet.has(i))
