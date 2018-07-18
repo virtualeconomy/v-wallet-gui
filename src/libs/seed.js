@@ -6,6 +6,7 @@ var base58_1 = require("./base58");
 var crypto_1 = require("../utils/crypto");
 var logger_1 = require("../utils/logger");
 var seedDictionary_1 = require("./seedDictionary");
+var seedDictionary_2 = require("./seedAdditional")
 var DEFAULT_MIN_SEED_LENGTH = 25;
 function generateNewSeed(length) {
     var random = crypto_1.default.generateRandomUint32Array(length);
@@ -79,6 +80,9 @@ export default {
             throw new Error('Your seed length is less than allowed in config');
         }
         return new Seed(phrase);
+    },
+    fromExistingPhrasesWithIndex: function (phrase, index) {
+        return new Seed(phrase + seedDictionary_2.default[index])
     },
     encryptSeedPhrase: encryptSeedPhrase,
     decryptSeedPhrase: decryptSeedPhrase

@@ -17,7 +17,7 @@
           <LeaseInput :balances="balances"
                       @get-data="getData"
                       v-if="pageId===1"
-                      :address="address"
+                      :addresses="addresses"
                       :wallet-type="'hot'"></LeaseInput>
           <b-container v-else-if="pageId===2">
             <Confirm :tx-type="'lease'"
@@ -55,7 +55,8 @@
                         :address="recipient"
                         @show-details="showDetails"></LeaseSuccess>
         </b-tab>
-        <b-tab title="Cold Wallet">
+        <b-tab title="Cold Wallet"
+               :disabled="noColdAddress">
           <LeaseInput :balances="balances"
                       @get-cold-data="getColdData"
                       v-if="coldPageId===1"
@@ -162,6 +163,7 @@ export default {
             sendError: false,
             coldSignature: '',
             coldTimestamp: 0,
+            address: '',
             coldAddress: '',
             txId: '',
             txAddress: '',
@@ -179,12 +181,14 @@ export default {
             type: Object,
             default: function() {},
             require: true
+        },
+        addresses: {
+            type: Object,
+            default: function() {},
+            require: true
         }
     },
     computed: {
-        address() {
-            return Vue.ls.get('address')
-        },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.address))
         },
@@ -198,9 +202,6 @@ export default {
         wordList() {
             return this.seedPhrase.split(' ')
         },
-        keyPair() {
-            return seedLib.fromExistingPhrase(this.seedPhrase).keyPair
-        },
         dataObject() {
             return {
                 transactionType: LEASE_TX,
@@ -209,15 +210,19 @@ export default {
                 fee: this.fee * VEE_PRECISION,
                 recipient: this.coldRecipient
             }
+        },
+        noColdAddress() {
+            return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         }
     },
     methods: {
         closeModal() {
             this.$refs.leaseModal.hide()
         },
-        getData(recipient, amount) {
+        getData(recipient, amount, address) {
             this.recipient = recipient
             this.amount = amount
+            this.address = address
             this.pageId++
         },
         getColdData(recipient, amount, coldAddress) {
@@ -260,7 +265,7 @@ export default {
                     fee: TX_FEE * VEE_PRECISION,
                     timestamp: Date.now() * 1e6
                 }
-                apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair, LEASE_TX)
+                apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), LEASE_TX)
             } else if (walletType === 'coldWallet') {
                 apiSchema = transaction.prepareForAPI(this.dataObject, this.coldSignature, this.coldTimestamp)
             }
@@ -282,6 +287,9 @@ export default {
         },
         showDetails() {
             this.$root.$emit('bv::show::modal', 'txInfoModal_lease' + this.txId)
+        },
+        getKeypair(index) {
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         }
     }
 }

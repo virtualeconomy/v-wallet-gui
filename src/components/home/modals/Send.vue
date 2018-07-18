@@ -23,24 +23,17 @@
           v-if="pageId===1">
           <b-form-group label="Wallet Address"
                         label-for="address-input">
-            <b-form-input
-              id="address-input"
-              type="text"
-              :value="address"
-              class="addr-input"
-              readonly>
-            </b-form-input>
+            <b-form-select id=address-input
+                           class="addr-input"
+                           v-model="address"
+                           :options="options(addresses)"></b-form-select>
             <b-btn
               block
               variant="light"
               disabled
               class="balance-input"
               readonly>
-              <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Gray.svg"
-                     width="20"
-                     height="20"> VEE
-              </span>
+              <span class="balance-title">Balance</span>
               <span class="balance">{{ balances[address] }} VEE</span>
             </b-btn>
           </b-form-group>
@@ -175,7 +168,7 @@
             <b-form-select id=wallet-address
                            class="addr-input"
                            v-model="coldAddress"
-                           :options="options"></b-form-select>
+                           :options="options(coldAddresses)"></b-form-select>
             <b-btn
               block
               variant="light"
@@ -352,6 +345,7 @@ var initData = {
     coldAttachment: '',
     coldPageId: 1,
     coldFee: TX_FEE,
+    address: '',
     coldAddress: '',
     scanShow: false,
     qrInit: false,
@@ -373,15 +367,17 @@ export default {
             type: Object,
             default: function() {},
             require: true
+        },
+        addresses: {
+            type: Object,
+            default: function() {},
+            require: true
         }
     },
     data: function() {
         return initData
     },
     computed: {
-        address() {
-            return Vue.ls.get('address')
-        },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.address))
         },
@@ -395,20 +391,11 @@ export default {
         wordList() {
             return this.seedPhrase.split(' ')
         },
-        keyPair() {
-            return seedLib.fromExistingPhrase(this.seedPhrase).keyPair
-        },
         isSubmitDisabled() {
             return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot'))
         },
         isColdSubmitDisabled() {
             return !(this.coldAddress && this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient) && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold'))
-        },
-        options() {
-            return Object.keys(this.coldAddresses).reduce((options, coldAddress) => {
-                options.push({ value: coldAddress, text: coldAddress })
-                return options
-            }, [{ value: '', text: '<span class="text-muted">Please select a cold wallet address</span>', disabled: true }])
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -424,9 +411,6 @@ export default {
                 recipient: this.coldRecipient,
                 attachment: this.coldAttachment
             }
-        },
-        coldPublicKey() {
-            return this.coldAddresses[this.coldAddress]
         },
         isValidAttachment() {
             if (!this.attachment) {
@@ -454,7 +438,7 @@ export default {
                     attachment: this.attachment,
                     timestamp: (Date.now() - 1) * 1e6
                 }
-                apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair, TRANSFER_TX)
+                apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), TRANSFER_TX)
             } else if (walletType === 'coldWallet') {
                 apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldTimestamp, TRANSFER_TX)
             }
@@ -635,6 +619,15 @@ export default {
         isInsufficient(amount, type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
             return amount > balance - TX_FEE
+        },
+        options(addrs) {
+            return Object.keys(addrs).reduce((options, addr) => {
+                options.push({ value: addr, text: addr })
+                return options
+            }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
+        },
+        getKeypair: function(index) {
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         }
     }
 }
