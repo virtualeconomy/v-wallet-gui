@@ -1,6 +1,10 @@
 <template>
   <div class="login-forms">
     <form class="text-left">
+      <div class="msg-amount"
+           v-show="getAddressAmount > 1">
+        <p>You have ever created {{ getAddressAmount }} wallets via the same seed phrase, and we will restore all the {{ getAddressAmount }} wallets for you.</p>
+      </div>
       <div>
         <label>Your avatar</label>
         <div class="avatar-group">
@@ -110,7 +114,19 @@ export default {
             password: '',
             password2: '',
             validator: validator,
-            registering: false
+            registering: false,
+            addressNumber: {
+                first: 1,
+                second: 2,
+                third: 3,
+                fourth: 4,
+                fifth: 5,
+                sixth: 6,
+                seventh: 7,
+                eighth: 8,
+                ninth: 9,
+                tenth: 10
+            }
         }
     },
 
@@ -256,6 +272,17 @@ export default {
         isPassMatchErrors() {
             let errors = this.validator.getErrors('passmatch')
             return errors && errors.length > 0
+        },
+        getAddressAmount() {
+            let wordList = this.seedPhrase.split(' ')
+            if (wordList.length === 16) {
+                const lastWord = wordList[wordList.length - 1]
+                if (this.addressNumber[lastWord]) {
+                    wordList = wordList.splice(0, wordList.length - 1)
+                    return this.addressNumber[lastWord]
+                }
+            }
+            return 1
         }
     },
 
@@ -305,5 +332,11 @@ export default {
 }
 .input-height {
     height: 54px;
+}
+.msg-amount {
+    margin-top: 4px;
+    font-size: 16px;
+    color: #9091A3;
+    letter-spacing: 0;
 }
 </style>

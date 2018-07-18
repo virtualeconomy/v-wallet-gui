@@ -49,10 +49,6 @@
               Sorry, the seed is not valid.
             </small>
           </div>
-          <div class="msg-amount"
-               v-show="addressAmount > 1">
-            <p>You have ever created {{ addressAmount }} wallets via the same seed phrase, and we will restore all the {{ addressAmount }} wallets for you.</p>
-          </div>
           <b-button
             v-if="seedBtnUp"
             class="btn-continue dropdown"
@@ -90,7 +86,6 @@
 </template>
 
 <script>
-import seedDic from '@/libs/seedDictionary.js'
 import UpdateAccount from '@/components/restore/UpdateAccount'
 
 export default {
@@ -103,45 +98,16 @@ export default {
             isSeedNoErr: void 0,
             showSeedErr: false,
             seedBtnUp: true,
-            seedPhrase: '',
-            addressNumber: {
-                first: 1,
-                second: 2,
-                third: 3,
-                fourth: 4,
-                fifth: 5,
-                sixth: 6,
-                seventh: 7,
-                eighth: 8,
-                ninth: 9,
-                tenth: 10
-            },
-            addressAmount: 1
+            seedPhrase: ''
         }
     },
     methods: {
 
         checkSeed() {
-            const isOk = this.isValidSeed(this.seedInput.trim())
-            this.showSeedErr = !isOk
-            this.isSeedNoErr = isOk
-            this.seedBtnUp = !isOk
-            if (isOk) {
-                this.seedPhrase = this.seedInput.trim()
-            }
-        },
-
-        isValidSeed(seedPhrase) {
-            let wordList = seedPhrase.split(' ')
-            if (wordList.length === 16) {
-                const lastWord = wordList[wordList.length - 1]
-                if (this.addressNumber[lastWord]) {
-                    wordList = wordList.splice(0, wordList.length - 1)
-                    this.addressAmount = this.addressNumber[lastWord]
-                }
-            }
-            const libSet = new Set(seedDic)
-            return wordList.every(i => libSet.has(i))
+            this.showSeedErr = false
+            this.isSeedNoErr = true
+            this.seedBtnUp = false
+            this.seedPhrase = this.seedInput.trim()
         },
 
         preventDefault(event) {
@@ -261,11 +227,5 @@ export default {
 .form-control:disabled, .non-square{
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
-}
-.msg-amount {
-    margin-top: 4px;
-    font-size: 16px;
-    color: #9091A3;
-    letter-spacing: 0;
 }
 </style>
