@@ -70,7 +70,8 @@
     </b-popover>
     <Lease show="false"
            :balances="balance"
-           :cold-addresses="coldAddresses"></Lease>
+           :cold-addresses="coldAddresses"
+           :addresses="addresses"></Lease>
   </div>
 </template>
 
@@ -83,9 +84,9 @@ export default {
         Lease
     },
     props: {
-        address: {
-            type: String,
-            default: '',
+        addresses: {
+            type: Object,
+            default: function() {},
             require: true
         },
         coldAddresses: {

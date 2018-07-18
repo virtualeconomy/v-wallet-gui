@@ -24,7 +24,8 @@
     </div>
     <Send show="false"
           :balances="balances"
-          :cold-addresses="coldAddresses"></Send>
+          :cold-addresses="coldAddresses"
+          :addresses="addresses"></Send>
     <Receive show="false"
              :address="address"></Receive>
   </div>
@@ -50,6 +51,11 @@ export default {
             default: ''
         },
         coldAddresses: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        addresses: {
             type: Object,
             default: function() {},
             require: true

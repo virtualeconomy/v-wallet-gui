@@ -18,7 +18,9 @@
             <img
               src="../assets/imgs/icons/wallet/ic_assets_line.svg"><b class="title-assets">Assets</b>
           </div>
-          <Asset v-if="address"
+          <Asset v-if="addresses"
+                 v-for="(index, address) in addresses"
+                 :key="address"
                  :address="address"
                  :balance="balance[address]"
                  :selected="address === selectedAddress"
@@ -71,7 +73,8 @@
                   <trans-pane :balance="balance[selectedAddress]"
                               :address="selectedAddress"
                               :balances="balance"
-                              :cold-addresses="coldAddresses"></trans-pane>
+                              :cold-addresses="coldAddresses"
+                              :addresses="addresses"></trans-pane>
                 </div>
                 <div class="f-records">
                   <Records :address="selectedAddress"></Records>
@@ -90,8 +93,8 @@
                   </div>
                 </template>
                 <div class="lease-pane">
-                  <LeasePane :address="selectedAddress"
-                             :cold-addresses="coldAddresses"
+                  <LeasePane :cold-addresses="coldAddresses"
+                             :addresses="addresses"
                              :balance="balance"
                              :available="available"
                              :leased-in="leasedIn"
@@ -102,8 +105,7 @@
                 <div class="f-records">
                   <LeaseRecords :address="selectedAddress"
                                 :wallet-type="walletType"
-                                :cold-public-key="coldPubKey"
-                                :key-pair="keyPair"></LeaseRecords>
+                                :cold-public-key="coldPubKey"></LeaseRecords>
                 </div>
               </b-tab>
             </b-tabs>
@@ -133,6 +135,7 @@ export default {
             balance: {},
             selectedAddress: '',
             sessionClearTimeout: void 0,
+            addresses: {},
             coldAddresses: {},
             walletType: '',
             transActive: 'trans',
@@ -150,8 +153,14 @@ export default {
             this.getBalance(this.address)
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
-            if (this.userInfo && this.userInfo.coldAddresses) {
-                this.coldAddresses = JSON.parse(this.userInfo.coldAddresses)
+            if (this.userInfo) {
+                if (this.userInfo.coldAddresses) {
+                    this.coldAddresses = JSON.parse(this.userInfo.coldAddresses)
+                }
+            }
+            this.getAddresses()
+            for (const addr in this.addresses) {
+                this.getBalance(addr)
             }
             for (const addr in this.coldAddresses) {
                 this.getBalance(addr)
@@ -185,6 +194,11 @@ export default {
                 return this.userInfo.username
             }
         },
+        walletAmount() {
+            if (this.userInfo) {
+                return this.userInfo.walletAmount
+            }
+        },
         avtHash() {
             if (this.userInfo) {
                 return this.userInfo.avtHash
@@ -199,12 +213,6 @@ export default {
         coldPubKey() {
             if (this.walletType === 'coldWallet') {
                 return this.coldAddresses[this.selectedAddress]
-            }
-        },
-        keyPair() {
-            var seedPhrase = this.getSeedPhrase()
-            if (seedPhrase) {
-                return seedLib.fromExistingPhrase(seedPhrase).keyPair
             }
         }
     },
@@ -280,6 +288,17 @@ export default {
         deleteCold(addr) {
             Vue.delete(this.coldAddresses, addr)
             this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
+        },
+        getAddresses() {
+            var addresses = []
+            var seedPhrase = this.getSeedPhrase()
+            if (seedPhrase) {
+                for (var index = 1; index <= this.walletAmount; index++) {
+                    var seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index)
+                    Vue.set(this.addresses, seed.address, index)
+                }
+            }
+            return addresses
         }
     },
 
