@@ -91,7 +91,12 @@
                 </template>
                 <div class="lease-pane">
                   <LeasePane :address="selectedAddress"
-                             :cold-addresses="coldAddresses">
+                             :cold-addresses="coldAddresses"
+                             :balance="balance"
+                             :available="available"
+                             :leased-in="leasedIn"
+                             :leased-out="leasedOut"
+                             :total="total">
                   </LeasePane>
                 </div>
                 <div class="f-records">
@@ -130,7 +135,11 @@ export default {
             sessionClearTimeout: void 0,
             coldAddresses: {},
             walletType: '',
-            transActive: 'trans'
+            transActive: 'trans',
+            available: 0,
+            leasedIn: 0,
+            leasedOut: 0,
+            total: 0
         }
     },
 
@@ -225,11 +234,14 @@ export default {
             clearTimeout(this.sessionClearTimeout)
             this.setSessionClearTimeout()
         },
-
         getBalance: function(address) {
-            const url = TESTNET_NODE + '/addresses/balance/' + address
+            const url = TESTNET_NODE + '/addresses/balance/details/' + address
             this.$http.get(url).then(response => {
-                Vue.set(this.balance, address, response.body['balance'] / VEE_PRECISION)
+                Vue.set(this.balance, address, response.body['available'] / VEE_PRECISION)
+                this.total = response.body.regular / VEE_PRECISION
+                this.available = response.body.available / VEE_PRECISION
+                this.leasedOut = (response.body.regular - response.body.available) / VEE_PRECISION
+                this.leasedIn = (response.body.effective - response.body.available) / VEE_PRECISION
             }, response => {
                 Vue.set(this.balance, address, 0)
             })

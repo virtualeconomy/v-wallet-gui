@@ -35,11 +35,18 @@
                width="60px"
                height="60px">
         </div>
-        <div :class="txIcon === 'sent' ? 'sent-amount' : 'received-amount'">{{ txIcon === 'sent' ? '-' : '+' }}{{ txAmount }} vee</div>
+        <div :class="txIcon + '-amount'"
+             v-if="txIcon !== 'cancelleasing'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ txAmount }} vee</div>
       </div>
-      <div class="tx-address">
-        <label>{{ txIcon === 'sent' ? 'To' : 'From' }}</label>
+      <div class="tx-address"
+           v-if="txIcon !== 'cancelleasing'">
+        <label>{{ (txIcon === 'received' || txIcon === 'leasedin') ? 'From' : 'To' }}</label>
         <span>{{ txAddress }}</span>
+      </div>
+      <div class="tx-id"
+           v-if="txIcon === 'cancelleasing'">
+        <label>TX</label>
+        <span>{{ modalId }}</span>
       </div>
       <div class="tx-block">
         <label>Timestamp</label>
@@ -47,9 +54,10 @@
       </div>
       <div class="tx-fee">
         <label>Fee</label>
-        <span>{{ txFee }}</span>
+        <span>{{ txFee }} vee</span>
       </div>
-      <div class="tx-attachment">
+      <div class="tx-attachment"
+           v-if="txIcon === 'sent' || txIcon === 'received'">
         <label>Attachment</label>
         <span>{{ txAttachment }}</span>
       </div>
@@ -134,6 +142,24 @@ export default {
             letter-spacing: 0;
         }
     }
+    .tx-id {
+        text-align: left;
+        border-bottom: 1px solid #E8E9ED;
+        height: 48px;
+        padding-top: 15px;
+        span {
+            float:right;
+            font-size: 15px;
+            color: #4F515E;
+            letter-spacing: 0;
+            text-align: right;
+        }
+        label {
+            font-size: 15px;
+            color: #9091A3;
+            letter-spacing: 0;
+        }
+    }
     .tx-block {
         text-align: left;
         border-bottom: 1px solid #E8E9ED;
@@ -197,6 +223,18 @@ export default {
     .received-amount {
         font-size: 28px;
         color: #23A28C;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedin-amount {
+        font-size: 28px;
+        color: #86BEF7;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedout-amount {
+        font-size: 28px;
+        color: #73CC5A;
         letter-spacing: 0;
         text-align: center;
     }

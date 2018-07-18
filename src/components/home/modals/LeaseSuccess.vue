@@ -6,16 +6,48 @@
       <p class="p-info">You have leased {{ amount }} VEE</p>
     </div>
     <b-button variant="warning"
-              class="btn-detail">View Details</b-button>
+              class="btn-detail"
+              @click="showDetails">View Details</b-button>
+    <TxInfoModal :modal-id="txId"
+                 :tx-icon="'leasedout'"
+                 :tx-address="address"
+                 :tx-time="111"
+                 :tx-fee="fee"
+                 :tx-amount="amount"
+                 :trans-type="'lease'"></TxInfoModal>
   </div>
 </template>
 <script>
+import TxInfoModal from '../elements/TxInfoModal'
+import { TX_FEE } from '../../../constants'
 export default {
     name: 'LeaseSuccess',
+    components: { TxInfoModal },
+    data: function() {
+        return {
+            fee: TX_FEE
+        }
+    },
     props: {
         amount: {
             type: Number,
-            default: 0
+            default: 0,
+            require: true
+        },
+        address: {
+            type: String,
+            default: '',
+            require: true
+        },
+        txId: {
+            type: String,
+            default: '',
+            require: true
+        }
+    },
+    methods: {
+        showDetails() {
+            this.$emit('show-details')
         }
     }
 }

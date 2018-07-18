@@ -6,7 +6,8 @@
       <p class="p-info">You have canceled a leasing transaction</p>
     </div>
     <b-button variant="warning"
-              class="btn-detail">View Details</b-button>
+              class="btn-detail"
+              @click="showDetails">View Details</b-button>
   </div>
 </template>
 
@@ -14,7 +15,12 @@
 import TxInfoModal from '../elements/TxInfoModal'
 export default {
     name: 'CancelSuccess',
-    components: { TxInfoModal }
+    components: { TxInfoModal },
+    methods: {
+        showDetails() {
+            this.$emit('show-details')
+        }
+    }
 }
 </script>
 

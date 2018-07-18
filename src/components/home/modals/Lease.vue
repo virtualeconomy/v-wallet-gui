@@ -1,129 +1,140 @@
 <template>
-  <b-modal id="leaseModal"
-           ref="leaseModal"
-           centered
-           hide-header
-           hide-footer
-           @hide="resetPage">
-    <button
-      class="close btn-close"
-      @click="closeModal">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
-    </button>
-    <b-tabs>
-      <b-tab title="Hot Wallet"
-             active>
-        <LeaseInput :balances="balances"
-                    @get-data="getData"
-                    v-if="pageId===1"
-                    :address="address"
-                    :wallet-type="'hot'"></LeaseInput>
-        <b-container v-else-if="pageId===2">
-          <Confirm :tx-type="'lease'"
-                   :amount="Number(amount)"
-                   :address="address"
-                   :recipient="recipient"
-                   :fee="fee"></Confirm>
-          <p v-show="sendError"
-             class="text-danger">
-            <small>Sorry, transaction send failed!</small>
-          </p>
-          <b-row>
-            <b-col class="col-lef">
-              <b-button
-                class="btn-back"
-                block
-                variant="light"
-                size="lg"
-                @click="prevPage">Back
-              </b-button>
-            </b-col>
-            <b-col class="col-rit">
-              <b-button
-                block
-                class="btn-confirm"
-                variant="warning"
-                size="lg"
-                @click="sendData('hotWallet')">Confirm
-              </b-button>
-            </b-col>
-          </b-row>
-        </b-container>
-        <LeaseSuccess v-else-if="pageId===3"
-                      :amount="amount"></LeaseSuccess>
-      </b-tab>
-      <b-tab title="Cold Wallet">
-        <LeaseInput :balances="balances"
-                    @get-cold-data="getColdData"
-                    v-if="coldPageId===1"
-                    :wallet-type="'cold'"
-                    :cold-addresses="coldAddresses"></LeaseInput>
-        <b-container v-else-if="coldPageId===2">
-          <Confirm :tx-type="'lease'"
-                   :amount="Number(coldAmount)"
-                   :address="coldAddress"
-                   :recipient="coldRecipient"
-                   :fee="fee"></Confirm>
-          <b-row>
-            <b-col class="col-lef">
-              <b-button
-                class="btn-back"
-                block
-                variant="light"
-                size="lg"
-                @click="prevColdPage">Back
-              </b-button>
-            </b-col>
-            <b-col class="col-rit">
-              <b-button
-                block
-                class="btn-confirm"
-                variant="warning"
-                size="lg"
-                @click=nextColdPage>Confirm
-              </b-button>
-            </b-col>
-          </b-row>
-        </b-container>
-        <ColdSignature :data-object="dataObject"
-                       v-if="coldPageId===3"
-                       @get-signature="getSignature"></ColdSignature>
-        <b-container v-else-if="coldPageId===4">
-          <Confirm :tx-type="'lease'"
-                   :amount="Number(coldAmount)"
-                   :address="coldAddress"
-                   :recipient="coldRecipient"
-                   :fee="fee"></Confirm>
-          <p v-show="sendError"
-             class="text-danger">
-            <small>Sorry, transaction send failed!</small>
-          </p>
-          <b-row>
-            <b-col class="col-lef">
-              <b-button
-                class="btn-back"
-                block
-                variant="light"
-                size="lg"
-                @click="prevColdPage">Back
-              </b-button>
-            </b-col>
-            <b-col class="col-rit">
-              <b-button
-                block
-                class="btn-confirm"
-                variant="warning"
-                size="lg"
-                @click="sendData('coldWallet')">Confirm
-              </b-button>
-            </b-col>
-          </b-row>
-        </b-container>
-        <LeaseSuccess v-else-if="coldPageId===5"
-                      :amount="coldAmount"></LeaseSuccess>
-      </b-tab>
-    </b-tabs>
-  </b-modal>
+  <div>
+    <b-modal id="leaseModal"
+             ref="leaseModal"
+             centered
+             hide-header
+             hide-footer
+             @hide="resetPage">
+      <button
+        class="close btn-close"
+        @click="closeModal">
+        <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      </button>
+      <b-tabs>
+        <b-tab title="Hot Wallet"
+               active>
+          <LeaseInput :balances="balances"
+                      @get-data="getData"
+                      v-if="pageId===1"
+                      :address="address"
+                      :wallet-type="'hot'"></LeaseInput>
+          <b-container v-else-if="pageId===2">
+            <Confirm :tx-type="'lease'"
+                     :amount="Number(amount)"
+                     :address="address"
+                     :recipient="recipient"
+                     :fee="fee"></Confirm>
+            <p v-show="sendError"
+               class="text-danger">
+              <small>Sorry, transaction send failed!</small>
+            </p>
+            <b-row>
+              <b-col class="col-lef">
+                <b-button
+                  class="btn-back"
+                  block
+                  variant="light"
+                  size="lg"
+                  @click="prevPage">Back
+                </b-button>
+              </b-col>
+              <b-col class="col-rit">
+                <b-button
+                  block
+                  class="btn-confirm"
+                  variant="warning"
+                  size="lg"
+                  @click="sendData('hotWallet')">Confirm
+                </b-button>
+              </b-col>
+            </b-row>
+          </b-container>
+          <LeaseSuccess v-else-if="pageId===3"
+                        :amount="Number(amount)"
+                        :address="recipient"
+                        @show-details="showDetails"></LeaseSuccess>
+        </b-tab>
+        <b-tab title="Cold Wallet">
+          <LeaseInput :balances="balances"
+                      @get-cold-data="getColdData"
+                      v-if="coldPageId===1"
+                      :wallet-type="'cold'"
+                      :cold-addresses="coldAddresses"></LeaseInput>
+          <b-container v-else-if="coldPageId===2">
+            <Confirm :tx-type="'lease'"
+                     :amount="Number(coldAmount)"
+                     :address="coldAddress"
+                     :recipient="coldRecipient"
+                     :fee="fee"></Confirm>
+            <b-row>
+              <b-col class="col-lef">
+                <b-button
+                  class="btn-back"
+                  block
+                  variant="light"
+                  size="lg"
+                  @click="prevColdPage">Back
+                </b-button>
+              </b-col>
+              <b-col class="col-rit">
+                <b-button
+                  block
+                  class="btn-confirm"
+                  variant="warning"
+                  size="lg"
+                  @click=nextColdPage>Confirm
+                </b-button>
+              </b-col>
+            </b-row>
+          </b-container>
+          <ColdSignature :data-object="dataObject"
+                         v-if="coldPageId===3"
+                         @get-signature="getSignature"></ColdSignature>
+          <b-container v-else-if="coldPageId===4">
+            <Confirm :tx-type="'lease'"
+                     :amount="Number(coldAmount)"
+                     :address="coldAddress"
+                     :recipient="coldRecipient"
+                     :fee="fee"></Confirm>
+            <p v-show="sendError"
+               class="text-danger">
+              <small>Sorry, transaction send failed!</small>
+            </p>
+            <b-row>
+              <b-col class="col-lef">
+                <b-button
+                  class="btn-back"
+                  block
+                  variant="light"
+                  size="lg"
+                  @click="prevColdPage">Back
+                </b-button>
+              </b-col>
+              <b-col class="col-rit">
+                <b-button
+                  block
+                  class="btn-confirm"
+                  variant="warning"
+                  size="lg"
+                  @click="sendData('coldWallet')">Confirm
+                </b-button>
+              </b-col>
+            </b-row>
+          </b-container>
+          <LeaseSuccess v-else-if="coldPageId===5"
+                        :amount="coldAmount"></LeaseSuccess>
+        </b-tab>
+      </b-tabs>
+    </b-modal>
+    <TxInfoModal :modal-id="txId"
+                 :tx-icon="'leasedout'"
+                 :tx-address="txAddress"
+                 :tx-time="txTimestamp"
+                 :tx-fee="fee"
+                 :tx-amount="txAmount"
+                 :trans-type="'lease'"></TxInfoModal>
+  </div>
 </template>
 
 <script>
@@ -135,9 +146,10 @@ import { TX_FEE, VEE_PRECISION, LEASE_TX, TESTNET_NODE } from '@/constants'
 import transaction from '@/utils/transaction'
 import seedLib from '@/libs/seed'
 import LeaseSuccess from './LeaseSuccess'
+import TxInfoModal from '../elements/TxInfoModal'
 export default {
     name: 'Lease',
-    components: { LeaseSuccess, Confirm, LeaseInput, ColdSignature },
+    components: { LeaseSuccess, Confirm, LeaseInput, ColdSignature, TxInfoModal },
     data: function() {
         return {
             amount: 0,
@@ -150,7 +162,11 @@ export default {
             sendError: false,
             coldSignature: '',
             coldTimestamp: 0,
-            coldAddress: ''
+            coldAddress: '',
+            txId: '',
+            txAddress: '',
+            txTimestamp: 0,
+            txAmount: 0
         }
     },
     props: {
@@ -190,7 +206,7 @@ export default {
                 transactionType: LEASE_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 amount: this.coldAmount * VEE_PRECISION,
-                fee: this.coldFee * VEE_PRECISION,
+                fee: this.fee * VEE_PRECISION,
                 recipient: this.coldRecipient
             }
         }
@@ -250,6 +266,10 @@ export default {
             }
             const url = TESTNET_NODE + '/leasing/broadcast/lease'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
+                this.txId = response.body.id
+                this.txAddress = response.body.recipient
+                this.txTimestamp = response.body.timestamp
+                this.txAmount = response.body.amount / VEE_PRECISION
                 this.pageId++
             }, response => {
                 this.sendError = true
@@ -259,6 +279,9 @@ export default {
             this.coldSignature = signature
             this.coldTimestamp = timestamp
             this.coldPageId++
+        },
+        showDetails() {
+            this.$root.$emit('bv::show::modal', 'txInfoModal_lease' + this.txId)
         }
     }
 }
