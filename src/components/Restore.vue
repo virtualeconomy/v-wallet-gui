@@ -25,7 +25,7 @@
             class="seed-des"
             v-show="!isSeedNoErr">
             <small class="text-muted">
-              Wallet seed is the 15 words which you are keeping as backup,
+              Wallet seed is the words which you are keeping as backup,
               the words should be seperated by single space
             </small>
           </p>
@@ -36,7 +36,7 @@
             @keydown.native.enter='preventDefault($event)'
             :state="isSeedNoErr"
             :disabled="isSeedNoErr"
-            placeholder="Enter 15 words here"
+            placeholder="Enter seed phrase here"
             :no-resize="true"
             :rows="4"
             :max-rows="6"
@@ -48,6 +48,10 @@
             <small>
               Sorry, the seed is not valid.
             </small>
+          </div>
+          <div class="msg-amount"
+               v-show="addressAmount > 1">
+            <p>You have ever created {{ addressAmount }} wallets via the same seed phrase, and we will restore all the {{ addressAmount }} wallets for you.</p>
           </div>
           <b-button
             v-if="seedBtnUp"
@@ -99,10 +103,22 @@ export default {
             isSeedNoErr: void 0,
             showSeedErr: false,
             seedBtnUp: true,
-            seedPhrase: ''
+            seedPhrase: '',
+            addressNumber: {
+                first: 1,
+                second: 2,
+                third: 3,
+                fourth: 4,
+                fifth: 5,
+                sixth: 6,
+                seventh: 7,
+                eighth: 8,
+                ninth: 9,
+                tenth: 10
+            },
+            addressAmount: 1
         }
     },
-
     methods: {
 
         checkSeed() {
@@ -116,11 +132,12 @@ export default {
         },
 
         isValidSeed(seedPhrase) {
-            const wordList = seedPhrase.split(' ')
-            // if (wordList.length !== 15) {
-            //     return false
-            // }
-
+            let wordList = seedPhrase.split(' ')
+            const lastWord = wordList[wordList.length - 1]
+            if (this.addressNumber[lastWord]) {
+                wordList = wordList.splice(0, wordList.length - 1)
+                this.addressAmount = this.addressNumber[lastWord]
+            }
             const libSet = new Set(seedDic)
             return wordList.every(i => libSet.has(i))
         },
@@ -242,5 +259,11 @@ export default {
 .form-control:disabled, .non-square{
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
+}
+.msg-amount {
+    margin-top: 4px;
+    font-size: 16px;
+    color: #9091A3;
+    letter-spacing: 0;
 }
 </style>

@@ -49,7 +49,7 @@
             @input="checkUsername(username)">
         </div>
         <div class="form-group amount-form">
-          <label>Amount of address</label>
+          <label>Number of addresses</label>
           <p class="amount-tip">You can create 1-10 addresses at a time</p>
           <div>
             <b-btn variant="warning"
