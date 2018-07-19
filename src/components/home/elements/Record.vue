@@ -110,7 +110,8 @@
                  :tx-fee="txFee"
                  :tx-time="cancelTime"
                  :tx-icon="'cancelleasing'"
-                 :trans-type="'cancelLease'"></TxInfoModal>
+                 :trans-type="'cancelLease'"
+                 v-if="transType==='lease'"></TxInfoModal>
     <CancelLease :modal-id="txRecord.id"
                  :wallet-type="walletType"
                  :address="address"
@@ -119,7 +120,8 @@
                  :cold-pub-key="coldPubKey"
                  :tx-timestamp="txRecord.timestamp"
                  :address-index="addressIndex"
-                 @show-details="showDetails">
+                 @show-details="showDetails"
+                 v-if="transType==='lease'">
     </CancelLease>
   </b-container>
 </template>
@@ -137,7 +139,8 @@ export default {
     data: function() {
         return {
             hovered: false,
-            cancelTime: 0
+            cancelTime: 0,
+            showCancelDetails: false
         }
     },
     props: {
@@ -300,6 +303,7 @@ export default {
         },
         showDetails(cancelTime) {
             this.cancelTime = cancelTime
+            this.showCancelDetails = true
             this.$root.$emit('bv::show::modal', 'txInfoModal_cancelLease' + this.txId)
         }
     }

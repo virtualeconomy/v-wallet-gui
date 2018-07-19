@@ -138,7 +138,8 @@ export default {
     },
     computed: {
         isSubmitDisabled() {
-            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid('hot'))
+            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid('hot') &&
+              (this.address !== '' || this.coldAddress !== ''))
         }
     },
     methods: {
