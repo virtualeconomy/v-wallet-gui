@@ -1,9 +1,22 @@
 <template>
   <div class="login-forms">
     <form class="text-left">
-      <div class="msg-amount"
-           v-show="getAddressAmount > 1">
-        <p>You have ever created {{ getAddressAmount }} wallets via the same seed phrase, and we will restore all the {{ getAddressAmount }} wallets for you.</p>
+      <div class="form-group amount-form">
+        <label>Number of addresses</label>
+        <p class="amount-tip">You can create 1-10 addresses at a time</p>
+        <div>
+          <b-btn variant="warning"
+                 class="bar-minus"
+                 @click="minus">-</b-btn>
+          <b-progress :value="addressAmount"
+                      :max="max"
+                      variant="warning"
+                      class="pg-bar"
+                      show-value></b-progress>
+          <b-btn variant="warning"
+                 class="bar-plus"
+                 @click="plus">+</b-btn>
+        </div>
       </div>
       <div>
         <label>Your avatar</label>
@@ -115,18 +128,8 @@ export default {
             password2: '',
             validator: validator,
             registering: false,
-            addressNumber: {
-                first: 1,
-                second: 2,
-                third: 3,
-                fourth: 4,
-                fifth: 5,
-                sixth: 6,
-                seventh: 7,
-                eighth: 8,
-                ninth: 9,
-                tenth: 10
-            }
+            addressAmount: 1,
+            max: 10
         }
     },
 
@@ -233,11 +236,11 @@ export default {
             Vue.ls.set('pwd', this.password)
             Vue.ls.set('address', this.seed.address)
             const userInfo = {
-                pubKey: this.seed.keyPair.publicKey,
                 encrSeed: seedLib.encryptSeedPhrase(this.seed.phrase, this.password)
             }
             const savedInfo = {
                 lastLogin: new Date().getTime(),
+                walletAmount: this.addressAmount,
                 username: this.username,
                 avtHash: this.avatarDataHex,
                 sessionTimeout: INITIAL_SESSION_TIMEOUT,
@@ -248,6 +251,16 @@ export default {
         },
         registerEnter() {
             this.register()
+        },
+        minus() {
+            if (this.addressAmount > 1) {
+                this.addressAmount--
+            }
+        },
+        plus() {
+            if (this.addressAmount < 10) {
+                this.addressAmount++
+            }
         }
     },
 
@@ -272,16 +285,6 @@ export default {
         isPassMatchErrors() {
             let errors = this.validator.getErrors('passmatch')
             return errors && errors.length > 0
-        },
-        getAddressAmount() {
-            let wordList = this.seedPhrase.split(' ')
-            if (wordList.length === 16) {
-                const lastWord = wordList[wordList.length - 1]
-                if (this.addressNumber[lastWord]) {
-                    return this.addressNumber[lastWord]
-                }
-            }
-            return 1
         }
     },
 
@@ -332,10 +335,26 @@ export default {
 .input-height {
     height: 54px;
 }
-.msg-amount {
-    margin-top: 4px;
-    font-size: 16px;
-    color: #9091A3;
-    letter-spacing: 0;
+.btn {
+    padding: 0 !important;
+}
+.pg-bar {
+    width: 360px;
+    margin-left: 40px;
+}
+.bar-minus {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    border-radius: 50%;
+    margin-top: -4px;
+}
+.bar-plus {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    margin-left: 420px;
+    margin-top: -20px;
+    border-radius: 50%;
 }
 </style>
