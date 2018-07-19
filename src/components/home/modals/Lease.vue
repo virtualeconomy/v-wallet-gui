@@ -199,9 +199,6 @@ export default {
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
-        wordList() {
-            return this.seedPhrase.split(' ')
-        },
         dataObject() {
             return {
                 transactionType: LEASE_TX,

@@ -73,6 +73,8 @@ import transaction from '@/utils/transaction'
 import ColdSignature from './ColdSignature'
 import CancelSuccess from './CancelSuccess'
 import TxInfoModal from '../elements/TxInfoModal'
+import seedLib from '@/libs/seed'
+import Vue from 'vue'
 export default {
     name: 'CancelLease',
     components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm },
@@ -125,11 +127,12 @@ export default {
             type: String,
             default: ''
         },
-        keyPair: {
-            type: Object,
-            default: function() {}
-        },
         txTimestamp: {
+            type: Number,
+            default: 0,
+            require: true
+        },
+        addressIndex: {
             type: Number,
             default: 0,
             require: true
@@ -143,6 +146,16 @@ export default {
                 fee: this.fee * VEE_PRECISION,
                 txId: this.modalId
             }
+        },
+        userInfo() {
+            return JSON.parse(window.localStorage.getItem(this.address))
+        },
+        secretInfo() {
+            return JSON.parse(
+                seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
+        },
+        seedPhrase() {
+            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         }
     },
     methods: {
@@ -172,7 +185,7 @@ export default {
                     timestamp: Date.now() * 1e6
                 }
                 this.timestamp = dataInfo.timestamp
-                apiSchema = transaction.prepareForAPI(dataInfo, this.keyPair, CANCEL_LEASE_TX)
+                apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(), CANCEL_LEASE_TX)
             }
             const url = TESTNET_NODE + '/leasing/broadcast/cancel'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
@@ -192,6 +205,9 @@ export default {
         },
         showDetails() {
             this.$emit('show-details', this.timestamp)
+        },
+        getKeypair() {
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addressIndex).keyPair
         }
     }
 }

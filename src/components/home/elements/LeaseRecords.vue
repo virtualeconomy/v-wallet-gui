@@ -44,10 +44,10 @@
         <div v-for="record in leaseRecords"
              :key="record.id">
           <Record :tx-record="record"
-                  :address="address"
                   :cold-pub-key="coldPubKey"
-                  :key-pair="keyPair"
-                  :trans-type="transType"></Record>
+                  :trans-type="transType"
+                  :address-index="addressIndex"
+                  :address="address"></Record>
         </div>
       </div>
     </div>
@@ -114,9 +114,9 @@ export default {
             type: String,
             default: ''
         },
-        keyPair: {
-            type: Object,
-            default: function() {}
+        addressIndex: {
+            type: Number,
+            default: 0
         }
     },
     watch: {
