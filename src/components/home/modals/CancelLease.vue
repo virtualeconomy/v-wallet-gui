@@ -132,9 +132,9 @@ export default {
             default: 0,
             require: true
         },
-        addresses: {
-            type: String,
-            default: '',
+        addressIndex: {
+            type: Number,
+            default: 0,
             require: true
         }
     },
@@ -185,8 +185,7 @@ export default {
                     timestamp: Date.now() * 1e6
                 }
                 this.timestamp = dataInfo.timestamp
-                console.log(dataInfo, this.getKeypair)
-                apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair, CANCEL_LEASE_TX)
+                apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(), CANCEL_LEASE_TX)
             }
             const url = TESTNET_NODE + '/leasing/broadcast/cancel'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
@@ -208,7 +207,7 @@ export default {
             this.$emit('show-details', this.timestamp)
         },
         getKeypair() {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addressIndex).keyPair
         }
     }
 }

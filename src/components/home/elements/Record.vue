@@ -113,7 +113,7 @@
                  :trans-type="'cancelLease'"></TxInfoModal>
     <CancelLease :modal-id="txRecord.id"
                  :wallet-type="walletType"
-                 :address="txAddress"
+                 :address="address"
                  :amount="txAmount"
                  :fee="txFee"
                  :cold-pub-key="coldPubKey"

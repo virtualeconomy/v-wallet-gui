@@ -46,7 +46,8 @@
           <Record :tx-record="record"
                   :cold-pub-key="coldPubKey"
                   :trans-type="transType"
-                  :address-index="addressIndex"></Record>
+                  :address-index="addressIndex"
+                  :address="address"></Record>
         </div>
       </div>
     </div>
