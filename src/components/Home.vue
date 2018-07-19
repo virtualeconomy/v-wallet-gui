@@ -194,8 +194,10 @@ export default {
             }
         },
         walletAmount() {
-            if (this.userInfo) {
+            if (this.userInfo && this.userInfo.walletAmount) {
                 return this.userInfo.walletAmount
+            } else {
+                return 1
             }
         },
         avtHash() {
