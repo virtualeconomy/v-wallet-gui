@@ -34,8 +34,8 @@ function keccak(input) {
 function hashChain(input) {
     return keccak(blake2b(input));
 }
-function buildSeedHash(seedBytes) {
-    var nonce = new Uint8Array(converters_1.default.int32ToBytes(constants.INITIAL_NONCE, true));
+function buildSeedHash(seedBytes, nonce) {
+    var nonce = new Uint8Array(converters_1.default.int32ToBytes(nonce, true));
     var seedBytesWithNonce = concat_1.concatUint8Arrays(nonce, seedBytes);
     var seedHash = hashChain(seedBytesWithNonce);
     return sha256(seedHash);
@@ -85,12 +85,12 @@ exports.default = {
         var hash = blake2b(dataBytes);
         return base58_1.default.encode(hash);
     },
-    buildKeyPair: function (seed) {
+    buildKeyPair: function (seed, nonce) {
         if (!seed || typeof seed !== 'string') {
             throw new Error('Missing or invalid seed phrase');
         }
         var seedBytes = Uint8Array.from(converters_1.default.stringToByteArray(seed));
-        var seedHash = buildSeedHash(seedBytes);
+        var seedHash = buildSeedHash(seedBytes, nonce);
         var keys = axlsign_1.default.generateKeyPair(seedHash);
         return {
             privateKey: keys.private,

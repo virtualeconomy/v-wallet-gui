@@ -266,7 +266,6 @@ export default {
             Vue.ls.set('pwd', this.password)
             Vue.ls.set('address', this.seed.address)
             const userInfo = {
-                pubKey: this.seed.keyPair.publicKey,
                 encrSeed: seedLib.encryptSeedPhrase(this.seed.phrase, this.password)
             }
             const savedInfo = {

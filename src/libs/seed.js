@@ -6,7 +6,7 @@ var base58_1 = require("./base58");
 var crypto_1 = require("../utils/crypto");
 var logger_1 = require("../utils/logger");
 var seedDictionary_1 = require("./seedDictionary");
-var seedDictionary_2 = require("./seedAdditional")
+var constant = require('../constants');
 var DEFAULT_MIN_SEED_LENGTH = 25;
 function generateNewSeed(length) {
     var random = crypto_1.default.generateRandomUint32Array(length);
@@ -48,16 +48,13 @@ function decryptSeedPhrase(encryptedSeedPhrase, password, encryptionRounds) {
     return phrase;
 }
 var Seed = /** @class */ (function () {
-    function Seed(phrase) {
-        var keys = crypto_1.default.buildKeyPair(phrase);
+    function Seed(phrase, nonce) {
         this.phrase = phrase;
-        this.address = crypto_1.default.buildRawAddress(keys.publicKey);
-        this.keyPair = {
-            privateKey: base58_1.default.encode(keys.privateKey),
-            publicKey: base58_1.default.encode(keys.publicKey)
-        };
+        this.nonce = nonce || constant.INITIAL_NONCE;
+        var keys = crypto_1.default.buildKeyPair(phrase, this.nonce)
+        this.address = crypto_1.default.buildRawAddress(keys.publicKey)
+
         Object.freeze(this);
-        Object.freeze(this.keyPair);
     }
     Seed.prototype.encrypt = function (password, encryptionRounds) {
         return encryptSeedPhrase(this.phrase, password, encryptionRounds);
@@ -65,15 +62,15 @@ var Seed = /** @class */ (function () {
     return Seed;
 }());
 export default {
-    create: function (words) {
-        if (words === void 0) { words = 15; }
+    create: function (words, nonce) {
+        if (words === void 0 || typeof words === 'number') { words = 18; }
         var phrase = generateNewSeed(words);
         var minimumSeedLength = DEFAULT_MIN_SEED_LENGTH;
         if (phrase.length < minimumSeedLength) {
             // If you see that error you should increase the number of words in the generated seed
             throw new Error("The resulted seed length is less than the minimum length (" + minimumSeedLength + ")");
         }
-        return new Seed(phrase);
+        return new Seed(phrase, nonce);
     },
     fromExistingPhrase: function (phrase) {
         if (phrase.length < DEFAULT_MIN_SEED_LENGTH) {
@@ -81,8 +78,8 @@ export default {
         }
         return new Seed(phrase);
     },
-    fromExistingPhrasesWithIndex: function (phrase, index) {
-        return new Seed(phrase + seedDictionary_2.default[index])
+    fromExistingPhrasesWithIndex: function (phrase, nonce) {
+        return new Seed(phrase, nonce)
     },
     encryptSeedPhrase: encryptSeedPhrase,
     decryptSeedPhrase: decryptSeedPhrase
