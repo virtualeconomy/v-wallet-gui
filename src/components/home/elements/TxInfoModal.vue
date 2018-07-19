@@ -89,10 +89,6 @@ export default {
             type: Number,
             default: 0
         },
-        txBlock: {
-            type: Number,
-            default: 0
-        },
         txTime: {
             type: Number,
             default: 0
