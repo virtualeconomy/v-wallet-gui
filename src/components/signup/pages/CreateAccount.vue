@@ -49,7 +49,7 @@
             @input="checkUsername(username)">
         </div>
         <div class="form-group amount-form">
-          <label>Amount of address</label>
+          <label>Number of addresses</label>
           <p class="amount-tip">You can create 1-10 addresses at a time</p>
           <div>
             <b-btn variant="warning"
@@ -266,7 +266,6 @@ export default {
             Vue.ls.set('pwd', this.password)
             Vue.ls.set('address', this.seed.address)
             const userInfo = {
-                pubKey: this.seed.keyPair.publicKey,
                 encrSeed: seedLib.encryptSeedPhrase(this.seed.phrase, this.password)
             }
             const savedInfo = {

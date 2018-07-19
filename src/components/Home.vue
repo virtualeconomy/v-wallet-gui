@@ -294,7 +294,7 @@ export default {
             var addresses = []
             var seedPhrase = this.getSeedPhrase()
             if (seedPhrase) {
-                for (var index = 1; index <= this.walletAmount; index++) {
+                for (var index = 0; index < this.walletAmount; index++) {
                     var seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index)
                     Vue.set(this.addresses, seed.address, index)
                 }
