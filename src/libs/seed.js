@@ -53,8 +53,12 @@ var Seed = /** @class */ (function () {
         this.nonce = nonce || constant.INITIAL_NONCE;
         var keys = crypto_1.default.buildKeyPair(phrase, this.nonce)
         this.address = crypto_1.default.buildRawAddress(keys.publicKey)
-
+        this.keyPair = {
+            privateKey: base58_1.default.encode(keys.privateKey),
+            publicKey: base58_1.default.encode(keys.publicKey)
+        };
         Object.freeze(this);
+        Object.freeze(this.keyPair);
     }
     Seed.prototype.encrypt = function (password, encryptionRounds) {
         return encryptSeedPhrase(this.phrase, password, encryptionRounds);

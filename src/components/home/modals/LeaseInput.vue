@@ -20,8 +20,12 @@
         disabled
         class="balance-input"
         readonly>
-        <span class="balance-title">Balance</span>
-        <span class="balance">{{ balances[address] }}</span>
+        <span class="balance-title">
+          <img src="../../../assets/imgs/icons/wallet/Symbol_Gray.svg"
+               width="20"
+               height="20"> VEE
+        </span>
+        <span class="balance">{{ balances[address] }} VEE</span>
       </b-btn>
     </b-form-group>
     <b-form-group label="Recipient"
@@ -134,7 +138,8 @@ export default {
     },
     computed: {
         isSubmitDisabled() {
-            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid('hot'))
+            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid('hot') &&
+              (this.address !== '' || this.coldAddress !== ''))
         }
     },
     methods: {
