@@ -1,12 +1,13 @@
 <template>
   <div class="home"
        @mousemove=resetSessionClearTimeout>
-    <nav-bar :address="address"
+    <nav-bar :addresses="addresses"
+             :address="selectedAddress"
              class="navibar"
              :cold-addresses="coldAddresses"
-             :pub-key="pubKey"
              :username="username"
              :avt-hash="avtHash"
+             :get-pub-key="getPubKey"
              :get-pri-key="getPriKey"
              :get-seed-phrase="getSeedPhrase"
              :set-usr-local-storage="setUsrLocalStorage"
@@ -180,11 +181,6 @@ export default {
                 return Vue.ls.get('address')
             }
         },
-        pubKey() {
-            if (this.secretInfo) {
-                return this.secretInfo.pubKey
-            }
-        },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.address))
         },
@@ -265,9 +261,14 @@ export default {
                 return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
             }
         },
-        getPriKey() {
+        getPriKey(nonce) {
             if (this.secretInfo) {
-                return seedLib.fromExistingPhrase(this.getSeedPhrase()).keyPair.privateKey
+                return seedLib.fromExistingPhrasesWithIndex(this.getSeedPhrase(), nonce).keyPair.privateKey
+            }
+        },
+        getPubKey(nonce) {
+            if (this.secretInfo) {
+                return seedLib.fromExistingPhrasesWithIndex(this.getSeedPhrase(), nonce).keyPair.publicKey
             }
         },
         setUsrLocalStorage(feildname, value) {

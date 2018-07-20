@@ -41,9 +41,10 @@
         </b-navbar-nav>
       </b-collapse>
     </b-navbar>
-    <Account :address="address"
+    <Account :addresses="addresses"
+             :address="address"
              :cold-addresses="coldAddresses"
-             :pub-key="pubKey"
+             :get-pub-key="getPubKey"
              :get-pri-key="getPriKey"
              :get-seed-phrase="getSeedPhrase"
              @delete-cold="deleteCold"></Account>
@@ -72,6 +73,11 @@ export default {
             require: true,
             default: ''
         },
+        addresses: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
         address: {
             type: String,
             require: true,
@@ -87,10 +93,12 @@ export default {
             require: true,
             default: function() {}
         },
-        pubKey: {
-            type: String,
+        getPubKey: {
+            type: Function,
             require: true,
-            default: ''
+            default: function() {
+                return ''
+            }
         },
         getPriKey: {
             type: Function,

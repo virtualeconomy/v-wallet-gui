@@ -17,13 +17,11 @@
       <div class="label-title">Account</div>
       <b-form-group label="Wallet Address"
                     label-for="walletAddress">
-        <b-form-input id="walletAddress"
-                      readonly
-                      size="sm"
-                      v-model="address"
-                      class="input-t"
-                      ref="walletAddress">
-        </b-form-input>
+        <b-form-select id="walletAddress"
+                       class="input-t"
+                       v-model="currentAddress"
+                       @input="addressChange"
+                       :options="addressOptions"></b-form-select>
         <textarea
           id="addrToCopy"
           v-model="address"
@@ -105,11 +103,11 @@
                       readonly
                       size="sm"
                       class="input-t"
-                      v-model="pubKey">
+                      v-model="publicKey">
         </b-form-input>
         <textarea
           id="pubToCopy"
-          v-model="pubKey"
+          v-model="publicKey"
           ref="pubToCopy"
           class="hidden"
           readonly>
@@ -260,6 +258,11 @@ import Vue from 'vue'
 export default {
     name: 'Account',
     props: {
+        addresses: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
         address: {
             type: String,
             require: true,
@@ -270,10 +273,12 @@ export default {
             require: true,
             default: function() {}
         },
-        pubKey: {
-            type: String,
+        getPubKey: {
+            type: Function,
             require: true,
-            default: ''
+            default: function() {
+                return ''
+            }
         },
         getPriKey: {
             type: Function,
@@ -294,6 +299,7 @@ export default {
         return {
             seed: '',
             privateKey: '',
+            publicKey: '',
             seedHidden: true,
             privateKeyHidden: true,
             tagOfColdWallet: {},
@@ -302,7 +308,9 @@ export default {
             prvKeyPwdErr: false,
             seedPwd: '',
             seedPwdErr: false,
-            refForCold: {}
+            refForCold: {},
+            addressOptions: {},
+            currentAddress: 0
         }
     },
     created() {
@@ -312,6 +320,12 @@ export default {
             obj[coldAddressArray[key]] = key
             return obj
         }, {})
+        var addrStrs = Object.keys(this.addresses)
+        for (var i = 0; i < addrStrs.length; i++) {
+            this.addressOptions[this.addresses[addrStrs[i]]] = addrStrs[i]
+        }
+        this.currentAddress = 0
+        this.addressChange(this.currentAddress)
     },
     watch: {
         coldAddresses() {
@@ -324,6 +338,14 @@ export default {
         }
     },
     methods: {
+        addressChange(tab) {
+            this.currentAddress = tab
+            this.publicKey = this.getPubKey(tab)
+            this.privateKey = this.getPriKey(tab)
+            this.seed = this.getSeedPhrase()
+            this.hidePriKey()
+            this.hideSeed()
+        },
         showSeed() {
             setTimeout(() => {
                 this.seed = this.getSeedPhrase()
@@ -338,7 +360,7 @@ export default {
             if (this.prvKeyPwd === Vue.ls.get('pwd')) {
                 setTimeout(() => {
                     this.prvKeyPwdErr = false
-                    this.privateKey = this.getPriKey()
+                    this.privateKey = this.getPriKey(this.currentAddress)
                     this.privateKeyHidden = false
                     this.prvKeyPwd = ''
                 }, 400)
@@ -352,6 +374,7 @@ export default {
         },
         resetData() {
             this.seed = ''
+            this.publicKey = ''
             this.privateKey = ''
             this.seedHidden = true
             this.privateKeyHidden = true
