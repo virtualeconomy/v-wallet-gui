@@ -24,7 +24,7 @@
                        :options="addressOptions"></b-form-select>
         <textarea
           id="addrToCopy"
-          v-model="address"
+          v-model="addressOptions[currentAddress]"
           ref="addrToCopy"
           class="hidden"
           readonly>
@@ -474,6 +474,11 @@ export default {
 }
 .btn-append {
     width: 52px;
+}
+#addr-cpy {
+    position: absolute;
+    margin-left: 372px;
+    margin-top: -40px;
 }
 input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 30px #FAFAFA inset;
