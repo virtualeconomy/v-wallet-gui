@@ -237,6 +237,7 @@ export default {
                 this.transActive = 'trans'
             } else if (tabIndex === 1) {
                 this.transActive = 'lease'
+                this.getBalance(this.selectedAddress)
             }
         },
         resetSessionClearTimeout() {
