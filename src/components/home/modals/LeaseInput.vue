@@ -21,9 +21,9 @@
         class="balance-input"
         readonly>
         <span class="balance-title">
-          <img src="../../../assets/imgs/icons/wallet/Symbol_Gray.svg"
+          <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
                width="20"
-               height="20"> VEE
+               height="20">
         </span>
         <span class="balance">{{ balances[address] }} VEE</span>
       </b-btn>

@@ -1,11 +1,15 @@
 <template>
   <div class="row justify-content-between height-full">
     <div class="col-auto align-self-center text-left tran-head">
+      <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+           class="money-icon"
+           width="30"
+           height="30">
       <span class="title">
         {{ balance }} VEE
       </span>
       <p class="text-muted text-des mb-0">
-        Balance
+        Available balance
       </p>
     </div>
     <div class="col align-self-center text-right">
@@ -104,6 +108,9 @@ export default {
 }
 .tran-head {
     padding-left: 38px;
+}
+.money-icon {
+    margin-top: -14px;
 }
 .icon-btn {
     margin-right: 10px;

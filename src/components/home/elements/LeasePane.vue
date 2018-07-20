@@ -1,32 +1,45 @@
 <template>
   <div class="row justify-content-between height-full">
     <div class="col-auto align-self-center text-left tran-head">
+      <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+           class="money-icon"
+           width="30"
+           height="30">
       <span class="title">
         {{ total }} VEE
       </span>
       <p class="text-muted text-des mb-0">
-        Balance
+        Total balance
       </p>
     </div>
     <div class="col-auto align-self-center text-left">
+      <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+           width="16"
+           height="16">
       <span class="sub-title">
-        {{ available }} VEE
+        {{ available }}
       </span>
       <p class="text-muted text-des mb-0">
         Available
       </p>
     </div>
     <div class="col-auto align-self-center text-left">
+      <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+           width="16"
+           height="16">
       <span class="sub-title">
-        {{ leasedIn }} VEE
+        {{ leasedIn }}
       </span>
       <p class="text-muted text-des mb-0">
         Leased In
       </p>
     </div>
     <div class="col-auto align-self-center text-left">
+      <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+           width="16"
+           height="16">
       <span class="sub-title">
-        {{ leasedOut }} VEE
+        {{ leasedOut }}
       </span>
       <p class="text-muted text-des mb-0">
         Leased Out
@@ -63,7 +76,6 @@
         </div>
         <div class="description-split"></div>
         <div>
-          <div style="margin-bottom: 15px">The generating balance will be updated after 1000 blocks.</div>
           <a href="javascript: void 0" >List of nodes</a>
         </div>
       </div>
@@ -132,6 +144,9 @@ export default {
 .title {
     font-size: 200%;
     line-height: 120%;
+}
+.money-icon {
+    margin-top: -14px;
 }
 .tran-head {
     padding-left: 38px;
