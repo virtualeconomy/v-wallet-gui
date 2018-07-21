@@ -347,6 +347,7 @@ export default {
 .height-full {
     max-height: 100%;
     height: inherit;
+    overflow-y: auto;
 }
 .page {
     background-color: rgb(250, 250, 250);
