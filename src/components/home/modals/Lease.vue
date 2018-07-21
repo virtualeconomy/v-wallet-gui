@@ -239,8 +239,12 @@ export default {
             this.coldPageId++
         },
         resetPage() {
-            this.$refs.addrInput.resetData()
-            this.$refs.coldAddrInput.resetData()
+            if (this.$refs.addrInput) {
+                this.$refs.addrInput.resetData()
+            }
+            if (this.$refs.coldAddrInput) {
+                this.$refs.coldAddrInput.resetData()
+            }
             this.amount = 0
             this.coldAmount = 0
             this.recipient = ''

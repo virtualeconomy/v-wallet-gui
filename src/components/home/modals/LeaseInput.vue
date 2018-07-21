@@ -63,15 +63,12 @@
       </div>
     </b-form-group>
     <b-form-group label="Amount"
-                  label-for="amount-input">
-      <b-form-input id="amount-input"
+                  :abel-for="'amount-input' + walletType">
+      <b-form-input :id="'amount-input' + walletType"
                     class="amount-input"
-                    type="number"
                     v-model="amount"
                     aria-describedby="inputLiveFeedback"
-                    min="0"
-                    step="1e-8"
-                    :state="isAmountValid('hot')"
+                    :state="isAmountValid(walletType)"
                     onfocus="this.select()">
       </b-form-input>
       <b-form-invalid-feedback id="inputLiveFeedback"
@@ -79,7 +76,7 @@
         The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
       </b-form-invalid-feedback>
       <b-form-invalid-feedback id="inputLiveFeedback"
-                               v-else-if="isInsufficient(amount, 'hot')">
+                               v-else-if="isInsufficient(amount, walletType)">
         Insufficient funds
       </b-form-invalid-feedback>
     </b-form-group>
@@ -145,8 +142,7 @@ export default {
     },
     computed: {
         isSubmitDisabled() {
-            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid('hot') &&
-              (this.address !== '' || this.coldAddress !== ''))
+            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid(this.walletType))
         }
     },
     methods: {
@@ -217,7 +213,7 @@ export default {
             if (Number(amount) === 0) {
                 return void 0
             }
-            return !this.isWrongFormat(amount) && !this.isInsufficient(amount, type)
+            return !isNaN(Number(amount)) && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type)
         },
         isWrongFormat(amount) {
             if (amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) {
