@@ -329,12 +329,14 @@ export default {
     width: 100%;
 }
 .assets-pane {
+    overflow-y: auto;
     border-right: 1px solid rgb(238, 238, 238);
     text-align: left;
     width: @assetsPaneW;
     height: 100%;
     padding-left: 20px;
     padding-right: 20px;
+    padding-bottom: 20px;
     background-color: rgb(245, 245, 245);
 }
 .records-pane {
@@ -395,8 +397,7 @@ export default {
     border-top: 1px solid rgb(232, 232, 236);
 }
 .f-records {
-    height: -webkit-fill-available;
-    padding-bottom: 180px;
+    /*padding-bottom: 120px;*/
 }
 .tab-pane {
     padding: 0 !important;

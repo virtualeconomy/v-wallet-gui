@@ -90,7 +90,7 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">TX info</b-dropdown-item>
-          <b-dropdown-item v-if="txIcon==='leased out'"
+          <b-dropdown-item v-if="transType === 'lease' && txIcon==='leased out'"
                            @click="cancelLeasing">Cancel Leasing</b-dropdown-item>
           <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
         </b-dropdown>

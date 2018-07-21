@@ -77,6 +77,7 @@
         <b-button
           block
           class="btn-confirm"
+          :style="{background:(isValidAddress && isValidPubKey ? '' : '#FFBE96')}"
           variant="warning"
           size="lg"
           @click="importOk">Confirm
@@ -147,8 +148,8 @@ export default {
                 evt.preventDefault()
             } else {
                 this.$emit('import-cold', this.coldAddress, this.coldPubKey)
+                this.closeModal()
             }
-            this.closeModal()
         },
         importCancel: function(evt) {
             if (this.qrInit) {

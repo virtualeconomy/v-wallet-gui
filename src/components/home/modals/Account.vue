@@ -347,10 +347,16 @@ export default {
             this.hideSeed()
         },
         showSeed() {
-            setTimeout(() => {
-                this.seed = this.getSeedPhrase()
-                this.seedHidden = false
-            }, 800)
+            if (this.seedPwd === Vue.ls.get('pwd')) {
+                setTimeout(() => {
+                    this.seedPwdErr = false
+                    this.seed = this.getSeedPhrase()
+                    this.seedHidden = false
+                    this.seedPwd = ''
+                }, 400)
+            } else {
+                this.seedPwdErr = true
+            }
         },
         hideSeed() {
             this.seed = ''

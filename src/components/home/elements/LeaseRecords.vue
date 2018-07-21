@@ -40,7 +40,8 @@
     </div>
 
     <div class="inherit-height">
-      <div class="scroll">
+      <div class="scroll"
+           :style="{height: myHeight}">
         <div v-for="record in leaseRecords"
              :key="record.id">
           <Record :tx-record="record"
@@ -52,7 +53,44 @@
       </div>
     </div>
   </div>
-  <div v-else>
+  <div v-else
+       class="records">
+    <div class="title-records">
+      <span>Leasing Records</span>
+      <b-dropdown class="pd-select"
+                  router-tag="div"
+                  no-caret
+                  :disable="changeShowDisable"
+                  variant="light">
+        <template slot="button-content">
+          <div style="display: inline-block; margin-right: 10px">
+            <img v-if="!changeShowDisable"
+                 src="../../../assets/imgs/icons/wallet/ic_filter.svg">
+            <img v-if="changeShowDisable"
+                 width="16"
+                 height="16"
+                 src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+            <span class="m-1">Latest {{ showingNum }} Records </span>
+          </div>
+          <img src="../../../assets/imgs/icons/signup/ic_arrow_down.svg">
+        </template>
+        <b-dropdown-item class="selection"
+                         @click="changeShowNum(num)"
+                         v-for="num in showNums"
+                         :key="num">Show {{ num }} records
+        </b-dropdown-item>
+      </b-dropdown>
+      <json-excel class="csv-export"
+                  :data="response"
+                  :fields="resFields"
+                  :type="downloadFileType"
+                  :name="'txs_' + address + '.' + downloadFileType">
+        <b-btn class="btn-export"
+               :disabled="changeShowDisable"
+               variant="light">
+        <img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
+      </json-excel>
+    </div>
     <img height="50"
          width="50"
          v-if="changeShowDisable"
@@ -78,6 +116,7 @@ export default {
         JsonExcel
     },
     created() {
+        this.myHeight = (window.innerHeight - 300) + 'px'
         if (this.address && Vue.ls.get('pwd')) {
             this.getLeaseRecords()
         }
@@ -88,7 +127,7 @@ export default {
             showNums: [10, 50, 100, 200, 500, 1000],
             showingNum: 10,
             changeShowDisable: false,
-            response: void 0,
+            response: [],
             downloadFileType: 'csv',
             resFields: {
                 transaction_id: 'id',
@@ -101,7 +140,8 @@ export default {
                 amount: 'amount',
                 attachment: 'attachment'
             },
-            transType: 'lease'
+            transType: 'lease',
+            myHeight: '0'
         }
     },
     props: {
@@ -122,7 +162,7 @@ export default {
     watch: {
         address() {
             this.leaseRecords = {}
-            this.response = void 0
+            this.response = []
             this.changeShowDisable = false
             this.showingNum = 10
             if (this.address && Vue.ls.get('pwd')) {
@@ -178,10 +218,8 @@ export default {
     border: 1px solid #E8E9ED;
     border-radius: 4px;
     margin: 0px 0px;
-    height: inherit;
 }
 .scroll {
-    height: inherit;
     overflow-y: scroll;
     overflow-x: hidden;
 }
