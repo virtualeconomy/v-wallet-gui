@@ -79,11 +79,8 @@
                         label-for="amount-input">
             <b-form-input id="amount-input"
                           class="amount-input"
-                          type="number"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          min="0"
-                          step="1e-8"
                           :state="isAmountValid('hot')"
                           onfocus="this.select()">
             </b-form-input>
@@ -225,10 +222,8 @@
                         label-for="cold-amount-input">
             <b-form-input id="cold-amount-input"
                           class="amount-input"
-                          type="number"
                           v-model="coldAmount"
                           aria-describedby="inputLiveFeedback"
-                          min="0"
                           :state="isAmountValid('cold')"
                           onfocus="this.select()">
             </b-form-input>
@@ -620,7 +615,7 @@ export default {
             if (Number(amount) === 0) {
                 return void 0
             }
-            return !this.isWrongFormat(amount) && !this.isInsufficient(amount, type)
+            return !isNaN(amount) && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type)
         },
         isWrongFormat(amount) {
             if (amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) {

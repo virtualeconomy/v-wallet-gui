@@ -43,7 +43,12 @@
            class="qr-code"
            @click="scanChange"
            title="scan qr-code">
-      <b-form-invalid-feedback id="inputLiveFeedback">
+      <b-form-invalid-feedback id="inputLiveFeedback"
+                               v-if="isSameWithSender">
+        Recipient should not be the same as the sender address.
+      </b-form-invalid-feedback>
+      <b-form-invalid-feedback id="inputLiveFeedback"
+                               v-else>
         Invalid recipient address.
       </b-form-invalid-feedback>
       <div v-if="scanShow">
@@ -143,6 +148,10 @@ export default {
     computed: {
         isSubmitDisabled() {
             return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid(this.walletType))
+        },
+        isSameWithSender() {
+            var thisAddr = this.walletType === 'hot' ? this.address : this.coldAddress
+            return thisAddr === this.recipient
         }
     },
     methods: {
@@ -156,7 +165,7 @@ export default {
             } catch (e) {
                 console.log(e)
             }
-            return isValid
+            return isValid && !this.isSameWithSender
         },
         scanChange: function() {
             if (!this.qrInit) {
