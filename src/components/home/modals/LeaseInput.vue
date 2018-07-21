@@ -21,9 +21,9 @@
         class="balance-input"
         readonly>
         <span class="balance-title">
-          <img src="../../../assets/imgs/icons/wallet/Symbol_Gray.svg"
+          <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
                width="20"
-               height="20"> VEE
+               height="20">
         </span>
         <span class="balance">{{ balances[address] }} VEE</span>
       </b-btn>
@@ -51,7 +51,6 @@
         <div class="qr-window">
           <qrcode-reader @init="onInit"
                          @decode="onDecode"
-                         :track="repaintLocation"
                          :paused="paused">
             <img v-if="qrInit"
                  class="qrcode-waiting center"
@@ -267,9 +266,9 @@ export default {
 .qr-code {
     width: 26px;
     cursor: pointer;
-    float: right;
+    position: absolute;
     margin-top: -37px;
-    margin-right: 10px;
+    margin-left: 380px;
 }
 .qr-info {
     text-align: left;

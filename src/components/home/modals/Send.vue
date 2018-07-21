@@ -34,9 +34,9 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Gray.svg"
+                <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
                      width="20"
-                     height="20"> VEE
+                     height="20">
               </span>
               <span class="balance">{{ balances[address] }} VEE</span>
             </b-btn>
@@ -180,9 +180,9 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Gray.svg"
+                <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
                      width="20"
-                     height="20"> VEE
+                     height="20">
               </span>
               <span class="balance">{{ balances[coldAddress] }} VEE</span>
             </b-btn>
@@ -648,9 +648,9 @@ export default {
 .qr-code {
     width: 26px;
     cursor: pointer;
-    float: right;
+    position: absolute;
     margin-top: -37px;
-    margin-right: 10px;
+    margin-left: 380px;
 }
 .qr-info {
     text-align: left;
@@ -682,7 +682,7 @@ export default {
 .balance {
     float: right;
     font-size: 15px;
-    color: gray;
+    color: #FF8737;
     letter-spacing: 0;
     text-align: right;
 }
