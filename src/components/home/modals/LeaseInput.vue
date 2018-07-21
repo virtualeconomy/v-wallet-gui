@@ -51,7 +51,6 @@
         <div class="qr-window">
           <qrcode-reader @init="onInit"
                          @decode="onDecode"
-                         :track="repaintLocation"
                          :paused="paused">
             <img v-if="qrInit"
                  class="qrcode-waiting center"
@@ -267,9 +266,9 @@ export default {
 .qr-code {
     width: 26px;
     cursor: pointer;
-    float: right;
+    position: absolute;
     margin-top: -37px;
-    margin-right: 10px;
+    margin-left: 380px;
 }
 .qr-info {
     text-align: left;

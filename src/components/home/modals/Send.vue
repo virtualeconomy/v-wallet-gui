@@ -648,9 +648,9 @@ export default {
 .qr-code {
     width: 26px;
     cursor: pointer;
-    float: right;
+    position: absolute;
     margin-top: -37px;
-    margin-right: 10px;
+    margin-left: 380px;
 }
 .qr-info {
     text-align: left;

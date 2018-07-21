@@ -329,6 +329,7 @@ export default {
     width: 100%;
 }
 .assets-pane {
+    overflow-y: auto;
     border-right: 1px solid rgb(238, 238, 238);
     text-align: left;
     width: @assetsPaneW;
@@ -347,7 +348,6 @@ export default {
 .height-full {
     max-height: 100%;
     height: inherit;
-    overflow-y: auto;
 }
 .page {
     background-color: rgb(250, 250, 250);
