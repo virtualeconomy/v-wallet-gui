@@ -9,7 +9,7 @@
         {{ balance }} VEE
       </span>
       <p class="text-muted text-des mb-0">
-        Available balance
+        Available Balance
       </p>
     </div>
     <div class="col align-self-center text-right">
