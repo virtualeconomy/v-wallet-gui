@@ -336,6 +336,7 @@ export default {
     height: 100%;
     padding-left: 20px;
     padding-right: 20px;
+    padding-bottom: 20px;
     background-color: rgb(245, 245, 245);
 }
 .records-pane {
