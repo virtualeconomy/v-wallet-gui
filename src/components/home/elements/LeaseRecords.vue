@@ -40,7 +40,8 @@
     </div>
 
     <div class="inherit-height">
-      <div class="scroll">
+      <div class="scroll"
+           :style="{height: myHeight}">
         <div v-for="record in leaseRecords"
              :key="record.id">
           <Record :tx-record="record"
@@ -115,6 +116,7 @@ export default {
         JsonExcel
     },
     created() {
+        this.myHeight = (window.innerHeight - 300) + 'px'
         if (this.address && Vue.ls.get('pwd')) {
             this.getLeaseRecords()
         }
@@ -138,7 +140,8 @@ export default {
                 amount: 'amount',
                 attachment: 'attachment'
             },
-            transType: 'lease'
+            transType: 'lease',
+            myHeight: '0'
         }
     },
     props: {
@@ -215,10 +218,8 @@ export default {
     border: 1px solid #E8E9ED;
     border-radius: 4px;
     margin: 0px 0px;
-    height: inherit;
 }
 .scroll {
-    height: inherit;
     overflow-y: scroll;
     overflow-x: hidden;
 }

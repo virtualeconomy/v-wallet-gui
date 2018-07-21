@@ -395,8 +395,7 @@ export default {
     border-top: 1px solid rgb(232, 232, 236);
 }
 .f-records {
-    height: -webkit-fill-available;
-    padding-bottom: 180px;
+    /*padding-bottom: 120px;*/
 }
 .tab-pane {
     padding: 0 !important;

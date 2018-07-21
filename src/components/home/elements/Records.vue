@@ -44,8 +44,8 @@
       </json-excel>
     </div>
     <div class="inherit-height">
-      <div
-        class="scroll">
+      <div class="scroll"
+           :style="{height: myHeight}">
         <template v-for="(records, monthYear, idx) in txRecords">
           <div :key="monthYear"
                :ref="idx"
@@ -127,6 +127,7 @@ export default {
         JsonExcel
     },
     created() {
+        this.myHeight = (window.innerHeight - 300) + 'px'
         if (this.address && Vue.ls.get('pwd')) {
             this.getTxRecords()
         }
@@ -150,7 +151,8 @@ export default {
                 amount: 'amount',
                 attachment: 'attachment'
             },
-            transType: 'transfer'
+            transType: 'transfer',
+            myHeight: '0'
         }
     },
     props: {
@@ -239,11 +241,9 @@ export default {
     border: 1px solid #E8E9ED;
     border-radius: 4px;
     margin: 0px 0px;
-    height: inherit;
 }
 .scroll {
-    height: inherit;
-    overflow-y: scroll;
+    overflow-y: auto;
     overflow-x: hidden;
 }
 .monthTtl {
@@ -259,7 +259,6 @@ export default {
 }
 .inherit-height {
     position: relative;
-    height: inherit;
     padding-top: 52px;
     top: -52px;
 }
