@@ -416,7 +416,7 @@ export default {
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 assetId: '',
                 feeAssetId: '',
-                amount: this.coldAmount * VEE_PRECISION,
+                amount: Number((this.coldAmount * VEE_PRECISION).toFixed(0)),
                 fee: this.coldFee * VEE_PRECISION,
                 recipient: this.coldRecipient,
                 attachment: this.coldAttachment
@@ -442,7 +442,7 @@ export default {
                 const dataInfo = {
                     recipient: this.recipient,
                     assetId: '',
-                    amount: Number(this.amount) * VEE_PRECISION,
+                    amount: Number((this.amount * VEE_PRECISION).toFixed(0)),
                     feeAssetId: '',
                     fee: TX_FEE * VEE_PRECISION,
                     attachment: this.attachment,

@@ -207,7 +207,7 @@ export default {
             return {
                 transactionType: LEASE_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
-                amount: this.coldAmount * VEE_PRECISION,
+                amount: Number((this.coldAmount * VEE_PRECISION).toFixed(0)),
                 fee: this.fee * VEE_PRECISION,
                 recipient: this.coldRecipient
             }
@@ -274,7 +274,7 @@ export default {
             if (walletType === 'hotWallet') {
                 const dataInfo = {
                     recipient: this.recipient,
-                    amount: Number(this.amount) * VEE_PRECISION,
+                    amount: Number((this.amount * VEE_PRECISION).toFixed(0)),
                     fee: TX_FEE * VEE_PRECISION,
                     timestamp: Date.now() * 1e6
                 }
