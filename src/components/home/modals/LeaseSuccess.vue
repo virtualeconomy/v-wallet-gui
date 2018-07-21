@@ -8,13 +8,6 @@
     <b-button variant="warning"
               class="btn-detail"
               @click="showDetails">View Details</b-button>
-    <TxInfoModal :modal-id="txId"
-                 :tx-icon="'leasedout'"
-                 :tx-address="address"
-                 :tx-time="111"
-                 :tx-fee="fee"
-                 :tx-amount="amount"
-                 :trans-type="'lease'"></TxInfoModal>
   </div>
 </template>
 <script>

@@ -41,7 +41,8 @@
       <b-form-group horizontal
                     class="form-line"
                     label="Description"
-                    label-for="attachment_confirm">
+                    label-for="attachment_confirm"
+                    v-if="txType==='transfer'">
         <b-form-input id="attachment_confirm"
                       v-model="attachment"
                       class="des"

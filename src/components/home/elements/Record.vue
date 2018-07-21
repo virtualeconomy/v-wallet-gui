@@ -12,15 +12,19 @@
              src="../../../assets/imgs/icons/wallet/ic_received.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='leasedin'"
+        <img v-else-if="txIcon==='leased in'"
              src="../../../assets/imgs/icons/wallet/ic_leasing_reverse.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='leasedout'"
+        <img v-else-if="txIcon==='leased out'"
              src="../../../assets/imgs/icons/wallet/ic_leasing.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='cancelleasing'"
+        <img v-else-if="txIcon==='leased out canceled'"
+             src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
+             width="32px"
+             height="32px">
+        <img v-else-if="txIcon==='leased in canceled'"
              src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
              width="32px"
              height="32px">
@@ -29,16 +33,16 @@
              v-if="transType==='transfer'"
              cols="auto">
         <b-row>
-          <b-col class="title">{{ txType }} VEE</b-col>
+          <b-col class="title">{{ txType }}</b-col>
         </b-row>
         <b-row>
           <b-col class="detail-1"
                  cols="auto"
-                 v-if="txIcon !== 'cancelleasing'">{{ (txIcon === 'sent' || txIcon === 'leasedout') ? 'To' : 'From' }}:</b-col>
+                 v-if="txIcon !== 'cancel leasing'">{{ (txIcon === 'sent' || txIcon === 'leased out') ? 'To' : 'From' }}:</b-col>
           <b-col class="detail-1"
                  cols="auto"
-                 v-if="txIcon === 'cancelleasing'">TX:</b-col>
-          <b-col class="detail-2">{{ txIcon === 'cancelleasing' ? txIdShow : txAddressShow }}</b-col>
+                 v-if="txIcon === 'cancel leasing'">TX:</b-col>
+          <b-col class="detail-2">{{ txIcon === 'cancel leasing' ? txIdShow : txAddressShow }}</b-col>
           <b-col class="detail-3"
                  cols="auto"></b-col>
           <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
@@ -52,19 +56,19 @@
         </b-row>
         <b-row>
           <b-col class="detail-1"
-                 cols="auto">{{ txIcon === 'leasedout' ? 'To' : txIcon === 'leasedin' ? 'From' : 'TX' }}:</b-col>
-          <b-col class="detail-2">{{ txIcon === 'cancelleasing' ? txIdShow : txAddressShow }}</b-col>
+                 cols="auto">{{ (txIcon === 'leased out' || txIcon === 'leased out canceled') ? 'To' : 'From' }}:</b-col>
+          <b-col class="detail-2">{{ txAddressShow }}</b-col>
           <b-col class="detail-3"
                  cols="auto"></b-col>
           <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
         </b-row>
       </b-col>
       <b-col class="record-blank"></b-col>
-      <b-col :class="txIcon === 'sent' ? 'record-amount-s' : 'record-amount-r'"
+      <b-col :class="'amount' + txIcon"
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span v-if="txIcon !== 'cancelleasing'">{{ txIcon === 'sent' ? txAmount + txFee : txAmount }} VEE</span>
+          <span>{{ (txIcon === 'sent' || txIcon === 'leased out') ? txAmount + txFee : txAmount }} VEE</span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -86,7 +90,7 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">TX info</b-dropdown-item>
-          <b-dropdown-item v-if="transType==='lease' && txIcon=='leasedout'"
+          <b-dropdown-item v-if="transType === 'lease' && txIcon==='leased out'"
                            @click="cancelLeasing">Cancel Leasing</b-dropdown-item>
           <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
         </b-dropdown>
@@ -109,9 +113,10 @@
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-fee="txFee"
                  :tx-time="cancelTime"
-                 :tx-icon="'cancelleasing'"
+                 :tx-icon="'leased out canceled'"
                  :trans-type="'cancelLease'"
-                 v-if="transType==='lease'"></TxInfoModal>
+                 v-if="transType==='lease'"
+                 :tx-amount="txAmount"></TxInfoModal>
     <CancelLease :modal-id="txRecord.id"
                  :wallet-type="walletType"
                  :address="address"
@@ -192,12 +197,16 @@ export default {
                 return 'Received'
             } else if (this.txRecord['type'] === 8) {
                 if (this.txRecord.sender === this.address) {
-                    return 'LeasedOut'
+                    return 'Leased Out'
                 } else {
-                    return 'LeasedIn'
+                    return 'Leased In'
                 }
             } else if (this.txRecord['type'] === 9) {
-                return 'CancelLeasing'
+                if (this.txRecord.sender === this.address) {
+                    return 'Leased Out Canceled'
+                } else {
+                    return 'Leased In Canceled'
+                }
             } else if (this.txRecord['type'] === 1) {
                 return 'Received'
             } else {
@@ -208,7 +217,7 @@ export default {
             return this.txType.toString().toLowerCase()
         },
         txAddress() {
-            return ((this.txType === 'Received' || this.txType === 'LeasedIn') ? this.txRecord.sender : this.txRecord.recipient)
+            return ((this.txType === 'Send' || this.txType === 'Leased Out') ? this.txRecord.recipient : this.txRecord.sender)
         },
         txAddressShow() {
             if (this.txAddress) {
@@ -225,12 +234,14 @@ export default {
             }
         },
         txTitle() {
-            if (this.txType === 'LeasedOut') {
+            if (this.txType === 'Leased Out') {
                 return 'Start Leasing'
-            } else if (this.txType === 'LeasedIn') {
+            } else if (this.txType === 'Leased In') {
                 return 'Incoming Leasing'
-            } else if (this.txType === 'CancelLeasing') {
-                return 'Cancel Leasing'
+            } else if (this.txType === 'Leased Out Canceled') {
+                return 'Canceled Out Leasing'
+            } else if (this.txType === 'Leased In Canceled') {
+                return 'Canceled Incoming Leasing'
             }
         },
         txTime() {
@@ -263,6 +274,9 @@ export default {
             return date.toString()
         },
         txAmount() {
+            if (this.txRecord.lease) {
+                return this.txRecord.lease.amount / VEE_PRECISION
+            }
             return this.txRecord.amount / VEE_PRECISION
         },
         txFee() {
