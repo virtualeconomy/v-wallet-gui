@@ -22,31 +22,28 @@
                src="../../../assets/imgs/icons/wallet/ic_received.svg"
                width="60px"
                height="60px">
-          <img v-else-if="txIcon==='leasedin'"
+          <img v-else-if="txIcon==='leased in'"
                src="../../../assets/imgs/icons/wallet/ic_leasing_reverse.svg"
                width="60px"
                height="60px">
-          <img v-else-if="txIcon==='leasedout'"
+          <img v-else-if="txIcon==='leased out'"
                src="../../../assets/imgs/icons/wallet/ic_leasing.svg"
                width="60px"
                height="60px">
-          <img v-else-if="txIcon==='cancelleasing'"
+          <img v-else-if="txIcon==='leased out canceled'"
+               src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
+               width="60px"
+               height="60px">
+          <img v-else-if="txIcon==='leased in canceled'"
                src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
                width="60px"
                height="60px">
         </div>
-        <div :class="txIcon + '-amount'"
-             v-if="txIcon !== 'cancelleasing'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ txAmount }} vee</div>
+        <div :class="txIcon + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ txAmount }} vee</div>
       </div>
-      <div class="tx-address"
-           v-if="txIcon !== 'cancelleasing'">
-        <label>{{ (txIcon === 'received' || txIcon === 'leasedin') ? 'From' : 'To' }}</label>
+      <div class="tx-address">
+        <label>{{ (txIcon === 'received' || txIcon === 'leased in' || txIcon === 'leased in canceled') ? 'From' : 'To' }}</label>
         <span>{{ txAddress }}</span>
-      </div>
-      <div class="tx-id"
-           v-if="txIcon === 'cancelleasing'">
-        <label>TX</label>
-        <span>{{ modalId }}</span>
       </div>
       <div class="tx-block">
         <label>Timestamp</label>

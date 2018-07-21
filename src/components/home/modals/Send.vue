@@ -353,8 +353,8 @@ var initData = {
     coldAttachment: '',
     coldPageId: 1,
     coldFee: TX_FEE,
-    address: '',
-    coldAddress: '',
+    address: this.defaultAddress,
+    coldAddress: this.defaultColdAddress,
     scanShow: false,
     qrInit: false,
     paused: false,
@@ -386,6 +386,13 @@ export default {
         return initData
     },
     computed: {
+        defaultAddress() {
+            return Vue.ls.get('address')
+        },
+        defaultColdAddress() {
+            if (this.noColdAddress) return ''
+            return Object.keys(this.coldAddresses)[0]
+        },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.address))
         },
@@ -501,6 +508,8 @@ export default {
             this.sendError = false
             this.coldSignature = ''
             this.coldTimestamp = 0
+            this.address = this.defaultAddress
+            this.coldAddress = this.defaultColdAddress
         },
         endSend: function() {
             this.$refs.sendModal.hide()
@@ -562,8 +571,6 @@ export default {
             this.amount = this.getParmFromUrl('amount', decodeString)
             if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                 this.paused = false
-            } else {
-                this.scanShow = false
             }
         },
         onColdDecode: function(decodeString) {
@@ -572,8 +579,6 @@ export default {
             this.coldAmount = this.getParmFromUrl('amount', decodeString)
             if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
                 this.paused = false
-            } else {
-                this.scanShow = false
             }
         },
         getSignature: function(signature, timestamp) {
@@ -612,7 +617,7 @@ export default {
         },
         isAmountValid(type) {
             var amount = type === 'hot' ? this.amount : this.coldAmount
-            if (amount === 0) {
+            if (Number(amount) === 0) {
                 return void 0
             }
             return !this.isWrongFormat(amount) && !this.isInsufficient(amount, type)

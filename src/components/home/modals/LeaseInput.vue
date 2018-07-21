@@ -25,7 +25,7 @@
                width="20"
                height="20"> VEE
         </span>
-        <span class="balance">{{ balances[address] }} VEE</span>
+        <span class="balance">{{ walletType === 'hot' ? balances[address] : balances[coldAddress] }} VEE</span>
       </b-btn>
     </b-form-group>
     <b-form-group label="Recipient"
@@ -51,7 +51,6 @@
         <div class="qr-window">
           <qrcode-reader @init="onInit"
                          @decode="onDecode"
-                         :track="repaintLocation"
                          :paused="paused">
             <img v-if="qrInit"
                  class="qrcode-waiting center"
@@ -110,10 +109,10 @@ export default {
             amount: 0,
             scanShow: false,
             qrInit: false,
-            qrError: void 0,
+            qrErrMsg: void 0,
             paused: false,
-            address: '',
-            coldAddress: ''
+            address: this.defaultAddress,
+            coldAddress: this.defaultColdAddress
         }
     },
     props: {
@@ -134,6 +133,14 @@ export default {
         addresses: {
             type: Object,
             default: function() {}
+        },
+        defaultAddress: {
+            type: String,
+            default: ''
+        },
+        defaultColdAddress: {
+            type: String,
+            default: ''
         }
     },
     computed: {
@@ -191,13 +198,23 @@ export default {
             if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                 this.paused = false
                 this.qrErrMsg = 'Sorry, your QR code seems unavalible.'
+            }
+        },
+        getParmFromUrl: function(key, url) {
+            var regex = new RegExp(key + '=([^&]*)', 'i')
+            if (url.match(regex)) {
+                return url.match(regex)[1]
             } else {
-                this.scanShow = false
+                if (key === 'recipient') {
+                    return ''
+                } else if (key === 'amount') {
+                    return 0
+                }
             }
         },
         isAmountValid(type) {
             var amount = type === 'hot' ? this.amount : this.coldAmount
-            if (amount === 0) {
+            if (Number(amount) === 0) {
                 return void 0
             }
             return !this.isWrongFormat(amount) && !this.isInsufficient(amount, type)
@@ -226,6 +243,16 @@ export default {
                 return options
             }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
             return res
+        },
+        resetData() {
+            this.recipient = ''
+            this.amount = 0
+            this.scanShow = false
+            this.qrInit = false
+            this.qrErrMsg = void 0
+            this.paused = false
+            this.address = this.defaultAddress
+            this.coldAddress = this.defaultColdAddress
         }
     }
 }

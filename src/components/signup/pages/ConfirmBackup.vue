@@ -2,7 +2,7 @@
   <div class="home">
     <v-title
       title="Confirm Backup"
-      description="Virify your backup phrase or "
+      description="Verify your backup phrase or "
       :goback-act="true"
       @goback="goBack">
     </v-title>

@@ -2,7 +2,7 @@
   <div class="home">
     <v-title
       title="Save backup phrase"
-      description="Treat your backup phrase with care!">
+      description="You must save the secret phrase. It is crucial for accessing your account.">
     </v-title>
     <textarea
       v-model="seedPhrase"
