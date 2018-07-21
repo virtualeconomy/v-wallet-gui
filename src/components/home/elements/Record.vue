@@ -33,7 +33,7 @@
              v-if="transType==='transfer'"
              cols="auto">
         <b-row>
-          <b-col class="title">{{ txType }} VEE</b-col>
+          <b-col class="title">{{ txType }}</b-col>
         </b-row>
         <b-row>
           <b-col class="detail-1"
