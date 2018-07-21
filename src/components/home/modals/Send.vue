@@ -354,8 +354,7 @@ var initData = {
     qrInit: false,
     paused: false,
     sendError: false,
-    coldSignature: '',
-    coldTimestamp: 0
+    coldSignature: ''
 }
 export default {
     name: 'Send',
@@ -419,7 +418,8 @@ export default {
                 amount: Number((this.coldAmount * VEE_PRECISION).toFixed(0)),
                 fee: this.coldFee * VEE_PRECISION,
                 recipient: this.coldRecipient,
-                attachment: this.coldAttachment
+                attachment: this.coldAttachment,
+                timestamp: Date.now() * 1e6
             }
         },
         isValidAttachment() {
@@ -450,7 +450,7 @@ export default {
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), TRANSFER_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldTimestamp, TRANSFER_TX)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, TRANSFER_TX)
             }
             const url = TESTNET_NODE + '/assets/broadcast/transfer'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
@@ -502,7 +502,6 @@ export default {
             this.paused = false
             this.sendError = false
             this.coldSignature = ''
-            this.coldTimestamp = 0
             this.address = this.defaultAddress
             this.coldAddress = this.defaultColdAddress
         },
@@ -576,9 +575,8 @@ export default {
                 this.paused = false
             }
         },
-        getSignature: function(signature, timestamp) {
+        getSignature: function(signature) {
             this.coldSignature = signature
-            this.coldTimestamp = timestamp
             this.coldPageId++
         },
         repaintLocation(location, ctx) {
