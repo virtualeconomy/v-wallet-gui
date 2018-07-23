@@ -37,12 +37,8 @@
         </b-row>
         <b-row>
           <b-col class="detail-1"
-                 cols="auto"
-                 v-if="txIcon !== 'cancel leasing'">{{ (txIcon === 'sent' || txIcon === 'leased out') ? 'To' : 'From' }}:</b-col>
-          <b-col class="detail-1"
-                 cols="auto"
-                 v-if="txIcon === 'cancel leasing'">TX:</b-col>
-          <b-col class="detail-2">{{ txIcon === 'cancel leasing' ? txIdShow : txAddressShow }}</b-col>
+                 cols="auto">{{ (txIcon === 'sent' || txIcon === 'leased out' || txIcon === 'leased out canceled') ? 'To' : 'From' }}:</b-col>
+          <b-col class="detail-2">{{ txAddressShow }}</b-col>
           <b-col class="detail-3"
                  cols="auto"></b-col>
           <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
@@ -220,7 +216,7 @@ export default {
             return this.txIcon.replace(/\s+/g, '')
         },
         txAddress() {
-            return ((this.txType === 'Send' || this.txType === 'Leased Out') ? this.txRecord.recipient : this.txRecord.sender)
+            return ((this.txType === 'Sent' || this.txType === 'Leased Out') ? this.txRecord.recipient : this.txRecord.sender)
         },
         txAddressShow() {
             if (this.txAddress) {
