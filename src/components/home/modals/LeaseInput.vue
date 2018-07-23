@@ -218,7 +218,7 @@ export default {
             }
         },
         isAmountValid(type) {
-            var amount = type === 'hot' ? this.amount : this.coldAmount
+            var amount = this.amount
             if (Number(amount) === 0) {
                 return void 0
             }

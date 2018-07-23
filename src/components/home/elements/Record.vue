@@ -37,12 +37,8 @@
         </b-row>
         <b-row>
           <b-col class="detail-1"
-                 cols="auto"
-                 v-if="txIcon !== 'cancel leasing'">{{ (txIcon === 'sent' || txIcon === 'leased out') ? 'To' : 'From' }}:</b-col>
-          <b-col class="detail-1"
-                 cols="auto"
-                 v-if="txIcon === 'cancel leasing'">TX:</b-col>
-          <b-col class="detail-2">{{ txIcon === 'cancel leasing' ? txIdShow : txAddressShow }}</b-col>
+                 cols="auto">{{ (txIcon === 'sent' || txIcon === 'leased out' || txIcon === 'leased out canceled') ? 'To' : 'From' }}:</b-col>
+          <b-col class="detail-2">{{ txAddressShow }}</b-col>
           <b-col class="detail-3"
                  cols="auto"></b-col>
           <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
@@ -68,7 +64,7 @@
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span>{{ (txIcon === 'sent' || txIcon === 'leased out') ? txAmount + txFee : txIcon === 'leased out canceled' ? txAmount - txFee : txAmount }} VEE</span>
+          <span>{{ txAmount }} VEE</span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -116,7 +112,8 @@
                  :tx-icon="'leased out canceled'"
                  :trans-type="'cancelLease'"
                  v-if="transType==='lease'"
-                 :tx-amount="txAmount"></TxInfoModal>
+                 :tx-amount="txAmount"
+                 :tx-address="txAddress"></TxInfoModal>
     <CancelLease :modal-id="txRecord.id"
                  :wallet-type="walletType"
                  :address="address"
@@ -156,7 +153,7 @@ export default {
                     txType: '',
                     txAddress: '',
                     txTime: '',
-                    txAmount: '',
+                    txAmount: 0,
                     txAttachment: ''
                 }
             }
@@ -220,7 +217,7 @@ export default {
             return this.txIcon.replace(/\s+/g, '')
         },
         txAddress() {
-            return ((this.txType === 'Send' || this.txType === 'Leased Out') ? this.txRecord.recipient : this.txRecord.sender)
+            return ((this.txType === 'Sent' || this.txType === 'Leased Out') ? this.txRecord.recipient : this.txRecord.sender)
         },
         txAddressShow() {
             if (this.txAddress) {

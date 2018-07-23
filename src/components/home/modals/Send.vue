@@ -388,7 +388,7 @@ export default {
             return Object.keys(this.coldAddresses)[0]
         },
         userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.address))
+            return JSON.parse(window.localStorage.getItem(this.defaultAddress))
         },
         secretInfo() {
             return JSON.parse(
