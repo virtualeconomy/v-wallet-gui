@@ -193,7 +193,7 @@ export default {
     },
     computed: {
         userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.address))
+            return JSON.parse(window.localStorage.getItem(this.defaultAddress))
         },
         secretInfo() {
             return JSON.parse(

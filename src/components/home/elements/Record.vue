@@ -64,7 +64,7 @@
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span>{{ (txIcon === 'sent' || txIcon === 'leased out') ? txAmount + txFee : txIcon === 'leased out canceled' ? txAmount - txFee : txAmount }} VEE</span>
+          <span>{{ txAmount }} VEE</span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -112,7 +112,8 @@
                  :tx-icon="'leased out canceled'"
                  :trans-type="'cancelLease'"
                  v-if="transType==='lease'"
-                 :tx-amount="txAmount"></TxInfoModal>
+                 :tx-amount="txAmount"
+                 :tx-address="txAddress"></TxInfoModal>
     <CancelLease :modal-id="txRecord.id"
                  :wallet-type="walletType"
                  :address="address"
@@ -152,7 +153,7 @@ export default {
                     txType: '',
                     txAddress: '',
                     txTime: '',
-                    txAmount: '',
+                    txAmount: 0,
                     txAttachment: ''
                 }
             }
