@@ -139,6 +139,9 @@ export default {
         }
     },
     computed: {
+        defaultAddress() {
+            return Vue.ls.get('address')
+        },
         dataObject() {
             return {
                 transactionType: CANCEL_LEASE_TX,
@@ -148,7 +151,7 @@ export default {
             }
         },
         userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.address))
+            return JSON.parse(window.localStorage.getItem(this.defaultAddress))
         },
         secretInfo() {
             return JSON.parse(
