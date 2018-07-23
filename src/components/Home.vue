@@ -107,7 +107,7 @@
                   <LeaseRecords :address="selectedAddress"
                                 :wallet-type="walletType"
                                 :cold-public-key="coldPubKey"
-                                :address-index="addresses[address]"></LeaseRecords>
+                                :address-index="addresses[selectedAddress]"></LeaseRecords>
                 </div>
               </b-tab>
             </b-tabs>
