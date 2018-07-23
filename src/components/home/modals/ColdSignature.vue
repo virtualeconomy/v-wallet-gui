@@ -131,12 +131,11 @@ export default {
             this.qrError = false
             try {
                 var signature = JSON.parse(decodeString).signature
-                var coldTimestamp = JSON.parse(decodeString).timestamp
-                if (!signature || !coldTimestamp) {
+                if (!signature) {
                     this.paused = false
                 } else {
-                    if (transaction.isValidSignature(this.dataObject, signature, coldTimestamp)) {
-                        this.$emit('get-signature', signature, coldTimestamp)
+                    if (transaction.isValidSignature(this.dataObject, signature)) {
+                        this.$emit('get-signature', signature)
                     } else {
                         this.qrError = true
                     }

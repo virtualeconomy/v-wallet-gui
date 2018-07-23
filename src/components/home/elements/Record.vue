@@ -64,11 +64,11 @@
         </b-row>
       </b-col>
       <b-col class="record-blank"></b-col>
-      <b-col :class="'amount' + txIcon"
+      <b-col :class="'amount-' + txClass"
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span>{{ (txIcon === 'sent' || txIcon === 'leased out') ? txAmount + txFee : txAmount }} VEE</span>
+          <span>{{ (txIcon === 'sent' || txIcon === 'leased out') ? txAmount + txFee : txIcon === 'leased out canceled' ? txAmount - txFee : txAmount }} VEE</span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -215,6 +215,9 @@ export default {
         },
         txIcon() {
             return this.txType.toString().toLowerCase()
+        },
+        txClass() {
+            return this.txIcon.replace(/\s+/g, '')
         },
         txAddress() {
             return ((this.txType === 'Send' || this.txType === 'Leased Out') ? this.txRecord.recipient : this.txRecord.sender)
@@ -371,19 +374,47 @@ export default {
         }
         padding-left: 0px;
     }
-    .record-amount-s {
+    .amount-sent {
         font-size: 17px;
         color: #F5354B;
         letter-spacing: 0;
         text-align: right;
         padding-right: 0px;
     }
-    .record-amount-r {
+    .amount-received {
         font-size: 17px;
         color: #23A28C;
         letter-spacing: 0;
         text-align: right;
         padding-right: 0px;
+    }
+    .amount-leasedout {
+      font-size: 17px;
+      color: #23A28C;
+      letter-spacing: 0;
+      text-align: right;
+      padding-right: 0px;
+    }
+    .amount-leasedin {
+      font-size: 17px;
+      color: #23A28C;
+      letter-spacing: 0;
+      text-align: right;
+      padding-right: 0px;
+    }
+    .amount-leasedoutcanceled {
+      font-size: 17px;
+      color: #23A28C;
+      letter-spacing: 0;
+      text-align: right;
+      padding-right: 0px;
+    }
+    .amount-leasedincanceled {
+      font-size: 17px;
+      color: #23A28C;
+      letter-spacing: 0;
+      text-align: right;
+      padding-right: 0px;
     }
     .record-action {
         padding-left: 0px;

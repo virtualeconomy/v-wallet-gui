@@ -166,7 +166,6 @@ export default {
             fee: TX_FEE,
             sendError: false,
             coldSignature: '',
-            coldTimestamp: 0,
             address: '',
             coldAddress: '',
             txId: '',
@@ -207,9 +206,10 @@ export default {
             return {
                 transactionType: LEASE_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
-                amount: this.coldAmount * VEE_PRECISION,
+                amount: Number((this.coldAmount * VEE_PRECISION).toFixed(0)),
                 fee: this.fee * VEE_PRECISION,
-                recipient: this.coldRecipient
+                recipient: this.coldRecipient,
+                timestamp: Date.now() * 1e6
             }
         },
         noColdAddress() {
@@ -254,7 +254,6 @@ export default {
             this.fee = TX_FEE
             this.sendError = false
             this.coldSignature = ''
-            this.coldTimestamp = 0
             this.coldAddress = ''
         },
         prevPage() {
@@ -274,13 +273,13 @@ export default {
             if (walletType === 'hotWallet') {
                 const dataInfo = {
                     recipient: this.recipient,
-                    amount: Number(this.amount) * VEE_PRECISION,
+                    amount: Number((this.amount * VEE_PRECISION).toFixed(0)),
                     fee: TX_FEE * VEE_PRECISION,
                     timestamp: Date.now() * 1e6
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), LEASE_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareForAPI(this.dataObject, this.coldSignature, this.coldTimestamp)
+                apiSchema = transaction.prepareForAPI(this.dataObject, this.coldSignature, LEASE_TX)
             }
             const url = TESTNET_NODE + '/leasing/broadcast/lease'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
@@ -295,7 +294,6 @@ export default {
         },
         getSignature(signature, timestamp) {
             this.coldSignature = signature
-            this.coldTimestamp = timestamp
             this.coldPageId++
         },
         showDetails() {
