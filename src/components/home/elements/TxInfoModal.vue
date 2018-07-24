@@ -35,7 +35,7 @@
                width="60px"
                height="60px">
           <img v-else-if="txIcon==='leased in canceled'"
-               src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
+               src="../../../assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
                width="60px"
                height="60px">
         </div>

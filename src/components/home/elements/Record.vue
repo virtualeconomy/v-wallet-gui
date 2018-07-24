@@ -25,7 +25,7 @@
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='leased in canceled'"
-             src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
+             src="../../../assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
              width="32px"
              height="32px">
       </b-col>
@@ -33,7 +33,7 @@
              v-if="transType==='transfer'"
              cols="auto">
         <b-row>
-          <b-col class="title">{{ txType }}</b-col>
+          <b-col class="title">{{ txTitle }}</b-col>
         </b-row>
         <b-row>
           <b-col class="detail-1"
@@ -242,6 +242,10 @@ export default {
                 return 'Canceled Out Leasing'
             } else if (this.txType === 'Leased In Canceled') {
                 return 'Canceled Incoming Leasing'
+            } else if (this.txType === 'Sent') {
+                return 'Sent'
+            } else if (this.txType === 'Received') {
+                return 'Received'
             }
         },
         txTime() {
