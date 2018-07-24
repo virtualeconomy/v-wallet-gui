@@ -7,7 +7,15 @@
         <p class="mb-0 asset-title">Wallet Address</p>
       </div>
       <div class="card-text">
-        <p class="mb-0 show-number balance"><b>{{ balance }} VEE</b></p>
+        <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+             class="money-icon unselected-icon"
+             width="16"
+             height="16">
+        <img src="../../../assets/imgs/icons/wallet/Symbol_White.svg"
+             class="money-icon selected-icon"
+             width="16"
+             height="16">
+        <p class="mb-0 show-number balance"><b>{{ balance }}</b></p>
         <p class="mb-0 asset-title">Balance</p>
       </div>
     </div>
@@ -105,6 +113,9 @@ export default {
 .show-number {
     font-size: 15px;
 }
+.money-icon {
+    display: inline-block;
+}
 .addr {
     color: #181B3A;
 }
@@ -113,11 +124,19 @@ export default {
 }
 .balance {
     color: #696B8A;
+    display: inline-block;
 }
 .selected-asset .balance {
     color: white;
 }
 .asset:not(.selected-asset):hover {
     background-color: #FAFAFA;
+}
+
+.shadow-sm .selected-icon {
+    display: none;
+}
+.shadow .unselected-icon {
+    display: none;
 }
 </style>

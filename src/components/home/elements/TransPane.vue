@@ -6,10 +6,22 @@
            width="30"
            height="30">
       <span class="title">
-        {{ balance }} VEE
+        {{ balance }}
       </span>
       <p class="text-muted text-des mb-0">
         Available Balance
+      </p>
+    </div>
+    <div class="col-auto align-self-center text-left">
+      <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+           class="money-icon"
+           width="16"
+           height="16">
+      <span class="sub-title">
+        {{ total }}
+      </span>
+      <p class="text-muted text-des mb-0">
+        Total Balance
       </p>
     </div>
     <div class="col align-self-center text-right">
@@ -68,6 +80,11 @@ export default {
             type: Object,
             default: function() {},
             require: true
+        },
+        total: {
+            type: Number,
+            default: 0,
+            require: true
         }
     }
 }
@@ -108,6 +125,7 @@ export default {
 }
 .tran-head {
     padding-left: 38px;
+    border-right: 1px solid #EDEDED;
 }
 .money-icon {
     margin-top: -14px;
