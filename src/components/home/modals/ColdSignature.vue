@@ -82,6 +82,10 @@ export default {
             type: Object,
             require: true,
             default: function() {}
+        },
+        txType: {
+            type: Number,
+            default: 0
         }
     },
     computed: {
@@ -95,7 +99,9 @@ export default {
                 background: '#ffffff',
                 foreground: '#000000'
             }
-            const imgBase64 = jrQrcode.getQrBase64(JSON.stringify(this.dataObject), options)
+            var data = this.dataObject
+            data.transactionType = this.txType
+            const imgBase64 = jrQrcode.getQrBase64(JSON.stringify(data), options)
             return imgBase64
         }
     },

@@ -106,7 +106,7 @@
                 <div class="f-records">
                   <LeaseRecords :address="selectedAddress"
                                 :wallet-type="walletType"
-                                :cold-public-key="coldPubKey"
+                                :cold-pub-key="coldPubKey"
                                 :address-index="addresses[selectedAddress]"></LeaseRecords>
                 </div>
               </b-tab>

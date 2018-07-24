@@ -95,7 +95,9 @@
           </b-container>
           <ColdSignature :data-object="dataObject"
                          v-if="coldPageId===3"
-                         @get-signature="getSignature"></ColdSignature>
+                         @get-signature="getSignature"
+                         :tx-type="txType"
+                         @prev-page="prevColdPage"></ColdSignature>
           <b-container v-else-if="coldPageId===4">
             <Confirm :tx-type="'lease'"
                      :amount="Number(coldAmount)"
@@ -171,7 +173,8 @@ export default {
             txId: '',
             txAddress: '',
             txTimestamp: 0,
-            txAmount: 0
+            txAmount: 0,
+            txType: LEASE_TX
         }
     },
     props: {
@@ -204,7 +207,6 @@ export default {
         },
         dataObject() {
             return {
-                transactionType: LEASE_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 amount: Number((this.coldAmount * VEE_PRECISION).toFixed(0)),
                 fee: this.fee * VEE_PRECISION,
@@ -279,7 +281,7 @@ export default {
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), LEASE_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareForAPI(this.dataObject, this.coldSignature, LEASE_TX)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, LEASE_TX)
             }
             const url = TESTNET_NODE + '/leasing/broadcast/lease'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
