@@ -82,10 +82,6 @@ export default {
             type: Object,
             require: true,
             default: function() {}
-        },
-        txType: {
-            type: Number,
-            default: 0
         }
     },
     computed: {
@@ -99,9 +95,7 @@ export default {
                 background: '#ffffff',
                 foreground: '#000000'
             }
-            var data = this.dataObject
-            data.transactionType = this.txType
-            const imgBase64 = jrQrcode.getQrBase64(JSON.stringify(data), options)
+            const imgBase64 = jrQrcode.getQrBase64(JSON.stringify(this.dataObject), options)
             return imgBase64
         }
     },
@@ -140,8 +134,15 @@ export default {
                 if (!signature) {
                     this.paused = false
                 } else {
-                    if (transaction.isValidSignature(this.dataObject, signature)) {
-                        this.$emit('get-signature', signature)
+                    var data = JSON.parse(JSON.stringify(this.dataObject))
+                    delete data.transactionType
+                    data.timestamp *= 1e6
+                    console.log(data)
+                    if (transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType)) {
+                        var _this = this
+                        setTimeout(function() {
+                            _this.$emit('get-signature', signature)
+                        }, 300)
                     } else {
                         this.qrError = true
                     }

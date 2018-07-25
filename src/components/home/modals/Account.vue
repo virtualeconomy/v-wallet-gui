@@ -297,9 +297,9 @@ export default {
     },
     data() {
         return {
-            seed: '',
-            privateKey: '',
-            publicKey: '',
+            seed: this.getSeedPhrase,
+            privateKey: this.getPriKey(0),
+            publicKey: this.getPubKey(0),
             seedHidden: true,
             privateKeyHidden: true,
             tagOfColdWallet: {},
@@ -330,11 +330,6 @@ export default {
     watch: {
         coldAddresses() {
             this.coldWalletNum = Object.keys(this.coldAddresses).length
-        }
-    },
-    computed: {
-        isCopyEnable: function() {
-            return this.isCpyDisable
         }
     },
     methods: {
@@ -379,9 +374,9 @@ export default {
             this.privateKeyHidden = true
         },
         resetData() {
-            this.seed = ''
-            this.publicKey = ''
-            this.privateKey = ''
+            this.seed = this.getSeedPhrase
+            this.publicKey = this.getPubKey(0)
+            this.privateKey = this.getPriKey(0)
             this.seedHidden = true
             this.privateKeyHidden = true
             this.tagOfColdWallet = {}
@@ -403,10 +398,8 @@ export default {
             this.$refs[refName].select()
             window.document.execCommand('copy')
             this.$root.$emit('bv::show::popover', buttonId)
-            this.isCpyDisable = true
             setTimeout(() => {
                 this.$root.$emit('bv::hide::popover', buttonId)
-                this.isCpyDisable = false
             }, 400)
         },
         copyColdText(addr) {
@@ -414,10 +407,8 @@ export default {
             this.$refs.coldToCopy[index].select()
             window.document.execCommand('copy')
             this.$root.$emit('bv::show::popover', addr)
-            this.isCpyDisable = true
             setTimeout(() => {
                 this.$root.$emit('bv::hide::popover', addr)
-                this.isCpyDisable = false
             }, 400)
         },
         hideErr(errorType) {
