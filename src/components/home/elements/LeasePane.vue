@@ -6,10 +6,10 @@
            width="30"
            height="30">
       <span class="title">
-        {{ total }} VEE
+        {{ total }}
       </span>
       <p class="text-muted text-des mb-0">
-        Total balance
+        Total Balance
       </p>
     </div>
     <div class="col-auto align-self-center text-left">

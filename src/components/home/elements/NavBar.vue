@@ -17,7 +17,7 @@
             right
             no-caret>
             <template slot="button-content">
-              <div class="row">
+              <div class="row username">
                 <span class="col align-self-center">{{ username }}</span>
                 <canvas
                   class="avatar col"
@@ -148,6 +148,9 @@ export default {
     padding: 0px;
     height: 32px;
     width: 32px;
+}
+.username {
+    display: inline-block;
 }
 .brand-logo {
     height: 24px;

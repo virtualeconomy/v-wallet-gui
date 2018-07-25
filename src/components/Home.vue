@@ -17,7 +17,7 @@
         <div class="col-auto assets-pane height-full">
           <div class="asset-title">
             <img
-              src="../assets/imgs/icons/wallet/ic_assets_line.svg"><b class="title-assets">Assets</b>
+              src="../assets/imgs/icons/wallet/ic_assets_line.svg"><b class="title-assets">Accounts</b>
           </div>
           <Asset v-if="addresses"
                  v-for="(index, address) in addresses"
@@ -75,6 +75,7 @@
                               :address="selectedAddress"
                               :balances="balance"
                               :cold-addresses="coldAddresses"
+                              :total="total"
                               :addresses="addresses"></trans-pane>
                 </div>
                 <div class="f-records">

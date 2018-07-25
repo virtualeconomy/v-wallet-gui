@@ -118,6 +118,14 @@ export default {
 </script>
 
 <style scoped lang="less">
+input[type=number] {
+    -moz-appearance:textfield !important;
+}
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0;
+}
 #address-qrcode {
     margin-top: 30px;
     text-align: center;
