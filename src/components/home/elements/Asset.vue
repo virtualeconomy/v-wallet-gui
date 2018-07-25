@@ -15,7 +15,7 @@
              class="money-icon selected-icon"
              width="16"
              height="16">
-        <p class="mb-0 show-number balance"><b>{{ balance }}</b></p>
+        <p class="mb-0 show-number balance"><b>{{ balance == 0 ? '0.00' : balance }}</b></p>
         <p class="mb-0 asset-title">Balance</p>
       </div>
     </div>
