@@ -61,7 +61,8 @@
     <b-container v-else-if="page==='cold'">
       <ColdSignature :data-object="dataObject"
                      @get-signature="getSignature"
-                     @prev-page="prevPage"></ColdSignature>
+                     @prev-page="prevPage"
+                     :tx-type="txType"></ColdSignature>
     </b-container>
   </b-modal>
 </template>
@@ -85,7 +86,8 @@ export default {
             coldSignature: '',
             coldTimestamp: 0,
             sendError: false,
-            signed: false
+            signed: false,
+            txType: CANCEL_LEASE_TX
         }
     },
     props: {
@@ -144,10 +146,10 @@ export default {
         },
         dataObject() {
             return {
-                transactionType: CANCEL_LEASE_TX,
                 senderPublicKey: this.coldPubKey,
                 fee: this.fee * VEE_PRECISION,
-                txId: this.modalId
+                txId: this.modalId,
+                timestamp: Date.now() * 1e6
             }
         },
         userInfo() {
@@ -177,6 +179,7 @@ export default {
             if (this.walletType === 'coldWallet') {
                 if (!this.signed) {
                     this.page = 'cold'
+                    return
                 } else {
                     this.timestamp = this.coldTimestamp
                     apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldTimestamp)

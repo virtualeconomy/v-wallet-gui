@@ -48,7 +48,8 @@
                   :cold-pub-key="coldPubKey"
                   :trans-type="transType"
                   :address-index="addressIndex"
-                  :address="address"></Record>
+                  :address="address"
+                  :wallet-type="walletType"></Record>
         </div>
       </div>
     </div>
@@ -152,11 +153,17 @@ export default {
         },
         coldPubKey: {
             type: String,
-            default: ''
+            default: '',
+            require: true
         },
         addressIndex: {
             type: Number,
             default: 0
+        },
+        walletType: {
+            type: String,
+            default: '',
+            require: true
         }
     },
     watch: {

@@ -134,8 +134,14 @@ export default {
                 if (!signature) {
                     this.paused = false
                 } else {
-                    if (transaction.isValidSignature(this.dataObject, signature)) {
-                        this.$emit('get-signature', signature)
+                    var data = JSON.parse(JSON.stringify(this.dataObject))
+                    delete data.transactionType
+                    data.timestamp *= 1e6
+                    if (transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType)) {
+                        var _this = this
+                        setTimeout(function() {
+                            _this.$emit('get-signature', signature)
+                        }, 300)
                     } else {
                         this.qrError = true
                     }

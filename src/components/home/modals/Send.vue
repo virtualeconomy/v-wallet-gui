@@ -302,14 +302,26 @@
                    :tx-type="'transfer'">
           </Confirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
-          <b-button variant="primary"
-                    size="lg"
-                    @click="prevPage">Cancle
-          </b-button>
-          <b-button variant="primary"
-                    size="lg"
-                    @click="sendData('coldwallet')">Confirm
-          </b-button>
+          <b-row>
+            <b-col class="col-lef">
+              <b-button
+                class="btn-back"
+                block
+                variant="light"
+                size="lg"
+                @click="coldPrevPage">Back
+              </b-button>
+            </b-col>
+            <b-col class="col-rit">
+              <b-button
+                block
+                class="btn-confirm"
+                variant="warning"
+                size="lg"
+                @click="sendData('coldWallet')">Confirm
+              </b-button>
+            </b-col>
+          </b-row>
         </b-container>
         <b-container v-show="coldPageId===5">
           <Success :address="coldAddress"
@@ -318,7 +330,8 @@
                    :fee="coldFee"
                    :attachment="coldAttachment">
           </Success>
-          <b-button variant="primary"
+          <b-button variant="warning"
+                    block
                     size="lg"
                     @click="endSend">OK
           </b-button>
@@ -419,7 +432,7 @@ export default {
                 fee: this.coldFee * VEE_PRECISION,
                 recipient: this.coldRecipient,
                 attachment: this.coldAttachment,
-                timestamp: Date.now() * 1e6
+                timestamp: Date.now()
             }
         },
         isValidAttachment() {
@@ -577,6 +590,7 @@ export default {
         },
         getSignature: function(signature) {
             this.coldSignature = signature
+            this.dataObject.timestamp *= 1e6
             this.coldPageId++
         },
         repaintLocation(location, ctx) {

@@ -95,7 +95,8 @@
           </b-container>
           <ColdSignature :data-object="dataObject"
                          v-if="coldPageId===3"
-                         @get-signature="getSignature"></ColdSignature>
+                         @get-signature="getSignature"
+                         @prev-page="prevColdPage"></ColdSignature>
           <b-container v-else-if="coldPageId===4">
             <Confirm :tx-type="'lease'"
                      :amount="Number(coldAmount)"
@@ -128,12 +129,13 @@
             </b-row>
           </b-container>
           <LeaseSuccess v-else-if="coldPageId===5"
-                        :amount="coldAmount"></LeaseSuccess>
+                        :amount="Number(coldAmount)"
+                        @show-details="showDetails"></LeaseSuccess>
         </b-tab>
       </b-tabs>
     </b-modal>
     <TxInfoModal :modal-id="txId"
-                 :tx-icon="'leasedout'"
+                 :tx-icon="'leased out'"
                  :tx-address="txAddress"
                  :tx-time="txTimestamp"
                  :tx-fee="fee"
@@ -209,7 +211,7 @@ export default {
                 amount: Number((this.coldAmount * VEE_PRECISION).toFixed(0)),
                 fee: this.fee * VEE_PRECISION,
                 recipient: this.coldRecipient,
-                timestamp: Date.now() * 1e6
+                timestamp: Date.now()
             }
         },
         noColdAddress() {
@@ -279,7 +281,7 @@ export default {
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), LEASE_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareForAPI(this.dataObject, this.coldSignature, LEASE_TX)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, LEASE_TX)
             }
             const url = TESTNET_NODE + '/leasing/broadcast/lease'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
@@ -287,13 +289,18 @@ export default {
                 this.txAddress = response.body.recipient
                 this.txTimestamp = response.body.timestamp
                 this.txAmount = response.body.amount / VEE_PRECISION
-                this.pageId++
+                if (walletType === 'hotWallet') {
+                    this.pageId++
+                } else {
+                    this.coldPageId++
+                }
             }, response => {
                 this.sendError = true
             })
         },
         getSignature(signature, timestamp) {
             this.coldSignature = signature
+            this.dataObject.timestamp *= 1e6
             this.coldPageId++
         },
         showDetails() {
