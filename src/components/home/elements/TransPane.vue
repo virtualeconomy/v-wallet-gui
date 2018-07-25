@@ -6,7 +6,7 @@
            width="30"
            height="30">
       <span class="title">
-        {{ balance }}
+        {{ balance == 0 ? '0.00' : balance }}
       </span>
       <p class="text-muted text-des mb-0">
         Available Balance
@@ -18,7 +18,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ total }}
+        {{ total == 0 ? '0.00' : total }}
       </span>
       <p class="text-muted text-des mb-0">
         Total Balance

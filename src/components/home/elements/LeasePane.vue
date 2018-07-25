@@ -6,7 +6,7 @@
            width="30"
            height="30">
       <span class="title">
-        {{ total }}
+        {{ total == 0 ? '0.00' : total }}
       </span>
       <p class="text-muted text-des mb-0">
         Total Balance
@@ -17,7 +17,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ available }}
+        {{ available == 0 ? '0.00' : available }}
       </span>
       <p class="text-muted text-des mb-0">
         Available
@@ -28,7 +28,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ leasedIn }}
+        {{ leasedIn == 0 ? '0.00' : leasedIn }}
       </span>
       <p class="text-muted text-des mb-0">
         Leased In
@@ -39,7 +39,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ leasedOut }}
+        {{ leasedOut == 0 ? '0.00' : leasedOut }}
       </span>
       <p class="text-muted text-des mb-0">
         Leased Out
