@@ -119,6 +119,7 @@ import { TESTNET_NODE } from '../../../constants'
 import Record from './Record'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
+import browser from '../../../utils/browser'
 
 export default {
     name: 'Records',
@@ -127,7 +128,7 @@ export default {
         JsonExcel
     },
     created() {
-        this.myHeight = (window.innerHeight - 300) + 'px'
+        this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
         if (this.address && Vue.ls.get('pwd')) {
             this.getTxRecords()
         }
@@ -183,6 +184,9 @@ export default {
         }
     },
     methods: {
+        isMobile() {
+            return browser.isMobile()
+        },
         getMonthYearStr(date) {
             const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
             const d = new Date(date / 1e6)

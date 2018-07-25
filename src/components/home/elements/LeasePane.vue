@@ -12,7 +12,7 @@
         Total Balance
       </p>
     </div>
-    <div class="col-auto align-self-center text-left">
+    <div class="col-xs-1 align-self-center text-left">
       <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
            width="16"
            height="16">
@@ -23,7 +23,7 @@
         Available
       </p>
     </div>
-    <div class="col-auto align-self-center text-left">
+    <div class="col-xs-1 align-self-center text-left">
       <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
            width="16"
            height="16">
@@ -34,7 +34,7 @@
         Leased In
       </p>
     </div>
-    <div class="col-auto align-self-center text-left">
+    <div class="col-xs-1 align-self-center text-left">
       <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
            width="16"
            height="16">
