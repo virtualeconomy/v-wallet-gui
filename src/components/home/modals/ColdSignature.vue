@@ -137,7 +137,6 @@ export default {
                     var data = JSON.parse(JSON.stringify(this.dataObject))
                     delete data.transactionType
                     data.timestamp *= 1e6
-                    console.log(data)
                     if (transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType)) {
                         var _this = this
                         setTimeout(function() {
