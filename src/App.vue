@@ -9,10 +9,13 @@
 import browser from '../src/utils/browser'
 export default {
     name: 'App',
-    methods: {
-        isMobile() {
-            return browser.isMobile()
+    data() {
+        return {
+            isMobile: false
         }
+    },
+    created() {
+        this.isMobile = browser.isMobile()
     }
 }
 </script>
@@ -20,7 +23,7 @@ export default {
 <style lang="less">
 @import 'assets/style/common';
 .mobile {
-    zoom: 0.6 !important;
+    zoom: 0.7 !important;
 }
 #app {
     font-family: 'Avenir', Helvetica, Arial, sans-serif;
@@ -30,5 +33,6 @@ export default {
     color: #2c3e50;
     width: 100%;
     height: 100%;
+    overflow-y: auto;
 }
 </style>

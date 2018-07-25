@@ -14,7 +14,7 @@
              @delete-cold="deleteCold"></nav-bar>
     <div class="container-fluid height-full contents">
       <div class="row height-full div-main">
-        <div class="col-auto assets-pane height-full">
+        <div class="col-auto col-xs-1 assets-pane height-full">
           <div class="asset-title">
             <img
               src="../assets/imgs/icons/wallet/ic_assets_line.svg"><b class="title-assets">Accounts</b>
