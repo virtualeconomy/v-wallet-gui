@@ -116,7 +116,7 @@
                  :tx-address="txAddress"></TxInfoModal>
     <CancelLease :modal-id="txRecord.id"
                  :wallet-type="walletType"
-                 :address="address"
+                 :address="txAddress"
                  :amount="txAmount"
                  :fee="txFee"
                  :cold-pub-key="coldPubKey"

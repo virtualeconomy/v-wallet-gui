@@ -84,7 +84,6 @@ export default {
             page: 'confirm',
             timestamp: 0,
             coldSignature: '',
-            coldTimestamp: 0,
             sendError: false,
             signed: false,
             txType: CANCEL_LEASE_TX
@@ -146,10 +145,11 @@ export default {
         },
         dataObject() {
             return {
+                transactionType: CANCEL_LEASE_TX,
                 senderPublicKey: this.coldPubKey,
                 fee: this.fee * VEE_PRECISION,
                 txId: this.modalId,
-                timestamp: Date.now() * 1e6
+                timestamp: Date.now()
             }
         },
         userInfo() {
@@ -169,7 +169,6 @@ export default {
             this.signed = false
             this.sendError = false
             this.coldSignature = ''
-            this.coldTimestamp = 0
         },
         closeModal() {
             this.$refs.cancelLeaseModal.hide()
@@ -181,8 +180,7 @@ export default {
                     this.page = 'cold'
                     return
                 } else {
-                    this.timestamp = this.coldTimestamp
-                    apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldTimestamp)
+                    apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, CANCEL_LEASE_TX)
                 }
             } else {
                 const dataInfo = {
@@ -203,9 +201,9 @@ export default {
         prevPage() {
             this.page = 'confirm'
         },
-        getSignature(signature, timestamp) {
+        getSignature(signature) {
             this.coldSignature = signature
-            this.coldTimestamp = timestamp
+            this.dataObject.timestamp *= 1e6
             this.signed = true
             this.page = 'confirm'
         },
