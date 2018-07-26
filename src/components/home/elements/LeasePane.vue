@@ -6,7 +6,7 @@
            width="30"
            height="30">
       <span class="title">
-        {{ total == 0 ? '0.00' : total }}
+        {{ formatter(total) }}
       </span>
       <p class="text-muted text-des mb-0">
         Total Balance
@@ -17,7 +17,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ available == 0 ? '0.00' : available }}
+        {{ formatter(available) }}
       </span>
       <p class="text-muted text-des mb-0">
         Available
@@ -28,7 +28,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ leasedIn == 0 ? '0.00' : leasedIn }}
+        {{ formatter(leasedIn) }}
       </span>
       <p class="text-muted text-des mb-0">
         Leased In
@@ -39,7 +39,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ leasedOut == 0 ? '0.00' : leasedOut }}
+        {{ formatter(leasedOut) }}
       </span>
       <p class="text-muted text-des mb-0">
         Leased Out
@@ -89,6 +89,7 @@
 
 <script>
 import Lease from '../modals/Lease'
+import browser from '../../../utils/browser'
 
 export default {
     name: 'LeasePane',
@@ -130,6 +131,11 @@ export default {
             type: Number,
             default: 0,
             require: true
+        }
+    },
+    methods: {
+        formatter(num) {
+            return browser.numberFormatter(num)
         }
     }
 }
