@@ -102,7 +102,7 @@ exports.default = {
             throw new Error('Missing or invalid address');
         }
         var addressBytes = base58_1.default.decode(address);
-        if (addressBytes[0] !== 1 || addressBytes[1] !== NETWORK_BYTE) {
+        if (addressBytes[0] !== constants.ADDRESS_VERSION || addressBytes[1] !== NETWORK_BYTE) {
             return false;
         }
         var key = addressBytes.slice(0, 22);
