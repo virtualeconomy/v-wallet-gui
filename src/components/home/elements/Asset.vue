@@ -15,7 +15,7 @@
              class="money-icon selected-icon"
              width="16"
              height="16">
-        <p class="mb-0 show-number balance"><b>{{ balance == 0 ? '0.00' : balance }}</b></p>
+        <p class="mb-0 show-number balance"><b>{{ formatter(balance) }}</b></p>
         <p class="mb-0 asset-title">Balance</p>
       </div>
     </div>
@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import browser from '../../../utils/browser'
 export default {
     name: 'Asset',
     props: {
@@ -56,6 +57,11 @@ export default {
                 return ['card', 'asset', 'shadow-sm']
             }
             return ['card', 'asset', 'shadow', 'selected-asset']
+        }
+    },
+    methods: {
+        formatter(num) {
+            return browser.numberFormatter(num)
         }
     }
 }

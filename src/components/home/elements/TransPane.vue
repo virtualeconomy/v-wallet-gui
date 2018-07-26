@@ -6,7 +6,7 @@
            width="30"
            height="30">
       <span class="title">
-        {{ balance == 0 ? '0.00' : balance }}
+        {{ formatter(balance) }}
       </span>
       <p class="text-muted text-des mb-0">
         Available Balance
@@ -18,7 +18,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ total == 0 ? '0.00' : total }}
+        {{ formatter(total) }}
       </span>
       <p class="text-muted text-des mb-0">
         Total Balance
@@ -50,6 +50,7 @@
 <script>
 import Receive from '../modals/Receive'
 import Send from '../modals/Send'
+import browser from '../../../utils/browser'
 export default {
     name: 'TransPane',
     components: {
@@ -85,6 +86,11 @@ export default {
             type: Number,
             default: 0,
             require: true
+        }
+    },
+    methods: {
+        formatter(num) {
+            return browser.numberFormatter(num)
         }
     }
 }
