@@ -36,7 +36,7 @@
         :data="response"
         :fields="resFields"
         :type="downloadFileType"
-        :name="'txs_' + address + '.' + downloadFileType">
+        :name="'txs_' + exportTime + '_' + address + '.' + downloadFileType">
         <b-btn
           class="btn-export"
           :disabled="changeShowDisable"
@@ -153,7 +153,8 @@ export default {
                 attachment: 'attachment'
             },
             transType: 'transfer',
-            myHeight: '0'
+            myHeight: '0',
+            exportTime: Date.now()
         }
     },
     props: {
