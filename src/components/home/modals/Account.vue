@@ -308,24 +308,27 @@ export default {
             prvKeyPwdErr: false,
             seedPwd: '',
             seedPwdErr: false,
-            refForCold: {},
             addressOptions: {},
             currentAddress: 0
         }
     },
     created() {
         this.coldWalletNum = Object.keys(this.coldAddresses).length
-        var coldAddressArray = Object.keys(this.coldAddresses)
-        this.refForCold = Object.keys(coldAddressArray).reduce(function(obj, key) {
-            obj[coldAddressArray[key]] = key
-            return obj
-        }, {})
         var addrStrs = Object.keys(this.addresses)
         for (var i = 0; i < addrStrs.length; i++) {
             this.addressOptions[this.addresses[addrStrs[i]]] = addrStrs[i]
         }
         this.currentAddress = 0
         this.addressChange(this.currentAddress)
+    },
+    computed: {
+        refForCold() {
+            var coldAddressArray = Object.keys(this.coldAddresses)
+            return Object.keys(coldAddressArray).reduce(function(obj, key) {
+                obj[coldAddressArray[key]] = key
+                return obj
+            }, {})
+        }
     },
     watch: {
         coldAddresses() {
