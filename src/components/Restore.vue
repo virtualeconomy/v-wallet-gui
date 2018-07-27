@@ -145,7 +145,7 @@ export default {
 <style scoped>
 .layout-main {
     width: 100%;
-    height: 100%;
+    /*height: 100%;*/
     min-width: 200px;
     background-color: rgb(249, 249, 249);
 }
@@ -161,6 +161,7 @@ export default {
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
+    margin-top: 80px;
 }
 .login-forms {
     width: 450px;
