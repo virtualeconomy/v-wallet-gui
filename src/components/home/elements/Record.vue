@@ -86,7 +86,7 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">TX info</b-dropdown-item>
-          <b-dropdown-item v-if="transType === 'lease' && txIcon==='leased out'"
+          <b-dropdown-item v-if="transType === 'lease' && txIcon==='leased out' && !isCanceled"
                            @click="cancelLeasing">Cancel Leasing</b-dropdown-item>
           <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
         </b-dropdown>
@@ -179,8 +179,11 @@ export default {
         addressIndex: {
             type: Number,
             default: 0
+        },
+        isCanceled: {
+            type: Boolean,
+            default: false
         }
-
     },
     computed: {
         txType() {
@@ -217,7 +220,7 @@ export default {
             return this.txIcon.replace(/\s+/g, '')
         },
         txAddress() {
-            return ((this.txType === 'Sent' || this.txType === 'Leased Out') ? this.txRecord.recipient : this.txRecord.sender)
+            return ((this.txType === 'Sent' || this.txType === 'Leased Out') ? this.txRecord.recipient : (this.txType === 'Leased Out Canceled') ? this.txRecord.lease.recipient : this.txRecord.sender)
         },
         txAddressShow() {
             if (this.txAddress) {
@@ -317,6 +320,7 @@ export default {
             this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.transType + this.txRecord.id)
         },
         cancelLeasing() {
+            console.log(this.txRecord.id)
             this.$root.$emit('bv::show::modal', 'cancelLeaseModal_' + this.txRecord.id)
         },
         showDetails(cancelTime) {
