@@ -6,10 +6,10 @@
            width="30"
            height="30">
       <span class="title">
-        {{ formatter(total) }}
+        {{ formatter(available) }}
       </span>
       <p class="text-muted text-des mb-0">
-        Total Balance
+        Available Balance
       </p>
     </div>
     <div class="col-auto align-self-center text-left">
@@ -17,10 +17,10 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ formatter(available) }}
+        {{ formatter(total) }}
       </span>
       <p class="text-muted text-des mb-0">
-        Available
+        Total Balance
       </p>
     </div>
     <div class="col-auto align-self-center text-left">

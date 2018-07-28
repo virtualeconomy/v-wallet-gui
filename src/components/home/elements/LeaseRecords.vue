@@ -49,7 +49,8 @@
                   :trans-type="transType"
                   :address-index="addressIndex"
                   :address="address"
-                  :wallet-type="walletType"></Record>
+                  :wallet-type="walletType"
+                  :is-canceled="beCanceledList[record.id]"></Record>
         </div>
       </div>
     </div>
@@ -143,7 +144,8 @@ export default {
                 attachment: 'attachment'
             },
             transType: 'lease',
-            myHeight: '0'
+            myHeight: '0',
+            beCanceledList: {}
         }
     },
     props: {
@@ -196,6 +198,9 @@ export default {
                         this.response.forEach(function(v, i) {
                             if (v.type === LEASE_TX || v.type === CANCEL_LEASE_TX) {
                                 self.leaseRecords.push(v)
+                                if (v.type === CANCEL_LEASE_TX) {
+                                    Vue.set(self.beCanceledList, v.lease.id, true)
+                                }
                             }
                         })
                         this.changeShowDisable = false
@@ -205,6 +210,7 @@ export default {
                         this.changeShowDisable = false
                     }
                 })
+                console.log(this.beCanceledList)
             }
         },
         changeShowNum(newNum) {
