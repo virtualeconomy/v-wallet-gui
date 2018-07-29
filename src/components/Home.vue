@@ -73,6 +73,7 @@
                 <div class="trans-pane">
                   <trans-pane :balance="balance[selectedAddress]"
                               :address="selectedAddress"
+                              :wallet-type="walletType"
                               :balances="balance"
                               :cold-addresses="coldAddresses"
                               :total="total"

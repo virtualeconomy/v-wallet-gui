@@ -191,6 +191,16 @@ export default {
             type: Object,
             default: function() {},
             require: true
+        },
+        walletType: {
+            type: String,
+            default: 'hotWallet',
+            require: true
+        },
+        selectedAddress: {
+            type: String,
+            default: '',
+            require: true
         }
     },
     computed: {
