@@ -83,7 +83,9 @@
     <Lease show="false"
            :balances="balance"
            :cold-addresses="coldAddresses"
-           :addresses="addresses"></Lease>
+           :addresses="addresses"
+           :selected-address="address"
+           :selected-wallet-type="walletType"></Lease>
   </div>
 </template>
 
@@ -130,6 +132,16 @@ export default {
         total: {
             type: Number,
             default: 0,
+            require: true
+        },
+        address: {
+            type: String,
+            default: '',
+            require: true
+        },
+        walletType: {
+            type: String,
+            default: '',
             require: true
         }
     },

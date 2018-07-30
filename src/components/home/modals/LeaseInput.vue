@@ -113,8 +113,8 @@ export default {
             qrInit: false,
             qrErrMsg: void 0,
             paused: false,
-            address: this.defaultAddress,
-            coldAddress: this.defaultColdAddress
+            address: this.selectedWalletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress,
+            coldAddress: this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         }
     },
     props: {
@@ -143,6 +143,16 @@ export default {
         defaultColdAddress: {
             type: String,
             default: ''
+        },
+        selectedAddress: {
+            type: String,
+            default: '',
+            require: true
+        },
+        selectedWalletType: {
+            type: String,
+            default: '',
+            require: true
         }
     },
     computed: {
@@ -256,8 +266,8 @@ export default {
             this.qrInit = false
             this.qrErrMsg = void 0
             this.paused = false
-            this.address = this.defaultAddress
-            this.coldAddress = this.defaultColdAddress
+            this.address = this.selectedWalletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
+            this.coldAddress = this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         }
     }
 }

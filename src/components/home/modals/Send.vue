@@ -361,8 +361,8 @@ var initData = {
     coldAttachment: '',
     coldPageId: 1,
     coldFee: TX_FEE,
-    address: this.defaultAddress,
-    coldAddress: this.defaultColdAddress,
+    address: this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress,
+    coldAddress: this.walletType === 'hotWallet' ? this.defaultColdAddress : this.selectedAddress,
     scanShow: false,
     qrInit: false,
     paused: false,
@@ -386,6 +386,16 @@ export default {
         addresses: {
             type: Object,
             default: function() {},
+            require: true
+        },
+        walletType: {
+            type: String,
+            default: 'hotWallet',
+            require: true
+        },
+        selectedAddress: {
+            type: String,
+            default: this.defaultAddress,
             require: true
         }
     },
@@ -515,8 +525,8 @@ export default {
             this.paused = false
             this.sendError = false
             this.coldSignature = ''
-            this.address = this.defaultAddress
-            this.coldAddress = this.defaultColdAddress
+            this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
+            this.coldAddress = this.walletType === 'hotWallet' ? this.defaultColdAddress : this.selectedAddress
         },
         endSend: function() {
             this.$refs.sendModal.hide()

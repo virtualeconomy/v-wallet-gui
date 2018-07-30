@@ -41,7 +41,9 @@
     <Send show="false"
           :balances="balances"
           :cold-addresses="coldAddresses"
-          :addresses="addresses"></Send>
+          :addresses="addresses"
+          :selected-address="address"
+          :wallet-type="walletType"></Send>
     <Receive show="false"
              :address="address"></Receive>
   </div>
@@ -85,6 +87,11 @@ export default {
         total: {
             type: Number,
             default: 0,
+            require: true
+        },
+        walletType: {
+            type: String,
+            default: '',
             require: true
         }
     },
