@@ -5,7 +5,8 @@
              centered
              hide-header
              hide-footer
-             @hide="resetPage">
+             @hide="resetPage"
+             @show="showPage">
       <button
         class="close btn-close"
         @click="closeModal">
@@ -20,7 +21,9 @@
                       :addresses="addresses"
                       :wallet-type="'hot'"
                       :default-address="defaultAddress"
-                      ref="addrInput"></LeaseInput>
+                      ref="addrInput"
+                      :selected-address="selectedAddress"
+                      :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="pageId===2">
             <Confirm :tx-type="'lease'"
                      :amount="Number(amount)"
@@ -65,7 +68,9 @@
                       :wallet-type="'cold'"
                       :cold-addresses="coldAddresses"
                       :default-cold-address="defaultColdAddress"
-                      ref="coldAddrInput"></LeaseInput>
+                      ref="coldAddrInput"
+                      :selected-address="selectedAddress"
+                      :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="coldPageId===2">
             <Confirm :tx-type="'lease'"
                      :amount="Number(coldAmount)"
@@ -192,7 +197,7 @@ export default {
             default: function() {},
             require: true
         },
-        walletType: {
+        selectedWalletType: {
             type: String,
             default: 'hotWallet',
             require: true
@@ -251,12 +256,6 @@ export default {
             this.coldPageId++
         },
         resetPage() {
-            if (this.$refs.addrInput) {
-                this.$refs.addrInput.resetData()
-            }
-            if (this.$refs.coldAddrInput) {
-                this.$refs.coldAddrInput.resetData()
-            }
             this.amount = 0
             this.coldAmount = 0
             this.recipient = ''
@@ -318,6 +317,14 @@ export default {
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
+        },
+        showPage() {
+            if (this.$refs.addrInput) {
+                this.$refs.addrInput.resetData()
+            }
+            if (this.$refs.coldAddrInput) {
+                this.$refs.coldAddrInput.resetData()
+            }
         }
     }
 }

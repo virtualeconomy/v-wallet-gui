@@ -88,6 +88,11 @@ export default {
             type: Number,
             default: 0,
             require: true
+        },
+        walletType: {
+            type: String,
+            default: '',
+            require: true
         }
     },
     methods: {
