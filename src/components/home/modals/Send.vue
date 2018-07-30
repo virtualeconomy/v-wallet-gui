@@ -525,7 +525,7 @@ export default {
             this.paused = false
             this.sendError = false
             this.coldSignature = ''
-            this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.default
+            this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'hotWallet' ? this.defaultColdAddress : this.selectedAddress
         },
         endSend: function() {
