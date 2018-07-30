@@ -361,7 +361,7 @@ var initData = {
     coldAttachment: '',
     coldPageId: 1,
     coldFee: TX_FEE,
-    address: this.walletType === 'hotWallet' ? this.selectedAddress : this.default,
+    address: this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress,
     coldAddress: this.walletType === 'hotWallet' ? this.defaultColdAddress : this.selectedAddress,
     scanShow: false,
     qrInit: false,
