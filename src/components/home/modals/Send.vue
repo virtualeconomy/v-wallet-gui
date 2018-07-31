@@ -17,7 +17,7 @@
     <b-tabs @input="hideQrScan">
       <b-tab title="Hot Wallet"
              :disabled="qrInit && !pageId"
-             active>
+             :active="walletType==='hotWallet'">
         <b-container
           class="text-left"
           v-if="pageId===1">
@@ -161,7 +161,8 @@
         </b-container>
       </b-tab>
       <b-tab title="Cold Wallet"
-             :disabled="noColdAddress || (qrInit && !coldPageId)">
+             :disabled="noColdAddress || (qrInit && !coldPageId)"
+             :active="walletType==='coldWallet'">
         <b-container v-if="coldPageId===1"
                      class="text-left">
           <b-form-group label="Wallet Address"
@@ -362,7 +363,7 @@ var initData = {
     coldPageId: 1,
     coldFee: TX_FEE,
     address: this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress,
-    coldAddress: this.walletType === 'hotWallet' ? this.defaultColdAddress : this.selectedAddress,
+    coldAddress: this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress,
     scanShow: false,
     qrInit: false,
     paused: false,
@@ -526,7 +527,7 @@ export default {
             this.sendError = false
             this.coldSignature = ''
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
-            this.coldAddress = this.walletType === 'hotWallet' ? this.defaultColdAddress : this.selectedAddress
+            this.coldAddress = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         endSend: function() {
             this.$refs.sendModal.hide()

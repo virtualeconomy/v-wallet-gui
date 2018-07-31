@@ -105,7 +105,8 @@
                  :tx-amount="txAmount"
                  :tx-block="txBlock"
                  :tx-attachment="txAttachment"
-                 :trans-type="transType"></TxInfoModal>
+                 :trans-type="transType"
+                 :v-if="transType==='transfer'"></TxInfoModal>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-fee="txFee"
                  :tx-time="cancelTime"
@@ -394,28 +395,28 @@ export default {
     }
     .amount-leasedout {
       font-size: 17px;
-      color: #23A28C;
+      color: #73CC5A;
       letter-spacing: 0;
       text-align: right;
       padding-right: 0px;
     }
     .amount-leasedin {
       font-size: 17px;
-      color: #23A28C;
+      color: #86BEF7;
       letter-spacing: 0;
       text-align: right;
       padding-right: 0px;
     }
     .amount-leasedoutcanceled {
       font-size: 17px;
-      color: #23A28C;
+      color: #FF7A8A;
       letter-spacing: 0;
       text-align: right;
       padding-right: 0px;
     }
     .amount-leasedincanceled {
       font-size: 17px;
-      color: #23A28C;
+      color: #FFD192;
       letter-spacing: 0;
       text-align: right;
       padding-right: 0px;
