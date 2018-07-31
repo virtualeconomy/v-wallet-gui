@@ -6,6 +6,7 @@
              hide-header
              hide-footer
              @hide="resetPage"
+             lazy
              @show="showPage">
       <button
         class="close btn-close"
@@ -14,7 +15,7 @@
       </button>
       <b-tabs>
         <b-tab title="Hot Wallet"
-               active>
+               :active="selectedWalletType==='hotWallet'">
           <LeaseInput :balances="balances"
                       @get-data="getData"
                       v-if="pageId===1"
@@ -61,7 +62,8 @@
                         @show-details="showDetails"></LeaseSuccess>
         </b-tab>
         <b-tab title="Cold Wallet"
-               :disabled="noColdAddress">
+               :disabled="noColdAddress"
+               :active="selectedWalletType==='coldWallet'">
           <LeaseInput :balances="balances"
                       @get-cold-data="getColdData"
                       v-if="coldPageId===1"

@@ -39,7 +39,7 @@
                width="60px"
                height="60px">
         </div>
-        <div :class="txIcon + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ txAmount }} vee</div>
+        <div :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ txAmount }} vee</div>
       </div>
       <div class="tx-address">
         <label>{{ (txIcon === 'received' || txIcon === 'leased in' || txIcon === 'leased in canceled') ? 'From' : 'To' }}</label>
@@ -97,6 +97,11 @@ export default {
         transType: {
             type: String,
             default: 'transfer'
+        }
+    },
+    computed: {
+        txClass() {
+            return this.txIcon.replace(/\s+/g, '')
         }
     },
     methods: {
@@ -228,6 +233,18 @@ export default {
     .leasedout-amount {
         font-size: 28px;
         color: #73CC5A;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedoutcanceled-amount {
+        font-size: 28px;
+        color: #FF7A8A;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedincanceled-amount {
+        font-size: 28px;
+        color: #FFD192;
         letter-spacing: 0;
         text-align: center;
     }
