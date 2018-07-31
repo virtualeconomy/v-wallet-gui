@@ -210,7 +210,6 @@ export default {
                         this.changeShowDisable = false
                     }
                 })
-                console.log(this.beCanceledList)
             }
         },
         changeShowNum(newNum) {
