@@ -47,7 +47,7 @@
                  class="btn-import-cold">
             <img
               class="mb-1"
-              src="../assets/imgs/icons/wallet/ic_import.svg"><b class="title-assets">Import Cold Wallet</b></b-btn>
+              src="../assets/imgs/icons/wallet/ic_import.svg"><b class="title-assets">Monitor Cold Wallet</b></b-btn>
           <ImportColdWallet @import-cold="importCold"
                             show="false"
                             :address="address"></ImportColdWallet>

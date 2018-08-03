@@ -38,65 +38,6 @@
           <img src="../../../assets/imgs/icons/operate/ic_copy.svg">
         </b-btn>
       </b-form-group>
-      <b-form-group label="Cold Wallet Address">
-        <b-input-group
-          class="mb-2"
-          v-if="coldWalletNum > 0"
-          v-for="(pubkey, addr) in coldAddresses"
-          :key="addr">
-          <b-dropdown
-            :text="tagOfColdWallet[addr] ? 'public key' : 'address'"
-            class="pd-select2 input-t"
-            variant="light"
-            size="sm"
-            slot="prepend">
-            <b-dropdown-item
-              class="drop-item"
-              @click="showAddr(addr)">address</b-dropdown-item>
-            <b-dropdown-item
-              class="drop-item"
-              @click="showKey(addr)">public key</b-dropdown-item>
-          </b-dropdown>
-          <b-form-input
-            readonly
-            size="sm"
-            :value="tagOfColdWallet[addr] ? pubkey : addr">
-          </b-form-input>
-          <b-input-group-append>
-            <textarea id="coldToCopy"
-                      :value="tagOfColdWallet[addr] ? pubkey : addr"
-                      ref="coldToCopy"
-                      class="hidden"
-                      readonly>
-            </textarea>
-            <b-btn
-              :id="addr"
-              class="btn-copy-append"
-              variant="link"
-              v-b-popover.click.topright="'Copied!'"
-              @click="copyColdText(addr, tagOfColdWallet[addr])"
-              size="sm">
-              <img src="../../../assets/imgs/icons/operate/ic_copy.svg">
-            </b-btn>
-          </b-input-group-append>
-          <b-input-group-append>
-            <b-btn
-              variant="danger"
-              v-b-tooltip.hover.topleft
-              title="WARN! To delete the coldwallet"
-              @click="deleteCold(addr)"
-              size="sm">×</b-btn>
-          </b-input-group-append>
-        </b-input-group>
-        <b-form-input
-          v-if="coldWalletNum == 0"
-          readonly
-          no-resize
-          size="sm"
-          class="input-t"
-          value="No cold wallet imported">
-        </b-form-input>
-      </b-form-group>
       <b-form-group label="Public Key"
                     label-for="pubKey">
         <b-form-input id="pubKey"
@@ -247,6 +188,57 @@
             Password is wrong.
           </small>
         </div>
+      </b-form-group>
+      <b-form-group label="Cold Wallet Address">
+        <b-input-group class="mb-2"
+                       v-if="coldWalletNum > 0"
+                       v-for="(pubkey, addr) in coldAddresses"
+                       :key="addr">
+          <b-dropdown :text="tagOfColdWallet[addr] ? 'public key' : 'address'"
+                      class="pd-select2 input-t"
+                      variant="light"
+                      size="sm"
+                      slot="prepend">
+            <b-dropdown-item class="drop-item"
+                             @click="showAddr(addr)">address</b-dropdown-item>
+            <b-dropdown-item class="drop-item"
+                             @click="showKey(addr)">public key</b-dropdown-item>
+          </b-dropdown>
+          <b-form-input readonly
+                        size="sm"
+                        :value="tagOfColdWallet[addr] ? pubkey : addr">
+          </b-form-input>
+          <b-input-group-append>
+            <textarea id="coldToCopy"
+                      :value="tagOfColdWallet[addr] ? pubkey : addr"
+                      ref="coldToCopy"
+                      class="hidden"
+                      readonly>
+            </textarea>
+            <b-btn :id="addr"
+                   class="btn-copy-append"
+                   variant="link"
+                   v-b-popover.click.topright="'Copied!'"
+                   @click="copyColdText(addr, tagOfColdWallet[addr])"
+                   size="sm">
+              <img src="../../../assets/imgs/icons/operate/ic_copy.svg">
+            </b-btn>
+          </b-input-group-append>
+          <b-input-group-append>
+            <b-btn variant="danger"
+                   v-b-tooltip.hover.topleft
+                   title="WARN! To delete the coldwallet"
+                   @click="deleteCold(addr)"
+                   size="sm">×</b-btn>
+          </b-input-group-append>
+        </b-input-group>
+        <b-form-input v-if="coldWalletNum == 0"
+                      readonly
+                      no-resize
+                      size="sm"
+                      class="input-t"
+                      value="No cold wallet imported">
+        </b-form-input>
       </b-form-group>
     </div>
   </b-modal>

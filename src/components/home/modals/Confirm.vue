@@ -17,6 +17,13 @@
         </b-form-input>
       </b-form-group>
       <b-form-group horizontal
+                    label="Type"
+                    class="form-line" >
+        <span id="transfer-type"
+              class="des">{{ txType }}
+        </span>
+      </b-form-group>
+      <b-form-group horizontal
                     class="form-line"
                     label="From"
                     label-for="walletAddress_confirm">
