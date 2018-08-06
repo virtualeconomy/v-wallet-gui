@@ -141,7 +141,7 @@ export default {
     border-right: 1px solid #EDEDED;
 }
 .money-icon {
-    margin-top: -14px;
+    margin-top: -2px;
 }
 .icon-btn {
     margin-right: 10px;

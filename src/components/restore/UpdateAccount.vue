@@ -1,6 +1,16 @@
 <template>
   <div class="login-forms">
     <form class="text-left">
+      <div>
+        <label>Your avatar</label>
+        <div class="avatar-group">
+          <canvas class="avatar"
+                  width="85"
+                  height="85"
+                  :data-jdenticon-hash="avatarDataHex">Fallback text for browsers not supporting canvas
+          </canvas>
+        </div>
+      </div>
       <div class="form-group amount-form">
         <label>Number of addresses</label>
         <p class="amount-tip">You can create 1-10 addresses at a time</p>
@@ -16,18 +26,6 @@
           <b-btn variant="warning"
                  class="bar-plus"
                  @click="plus">+</b-btn>
-        </div>
-      </div>
-      <div>
-        <label>Your avatar</label>
-        <div class="avatar-group">
-          <canvas
-            class="avatar"
-            width="85"
-            height="85"
-            :data-jdenticon-hash="avatarDataHex">
-            Fallback text for browsers not supporting canvas
-          </canvas>
         </div>
       </div>
       <ul class="form-group error-messages">
