@@ -11,10 +11,10 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 };
 
 export const INITIAL_SESSION_TIMEOUT = 5
-export const MAINNET_BYTE = 'W'.charCodeAt(0);
+export const MAINNET_BYTE = 'M'.charCodeAt(0);
 export const TESTNET_BYTE = 'T'.charCodeAt(0);
 export const INITIAL_NONCE = 0;
-export const ADDRESS_VERSION = 1;
+export const ADDRESS_VERSION = 5;
 export const TRANSFER_TX = 4;
 export const LEASE_TX = 8;
 export const CANCEL_LEASE_TX = 9;
@@ -40,9 +40,8 @@ export const MAINNET_NODE = 'http://54.152.46.6:6869'
 export const MAINNET_API = 'http://54.152.46.6:6869'
 
 //for test
-// export const TESTNET_NODE = 'https://nodes.wavesnodes.com'
-export const TESTNET_NODE = 'http://34.229.136.59:6869'
-export const TESTNET_API = 'http://34.229.136.59:6869'
+export const TESTNET_API = 'http://54.173.234.114:6869'
+export const TESTNET_NODE = 'http://54.173.234.114:6869'
 
 export const ADDRESS_LENGTH = 35;
 
