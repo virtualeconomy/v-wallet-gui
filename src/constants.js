@@ -11,7 +11,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 };
 
 export const INITIAL_SESSION_TIMEOUT = 5
-export const MAINNET_BYTE = 'W'.charCodeAt(0);
+export const MAINNET_BYTE = 'M'.charCodeAt(0);
 export const TESTNET_BYTE = 'T'.charCodeAt(0);
 export const INITIAL_NONCE = 0;
 export const ADDRESS_VERSION = 5;

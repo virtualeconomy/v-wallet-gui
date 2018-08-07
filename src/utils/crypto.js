@@ -35,8 +35,8 @@ function hashChain(input) {
     return keccak(blake2b(input));
 }
 function buildSeedHash(seed, nonce) {
-    var seedNoceStr = nonce.toString() + seed
-    var seedBytesWithNonce = Uint8Array.from(converters_1.default.stringToByteArray(seedNoceStr));
+    var seedNonceStr = nonce.toString() + seed
+    var seedBytesWithNonce = Uint8Array.from(converters_1.default.stringToByteArray(seedNonceStr));
     var seedHash = hashChain(seedBytesWithNonce);
     return sha256(seedHash);
 }
