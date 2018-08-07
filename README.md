@@ -11,7 +11,7 @@ vee wallet gui based on the basic wallet and clod wallet.
 │   │   └── imgs                         // image files
 │   │   └── style                        // common less styles
 │   ├── components/                      // js files of components
-│   ├── utils/                           // js files of view
+│   ├── utils/                           // js utils
 │   ├── lib/                             // common library
 │   ├── main.js                          // entrance of js
 │   ├── router.js                        // defination of router
