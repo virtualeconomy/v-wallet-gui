@@ -152,7 +152,7 @@ export default {
                 amount: 'amount',
                 attachment: 'attachment'
             },
-            transType: 'transfer',
+            transType: 'payment',
             myHeight: '0',
             exportTime: Date.now()
         }

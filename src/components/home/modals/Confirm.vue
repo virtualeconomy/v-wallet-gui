@@ -18,10 +18,14 @@
       </b-form-group>
       <b-form-group horizontal
                     label="Type"
-                    class="form-line" >
-        <span id="transfer-type"
-              class="des">{{ txType }}
-        </span>
+                    class="form-line"
+                    label-for="tranType">
+        <b-form-input id="tranType"
+                      :value="txType"
+                      class="des"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
       </b-form-group>
       <b-form-group horizontal
                     class="form-line"

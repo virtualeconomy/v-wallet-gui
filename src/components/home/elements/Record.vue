@@ -30,7 +30,7 @@
              height="32px">
       </b-col>
       <b-col class="record-detail"
-             v-if="transType==='transfer'"
+             v-if="transType==='payment'"
              cols="auto">
         <b-row>
           <b-col class="title">{{ txTitle }}</b-col>
@@ -106,7 +106,7 @@
                  :tx-block="txBlock"
                  :tx-attachment="txAttachment"
                  :trans-type="transType"
-                 :v-if="transType==='transfer'"></TxInfoModal>
+                 :v-if="transType==='payment'"></TxInfoModal>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-fee="txFee"
                  :tx-time="cancelTime"
@@ -135,6 +135,7 @@ import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import { VEE_PRECISION } from '@/constants'
 import CancelLease from '../modals/CancelLease'
+import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '../../../constants'
 
 export default {
     name: 'Record',
@@ -170,7 +171,7 @@ export default {
         },
         transType: {
             type: String,
-            default: 'transfer',
+            default: 'payment',
             require: true
         },
         coldPubKey: {
@@ -188,30 +189,26 @@ export default {
     },
     computed: {
         txType() {
-            if (this.txRecord['type'] === 4) {
+            if (this.txRecord['type'] === PAYMENT_TX) {
                 if (this.txRecord.sender === this.address) {
                     return 'Sent'
                 } else {
                     return 'Received'
                 }
-            } else if (this.txRecord['type'] === 11) {
-                return 'Received'
-            } else if (this.txRecord['type'] === 8) {
+            } else if (this.txRecord['type'] === LEASE_TX) {
                 if (this.txRecord.sender === this.address) {
                     return 'Leased Out'
                 } else {
                     return 'Leased In'
                 }
-            } else if (this.txRecord['type'] === 9) {
+            } else if (this.txRecord['type'] === CANCEL_LEASE_TX) {
                 if (this.txRecord.sender === this.address) {
                     return 'Leased Out Canceled'
                 } else {
                     return 'Leased In Canceled'
                 }
-            } else if (this.txRecord['type'] === 1) {
-                return 'Received'
             } else {
-                return ''
+                return 'Received'
             }
         },
         txIcon() {

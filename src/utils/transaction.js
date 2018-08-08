@@ -15,15 +15,12 @@ var remap_1 = require("./remap");
 var constants = require("../constants");
 
 // Fields of the original data object
-var transferField = {
+var paymentField = {
     senderPublicKey: new ByteProcessor_1.Base58('senderPublicKey'),
-    assetId: new ByteProcessor_1.AssetId('assetId'),
-    feeAssetId: new ByteProcessor_1.AssetId('feeAssetId'),
     timestamp: new ByteProcessor_1.Long('timestamp'),
     amount: new ByteProcessor_1.Long('amount'),
     fee: new ByteProcessor_1.Long('fee'),
-    recipient: new ByteProcessor_1.Recipient('recipient'),
-    attachment: new ByteProcessor_1.Attachment('attachment')
+    recipient: new ByteProcessor_1.Recipient('recipient')
 }
 var leaseField = {
     senderPublicKey: new ByteProcessor_1.Base58('senderPublicKey'),
@@ -43,8 +40,8 @@ var storedFields = {};
 
 function getFields(type) {
     switch (type) {
-        case constants.TRANSFER_TX:
-            storedFields = transferField;
+        case constants.PAYMENT_TX:
+            storedFields = paymentField;
             break;
         case constants.LEASE_TX:
             storedFields = leaseField;
