@@ -346,7 +346,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VEE_PRECISION, TX_FEE, TRANSFER_TX } from '@/constants.js'
+import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VEE_PRECISION, TX_FEE, PAYMENT_TX } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
@@ -435,14 +435,11 @@ export default {
         },
         dataObject() {
             return {
-                transactionType: TRANSFER_TX,
+                transactionType: PAYMENT_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
-                assetId: '',
-                feeAssetId: '',
                 amount: Number((this.coldAmount * VEE_PRECISION).toFixed(0)),
                 fee: this.coldFee * VEE_PRECISION,
                 recipient: this.coldRecipient,
-                attachment: this.coldAttachment,
                 timestamp: Date.now()
             }
         },
@@ -465,18 +462,16 @@ export default {
             if (walletType === 'hotWallet') {
                 const dataInfo = {
                     recipient: this.recipient,
-                    assetId: '',
                     amount: Number((this.amount * VEE_PRECISION).toFixed(0)),
-                    feeAssetId: '',
                     fee: TX_FEE * VEE_PRECISION,
-                    attachment: this.attachment,
                     timestamp: (Date.now() - 1) * 1e6
                 }
-                apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), TRANSFER_TX)
+                apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, TRANSFER_TX)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, PAYMENT_TX)
             }
-            const url = TESTNET_NODE + '/assets/broadcast/transfer'
+            console.log(JSON.stringify(apiSchema))
+            const url = TESTNET_NODE + '/vee/broadcast/payment'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
@@ -527,7 +522,7 @@ export default {
             this.sendError = false
             this.coldSignature = ''
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
-            this.coldAddress = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultColdAddress
+            this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         endSend: function() {
             this.$refs.sendModal.hide()

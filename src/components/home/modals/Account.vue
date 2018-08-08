@@ -435,7 +435,7 @@ export default {
     margin-top: 4px;
 }
 .input-t {
-    height: 48px;
+    height: 48px !important;
     font-size: 15px;
     letter-spacing: 0;
 }

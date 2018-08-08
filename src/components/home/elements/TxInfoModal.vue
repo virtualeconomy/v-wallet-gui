@@ -96,7 +96,7 @@ export default {
         },
         transType: {
             type: String,
-            default: 'transfer'
+            default: 'payment'
         }
     },
     computed: {
