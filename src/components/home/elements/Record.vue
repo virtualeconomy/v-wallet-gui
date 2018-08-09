@@ -218,7 +218,7 @@ export default {
             return this.txIcon.replace(/\s+/g, '')
         },
         txAddress() {
-            return ((this.txType === 'Sent' || this.txType === 'Leased Out') ? this.txRecord.recipient : (this.txType === 'Leased Out Canceled') ? this.txRecord.lease.recipient : this.txRecord.sender)
+            return (((this.txType === 'Sent' || this.txType === 'Leased Out') ? this.txRecord.recipient : (this.txType === 'Leased Out Canceled') ? this.txRecord.lease.recipient : this.txRecord.sender) || this.txRecord.recipient)
         },
         txAddressShow() {
             if (this.txAddress) {

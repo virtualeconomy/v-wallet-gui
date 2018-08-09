@@ -20,6 +20,7 @@ var paymentField = {
     timestamp: new ByteProcessor_1.Long('timestamp'),
     amount: new ByteProcessor_1.Long('amount'),
     fee: new ByteProcessor_1.Long('fee'),
+    feeScale: new ByteProcessor_1.Short('feeScale'),
     recipient: new ByteProcessor_1.Recipient('recipient')
 }
 var leaseField = {
@@ -27,11 +28,13 @@ var leaseField = {
     recipient: new ByteProcessor_1.Recipient('recipient'),
     amount: new ByteProcessor_1.Long('amount'),
     fee: new ByteProcessor_1.Long('fee'),
+    feeScale: new ByteProcessor_1.Short('feeScale'),
     timestamp: new ByteProcessor_1.Long('timestamp'),
 }
 var cancelLeasingField = {
     senderPublicKey: new ByteProcessor_1.Base58('senderPublicKey'),
     fee: new ByteProcessor_1.Long('fee'),
+    feeScale: new ByteProcessor_1.Short('feeScale'),
     timestamp: new ByteProcessor_1.Long('timestamp'),
     txId: new ByteProcessor_1.Base58('transactionId')
 }

@@ -34,6 +34,17 @@ export var Base58 = /** @class */ (function (_super) {
     };
     return Base58;
 }(ByteProcessor));
+export var Short = /** @class */ (function (_super) {
+    __extends(Short, _super);
+    function Short() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Short.prototype.process = function (value) {
+        var bytes = convert_1.default.shortToByteArray(value);
+        return Uint8Array.from(bytes);
+    };
+    return Short;
+}(ByteProcessor));
 export var Long = /** @class */ (function (_super) {
     __extends(Long, _super);
     function Long() {
