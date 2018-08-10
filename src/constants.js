@@ -19,6 +19,8 @@ export const PAYMENT_TX = 2;
 export const LEASE_TX = 3;
 export const CANCEL_LEASE_TX = 4;
 export const TRANSFER_TX = 12;
+export const MINT_TX = 5;
+export const PAYMENT_TX_NAME = 'payment';
 export const TRANSFER_TX_NAME = 'transfer';
 export const LEASE_TX_NAME = 'lease';
 export const CANCEL_LEASE_TX_NAME = 'cancelLeasing';
@@ -42,10 +44,11 @@ export const MAINNET_API = 'http://54.152.46.6:6869'
 
 //for test
 export const TESTNET_API = 'http://54.173.234.114:6869'
-export const TESTNET_NODE = 'http://54.173.234.114:6869'
+export const TESTNET_NODE = 'http://127.0.0.1:9922'
 
 export const ADDRESS_LENGTH = 35;
 
 export const VEE_PRECISION = 1e8
-export const TX_FEE = 0.001
+export const TX_FEE = 0.1
+export const FEE_SCALE = 100
 

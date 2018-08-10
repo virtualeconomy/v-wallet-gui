@@ -26,7 +26,7 @@
                       :selected-address="selectedAddress"
                       :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="pageId===2">
-            <Confirm :tx-type="'lease'"
+            <Confirm :tx-type="'Lease'"
                      :amount="Number(amount)"
                      :address="address"
                      :recipient="recipient"
@@ -105,7 +105,7 @@
                          @get-signature="getSignature"
                          @prev-page="prevColdPage"></ColdSignature>
           <b-container v-else-if="coldPageId===4">
-            <Confirm :tx-type="'lease'"
+            <Confirm :tx-type="'Lease'"
                      :amount="Number(coldAmount)"
                      :address="coldAddress"
                      :recipient="coldRecipient"
@@ -156,7 +156,7 @@ import LeaseInput from './LeaseInput'
 import Confirm from './Confirm'
 import ColdSignature from './ColdSignature'
 import Vue from 'vue'
-import { TX_FEE, VEE_PRECISION, LEASE_TX, TESTNET_NODE } from '@/constants'
+import { TX_FEE, VEE_PRECISION, LEASE_TX, TESTNET_NODE, FEE_SCALE } from '@/constants'
 import transaction from '@/utils/transaction'
 import seedLib from '@/libs/seed'
 import LeaseSuccess from './LeaseSuccess'
@@ -227,6 +227,7 @@ export default {
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 amount: Number((this.coldAmount * VEE_PRECISION).toFixed(0)),
                 fee: this.fee * VEE_PRECISION,
+                feeScale: FEE_SCALE,
                 recipient: this.coldRecipient,
                 timestamp: Date.now()
             }
@@ -288,6 +289,7 @@ export default {
                     recipient: this.recipient,
                     amount: Number((this.amount * VEE_PRECISION).toFixed(0)),
                     fee: TX_FEE * VEE_PRECISION,
+                    feeScale: FEE_SCALE,
                     timestamp: Date.now() * 1e6
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), LEASE_TX)

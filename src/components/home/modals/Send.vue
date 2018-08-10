@@ -120,7 +120,7 @@
                    :amount="Number(amount)"
                    :fee="fee"
                    :attachment="attachment"
-                   :tx-type="'transfer'">
+                   :tx-type="'Payment'">
           </Confirm>
           <p
             v-show="sendError"
@@ -300,7 +300,7 @@
                    :amount="Number(coldAmount)"
                    :fee="coldFee"
                    :attachment="coldAttachment"
-                   :tx-type="'transfer'">
+                   :tx-type="'Payment'">
           </Confirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-row>
@@ -346,7 +346,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VEE_PRECISION, TX_FEE, PAYMENT_TX } from '@/constants.js'
+import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VEE_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
@@ -439,6 +439,7 @@ export default {
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 amount: Number((this.coldAmount * VEE_PRECISION).toFixed(0)),
                 fee: this.coldFee * VEE_PRECISION,
+                feeScale: FEE_SCALE,
                 recipient: this.coldRecipient,
                 timestamp: Date.now()
             }
@@ -464,13 +465,13 @@ export default {
                     recipient: this.recipient,
                     amount: Number((this.amount * VEE_PRECISION).toFixed(0)),
                     fee: TX_FEE * VEE_PRECISION,
+                    feeScale: FEE_SCALE,
                     timestamp: (Date.now() - 1) * 1e6
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
             } else if (walletType === 'coldWallet') {
                 apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, PAYMENT_TX)
             }
-            console.log(JSON.stringify(apiSchema))
             const url = TESTNET_NODE + '/vee/broadcast/payment'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 if (walletType === 'hotWallet') {

@@ -69,7 +69,7 @@
 
 <script>
 import Confirm from './Confirm'
-import {CANCEL_LEASE_TX, VEE_PRECISION, TESTNET_NODE, TX_FEE} from '../../../constants'
+import { CANCEL_LEASE_TX, VEE_PRECISION, TESTNET_NODE, TX_FEE, FEE_SCALE } from '../../../constants'
 import transaction from '@/utils/transaction'
 import ColdSignature from './ColdSignature'
 import CancelSuccess from './CancelSuccess'
@@ -148,6 +148,7 @@ export default {
                 transactionType: CANCEL_LEASE_TX,
                 senderPublicKey: this.coldPubKey,
                 fee: this.fee * VEE_PRECISION,
+                feeScale: FEE_SCALE,
                 txId: this.modalId,
                 timestamp: Date.now()
             }
@@ -186,6 +187,7 @@ export default {
                 const dataInfo = {
                     txId: this.modalId,
                     fee: this.fee * VEE_PRECISION,
+                    feeScale: FEE_SCALE,
                     timestamp: Date.now() * 1e6
                 }
                 this.timestamp = dataInfo.timestamp
