@@ -20,6 +20,7 @@ export const LEASE_TX = 3;
 export const CANCEL_LEASE_TX = 4;
 export const TRANSFER_TX = 12;
 export const MINT_TX = 5;
+export const PAYMENT_TX_NAME = 'payment';
 export const TRANSFER_TX_NAME = 'transfer';
 export const LEASE_TX_NAME = 'lease';
 export const CANCEL_LEASE_TX_NAME = 'cancelLeasing';
