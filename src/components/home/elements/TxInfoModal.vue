@@ -51,7 +51,7 @@
       </div>
       <div class="tx-fee">
         <label>Fee</label>
-        <span>{{ txFee }} vee</span>
+        <span>{{ txFee || 0 }} vee</span>
       </div>
       <div class="tx-attachment"
            v-if="txIcon === 'sent' || txIcon === 'received'">
