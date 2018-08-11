@@ -14,7 +14,6 @@
     </div>
     <div class="col-auto align-self-center text-left">
       <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
-           class="money-icon"
            width="16"
            height="16">
       <span class="sub-title">
@@ -141,7 +140,7 @@ export default {
     border-right: 1px solid #EDEDED;
 }
 .money-icon {
-    margin-top: -2px;
+    margin-top: -14px;
 }
 .icon-btn {
     margin-right: 10px;
