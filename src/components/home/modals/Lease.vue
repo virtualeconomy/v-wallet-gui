@@ -317,6 +317,7 @@ export default {
             this.coldPageId++
         },
         showDetails() {
+            this.$root.$emit('bv::hide::modal', 'txInfoModal_lease' + this.txId)
             this.$root.$emit('bv::show::modal', 'txInfoModal_lease' + this.txId)
         },
         getKeypair(index) {

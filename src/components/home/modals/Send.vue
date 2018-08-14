@@ -287,7 +287,8 @@
             </b-col>
           </b-row>
         </b-container>
-        <b-container v-if="coldPageId===3">
+        <b-container v-if="coldPageId===3"
+                     class="text-left">
           <ColdSignature :data-object="dataObject"
                          v-if="coldPageId===3"
                          @get-signature="getSignature"
