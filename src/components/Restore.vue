@@ -25,7 +25,7 @@
             class="seed-des"
             v-show="!isSeedNoErr">
             <small class="text-muted">
-              Wallet seed is the 15 words which you are keeping as backup,
+              Wallet seed is the seed words which you are keeping as backup,
               the words should be seperated by single space
             </small>
           </p>
@@ -36,7 +36,7 @@
             @keydown.native.enter='preventDefault($event)'
             :state="isSeedNoErr"
             :disabled="isSeedNoErr"
-            placeholder="Enter 15 words here"
+            placeholder="Enter seed words here"
             :no-resize="true"
             :rows="4"
             :max-rows="6"
@@ -114,8 +114,9 @@ export default {
         },
 
         isValidSeed(seedPhrase) {
-            const wordList = seedPhrase.split(' ')
-            return wordList.length === 15
+            // const wordList = seedPhrase.split(' ')
+            // return wordList.length === 15
+            return seedPhrase.length >= 15
         },
 
         preventDefault(event) {
