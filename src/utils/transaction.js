@@ -21,7 +21,8 @@ var paymentField = {
     amount: new ByteProcessor_1.Long('amount'),
     fee: new ByteProcessor_1.Long('fee'),
     feeScale: new ByteProcessor_1.Short('feeScale'),
-    recipient: new ByteProcessor_1.Recipient('recipient')
+    recipient: new ByteProcessor_1.Recipient('recipient'),
+    attachment: new ByteProcessor_1.Attachment('attachment')
 }
 var leaseField = {
     senderPublicKey: new ByteProcessor_1.Base58('senderPublicKey'),
@@ -29,7 +30,7 @@ var leaseField = {
     amount: new ByteProcessor_1.Long('amount'),
     fee: new ByteProcessor_1.Long('fee'),
     feeScale: new ByteProcessor_1.Short('feeScale'),
-    timestamp: new ByteProcessor_1.Long('timestamp'),
+    timestamp: new ByteProcessor_1.Long('timestamp')
 }
 var cancelLeasingField = {
     senderPublicKey: new ByteProcessor_1.Base58('senderPublicKey'),
@@ -118,7 +119,7 @@ function transformRecipient() {
 function castToAPISchema(data, tx_type) {
     var apiSchema = data
 
-    if (tx_type === constants.TRANSFER_TX) {
+    if (tx_type === constants.PAYMENT_TX) {
         __assign(apiSchema, {attachment: transformAttachment()})
     }
     __assign(apiSchema, { recipient : transformRecipient() })
