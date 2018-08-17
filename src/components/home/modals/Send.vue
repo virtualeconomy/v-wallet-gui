@@ -442,7 +442,8 @@ export default {
                 fee: this.coldFee * VEE_PRECISION,
                 feeScale: FEE_SCALE,
                 recipient: this.coldRecipient,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                attachment: this.coldAttachment
             }
         },
         isValidAttachment() {
@@ -467,7 +468,8 @@ export default {
                     amount: Number((this.amount * VEE_PRECISION).toFixed(0)),
                     fee: TX_FEE * VEE_PRECISION,
                     feeScale: FEE_SCALE,
-                    timestamp: (Date.now() - 1) * 1e6
+                    timestamp: (Date.now() - 1) * 1e6,
+                    attachment: this.attachment
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
             } else if (walletType === 'coldWallet') {
