@@ -102,9 +102,8 @@
                              :state="isValidAttachment">
             </b-form-textarea>
           </b-form-group>
-          <b-form-group
-            class="fee-remark"
-            label="Transaction Fee 0.001 VEE">
+          <b-form-group>
+            <label class="fee-remark">Transaction Fee {{ fee }} VEE</label>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -246,9 +245,8 @@
                              :state="isValidColdAttachment">
             </b-form-textarea>
           </b-form-group>
-          <b-form-group
-            class="fee-remark"
-            label="Transaction Fee 0.001 VEE">
+          <b-form-group>
+            <label class="fee-remark">Transaction Fee {{ coldFee }} VEE</label>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -264,7 +262,7 @@
                    :amount="Number(coldAmount)"
                    :fee="coldFee"
                    :attachment="coldAttachment"
-                   :tx-type="'transfer'">
+                   :tx-type="'payment'">
           </Confirm>
           <b-row>
             <b-col class="col-lef">
