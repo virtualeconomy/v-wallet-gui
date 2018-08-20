@@ -44,7 +44,7 @@ export const MAINNET_API = 'http://54.152.46.6:6869'
 
 //for test
 export const TESTNET_API = 'http://54.173.234.114:6869'
-export const TESTNET_NODE = 'http://127.0.0.1:9922'
+export const TESTNET_NODE = 'http://54.193.10.70:9922'
 
 export const ADDRESS_LENGTH = 35;
 
