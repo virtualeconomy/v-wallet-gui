@@ -709,7 +709,7 @@ export default {
     text-align: right;
 }
 .balance-input {
-    border: 1px solid #E8E9ED;
+    border: 1px solid #E8E9ED !important;
     border-top-left-radius: 0;
     border-top-right-radius: 0;
     opacity: 1;
