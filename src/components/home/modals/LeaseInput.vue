@@ -85,9 +85,8 @@
         Insufficient funds
       </b-form-invalid-feedback>
     </b-form-group>
-    <b-form-group
-      class="fee-remark"
-      label="Transaction Fee 0.001 VEE">
+    <b-form-group>
+      <label class="fee-remark">Transaction Fee {{ fee }} VEE</label>
     </b-form-group>
     <b-button variant="warning"
               class="btn-continue"
@@ -114,7 +113,8 @@ export default {
             qrErrMsg: void 0,
             paused: false,
             address: this.selectedWalletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress,
-            coldAddress: this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
+            coldAddress: this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress,
+            fee: TX_FEE
         }
     },
     props: {
