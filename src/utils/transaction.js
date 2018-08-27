@@ -16,7 +16,6 @@ var constants = require("../constants");
 
 // Fields of the original data object
 var paymentField = {
-    senderPublicKey: new ByteProcessor_1.Base58('senderPublicKey'),
     timestamp: new ByteProcessor_1.Long('timestamp'),
     amount: new ByteProcessor_1.Long('amount'),
     fee: new ByteProcessor_1.Long('fee'),
@@ -105,7 +104,7 @@ function getExactBytes(fieldName) {
 }
 
 function getSignature(transferData, keyPair, tx_type) {
-    return crypto_1.default.buildTransactionSignature(getBytes(__assign({}, transferData, { senderPublicKey: keyPair.publicKey }), tx_type), keyPair.privateKey);
+    return crypto_1.default.buildTransactionSignature(getBytes(__assign({}, transferData), tx_type), keyPair.privateKey);
 }
 
 function transformAttachment() {
@@ -130,16 +129,16 @@ export default {
     prepareForAPI: function(transferData, keyPair, tx_type) {
         getFields(tx_type)
         var signature = getSignature(transferData, keyPair, tx_type);
-        return  __assign({}, (tx_type ? {transactionType: tx_type} : {}), castToAPISchema(userData, tx_type), {signature: signature});
+        return  __assign({}, (tx_type ? {transactionType: tx_type} : {}), {senderPublicKey: keyPair.publicKey}, castToAPISchema(userData, tx_type), {signature: signature});
     },
     isValidSignature: function(data, signature, publicKey, tx_type) {
         getFields(tx_type)
         return crypto_1.default.isValidTransactionSignature(getBytes(data, tx_type), signature, publicKey)
     },
-    prepareColdForAPI: function(transferData, signature, tx_type) {
+    prepareColdForAPI: function(transferData, signature, publicKey, tx_type) {
         getFields(tx_type)
         getData(transferData);
-        return __assign({}, (tx_type ? {transactionType: tx_type} : {}), castToAPISchema(userData, tx_type), {signature:signature})
+        return __assign({}, (tx_type ? {transactionType: tx_type} : {}), {senderPublicKey: publicKey}, castToAPISchema(userData, tx_type), {signature:signature})
     }
 };
 

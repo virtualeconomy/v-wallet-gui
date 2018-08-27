@@ -294,7 +294,7 @@ export default {
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), LEASE_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, LEASE_TX)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress], LEASE_TX)
             }
             const url = TESTNET_NODE + '/leasing/broadcast/lease'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
