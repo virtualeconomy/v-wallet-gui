@@ -34,7 +34,7 @@
                 :data-jdenticon-hash="mutableValue.avt"
               ></canvas>
             </div>
-            <div>
+            <div v-if="mutableValue">
               <div class="usrname">
                 {{ mutableValue.usrname }}
               </div>
@@ -157,7 +157,7 @@ export default {
                 try {
                     const usrStr = strg[addr]
                     const usrObj = JSON.parse(usrStr)
-                    if (usrObj['username'] && usrObj['avtHash'] && usrObj['lastLogin']) {
+                    if (usrObj && usrObj['username'] && usrObj['avtHash'] && usrObj['lastLogin']) {
                         const usr = {
                             addr: addr,
                             usrname: usrObj['username'],

@@ -4,7 +4,6 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import BootstrapVue from 'bootstrap-vue'
-import VueQrcodeReader from 'vue-qrcode-reader'
 import VueResource from 'vue-resource'
 
 import 'bootstrap/dist/css/bootstrap.css'
@@ -21,6 +20,7 @@ const options = {
 
 Vue.use(Storage, options)
 Vue.use(BootstrapVue)
+// eslint-disable-next-line
 Vue.use(VueQrcodeReader)
 Vue.use(VueResource)
 Vue.config.productionTip = false
