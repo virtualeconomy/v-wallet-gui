@@ -134,6 +134,7 @@ import TxInfoModal from './TxInfoModal'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import { VEE_PRECISION } from '@/constants'
+import crypto from '@/utils/crypto'
 import CancelLease from '../modals/CancelLease'
 import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '../../../constants'
 
@@ -190,22 +191,22 @@ export default {
     computed: {
         txType() {
             if (this.txRecord['type'] === PAYMENT_TX) {
-                if (this.txRecord.sender === this.address) {
-                    return 'Sent'
-                } else {
+                if (this.txRecord.recipient === this.address) {
                     return 'Received'
+                } else {
+                    return 'Sent'
                 }
             } else if (this.txRecord['type'] === LEASE_TX) {
-                if (this.txRecord.sender === this.address) {
-                    return 'Leased Out'
-                } else {
+                if (this.txRecord.recipient === this.address) {
                     return 'Leased In'
+                } else {
+                    return 'Leased Out'
                 }
             } else if (this.txRecord['type'] === CANCEL_LEASE_TX) {
-                if (this.txRecord.sender === this.address) {
-                    return 'Leased Out Canceled'
-                } else {
+                if (this.txRecord.lease.recipient === this.address) {
                     return 'Leased In Canceled'
+                } else {
+                    return 'Leased Out Canceled'
                 }
             } else {
                 return 'Received'
@@ -218,7 +219,15 @@ export default {
             return this.txIcon.replace(/\s+/g, '')
         },
         txAddress() {
-            return (((this.txType === 'Sent' || this.txType === 'Leased Out') ? this.txRecord.recipient : (this.txType === 'Leased Out Canceled') ? this.txRecord.lease.recipient : this.txRecord.sender) || this.txRecord.recipient)
+            var sender = this.txRecord.proofs === undefined ? this.address : crypto.buildRawAddress(base58.decode(this.txRecord.proofs[0].publicKey))
+            if (this.txType === 'Sent' || this.txType === 'Leased Out' || this.txType === 'Leased Out Canceled') {
+                if (this.txType === 'Leased Out Canceled') {
+                    return this.txRecord.lease.recipient
+                }
+                return this.txRecord.recipient
+            } else {
+                return sender
+            }
         },
         txAddressShow() {
             if (this.txAddress) {
