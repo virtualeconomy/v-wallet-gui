@@ -196,16 +196,16 @@ export default {
                     return 'Sent'
                 }
             } else if (this.txRecord['type'] === LEASE_TX) {
-                if (this.txRecord.sender === this.address) {
-                    return 'Leased Out'
-                } else {
+                if (this.txRecord.recipient === this.address) {
                     return 'Leased In'
+                } else {
+                    return 'Leased Out'
                 }
             } else if (this.txRecord['type'] === CANCEL_LEASE_TX) {
-                if (this.txRecord.sender === this.address) {
-                    return 'Leased Out Canceled'
-                } else {
+                if (this.txRecord.recipient === this.address) {
                     return 'Leased In Canceled'
+                } else {
+                    return 'Leased Out Canceled'
                 }
             } else {
                 return 'Received'
