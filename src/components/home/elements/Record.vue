@@ -190,10 +190,10 @@ export default {
     computed: {
         txType() {
             if (this.txRecord['type'] === PAYMENT_TX) {
-                if (this.txRecord.sender === this.address) {
-                    return 'Sent'
-                } else {
+                if (this.txRecord.recipient === this.address) {
                     return 'Received'
+                } else {
+                    return 'Sent'
                 }
             } else if (this.txRecord['type'] === LEASE_TX) {
                 if (this.txRecord.sender === this.address) {
