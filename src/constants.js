@@ -39,10 +39,7 @@ export const DEFAULT_BASIC_CONFIG = {
     logLevel: 'warning',
     timeDiff: 0
 };
-export const MAINNET_NODE = 'http://54.152.46.6:6869'
-export const MAINNET_API = 'http://54.152.46.6:6869'
 
-//for test
 export const TESTNET_API = '/api'
 export const TESTNET_NODE = '/api'
 
