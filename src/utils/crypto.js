@@ -11,7 +11,7 @@ var secure_random_1 = require("../libs/secure-random");
 var sha3_1 = require("../libs/sha3");
 var concat_1 = require("./concat");
 var constants = require("../constants");
-var NETWORK_BYTE = 'T'.charCodeAt(0) //Todo: import env varible,
+var NETWORK_BYTE = constants.NETWORK_BYTE
 
 function sha256(input) {
     var bytes;
