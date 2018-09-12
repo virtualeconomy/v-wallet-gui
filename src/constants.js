@@ -11,8 +11,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 };
 
 export const INITIAL_SESSION_TIMEOUT = 5
-export const MAINNET_BYTE = 'M'.charCodeAt(0);
-export const TESTNET_BYTE = 'T'.charCodeAt(0);
+export const NETWORK_BYTE = 'T'.charCodeAt(0);
 export const INITIAL_NONCE = 0;
 export const ADDRESS_VERSION = 5;
 export const PAYMENT_TX = 2;
@@ -40,7 +39,6 @@ export const DEFAULT_BASIC_CONFIG = {
     timeDiff: 0
 };
 
-export const TESTNET_API = '/api'
 export const TESTNET_NODE = '/api'
 
 export const ADDRESS_LENGTH = 35;
