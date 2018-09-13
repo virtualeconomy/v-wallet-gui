@@ -208,7 +208,7 @@ export default {
         onDecode: function(decodeString) {
             this.qrErrMsg = void 0
             this.paused = true
-            this.recipient = this.getParmFromUrl('recipient', decodeString) || decodeString
+            this.recipient = this.getParmFromUrl('recipient', decodeString) || this.getParmFromUrl('address', decodeString) || decodeString
             this.amount = this.getParmFromUrl('amount', decodeString)
             if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                 this.paused = false
