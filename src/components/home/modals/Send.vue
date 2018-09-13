@@ -590,7 +590,7 @@ export default {
         },
         onColdDecode: function(decodeString) {
             this.paused = true
-            this.coldRecipient = this.getParmFromUrl('recipient', decodeString) || decodeString
+            this.coldRecipient = this.getParmFromUrl('recipient', decodeString) || this.getParmFromUrl('address', decodeString) || decodeString
             this.coldAmount = this.getParmFromUrl('amount', decodeString)
             if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
                 this.paused = false
