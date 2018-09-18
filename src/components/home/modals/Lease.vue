@@ -156,7 +156,7 @@ import LeaseInput from './LeaseInput'
 import Confirm from './Confirm'
 import ColdSignature from './ColdSignature'
 import Vue from 'vue'
-import { TX_FEE, VEE_PRECISION, LEASE_TX, TESTNET_NODE, FEE_SCALE } from '@/constants'
+import { TX_FEE, VEE_PRECISION, LEASE_TX, TESTNET_NODE, FEE_SCALE, API_VERSION } from '@/constants'
 import transaction from '@/utils/transaction'
 import seedLib from '@/libs/seed'
 import LeaseSuccess from './LeaseSuccess'
@@ -229,7 +229,8 @@ export default {
                 fee: this.fee * VEE_PRECISION,
                 feeScale: FEE_SCALE,
                 recipient: this.coldRecipient,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                api: API_VERSION
             }
         },
         noColdAddress() {

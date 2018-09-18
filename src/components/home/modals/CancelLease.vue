@@ -69,7 +69,7 @@
 
 <script>
 import Confirm from './Confirm'
-import { CANCEL_LEASE_TX, VEE_PRECISION, TESTNET_NODE, TX_FEE, FEE_SCALE } from '../../../constants'
+import { CANCEL_LEASE_TX, VEE_PRECISION, TESTNET_NODE, TX_FEE, FEE_SCALE, API_VERSION } from '../../../constants'
 import transaction from '@/utils/transaction'
 import ColdSignature from './ColdSignature'
 import CancelSuccess from './CancelSuccess'
@@ -150,7 +150,8 @@ export default {
                 fee: this.fee * VEE_PRECISION,
                 feeScale: FEE_SCALE,
                 txId: this.modalId,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                api: API_VERSION
             }
         },
         userInfo() {

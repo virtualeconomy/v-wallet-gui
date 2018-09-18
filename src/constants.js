@@ -47,3 +47,5 @@ export const VEE_PRECISION = 1e8
 export const TX_FEE = 0.1
 export const FEE_SCALE = 100
 
+export const API_VERSION = 1
+
