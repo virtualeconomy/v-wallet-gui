@@ -345,7 +345,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VEE_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE } from '@/constants.js'
+import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VEE_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
@@ -441,7 +441,8 @@ export default {
                 feeScale: FEE_SCALE,
                 recipient: this.coldRecipient,
                 timestamp: Date.now(),
-                attachment: this.coldAttachment
+                attachment: this.coldAttachment,
+                api: API_VERSION
             }
         },
         isValidAttachment() {

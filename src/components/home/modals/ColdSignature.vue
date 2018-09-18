@@ -136,6 +136,7 @@ export default {
                 } else {
                     var data = JSON.parse(JSON.stringify(this.dataObject))
                     delete data.transactionType
+                    delete data.api
                     data.timestamp *= 1e6
                     if (transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType)) {
                         var _this = this
