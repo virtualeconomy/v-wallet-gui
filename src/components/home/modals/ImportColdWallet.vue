@@ -127,7 +127,7 @@ export default {
             if (!this.coldPubKey) {
                 return void 0
             }
-            return this.coldPubKey.length === PUBLIC_KEY_LENGTH
+            return true
         },
         addressExisted: function() {
             return this.coldAddress === this.address
