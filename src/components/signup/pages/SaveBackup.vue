@@ -12,7 +12,7 @@
     </textarea>
     <div class="backup-words-copy">
       <p>
-        Please write these 18 words down in order or
+        Please write these 15 words down in order or
         <b-button
           id="btn-cpy"
           :disabled="isCpyDisable"
