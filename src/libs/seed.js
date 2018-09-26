@@ -67,7 +67,7 @@ var Seed = /** @class */ (function () {
 }());
 export default {
     create: function (words, nonce) {
-        if (words === void 0 || typeof words === 'number') { words = 18; }
+        if (words === void 0 || typeof words === 'number') { words = 15; }
         var phrase = generateNewSeed(words);
         var minimumSeedLength = DEFAULT_MIN_SEED_LENGTH;
         if (phrase.length < minimumSeedLength) {
