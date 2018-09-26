@@ -7,7 +7,6 @@ var crypto_1 = require("../utils/crypto");
 var logger_1 = require("../utils/logger");
 var seedDictionary_1 = require("./seedDictionary");
 var constant = require('../constants');
-var DEFAULT_MIN_SEED_LENGTH = 25;
 function generateNewSeed(length) {
     var random = crypto_1.default.generateRandomUint32Array(length);
     var wordCount = seedDictionary_1.default.length;
@@ -27,9 +26,6 @@ function encryptSeedPhrase(seedPhrase, password, encryptionRounds) {
     if (encryptionRounds < 1000) {
         logger_1.default.warn('Encryption rounds may be too few');
     }
-    if (seedPhrase.length < DEFAULT_MIN_SEED_LENGTH) {
-        throw new Error('The seed phrase you are trying to encrypt is too short');
-    }
     return crypto_1.default.encryptSeed(seedPhrase, password, encryptionRounds);
 }
 function decryptSeedPhrase(encryptedSeedPhrase, password, encryptionRounds) {
@@ -40,9 +36,6 @@ function decryptSeedPhrase(encryptedSeedPhrase, password, encryptionRounds) {
         phrase = crypto_1.default.decryptSeed(encryptedSeedPhrase, password, encryptionRounds);
     }
     catch (e) {
-        throw new Error(wrongPasswordMessage);
-    }
-    if (phrase === '' || phrase.length < DEFAULT_MIN_SEED_LENGTH) {
         throw new Error(wrongPasswordMessage);
     }
     return phrase;
@@ -69,21 +62,22 @@ export default {
     create: function (words, nonce) {
         if (words === void 0 || typeof words === 'number') { words = 15; }
         var phrase = generateNewSeed(words);
-        var minimumSeedLength = DEFAULT_MIN_SEED_LENGTH;
-        if (phrase.length < minimumSeedLength) {
-            // If you see that error you should increase the number of words in the generated seed
-            throw new Error("The resulted seed length is less than the minimum length (" + minimumSeedLength + ")");
-        }
         return new Seed(phrase, nonce);
     },
     fromExistingPhrase: function (phrase) {
-        if (phrase.length < DEFAULT_MIN_SEED_LENGTH) {
-            throw new Error('Your seed length is less than allowed in config');
-        }
         return new Seed(phrase);
     },
     fromExistingPhrasesWithIndex: function (phrase, nonce) {
         return new Seed(phrase, nonce)
+    },
+    isSystemPhrase: function (wordList) {
+        for (let word in wordList) {
+            if (seedDictionary_1.default.indexOf(wordList[word]) == -1) {
+                console.log(word)
+                return false
+            }
+        }
+        return true
     },
     encryptSeedPhrase: encryptSeedPhrase,
     decryptSeedPhrase: decryptSeedPhrase
