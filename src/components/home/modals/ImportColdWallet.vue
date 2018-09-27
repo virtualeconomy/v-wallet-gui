@@ -20,7 +20,7 @@
     </button>
     <b-container fluid
                  class="c-import">
-      <b-form-group label="Cold Wallet Adress"
+      <b-form-group label="Cold Wallet Address"
                     label-for="coldAddress">
         <b-form-input id="coldAddress"
                       type="text"
@@ -46,7 +46,7 @@
           Invalid cold wallet public key.
         </b-form-invalid-feedback>
       </b-form-group>
-      <p class="qrInfo">Tips: Please confirm your browser's camera is available.</p>
+      <p class="qrInfo">Tips: Please confirm if your browser's camera is available.</p>
       <div class="scan-pane">
         <qrcode-reader @init="onInit"
                        @decode="onDecode"

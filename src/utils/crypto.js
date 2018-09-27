@@ -86,8 +86,8 @@ exports.default = {
         return base58_1.default.encode(hash);
     },
     buildKeyPair: function (seed, nonce) {
-        if (!seed || typeof seed !== 'string') {
-            throw new Error('Missing or invalid seed phrase');
+        if (typeof seed !== 'string') {
+            throw new Error('Invalid seed phrase');
         }
         var seedHash = buildSeedHash(seed, nonce);
         var keys = axlsign_1.default.generateKeyPair(seedHash);
@@ -125,7 +125,7 @@ exports.default = {
         return base58_1.default.encode(concat_1.concatUint8Arrays(rawAddress, addressHash));
     },
     encryptSeed: function (seed, password, encryptionRounds) {
-        if (!seed || typeof seed !== 'string') {
+        if (typeof seed !== 'string') {
             throw new Error('Seed is required');
         }
         if (!password || typeof password !== 'string') {

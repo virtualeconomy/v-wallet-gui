@@ -18,12 +18,12 @@
         <div class="login-forms">
           <p
             class="subtit"
-            v-show="!isSeedNoErr">
+            v-show="!showSeedErr">
             Please enter your wallet seed here.
           </p>
           <p
             class="seed-des"
-            v-show="!isSeedNoErr">
+            v-show="!showSeedErr">
             <small class="text-muted">
               Wallet seed is the seed words which you are keeping as backup,
               the words should be seperated by single space
@@ -34,25 +34,16 @@
             v-model="seedInput"
             maxlength="150"
             @keydown.native.enter='preventDefault($event)'
-            :state="isSeedNoErr"
-            :disabled="isSeedNoErr"
-            placeholder="Enter seed words here"
+            :disabled="showSeedErr"
+            :placeholder="seedPlaceHolder"
             :no-resize="true"
             :rows="4"
             :max-rows="6"
             @input="hideErrMsg">
           </b-form-textarea>
-          <div
-            class="msg-err text-danger"
-            v-show="showSeedErr">
-            <small>
-              Sorry, the seed is not valid.
-            </small>
-          </div>
           <b-button
-            v-if="seedBtnUp"
+            v-if="!showSeedErr"
             class="btn-continue dropdown"
-            :disabled="showSeedErr || !seedInput"
             :variant="'warning'"
             :size="'lg'"
             @click="checkSeed"
@@ -67,10 +58,18 @@
             :block=true>
             Edit wallet seed
           </b-button>
+          <div
+            class="msg-err text-danger"
+            v-show="!isValidSeed && showSeedErr">
+            <small>
+              Warning! The seed phrase above is from a user-supplied source.
+              An insecure entropy source can lead to total loss of the wallet.
+            </small>
+          </div>
           <update-account
             class="update-form"
             :seed-phrase="seedPhrase"
-            v-if="isSeedNoErr">
+            v-if="showSeedErr">
           </update-account>
         </div>
         <p class="flink">
@@ -87,6 +86,7 @@
 
 <script>
 import UpdateAccount from '@/components/restore/UpdateAccount'
+import seedLib from '@/libs/seed'
 
 export default {
     name: 'Restore',
@@ -95,28 +95,24 @@ export default {
         return {
             pageId: 'registration',
             seedInput: '',
-            isSeedNoErr: void 0,
             showSeedErr: false,
-            seedBtnUp: true,
             seedPhrase: ''
+        }
+    },
+    computed: {
+        isValidSeed() {
+            const wordList = this.seedPhrase.split(' ')
+            return (wordList.length === 15 || wordList.length === 18) && seedLib.isSystemPhrase(wordList)
+        },
+        seedPlaceHolder() {
+            return this.showSeedErr ? '' : 'Enter seed word here'
         }
     },
     methods: {
 
         checkSeed() {
-            const isOk = this.isValidSeed(this.seedInput.trim())
-            this.showSeedErr = !isOk
-            this.isSeedNoErr = isOk
-            this.seedBtnUp = !isOk
-            if (isOk) {
-                this.seedPhrase = this.seedInput.trim()
-            }
-        },
-
-        isValidSeed(seedPhrase) {
-            // const wordList = seedPhrase.split(' ')
-            // return wordList.length === 15
-            return seedPhrase.length >= 15
+            this.showSeedErr = true
+            this.seedPhrase = this.seedInput.trim()
         },
 
         preventDefault(event) {
@@ -127,13 +123,10 @@ export default {
 
         editSeed() {
             this.showSeedErr = false
-            this.isSeedNoErr = void 0
-            this.seedBtnUp = true
         },
 
         hideErrMsg() {
             this.showSeedErr = false
-            this.isSeedNoErr = void 0
         }
     },
 
