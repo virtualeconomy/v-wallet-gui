@@ -27,18 +27,7 @@
           Show {{ num }} records
         </b-dropdown-item>
       </b-dropdown>
-      <json-excel class="csv-export"
-                  :data="response"
-                  :fields="resFields"
-                  :type="downloadFileType"
-                  :name="'txs_' + address + '.' + downloadFileType">
-        <b-btn class="btn-export"
-               :disabled="changeShowDisable"
-               variant="light">
-        <img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
-      </json-excel>
     </div>
-
     <div class="inherit-height">
       <div class="scroll"
            :style="{height: myHeight}">
@@ -82,16 +71,6 @@
                          :key="num">Show {{ num }} records
         </b-dropdown-item>
       </b-dropdown>
-      <json-excel class="csv-export"
-                  :data="response"
-                  :fields="resFields"
-                  :type="downloadFileType"
-                  :name="'txs_' + address + '.' + downloadFileType">
-        <b-btn class="btn-export"
-               :disabled="changeShowDisable"
-               variant="light">
-        <img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
-      </json-excel>
     </div>
     <img height="50"
          width="50"
@@ -108,15 +87,13 @@
 
 import {TESTNET_NODE, LEASE_TX, CANCEL_LEASE_TX} from '../../../constants'
 import Vue from 'vue'
-import JsonExcel from 'vue-json-excel'
 import Record from './Record'
 import browser from '../../../utils/browser'
 
 export default {
     name: 'LeaseRecords',
     components: {
-        Record,
-        JsonExcel
+        Record
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
@@ -268,11 +245,6 @@ export default {
     display: flex;
     align-items: Center;
 }
-.csv-export {
-    position: absolute;
-    right: 40px;
-    z-index: 100;
-}
 .btn-export {
     width: 116px;
     height: 36px;
@@ -290,7 +262,7 @@ export default {
 }
 .pd-select {
     position: absolute;
-    right: 166px;
+    right: 40px;
     display: flex;
     height: 36px;
     z-index: 100;

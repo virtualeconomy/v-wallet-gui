@@ -74,7 +74,7 @@
           :class="{'text-danger':isPassMatchErrors,'is-invalid':isPassMatchErrors}"
           v-model="password2"
           :readonly="registering"
-          placeholder="Set new password"
+          placeholder="Confirm password"
           @input="checkPasswordMatch(password, password2)"
           @keyup.enter="registerEnter">
       </div>
