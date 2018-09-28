@@ -439,6 +439,16 @@ export default {
     font-size: 15px;
     letter-spacing: 0;
 }
+#prvKeyPwd {
+    height: 48px !important;
+    font-size: 15px;
+    letter-spacing: 0;
+}
+#seedPwd {
+    height: 48px !important;
+    font-size: 15px;
+    letter-spacing: 0;
+}
 .label-title {
     font-size: 28px;
     color: #181B3A;
