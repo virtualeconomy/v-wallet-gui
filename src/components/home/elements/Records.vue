@@ -3,7 +3,7 @@
        class="records">
     <div
       class="title-records">
-      <span>Transaction Record</span>
+      <span>Transaction Records</span>
       <b-dropdown
         class="pd-select"
         router-tag="div"
@@ -68,7 +68,7 @@
   <div v-else
        class="records">
     <div class="title-records">
-      <span>Transaction Record</span>
+      <span>Transaction Records</span>
       <b-dropdown class="pd-select"
                   router-tag="div"
                   no-caret
@@ -143,11 +143,8 @@ export default {
             downloadFileType: 'csv',
             resFields: {
                 transaction_id: 'id',
-                sender_address: 'sender',
-                sender_public_key: 'senderPublicKey',
                 transaction_fee: 'fee',
                 'timestamp(in nano second)': 'timestamp',
-                signature: 'signature',
                 recipient_address: 'recipient',
                 amount: 'amount',
                 attachment: 'attachment'

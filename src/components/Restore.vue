@@ -105,7 +105,7 @@ export default {
             return (wordList.length === 15 || wordList.length === 18) && seedLib.isSystemPhrase(wordList)
         },
         seedPlaceHolder() {
-            return this.showSeedErr ? '' : 'Enter seed word here'
+            return this.showSeedErr ? '' : 'Enter seed words here'
         }
     },
     methods: {
