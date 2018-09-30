@@ -140,6 +140,7 @@
                 class="btn-confirm"
                 variant="warning"
                 size="lg"
+                :disabled="hasConfirmed"
                 @click="sendData('hotWallet')">Confirm
               </b-button>
             </b-col>
@@ -367,7 +368,9 @@ var initData = {
     qrInit: false,
     paused: false,
     sendError: false,
-    coldSignature: ''
+    coldSignature: '',
+    timeStamp: (Date.now() - 1) * 1e6,
+    hasConfirmed: false
 }
 export default {
     name: 'Send',
@@ -460,6 +463,10 @@ export default {
     },
     methods: {
         sendData: function(walletType) {
+            if (this.hasConfirmed) {
+                return
+            }
+            this.hasConfirmed = true
             var apiSchema
             if (walletType === 'hotWallet') {
                 const dataInfo = {
@@ -467,7 +474,7 @@ export default {
                     amount: Number((this.amount * VEE_PRECISION).toFixed(0)),
                     fee: TX_FEE * VEE_PRECISION,
                     feeScale: FEE_SCALE,
-                    timestamp: (Date.now() - 1) * 1e6,
+                    timestamp: this.timeStamp,
                     attachment: this.attachment
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
@@ -487,6 +494,8 @@ export default {
         },
         nextPage: function() {
             this.sendError = false
+            this.timeStamp = Date.now() * 1e6
+            this.hasConfirmed = false
             this.pageId++
         },
         coldNextPage: function() {

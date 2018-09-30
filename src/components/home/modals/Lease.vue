@@ -51,6 +51,7 @@
                   class="btn-confirm"
                   variant="warning"
                   size="lg"
+                  :disabled="hasConfirmed"
                   @click="sendData('hotWallet')">Confirm
                 </b-button>
               </b-col>
@@ -180,7 +181,9 @@ export default {
             txId: '',
             txAddress: '',
             txTimestamp: 0,
-            txAmount: 0
+            txAmount: 0,
+            timestamp: 0,
+            hasConfirmed: false
         }
     },
     props: {
@@ -251,6 +254,8 @@ export default {
             this.recipient = recipient
             this.amount = amount
             this.address = address
+            this.timestamp = Date.now() * 1e6
+            this.hasConfirmed = false
             this.pageId++
         },
         getColdData(recipient, amount, coldAddress) {
@@ -286,12 +291,16 @@ export default {
         sendData(walletType) {
             var apiSchema
             if (walletType === 'hotWallet') {
+                if (this.hasConfirmed) {
+                    return
+                }
+                this.hasConfirmed = true
                 const dataInfo = {
                     recipient: this.recipient,
                     amount: Number((this.amount * VEE_PRECISION).toFixed(0)),
                     fee: TX_FEE * VEE_PRECISION,
                     feeScale: FEE_SCALE,
-                    timestamp: Date.now() * 1e6
+                    timestamp: this.timestamp
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), LEASE_TX)
             } else if (walletType === 'coldWallet') {
