@@ -50,6 +50,7 @@
             class="btn-confirm"
             variant="warning"
             size="lg"
+            :disabled="hasConfirmed"
             @click="sendCancelLease">Confirm
           </b-button>
         </b-col>
@@ -86,7 +87,8 @@ export default {
             coldSignature: '',
             sendError: false,
             signed: false,
-            txType: CANCEL_LEASE_TX
+            txType: CANCEL_LEASE_TX,
+            hasConfirmed: false
         }
     },
     props: {
@@ -171,6 +173,7 @@ export default {
             this.signed = false
             this.sendError = false
             this.coldSignature = ''
+            this.hasConfirmed = false
         },
         closeModal() {
             this.$refs.cancelLeaseModal.hide()
@@ -185,6 +188,10 @@ export default {
                     apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldPubKey, CANCEL_LEASE_TX)
                 }
             } else {
+                if (this.hasConfirmed) {
+                    return
+                }
+                this.hasConfirmed = true
                 const dataInfo = {
                     txId: this.modalId,
                     fee: this.fee * VEE_PRECISION,
