@@ -206,6 +206,7 @@
           </b-dropdown>
           <b-form-input readonly
                         size="sm"
+                        class="input-t"
                         :value="tagOfColdWallet[addr] ? pubkey : addr">
           </b-form-input>
           <b-input-group-append>
