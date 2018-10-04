@@ -463,12 +463,12 @@ export default {
     },
     methods: {
         sendData: function(walletType) {
-            if (this.hasConfirmed) {
-                return
-            }
-            this.hasConfirmed = true
             var apiSchema
             if (walletType === 'hotWallet') {
+                if (this.hasConfirmed) {
+                    return
+                }
+                this.hasConfirmed = true
                 const dataInfo = {
                     recipient: this.recipient,
                     amount: Number((this.amount * VEE_PRECISION).toFixed(0)),
