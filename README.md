@@ -4,8 +4,6 @@ vee wallet gui based on the basic wallet and cold wallet.
 
 ### Directory Structure
 
-### test test2
-
 ```
 .
 ├── src                                  // all files of the application
