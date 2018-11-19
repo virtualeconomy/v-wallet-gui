@@ -15,10 +15,10 @@
       <img src="../../../assets/imgs/icons/wallet/ic_illustration_wallet.svg">
     </div>
     <div class="about-vee wallet">
-      <h1> About vee wallet</h1>
+      <h1> About VEE Wallet</h1>
     </div>
     <div class="version">
-      <h3> version 1.1.2</h3>
+      <h3> {{ vnumber }}</h3>
     </div>
     <div class="about_text">
       <p align="left"> Virtual Economy Era(VEE) is a blockchain database cloud that aims to create a brand new digital economy era.
@@ -30,7 +30,11 @@
   </b-modal>
 </template>
 <script>
-/* import { WALLET_VERSION } from '@/constants.js' */
+import { WALLET_VERSION } from '@/constants.js'
+var initData = {
+    vnumber: WALLET_VERSION
+}
+
 export default {
     name: 'About',
     created() {
@@ -48,6 +52,9 @@ export default {
             require: true,
             default: ''
         }
+    },
+    data: function() {
+        return initData
     },
     methods: {
         closeModal() {
@@ -69,7 +76,7 @@ export default {
     font-size: 7px;
 }
 .version {
-    color:#EB7D34;
+    color:#696B8A;
     font-size:15px;
 }
 .about_text {
