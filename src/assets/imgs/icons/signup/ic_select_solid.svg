@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.2 (67145) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_select_solid</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Export" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(-170.000000, -114.000000)">
+            <rect id="ic_select_solid" stroke="#FF8737" fill="#FF8737" x="170.5" y="114.5" width="17" height="17" rx="2"></rect>
+            <polygon id="ic_select_check" fill="#FFFFFF" points="176.81353 125.217737 173.968732 122.372939 173 123.334849 176.81353 127.14838 185 118.96191 184.03809 118"></polygon>
+        </g>
+    </g>
+</svg>
