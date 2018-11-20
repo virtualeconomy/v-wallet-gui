@@ -11,21 +11,19 @@
       @click="closeModal">
       <img src="../../../assets/imgs/icons/operate/ic_close.svg">
     </button>
-    <div class="image-illustration">
-      <img src="../../../assets/imgs/icons/wallet/ic_illustration_wallet.svg">
-    </div>
-    <div class="about-vee wallet">
-      <h1> About VEE Wallet</h1>
-    </div>
-    <div class="version">
-      <h3> {{ vnumber }}</h3>
-    </div>
-    <div class="about_text">
-      <p align="left"> Virtual Economy Era(VEE) is a blockchain database cloud that aims to create a brand new digital economy era.
-      It is the world's first object-oriented general purpose distributed database.which is empowered to carry nn,mjnm, complex decentralize applicatrions.</p>
-    </div>
-    <div class="right reserved">
-      <p align="left"> @2018 VEE ALL rights reserved</p>
+    <div class="about-container">
+      <div class="image-illustration">
+        <img src="../../../assets/imgs/icons/wallet/ic_illustration_wallet.svg">
+      </div>
+      <div class="about-veewallet">About VEE Wallet
+      </div>
+      <div class="version">Version {{ vnumber }}
+      </div>
+      <div class="about_text">
+        Virtual Economy Era(VEE) is a blockchain database cloud that aims to create a brand new digital economy era.It is the world's first object-oriented general purpose distributed database.which is empowered to carry nn,mjnm,complex decentralize applicatrions.
+      </div>
+      <div class="right-reserved">@2018 VEE ALL rights reserved
+      </div>
     </div>
   </b-modal>
 </template>
@@ -67,26 +65,30 @@ export default {
 <style scoped>
 .btn-close {
     position: absolute;
-    right: 0;
-    margin-right: 20px;
-    margin-top: 4px;
+    right: 20px;
 }
-.about-vee wallet {
-    color:#FFFFFF;
-    font-size: 7px;
+.image-illustration{
+    margin-top: 30px;
+    margin-bottom: 40px;
+}
+.about-veewallet {
+    color:#181B3A;
+    font-size: 34px;
 }
 .version {
-    color:#696B8A;
-    font-size:15px;
+    color:#9091A3;
+    font-size:18px;
 }
 .about_text {
-    color:#696B8A;
+    margin-top: 30px;
+    color:#4F515E;
     font-size:15px;
+    margin-bottom: 20px;
+    text-align: left;
 }
-.right reserved {
-    left:0;
-    margin-left: 0;
-    color:#ced4da;
+.right-reserved {
+    color:#9091A3;
+    float:left;
     font-size:15px;
 }
 </style>

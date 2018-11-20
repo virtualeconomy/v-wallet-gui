@@ -4,7 +4,7 @@ import Home from '../components/Home.vue'
 import Signup from '../components/Signup.vue'
 import Restore from '../components/Restore.vue'
 import Login from '../components/Login'
-
+import Terms from '../components/Terms'
 Vue.use(Router)
 
 export default new Router({
@@ -25,5 +25,10 @@ export default new Router({
         path: '/restore',
         name: 'restore',
         component: Restore
-    }]
+    }, {
+        path: '/terms',
+        name: 'terms',
+        component: Terms
+    }
+    ]
 })
