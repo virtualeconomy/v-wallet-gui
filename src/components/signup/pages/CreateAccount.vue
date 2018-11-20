@@ -105,7 +105,9 @@
             @click="changeicon"
             src="../../../assets/imgs/icons/signup/ic_select_border.svg">
           I have read and agree to the <a class='vee-color'
-                                          href="/login">terms and condition<br></a>
+                                          href="#"
+                                          target="_blank"
+                                          @click="openwin()">terms and condition<br></a>
           <b-button
             class="input-height"
             :disabled="isSubmitDisabled"
@@ -117,9 +119,7 @@
           </b-button>
         </div>
       </form>
-      <p class="flink">or <a
-        class='vee-color'
-        href="/login">sign in</a> with a saved account</p>
+      <p class="flink">or <router-link to="/login">sign in</router-link> with a saved account</p>
     </div>
   </div>
 </template>
@@ -138,7 +138,6 @@ import imgread1 from '@/assets/imgs/icons/signup/ic_select_solid.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_select_border.svg'
 export default {
     name: 'CreateAccount',
-
     data: function() {
         return {
             read_agree: false,
@@ -177,7 +176,6 @@ export default {
             }, 0)
         }
     },
-
     methods: {
         changeicon() {
             if (this.read_agree === false) {
@@ -318,6 +316,9 @@ export default {
             if (this.addressAmount < 10) {
                 this.addressAmount++
             }
+        },
+        openwin() {
+            window.open('/terms', '_blank')
         }
     },
 

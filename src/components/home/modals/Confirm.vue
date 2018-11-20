@@ -45,6 +45,7 @@
         <b-form-input id="recipientAddress_confirm"
                       v-model="recipient"
                       class="addr"
+                      margin-left="0px"
                       readonly
                       :plaintext="true">
         </b-form-input>
@@ -118,8 +119,12 @@ export default {
     margin-bottom: 0px;
     border-top: 1px solid #E8E9ED;
     height: 48px;
-    text-align: right;
+    text-align: center;
     padding-top: 5px;
+}
+.box {
+
+    overflow-x: visible;
 }
 .infos {
     margin-top: 30px;
@@ -142,7 +147,7 @@ export default {
     font-size: 15px;
     color: #181B3A;
     letter-spacing: 0;
-    text-align: right;
+    text-align: left;
 }
 .fee {
     font-size: 15px;
