@@ -38,8 +38,8 @@ export const DEFAULT_BASIC_CONFIG = {
     logLevel: 'warning',
     timeDiff: 0
 };
-
-export const TESTNET_NODE = 'http://localhost:19922/'
+//http://localhost:19922/
+export const TESTNET_NODE = 'http://wallettestnet.vee.tech:9922'
 
 export const ADDRESS_LENGTH = 35;
 

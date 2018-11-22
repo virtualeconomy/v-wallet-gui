@@ -19,7 +19,8 @@
       <hr class="hr-login">
       <div
         class="dropdown v-select"
-        :class="dropdownClasses">
+        :class="dropdownClasses"
+        v-if="mutableValue">
         <div
           ref="toggle"
           @mousedown.prevent="toggleDropdown"
@@ -84,6 +85,13 @@
           </ul>
         </transition>
       </div>
+      <div v-else>
+        <b-form-input readonly
+                      size="lg"
+                      class="h-input"
+                      value="If it's your first time login, please create an account">
+        </b-form-input>
+      </div>
       <div class="input-pwd">
         <b-form-input
           class="h-input"
@@ -116,7 +124,8 @@
         </b-button>
       </div>
       <p class="flink">
-        or <b-button
+        Already have an account ?
+        <b-button
           class="blink"
           @click="changePage('/restore')"
           variant="link">
@@ -145,7 +154,8 @@ export default {
             typeAheadPointer: -1,
             isPwdError: false,
             password: void 0,
-            faded: 'slideInDown'
+            faded: 'slideInDown',
+            thetxt: 'gasjgkldsjkalng'
         }
     },
 
@@ -176,9 +186,11 @@ export default {
         }).slice(0, 20)
         this.selectedAddr = this.usrOptions[0]
         this.mutableValue = this.usrOptions[0]
+        /*
         if (!this.usrOptions.length) {
             this.$router.push('/signup')
         }
+        */
     },
 
     mounted() {
@@ -576,5 +588,8 @@ export default {
 }
 .flink {
     margin-top: 20px;
+}
+.hput {
+    font-size: 14px;
 }
 </style>

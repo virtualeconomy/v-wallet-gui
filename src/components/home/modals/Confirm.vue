@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="outside">
     <img v-if="txType==='transfer'"
          src="../../../assets/imgs/icons/operate/ic_sent_big.svg">
     <img v-else-if="txType==='lease'"
@@ -45,7 +45,6 @@
         <b-form-input id="recipientAddress_confirm"
                       v-model="recipient"
                       class="addr"
-                      margin-left="0px"
                       readonly
                       :plaintext="true">
         </b-form-input>
@@ -115,6 +114,9 @@ export default {
 </script>
 
 <style scoped>
+.outside{
+    padding-right: 0px;
+}
 .form-line {
     margin-bottom: 0px;
     border-top: 1px solid #E8E9ED;
@@ -127,6 +129,7 @@ export default {
     overflow-x: visible;
 }
 .infos {
+    width: 439px;
     margin-top: 30px;
     border-bottom: 1px solid #E8E9ED;
     margin-bottom: 40px;
@@ -147,7 +150,7 @@ export default {
     font-size: 15px;
     color: #181B3A;
     letter-spacing: 0;
-    text-align: left;
+    text-align: right;
 }
 .fee {
     font-size: 15px;

@@ -119,7 +119,12 @@
           </b-button>
         </div>
       </form>
-      <p class="flink">or <router-link to="/login">sign in</router-link> with a saved account</p>
+      <b-button
+        class="blink"
+        @click="changePage('/login')"
+        variant="link">
+        sign in
+      </b-button>
     </div>
   </div>
 </template>
@@ -177,6 +182,9 @@ export default {
         }
     },
     methods: {
+        changePage(route) {
+            this.$router.push(route)
+        },
         changeicon() {
             if (this.read_agree === false) {
                 document.getElementById('img_read').src = imgread1
