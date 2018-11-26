@@ -53,4 +53,8 @@ $ npm run dev
 ```
   5. open the website on ```localhost:8080```
 
+  6. if you want the wallet to access data from local node, edit ```src/constants.js```
 
+```bash
+  export const TESTNET_NODE = 'http://localhost:9922'
+```
