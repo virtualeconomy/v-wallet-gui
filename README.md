@@ -1,4 +1,4 @@
-# Vee Wallet Gui
+# VSYS Wallet Gui
 
 vee wallet gui based on the basic wallet and cold wallet.
 
