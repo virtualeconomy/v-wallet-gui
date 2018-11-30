@@ -11,7 +11,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 };
 
 export const INITIAL_SESSION_TIMEOUT = 5
-export const NETWORK_BYTE = 'T'.charCodeAt(0);
+export const NETWORK_BYTE = 'M'.charCodeAt(0);
 export const INITIAL_NONCE = 0;
 export const ADDRESS_VERSION = 5;
 export const PAYMENT_TX = 2;
@@ -39,11 +39,11 @@ export const DEFAULT_BASIC_CONFIG = {
     timeDiff: 0
 };
 
-export const TESTNET_NODE = '/api'
+export const TESTNET_NODE = 'http://localhost:9922'
 
 export const ADDRESS_LENGTH = 35;
 
-export const VEE_PRECISION = 1e8
+export const VSYS_PRECISION = 1e8
 export const TX_FEE = 0.1
 export const FEE_SCALE = 100
 

@@ -157,7 +157,7 @@ import LeaseInput from './LeaseInput'
 import Confirm from './Confirm'
 import ColdSignature from './ColdSignature'
 import Vue from 'vue'
-import { TX_FEE, VEE_PRECISION, LEASE_TX, TESTNET_NODE, FEE_SCALE, API_VERSION } from '@/constants'
+import { TX_FEE, VSYS_PRECISION, LEASE_TX, TESTNET_NODE, FEE_SCALE, API_VERSION } from '@/constants'
 import transaction from '@/utils/transaction'
 import seedLib from '@/libs/seed'
 import LeaseSuccess from './LeaseSuccess'
@@ -228,8 +228,8 @@ export default {
             return {
                 transactionType: LEASE_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
-                amount: Number((this.coldAmount * VEE_PRECISION).toFixed(0)),
-                fee: this.fee * VEE_PRECISION,
+                amount: Number((this.coldAmount * VSYS_PRECISION).toFixed(0)),
+                fee: this.fee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
                 recipient: this.coldRecipient,
                 timestamp: Date.now(),
@@ -297,8 +297,8 @@ export default {
                 this.hasConfirmed = true
                 const dataInfo = {
                     recipient: this.recipient,
-                    amount: Number((this.amount * VEE_PRECISION).toFixed(0)),
-                    fee: TX_FEE * VEE_PRECISION,
+                    amount: Number((this.amount * VSYS_PRECISION).toFixed(0)),
+                    fee: TX_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timestamp
                 }
@@ -311,7 +311,7 @@ export default {
                 this.txId = response.body.id
                 this.txAddress = response.body.recipient
                 this.txTimestamp = response.body.timestamp
-                this.txAmount = response.body.amount / VEE_PRECISION
+                this.txAmount = response.body.amount / VSYS_PRECISION
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {

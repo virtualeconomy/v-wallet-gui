@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === 'DEV') {
 
 function createWindow() {
     let window = new BrowserWindow({
-        title: 'VEE Client',
+        title: 'VSYS Client',
         height: 600,
         width: 1000,
         minHeight: 600,

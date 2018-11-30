@@ -1,6 +1,6 @@
 import tx_util from './src/utils/transaction.js'
 import seed_lib from './src/libs/seed.js'
-import {VEE_PRECISION, TX_FEE, FEE_SCALE} from './src/constants.js'
+import {VSYS_PRECISION, TX_FEE, FEE_SCALE} from './src/constants.js'
 var request = require('request')
 
 //your seed here
@@ -11,7 +11,7 @@ var api_node_url = 'http://52.53.239.131:8080/api'
 
 
 var key_pair = seed_lib.fromExistingPhrasesWithIndex(seed_str, 0).keyPair
-const payment_url = api_node_url + '/vee/broadcast/payment'
+const payment_url = api_node_url + '/vsys/broadcast/payment'
 const lease_url = api_node_url + '/leasing/broadcast/lease'
 const cancel_lease_url = api_node_url + '/leasing/broadcast/cancel'
 
@@ -44,8 +44,8 @@ var post_tx_request = (tx_info, tx_type, tx_url) => {
 var payment = (recipient, amount, attachment) => {
     const payment_tx_info = {
         recipient: recipient,
-        amount: Number(( amount * VEE_PRECISION).toFixed(0)),
-        fee: TX_FEE * VEE_PRECISION,
+        amount: Number(( amount * VSYS_PRECISION).toFixed(0)),
+        fee: TX_FEE * VSYS_PRECISION,
         feeScale: FEE_SCALE,
         timestamp: Date.now() * 1e6,
         attachment: attachment? attachment: ''
@@ -56,8 +56,8 @@ var payment = (recipient, amount, attachment) => {
 var lease = (recipient, amount) => {
     const lease_tx_info = {
         recipient: recipient,
-        amount: Number((amount * VEE_PRECISION).toFixed(0)),
-        fee: TX_FEE * VEE_PRECISION,
+        amount: Number((amount * VSYS_PRECISION).toFixed(0)),
+        fee: TX_FEE * VSYS_PRECISION,
         feeScale: FEE_SCALE,
         timestamp: Date.now() * 1e6
     }
@@ -67,7 +67,7 @@ var lease = (recipient, amount) => {
 var cancel_lease = (tx_id) => {
     const cancel_lease_tx_info = {
         txId: tx_id,
-        fee: TX_FEE * VEE_PRECISION,
+        fee: TX_FEE * VSYS_PRECISION,
         feeScale: FEE_SCALE,
         timestamp: Date.now() * 1e6
     }

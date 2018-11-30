@@ -84,7 +84,7 @@ export default {
     }
 
     to {
-        background-color: @veeColor;
+        background-color: @vsysColor;
     }
 }
 @keyframes assetFadeIn {
@@ -93,7 +93,7 @@ export default {
     }
 
     to {
-        background-color: @veeColor;
+        background-color: @vsysColor;
     }
 }
 .selected-asset {

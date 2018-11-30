@@ -128,7 +128,7 @@ import TransPane from './home/elements/TransPane'
 import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
-import { INITIAL_SESSION_TIMEOUT, TESTNET_NODE, VEE_PRECISION } from '@/constants.js'
+import { INITIAL_SESSION_TIMEOUT, TESTNET_NODE, VSYS_PRECISION } from '@/constants.js'
 import seedLib from '@/libs/seed.js'
 import Records from './home/elements/Records'
 import LeasePane from './home/elements/LeasePane'
@@ -247,11 +247,11 @@ export default {
         getBalance: function(address) {
             const url = TESTNET_NODE + '/addresses/balance/details/' + address
             this.$http.get(url).then(response => {
-                Vue.set(this.balance, address, response.body['available'] / VEE_PRECISION)
-                this.total = response.body.regular / VEE_PRECISION
-                this.available = response.body.available / VEE_PRECISION
-                this.leasedOut = (response.body.regular - response.body.available) / VEE_PRECISION
-                this.leasedIn = (response.body.effective - response.body.available) / VEE_PRECISION
+                Vue.set(this.balance, address, response.body['available'] / VSYS_PRECISION)
+                this.total = response.body.regular / VSYS_PRECISION
+                this.available = response.body.available / VSYS_PRECISION
+                this.leasedOut = (response.body.regular - response.body.available) / VSYS_PRECISION
+                this.leasedIn = (response.body.effective - response.body.available) / VSYS_PRECISION
             }, response => {
                 Vue.set(this.balance, address, 0)
             })
@@ -364,7 +364,7 @@ export default {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    color: @veeColor;
+    color: @vsysColor;
 }
 .pointer {
     cursor: pointer;

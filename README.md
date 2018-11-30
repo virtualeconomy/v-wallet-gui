@@ -1,6 +1,6 @@
-# Vee Wallet Gui
+# Vsys Wallet Gui
 
-vee wallet gui based on the basic wallet and cold wallet.
+vsys wallet gui based on the basic wallet and cold wallet.
 
 ### Directory Structure
 
@@ -36,13 +36,13 @@ vee wallet gui based on the basic wallet and cold wallet.
   2. clone this project
 
 ``` bash
-$ git clone https://github.com/excelsia/vee-wallet-gui.git
+$ git clone https://github.com/excelsia/vsys-wallet-gui.git
 ```
 
   3. install packages
 
 ```bash
-  $ cd vee-wallet-gui
+  $ cd vsys-wallet-gui
   $ npm install
 ```
 

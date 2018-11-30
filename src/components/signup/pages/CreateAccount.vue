@@ -3,7 +3,7 @@
     <div>
       <v-title
         title="Create New Account"
-        description="Sign up for a free account below or <a class='vee-color' href='/restore'>restore your account</a> from backup">
+        description="Sign up for a free account below or <a class='vsys-color' href='/restore'>restore your account</a> from backup">
       </v-title>
     </div>
     <div class="login-forms">
@@ -111,7 +111,7 @@
         </div>
       </form>
       <p class="flink">or <a
-        class='vee-color'
+        class='vsys-color'
         href="/login">sign in</a> with a saved account</p>
     </div>
   </div>
