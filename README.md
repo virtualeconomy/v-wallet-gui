@@ -53,8 +53,9 @@ $ npm run dev
 ```
   5. open the website on ```localhost:8080```
 
-  6. if you want the wallet to access data from local node, edit ```src/constants.js```
+  6. if you want the wallet to access data from a different address, edit ```config/nginx.default.conf```
 
 ```bash
-  export const TESTNET_NODE = 'http://localhost:9922'
+  proxy_pass http://wallet.vee.tech:9922 
 ```
+to a particular address
