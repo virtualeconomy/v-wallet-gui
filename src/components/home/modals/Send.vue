@@ -481,7 +481,7 @@ export default {
             } else if (walletType === 'coldWallet') {
                 apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress], PAYMENT_TX)
             }
-            const url = TESTNET_NODE + '/vee/broadcast/payment'
+            const url = TESTNET_NODE + '/vsys/broadcast/payment'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++

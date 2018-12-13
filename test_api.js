@@ -11,7 +11,7 @@ var api_node_url = 'http://52.53.239.131:8080/api'
 
 
 var key_pair = seed_lib.fromExistingPhrasesWithIndex(seed_str, 0).keyPair
-const payment_url = api_node_url + '/vee/broadcast/payment'
+const payment_url = api_node_url + '/vsys/broadcast/payment'
 const lease_url = api_node_url + '/leasing/broadcast/lease'
 const cancel_lease_url = api_node_url + '/leasing/broadcast/cancel'
 

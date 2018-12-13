@@ -39,7 +39,7 @@ export const DEFAULT_BASIC_CONFIG = {
     timeDiff: 0
 };
 
-export const TESTNET_NODE = 'http://localhost:9922'
+export const TESTNET_NODE = '/api'
 
 export const ADDRESS_LENGTH = 35;
 
