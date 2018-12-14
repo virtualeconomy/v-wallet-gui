@@ -19,7 +19,7 @@
                  width="60px"
                  height="60px">
           </div>
-          <div class="cl-amount">{{ amount }} vee</div>
+          <div class="cl-amount">{{ amount }} vsys</div>
         </div>
         <div class="cl-address">
           <label>To</label>
@@ -27,7 +27,7 @@
         </div>
         <div class="cl-fee">
           <label>Fee</label>
-          <span>{{ fee }} vee</span>
+          <span>{{ fee }} vsys</span>
         </div>
       </div>
       <p v-show="sendError"
@@ -70,7 +70,7 @@
 
 <script>
 import Confirm from './Confirm'
-import { CANCEL_LEASE_TX, VEE_PRECISION, TESTNET_NODE, TX_FEE, FEE_SCALE, API_VERSION } from '../../../constants'
+import { CANCEL_LEASE_TX, VSYS_PRECISION, TESTNET_NODE, TX_FEE, FEE_SCALE, API_VERSION } from '../../../constants'
 import transaction from '@/utils/transaction'
 import ColdSignature from './ColdSignature'
 import CancelSuccess from './CancelSuccess'
@@ -149,7 +149,7 @@ export default {
             return {
                 transactionType: CANCEL_LEASE_TX,
                 senderPublicKey: this.coldPubKey,
-                fee: this.fee * VEE_PRECISION,
+                fee: this.fee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
                 txId: this.modalId,
                 timestamp: Date.now(),
@@ -194,7 +194,7 @@ export default {
                 this.hasConfirmed = true
                 const dataInfo = {
                     txId: this.modalId,
-                    fee: this.fee * VEE_PRECISION,
+                    fee: this.fee * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: Date.now() * 1e6
                 }

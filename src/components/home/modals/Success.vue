@@ -7,7 +7,7 @@
                     label="Amount"
                     label-for="amount_success">
         <b-form-input id="amount_success"
-                      :value="amount + ' VEE'"
+                      :value="amount + ' VSYS'"
                       class="amount"
                       readonly
                       :plaintext="true">
@@ -51,7 +51,7 @@
                     label="Fee"
                     label-for="fee_success">
         <b-form-input id="fee_success"
-                      :value="fee + 'vee'"
+                      :value="fee + 'vsys'"
                       class="fee"
                       readonly
                       :plaintext="true">

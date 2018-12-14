@@ -25,7 +25,7 @@
                width="20"
                height="20">
         </span>
-        <span class="balance">{{ walletType === 'hot' ? balances[address] : balances[coldAddress] }} VEE</span>
+        <span class="balance">{{ walletType === 'hot' ? balances[address] : balances[coldAddress] }} VSYS</span>
       </b-btn>
     </b-form-group>
     <b-form-group label="Recipient"
@@ -86,7 +86,7 @@
       </b-form-invalid-feedback>
     </b-form-group>
     <b-form-group>
-      <label class="fee-remark">Transaction Fee {{ fee }} VEE</label>
+      <label class="fee-remark">Transaction Fee {{ fee }} VSYS</label>
     </b-form-group>
     <b-button variant="warning"
               class="btn-continue"

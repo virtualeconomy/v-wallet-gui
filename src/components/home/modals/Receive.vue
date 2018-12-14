@@ -17,7 +17,7 @@
       <!-- <b-form-group label="Asset"
                     label-for="assetInput">
         <b-form-input id="assetInput"
-                      value="VEE"
+                      value="VSYS"
                       readonly>
         </b-form-input>
       </b-form-group> -->
@@ -85,7 +85,7 @@ export default {
     },
     computed: {
         getQrCodeImg() {
-            const text = window.location.href + '/#send/VEE?recipient=' + this.address + '&amount=' + this.amount
+            const text = window.location.href + '/#send/VSYS?recipient=' + this.address + '&amount=' + this.amount
             const options = {
                 padding: 10,
                 width: 180,

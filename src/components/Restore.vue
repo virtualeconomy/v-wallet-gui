@@ -4,7 +4,7 @@
       <div class="container logo">
         <img
           class="brand-logo"
-          src="../assets/imgs/icons/signup/vee_logo.svg">
+          src="../assets/imgs/icons/signup/vsys_logo.svg">
       </div>
       <div class="home">
         <div>
@@ -74,9 +74,9 @@
         </div>
         <p class="flink">
           <a
-            class='vee-color'
+            class='vsys-color'
             href="/login">Sign in</a> or <a
-              class='vee-color'
+              class='vsys-color'
               href="/signup">Create a new account</a>
         </p>
       </div>

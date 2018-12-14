@@ -38,7 +38,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">{{ balances[address] }} VEE</span>
+              <span class="balance">{{ balances[address] }} VSYS</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -103,7 +103,7 @@
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
-            <label class="fee-remark">Transaction Fee {{ fee }} VEE</label>
+            <label class="fee-remark">Transaction Fee {{ fee }} VSYS</label>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -182,7 +182,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">{{ balances[coldAddress] }} VEE</span>
+              <span class="balance">{{ balances[coldAddress] }} VSYS</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -247,7 +247,7 @@
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
-            <label class="fee-remark">Transaction Fee {{ coldFee }} VEE</label>
+            <label class="fee-remark">Transaction Fee {{ coldFee }} VSYS</label>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -346,7 +346,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VEE_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION } from '@/constants.js'
+import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
@@ -439,8 +439,8 @@ export default {
             return {
                 transactionType: PAYMENT_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
-                amount: Number((this.coldAmount * VEE_PRECISION).toFixed(0)),
-                fee: this.coldFee * VEE_PRECISION,
+                amount: Number((this.coldAmount * VSYS_PRECISION).toFixed(0)),
+                fee: this.coldFee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
                 recipient: this.coldRecipient,
                 timestamp: Date.now(),
@@ -471,8 +471,8 @@ export default {
                 this.hasConfirmed = true
                 const dataInfo = {
                     recipient: this.recipient,
-                    amount: Number((this.amount * VEE_PRECISION).toFixed(0)),
-                    fee: TX_FEE * VEE_PRECISION,
+                    amount: Number((this.amount * VSYS_PRECISION).toFixed(0)),
+                    fee: TX_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
                     attachment: this.attachment
@@ -481,7 +481,7 @@ export default {
             } else if (walletType === 'coldWallet') {
                 apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress], PAYMENT_TX)
             }
-            const url = TESTNET_NODE + '/vee/broadcast/payment'
+            const url = TESTNET_NODE + '/vsys/broadcast/payment'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++

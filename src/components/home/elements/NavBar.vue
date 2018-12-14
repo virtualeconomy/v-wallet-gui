@@ -8,7 +8,7 @@
       <b-navbar-brand>
         <img
           class="brand-logo"
-          src="../../../assets/imgs/icons/wallet/vee_logo_small.svg">
+          src="../../../assets/imgs/icons/wallet/vsys_logo_small.svg">
       </b-navbar-brand>
       <b-collapse is-nav
                   id="nav_collapse">

@@ -1,7 +1,7 @@
 {
-    "name": "vee-wallet-gui",
+    "name": "vsys-wallet-gui",
     "version": "1.0.0",
-    "description": "vee wallet gui ",
+    "description": "vsys wallet gui ",
     "author": "masonExcelsia <mason@excelsia.io>",
     "private": true,
     "scripts": {

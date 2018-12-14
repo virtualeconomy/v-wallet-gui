@@ -3,7 +3,7 @@
     <div class="container logo">
       <img
         class="brand-logo"
-        src="../assets/imgs/icons/signup/vee_logo.svg">
+        src="../assets/imgs/icons/signup/vsys_logo.svg">
     </div>
     <div class="form-login">
       <H1>
@@ -101,7 +101,7 @@
         <small>
           Password is wrong.
           <a
-            class='vee-color'
+            class='vsys-color'
             href="/restore"> Forget your password? </a>
         </small>
       </div>
@@ -567,7 +567,7 @@ export default {
     margin-top: 30px;
 }
 .btn-link {
-    color: @veeColor !important;
+    color: @vsysColor !important;
 }
 .blink {
     padding-top: 3px;

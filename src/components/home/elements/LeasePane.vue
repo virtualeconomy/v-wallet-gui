@@ -63,7 +63,7 @@
                triggers="click blur">
       <div class="quick-note">
         <div>
-          <span>You can only transfer or trade VEEs that aren’t leased. The leased amount cannot be transferred or traded by you or anyone else.</span>
+          <span>You can only transfer or trade VSYSs that aren’t leased. The leased amount cannot be transferred or traded by you or anyone else.</span>
         </div>
         <div class="description-split"></div>
         <div>

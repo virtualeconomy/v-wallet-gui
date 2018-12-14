@@ -64,7 +64,7 @@
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span>{{ txAmount }} VEE</span>
+          <span>{{ txAmount }} VSYS</span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -133,7 +133,7 @@
 import TxInfoModal from './TxInfoModal'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
-import { VEE_PRECISION } from '@/constants'
+import { VSYS_PRECISION } from '@/constants'
 import crypto from '@/utils/crypto'
 import CancelLease from '../modals/CancelLease'
 import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '../../../constants'
@@ -289,12 +289,12 @@ export default {
         },
         txAmount() {
             if (this.txRecord.lease) {
-                return this.txRecord.lease.amount / VEE_PRECISION
+                return this.txRecord.lease.amount / VSYS_PRECISION
             }
-            return this.txRecord.amount / VEE_PRECISION
+            return this.txRecord.amount / VSYS_PRECISION
         },
         txFee() {
-            return this.txRecord.fee / VEE_PRECISION
+            return this.txRecord.fee / VSYS_PRECISION
         },
         txBlock() {
             return this.txRecord.height
