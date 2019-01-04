@@ -346,7 +346,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, TRANSACTION } from '@/constants.js'
+import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_TRANSACTION } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
@@ -440,7 +440,7 @@ export default {
             return {
                 protocol: PROTOCOL,
                 api: API_VERSION,
-                opc: TRANSACTION,
+                opc: OPC_TRANSACTION,
                 transactionType: PAYMENT_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 amount: Number((this.coldAmount * VSYS_PRECISION).toFixed(0)),
@@ -522,6 +522,7 @@ export default {
             }
         },
         resetPage: function() {
+            this.opc = ''
             this.recipient = ''
             this.amount = 0
             this.attachment = ''

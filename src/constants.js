@@ -48,9 +48,9 @@ export const TX_FEE = 0.1
 export const FEE_SCALE = 100
 export const PROTOCOL = 'v.systems'
 export const API_VERSION = 1
-export const TRANSACTION = 'transaction'
-export const ACCOUNT = 'account'
-export const SIGNATURE = 'signature'
-export const SEED = 'seed'
+export const OPC_TRANSACTION = 'transaction'
+export const OPC_ACCOUNT = 'account'
+export const OPC_SIGNATURE = 'signature'
+export const OPC_SEED = 'seed'
 
 
