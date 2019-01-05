@@ -587,7 +587,7 @@ export default {
             this.recipient = JSON.parse(decodeString).address
             this.amount = JSON.parse(decodeString).amount
             if (this.amount) {
-                this.amount /= VEE_PRECISION
+                this.amount /= VSYS_PRECISION
             }
             if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                 this.paused = false

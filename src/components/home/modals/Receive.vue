@@ -70,7 +70,7 @@
 
 <script>
 import jrQrcode from 'jr-qrcode'
-import { API_VERSION, PROTOCOL, OPC_ACCOUNT, VEE_PRECISION } from '@/constants.js'
+import { API_VERSION, PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION } from '@/constants.js'
 export default {
     name: 'Receive',
     props: {
@@ -111,7 +111,7 @@ export default {
         transferAmount() {
             if (this.amount) {
                 var temAmount = parseFloat(this.amount)
-                return temAmount * VEE_PRECISION
+                return temAmount * VSYS_PRECISION
             }
         }
     },
