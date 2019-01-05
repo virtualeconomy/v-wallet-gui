@@ -582,30 +582,20 @@ export default {
                 this.qrInit = false
             }
         },
-        getParmFromUrl: function(key, url) {
-            var regex = new RegExp(key + '=([^&]*)', 'i')
-            if (url.match(regex)) {
-                return url.match(regex)[1]
-            } else {
-                if (key === 'recipient') {
-                    return ''
-                } else if (key === 'amount') {
-                    return 0
-                }
-            }
-        },
         onDecode: function(decodeString) {
             this.paused = true
-            this.recipient = this.getParmFromUrl('recipient', decodeString) || this.getParmFromUrl('address', decodeString) || decodeString
-            this.amount = this.getParmFromUrl('amount', decodeString)
+            this.recipient = JSON.parse(decodeString).address
+            this.amount = JSON.parse(decodeString).amount
+            if (this.amount) {
+                this.amount /= VEE_PRECISION
+            }
             if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                 this.paused = false
             }
         },
         onColdDecode: function(decodeString) {
             this.paused = true
-            this.coldRecipient = this.getParmFromUrl('recipient', decodeString) || this.getParmFromUrl('address', decodeString) || decodeString
-            this.coldAmount = this.getParmFromUrl('amount', decodeString)
+            this.coldRecipient = JSON.parse(decodeString).address
             if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
                 this.paused = false
             }
