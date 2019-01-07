@@ -104,7 +104,10 @@ export default {
             qrInit: false,
             paused: false,
             coldAddress: '',
-            coldPubKey: ''
+            coldPubKey: '',
+            opc: '',
+            api: '',
+            protocol: ''
         }
     },
     computed: {
@@ -180,13 +183,11 @@ export default {
         },
         onDecode: function(decodeString) {
             this.paused = true
-            let start = decodeString.indexOf('address')
-            let end = decodeString.indexOf('&')
-            this.coldAddress = decodeString.substring(start + 8, end)
-
-            start = decodeString.indexOf('publicKey')
-            end = decodeString.length
-            this.coldPubKey = decodeString.substring(start + 10, end)
+            this.coldAddress = JSON.parse(decodeString).address
+            this.coldPubKey = JSON.parse(decodeString).publicKey
+            this.opc = JSON.parse(decodeString).opc
+            this.api = JSON.parse(decodeString).api
+            this.protocol = JSON.parse(decodeString).protocol
         },
         scanAgain: function() {
             this.paused = false

@@ -157,7 +157,7 @@ import LeaseInput from './LeaseInput'
 import Confirm from './Confirm'
 import ColdSignature from './ColdSignature'
 import Vue from 'vue'
-import { TX_FEE, VSYS_PRECISION, LEASE_TX, TESTNET_NODE, FEE_SCALE, API_VERSION } from '@/constants'
+import { TX_FEE, VSYS_PRECISION, LEASE_TX, TESTNET_NODE, FEE_SCALE, API_VERSION, OPC_TRANSACTION, PROTOCOL } from '@/constants'
 import transaction from '@/utils/transaction'
 import seedLib from '@/libs/seed'
 import LeaseSuccess from './LeaseSuccess'
@@ -226,6 +226,8 @@ export default {
         },
         dataObject() {
             return {
+                protocol: PROTOCOL,
+                opc: OPC_TRANSACTION,
                 transactionType: LEASE_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 amount: Number((this.coldAmount * VSYS_PRECISION).toFixed(0)),

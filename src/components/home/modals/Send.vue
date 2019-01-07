@@ -346,12 +346,13 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION } from '@/constants.js'
+import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_TRANSACTION } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
 import ColdSignature from './ColdSignature'
 var initData = {
+    opc: '',
     recipient: '',
     amount: 0,
     attachment: '',
@@ -437,6 +438,9 @@ export default {
         },
         dataObject() {
             return {
+                protocol: PROTOCOL,
+                api: API_VERSION,
+                opc: OPC_TRANSACTION,
                 transactionType: PAYMENT_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
                 amount: Number((this.coldAmount * VSYS_PRECISION).toFixed(0)),
@@ -444,8 +448,7 @@ export default {
                 feeScale: FEE_SCALE,
                 recipient: this.coldRecipient,
                 timestamp: Date.now(),
-                attachment: this.coldAttachment,
-                api: API_VERSION
+                attachment: this.coldAttachment
             }
         },
         isValidAttachment() {
@@ -519,6 +522,7 @@ export default {
             }
         },
         resetPage: function() {
+            this.opc = ''
             this.recipient = ''
             this.amount = 0
             this.attachment = ''
@@ -578,30 +582,20 @@ export default {
                 this.qrInit = false
             }
         },
-        getParmFromUrl: function(key, url) {
-            var regex = new RegExp(key + '=([^&]*)', 'i')
-            if (url.match(regex)) {
-                return url.match(regex)[1]
-            } else {
-                if (key === 'recipient') {
-                    return ''
-                } else if (key === 'amount') {
-                    return 0
-                }
-            }
-        },
         onDecode: function(decodeString) {
             this.paused = true
-            this.recipient = this.getParmFromUrl('recipient', decodeString) || this.getParmFromUrl('address', decodeString) || decodeString
-            this.amount = this.getParmFromUrl('amount', decodeString)
+            this.recipient = JSON.parse(decodeString).address
+            this.amount = JSON.parse(decodeString).amount
+            if (this.amount) {
+                this.amount /= VSYS_PRECISION
+            }
             if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                 this.paused = false
             }
         },
         onColdDecode: function(decodeString) {
             this.paused = true
-            this.coldRecipient = this.getParmFromUrl('recipient', decodeString) || this.getParmFromUrl('address', decodeString) || decodeString
-            this.coldAmount = this.getParmFromUrl('amount', decodeString)
+            this.coldRecipient = JSON.parse(decodeString).address
             if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
                 this.paused = false
             }
