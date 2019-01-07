@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { TX_FEE, VSYS_PRECISION} from '@/constants'
+import { TX_FEE, VSYS_PRECISION } from '@/constants'
 import crypto from '@/utils/crypto'
 
 export default {
