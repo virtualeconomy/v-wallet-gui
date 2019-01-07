@@ -584,10 +584,14 @@ export default {
         },
         onDecode: function(decodeString) {
             this.paused = true
-            this.recipient = JSON.parse(decodeString).address
-            this.amount = JSON.parse(decodeString).amount
-            if (this.amount) {
-                this.amount /= VSYS_PRECISION
+            var jsonObj = JSON.parse(decodeString)
+            if (jsonObj.hasOwnProperty('address')) {
+                this.recipient = jsonObj.address
+            } else {
+                this.recipient = ''
+            }
+            if (jsonObj.hasOwnProperty('amount')) {
+                this.amount = jsonObj.amount / VSYS_PRECISION
             }
             if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                 this.paused = false
@@ -595,7 +599,12 @@ export default {
         },
         onColdDecode: function(decodeString) {
             this.paused = true
-            this.coldRecipient = JSON.parse(decodeString).address
+            var jsonObj = JSON.parse(decodeString)
+            if (jsonObj.hasOwnProperty('address')) {
+                this.coldRecipient = jsonObj.address
+            } else {
+                this.coldRecipient = ''
+            }
             if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
                 this.paused = false
             }

@@ -208,10 +208,14 @@ export default {
         onDecode: function(decodeString) {
             this.qrErrMsg = void 0
             this.paused = true
-            this.recipient = JSON.parse(decodeString).address
-            this.amount = JSON.parse(decodeString).amount
-            if (this.amount) {
-                this.amount /= VSYS_PRECISION
+            var jsonObj = JSON.parse(decodeString)
+            if (jsonObj.hasOwnProperty('address')) {
+                this.recipient = jsonObj.address
+            } else {
+                this.recipient = ''
+            }
+            if (jsonObj.hasOwnProperty('amount')) {
+                this.amount = jsonObj.amount / VSYS_PRECISION
             }
             if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                 this.paused = false
