@@ -92,8 +92,8 @@ export default {
         getQrCodeImg() {
             const options = {
                 padding: 10,
-                width: 160,
-                height: 160,
+                width: 256,
+                height: 256,
                 correctLevel: 2,
                 reverse: false,
                 background: '#ffffff',
