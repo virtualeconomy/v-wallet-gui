@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { TX_FEE } from '@/constants'
+import { TX_FEE, VSYS_PRECISION } from '@/constants'
 import crypto from '@/utils/crypto'
 
 export default {
@@ -208,23 +208,18 @@ export default {
         onDecode: function(decodeString) {
             this.qrErrMsg = void 0
             this.paused = true
-            this.recipient = this.getParmFromUrl('recipient', decodeString) || this.getParmFromUrl('address', decodeString) || decodeString
-            this.amount = this.getParmFromUrl('amount', decodeString)
+            var jsonObj = JSON.parse(decodeString)
+            if (jsonObj.hasOwnProperty('address')) {
+                this.recipient = jsonObj.address
+            } else {
+                this.recipient = ''
+            }
+            if (jsonObj.hasOwnProperty('amount')) {
+                this.amount = jsonObj.amount / VSYS_PRECISION
+            }
             if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                 this.paused = false
                 this.qrErrMsg = 'Sorry, your QR code seems unavalible.'
-            }
-        },
-        getParmFromUrl: function(key, url) {
-            var regex = new RegExp(key + '=([^&]*)', 'i')
-            if (url.match(regex)) {
-                return url.match(regex)[1]
-            } else {
-                if (key === 'recipient') {
-                    return ''
-                } else if (key === 'amount') {
-                    return 0
-                }
             }
         },
         isAmountValid(type) {
