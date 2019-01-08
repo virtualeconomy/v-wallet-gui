@@ -166,6 +166,7 @@ export default {
                     }
                 }
             } catch (e) {
+                this.paused = false
                 this.qrError = true
             }
         },

@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { TX_FEE, VSYS_PRECISION } from '@/constants'
+import { TX_FEE, VEE_PRECISION } from '@/constants'
 import crypto from '@/utils/crypto'
 
 export default {
@@ -181,6 +181,9 @@ export default {
             if (!this.qrInit) {
                 this.scanShow = !this.scanShow
             }
+            if (this.scanShow) {
+                this.paused = false
+            }
         },
         async onInit(promise) {
             try {
@@ -208,18 +211,22 @@ export default {
         onDecode: function(decodeString) {
             this.qrErrMsg = void 0
             this.paused = true
-            var jsonObj = JSON.parse(decodeString)
-            if (jsonObj.hasOwnProperty('address')) {
-                this.recipient = jsonObj.address
-            } else {
-                this.recipient = ''
-            }
-            if (jsonObj.hasOwnProperty('amount')) {
-                this.amount = jsonObj.amount / VSYS_PRECISION
-            }
-            if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
+            try {
+                var jsonObj = JSON.parse(decodeString)
+                if (jsonObj.hasOwnProperty('address')) {
+                    this.recipient = jsonObj.address
+                } else {
+                    this.recipient = ''
+                }
+                if (jsonObj.hasOwnProperty('amount')) {
+                    this.amount = jsonObj.amount / VEE_PRECISION
+                }
+                if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
+                    this.paused = false
+                    this.qrErrMsg = 'Sorry, your QR code seems unavalible.'
+                }
+            } catch (e) {
                 this.paused = false
-                this.qrErrMsg = 'Sorry, your QR code seems unavalible.'
             }
         },
         isAmountValid(type) {
