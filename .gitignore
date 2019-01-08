@@ -15,3 +15,5 @@ selenium-debug.log
 *.njsproj
 *.sln
 ./package-lock.json
+package-lock.json
+vsys-hot-wallet.code-workspace

@@ -595,7 +595,7 @@ export default {
                     this.recipient = ''
                 }
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = jsonObj.amount / VEE_PRECISION
+                    this.amount = jsonObj.amount / VSYS_PRECISION
                 }
                 if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                     this.paused = false

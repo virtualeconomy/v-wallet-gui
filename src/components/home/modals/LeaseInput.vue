@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { TX_FEE, VEE_PRECISION } from '@/constants'
+import { TX_FEE, VSYS_PRECISION } from '@/constants'
 import crypto from '@/utils/crypto'
 
 export default {
@@ -219,7 +219,7 @@ export default {
                     this.recipient = ''
                 }
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = jsonObj.amount / VEE_PRECISION
+                    this.amount = jsonObj.amount / VSYS_PRECISION
                 }
                 if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                     this.paused = false
