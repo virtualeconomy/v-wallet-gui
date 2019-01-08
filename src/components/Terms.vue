@@ -6,7 +6,7 @@
         <img
           class="brand-logo"
           centered
-          src="../assets/imgs/icons/signup/vee_logo.svg">
+          src="../assets/imgs/icons/signup/vsys_logo.svg">
       </div>
       <br>
       <div class="title">
@@ -22,7 +22,7 @@
       </div>
       <div class="txt"
            align="justify">
-        <p> The Terms of Use includes the terms and conditions (the “Terms” ) set forth herein which applies to the website located at www.VEE.tech (the “Website”, ”we”, “our" or “us” ). We remind you, before accessing to and using of the Website, you shall carefullyread and fully understand the Terms, including the Prohibited Actions, Representations and Warranties, Indemnification and Disclaimer clauses.</p>
+        <p> The Terms of Use includes the terms and conditions (the “Terms” ) set forth herein which applies to the website located at www.v.systems (the “Website”, ”we”, “our" or “us” ). We remind you, before accessing to and using of the Website, you shall carefullyread and fully understand the Terms, including the Prohibited Actions, Representations and Warranties, Indemnification and Disclaimer clauses.</p>
         <p>  If you choose to access and use the Website and any of its features (collectively, the “Services" ), you agree to abide by all the Terms set forth herein between you and us, and all the applicable laws and regulations. If you do not accept all the Terms, do not use the Website. Your access and use of the Website constitutes an implied consent of yours to the Terms.</p>
         <p> We reserve the right, at its sole and absolute discretion, to change, modify, supplement, update, add or remove (collectively, the Changes" ) portions of the Terms, at any time, without your prior consent. The Changes are effective immediately upon posting on the Website. We will not be responsible to notify you any Changes. lt is your responsibility to check the Terms every time you access and use the Website. If you continue to use the Website following the posting of changes, it shall mean you accept and agree to the changes.</p>
       </div>

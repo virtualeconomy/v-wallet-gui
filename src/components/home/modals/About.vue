@@ -15,14 +15,14 @@
       <div class="image-illustration">
         <img src="../../../assets/imgs/icons/wallet/ic_illustration_wallet.svg">
       </div>
-      <div class="about-veewallet">About VEE Wallet
+      <div class="about-vsyswallet">About VSYS Wallet
       </div>
       <div class="version">Version {{ vnumber }}
       </div>
       <div class="about_text">
-        Virtual Economy Era(VEE) is a blockchain database cloud that aims to create a brand new digital economy era.It is the world's first object-oriented general purpose distributed database.which is empowered to carry nn,mjnm,complex decentralize applicatrions.
+        V Systems(VSYS) is a blockchain database cloud that aims to create a brand new digital economy era.It is the world's first object-oriented general purpose distributed database.which is empowered to carry nn,mjnm,complex decentralize applicatrions.
       </div>
-      <div class="right-reserved">@2018 VEE ALL rights reserved
+      <div class="right-reserved">@2018 V SYSTEMS ALL rights reserved
       </div>
     </div>
   </b-modal>
@@ -71,7 +71,7 @@ export default {
     margin-top: 30px;
     margin-bottom: 40px;
 }
-.about-veewallet {
+.about-vsyswallet {
     color:#181B3A;
     font-size: 34px;
 }

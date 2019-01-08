@@ -104,7 +104,7 @@
             id="img_read"
             @click="changeicon"
             src="../../../assets/imgs/icons/signup/ic_select_border.svg">
-          I have read and agree to the <a class='vee-color'
+          I have read and agree to the <a class='vsys-color'
                                           href="#"
                                           target="_blank"
                                           @click="openwin()">terms and condition<br></a>
