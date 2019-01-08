@@ -223,7 +223,7 @@ export default {
                 }
                 if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                     this.paused = false
-                    this.qrErrMsg = 'Sorry, your QR code seems unavalible.'
+                    this.qrErrMsg = 'Invalid recipient address in QR code.'
                 }
             } catch (e) {
                 this.paused = false

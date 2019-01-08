@@ -613,6 +613,9 @@ export default {
                 } else {
                     this.coldRecipient = ''
                 }
+                if (jsonObj.hasOwnProperty('amount')) {
+                    this.coldAmount = jsonObj.amount / VSYS_PRECISION
+                }
                 if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
                     this.paused = false
                 }
