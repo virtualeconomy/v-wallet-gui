@@ -595,14 +595,14 @@ export default {
                     this.recipient = ''
                 }
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = jsonObj.amount / VSYS_PRECISION
+                    this.amount = this.toNonExp(jsonObj.amount / VSYS_PRECISION)
                 }
                 if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                     this.paused = false
                 }
             } catch (e) {
-                this.paused = false
                 this.recipient = 'please scan QR code of recipient'
+                this.paused = false
             }
         },
         onColdDecode: function(decodeString) {
@@ -615,14 +615,14 @@ export default {
                     this.coldRecipient = ''
                 }
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.coldAmount = jsonObj.amount / VSYS_PRECISION
+                    this.coldAmount = this.toNonExp(jsonObj.amount / VSYS_PRECISION)
                 }
                 if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
                     this.paused = false
                 }
             } catch (e) {
-                this.paused = false
                 this.coldRecipient = 'please scan QR code of recipient'
+                this.paused = false
             }
         },
         getSignature: function(signature) {
@@ -676,6 +676,10 @@ export default {
         isInsufficient(amount, type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
             return amount > balance - TX_FEE
+        },
+        toNonExp(num) {
+            var m = num.toExponential().match(/\d(?:\.(\d*))?e([+-]\d+)/)
+            return num.toFixed(Math.max(0, (m[1] || '').length - m[2]))
         },
         options(addrs) {
             return Object.keys(addrs).reduce((options, addr) => {

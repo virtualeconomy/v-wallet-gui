@@ -219,7 +219,7 @@ export default {
                     this.recipient = ''
                 }
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = jsonObj.amount / VSYS_PRECISION
+                    this.amount = this.toNonExp(jsonObj.amount / VSYS_PRECISION)
                 }
                 if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                     this.paused = false
@@ -254,6 +254,10 @@ export default {
             } else if (this.walletType === 'cold') {
                 this.$emit('get-cold-data', this.recipient, this.amount, this.coldAddress)
             }
+        },
+        toNonExp(num) {
+            var m = num.toExponential().match(/\d(?:\.(\d*))?e([+-]\d+)/);
+            return num.toFixed(Math.max(0, (m[1] || '').length - m[2]));
         },
         options(addrs) {
             var res = Object.keys(addrs).reduce((options, addr) => {
