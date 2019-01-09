@@ -9,7 +9,8 @@
     <div class="login-forms">
       <form class="text-left">
         <div>
-          <label>Avatar</label>
+          <label>Choose your address avatar</label>
+          <p class="amount-tip">Avatar is unique. you can't change it later</p>
           <div class="avatar-group">
             <canvas
               class="avatar"
@@ -98,7 +99,15 @@
             @input="checkPasswordMatch(password, password2)"
             @keyup.enter="registerEnter">
         </div>
-        <div class="form-group submit-button">
+        <div>
+          <img
+            id="img_read"
+            @click="changeicon"
+            src="../../../assets/imgs/icons/signup/ic_select_border.svg">
+          I have read and agree to the <a class='vsys-color'
+                                          href="#"
+                                          target="_blank"
+                                          @click="openwin()">terms and condition<br></a>
           <b-button
             class="input-height"
             :disabled="isSubmitDisabled"
@@ -110,9 +119,7 @@
           </b-button>
         </div>
       </form>
-      <p class="flink">or <a
-        class='vsys-color'
-        href="/login">sign in</a> with a saved account</p>
+      <p class="flink">or <router-link to="/login">sign in</router-link> with a saved account</p>
     </div>
   </div>
 </template>
@@ -127,12 +134,13 @@ import validator from 'vue-m-validator'
 import Vue from 'vue'
 import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
 import jdenticon from '@/libs/jdenticon-2.1.0'
-
+import imgread1 from '@/assets/imgs/icons/signup/ic_select_solid.svg'
+import imgread2 from '@/assets/imgs/icons/signup/ic_select_border.svg'
 export default {
     name: 'CreateAccount',
-
     data: function() {
         return {
+            read_agree: false,
             addressAmount: 1,
             max: 10,
             vTitleTitle: 'CreateAccount',
@@ -153,7 +161,6 @@ export default {
             registering: false
         }
     },
-
     created() {
         validator.reset()
     },
@@ -169,8 +176,22 @@ export default {
             }, 0)
         }
     },
-
     methods: {
+        changeicon() {
+            if (this.read_agree === false) {
+                document.getElementById('img_read').src = imgread1
+                this.read_agree = true
+            } else {
+                document.getElementById('img_read').src = imgread2
+                this.read_agree = false
+            }
+            // if (document.getElementById('img_read').src.match('solid')) {
+            // document.getElementById('img_read').src = imgread2
+            // this.read_agree = false
+            // }
+            // document.getElementById('img_agree').src = this.img_url
+            // element.src = '../../../assets/imgs/icons/signup/ic_select_solid.svg'
+        },
         changeAvatar() {
             this.seed = seedLib.create()
             this.avatarCanChange = false
@@ -295,6 +316,9 @@ export default {
             if (this.addressAmount < 10) {
                 this.addressAmount++
             }
+        },
+        openwin() {
+            window.open('/terms', '_blank')
         }
     },
 
@@ -310,7 +334,7 @@ export default {
             return converters.stringToHexString(this.seed.address).split('').reverse().slice(1, 21).join('')
         },
         isSubmitDisabled() {
-            return this.isFirstRun === true || this.validator.errors.length > 0
+            return this.isFirstRun === true || this.validator.errors.length > 0 || this.read_agree === false
         },
         isEnabled() {
             return this.isFirstRun === false && this.validator.errors.length === 0
@@ -396,6 +420,7 @@ export default {
     margin-top: 20px;
 }
 .input-height {
+    top:5px;
     height: 54px;
 }
 .check-right {
@@ -409,6 +434,14 @@ export default {
 .amount-tip {
     font-size: 13px;
     color: #9091A3;
+    letter-spacing: 0;
+}
+.checkmark{
+
+}
+.mount-tip {
+    font-size: 13px;
+    color:#9091A3;
     letter-spacing: 0;
 }
 .btn {

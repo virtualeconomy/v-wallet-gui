@@ -33,6 +33,9 @@
             <b-dropdown-item v-b-modal.settingsModal>
               Settings
             </b-dropdown-item>
+            <b-dropdown-item v-b-modal.aboutModal>
+              About
+            </b-dropdown-item>
             <b-dropdown-divider></b-dropdown-divider>
             <b-dropdown-item @click="logout">
               Logout
@@ -50,6 +53,8 @@
              @delete-cold="deleteCold"></Account>
     <Settings :set-usr-local-storage="setUsrLocalStorage"
               :address="address"></Settings>
+    <About :set-usr-local-storage="setUsrLocalStorage"
+           :address="address"></About>
   </div>
 
 </template>
@@ -58,6 +63,8 @@
 
 import Settings from '../modals/Settings'
 import Account from '../modals/Account'
+import About from '../modals/About'
+
 import Vue from 'vue'
 import jdenticon from '@/libs/jdenticon-2.1.0'
 
@@ -65,7 +72,8 @@ export default {
     name: 'NavBar',
     components: {
         Settings,
-        Account
+        Account,
+        About
     },
     props: {
         username: {
