@@ -185,12 +185,6 @@ export default {
                 document.getElementById('img_read').src = imgread2
                 this.read_agree = false
             }
-            // if (document.getElementById('img_read').src.match('solid')) {
-            // document.getElementById('img_read').src = imgread2
-            // this.read_agree = false
-            // }
-            // document.getElementById('img_agree').src = this.img_url
-            // element.src = '../../../assets/imgs/icons/signup/ic_select_solid.svg'
         },
         changeAvatar() {
             this.seed = seedLib.create()
@@ -297,10 +291,6 @@ export default {
                 sessionTimeout: INITIAL_SESSION_TIMEOUT,
                 info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password)
             }
-            // clear session in home
-            // setTimeout(() => {
-            //     Vue.ls.clear()
-            // }, INITIAL_SESSION_TIMEOUT)
             window.localStorage.setItem(this.seed.address, JSON.stringify(savedInfo))
             this.$emit('show-page', 'saveBackup')
         },
