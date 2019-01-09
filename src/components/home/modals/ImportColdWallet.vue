@@ -194,7 +194,7 @@ export default {
                 this.paused = false
             }
             if (!this.isValidAddress) {
-                this.coldAddress = 'invalid address'
+                this.coldAddress = 'please scan QR code of cold wallet address'
                 this.paused = false
             }
             if (this.api === '1' && !this.isValidPubKey) {

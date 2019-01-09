@@ -227,6 +227,7 @@ export default {
                 }
             } catch (e) {
                 this.paused = false
+                this.recipient = 'please scan QR code of recipient'
             }
         },
         isAmountValid(type) {

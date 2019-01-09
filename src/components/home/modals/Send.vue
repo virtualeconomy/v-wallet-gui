@@ -602,6 +602,7 @@ export default {
                 }
             } catch (e) {
                 this.paused = false
+                this.recipient = 'please scan QR code of recipient'
             }
         },
         onColdDecode: function(decodeString) {
@@ -621,6 +622,7 @@ export default {
                 }
             } catch (e) {
                 this.paused = false
+                this.coldRecipient = 'please scan QR code of recipient'
             }
         },
         getSignature: function(signature) {
