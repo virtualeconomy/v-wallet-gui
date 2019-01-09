@@ -140,6 +140,7 @@ export default {
         showingUp() {
             this.coldAddress = ''
             this.coldPubKey = ''
+            this.paused = false
         },
         importClose: function(evt) {
             if (this.qrInit) {
@@ -183,11 +184,23 @@ export default {
         },
         onDecode: function(decodeString) {
             this.paused = true
-            this.coldAddress = JSON.parse(decodeString).address
-            this.coldPubKey = JSON.parse(decodeString).publicKey
-            this.opc = JSON.parse(decodeString).opc
-            this.api = JSON.parse(decodeString).api
-            this.protocol = JSON.parse(decodeString).protocol
+            try {
+                this.coldAddress = JSON.parse(decodeString).address
+                this.coldPubKey = JSON.parse(decodeString).publicKey
+                this.opc = JSON.parse(decodeString).opc
+                this.api = JSON.parse(decodeString).api
+                this.protocol = JSON.parse(decodeString).protocol
+            } catch (e) {
+                this.paused = false
+            }
+            if (!this.isValidAddress) {
+                this.coldAddress = 'invalid address'
+                this.paused = false
+            }
+            if (this.api === '1' && !this.isValidPubKey) {
+                this.coldPubKey = 'invalid public key'
+                this.paused = false
+            }
         },
         scanAgain: function() {
             this.paused = false

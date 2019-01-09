@@ -547,6 +547,9 @@ export default {
             if (!this.qrInit) {
                 this.scanShow = !this.scanShow
             }
+            if (this.scanShow) {
+                this.paused = false
+            }
         },
         isValidRecipient: function(recipient) {
             if (!recipient) {
@@ -584,28 +587,39 @@ export default {
         },
         onDecode: function(decodeString) {
             this.paused = true
-            var jsonObj = JSON.parse(decodeString)
-            if (jsonObj.hasOwnProperty('address')) {
-                this.recipient = jsonObj.address
-            } else {
-                this.recipient = ''
-            }
-            if (jsonObj.hasOwnProperty('amount')) {
-                this.amount = jsonObj.amount / VSYS_PRECISION
-            }
-            if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
+            try {
+                var jsonObj = JSON.parse(decodeString)
+                if (jsonObj.hasOwnProperty('address')) {
+                    this.recipient = jsonObj.address
+                } else {
+                    this.recipient = ''
+                }
+                if (jsonObj.hasOwnProperty('amount')) {
+                    this.amount = jsonObj.amount / VSYS_PRECISION
+                }
+                if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
+                    this.paused = false
+                }
+            } catch (e) {
                 this.paused = false
             }
         },
         onColdDecode: function(decodeString) {
             this.paused = true
-            var jsonObj = JSON.parse(decodeString)
-            if (jsonObj.hasOwnProperty('address')) {
-                this.coldRecipient = jsonObj.address
-            } else {
-                this.coldRecipient = ''
-            }
-            if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
+            try {
+                var jsonObj = JSON.parse(decodeString)
+                if (jsonObj.hasOwnProperty('address')) {
+                    this.coldRecipient = jsonObj.address
+                } else {
+                    this.coldRecipient = ''
+                }
+                if (jsonObj.hasOwnProperty('amount')) {
+                    this.coldAmount = jsonObj.amount / VSYS_PRECISION
+                }
+                if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
+                    this.paused = false
+                }
+            } catch (e) {
                 this.paused = false
             }
         },
