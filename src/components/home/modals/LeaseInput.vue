@@ -49,7 +49,7 @@
       </b-form-invalid-feedback>
       <b-form-invalid-feedback id="inputLiveFeedback"
                                v-else>
-        Invalid recipient address.
+        Invalid recipient address (make sure correct QR code is using and scanned).
       </b-form-invalid-feedback>
       <div v-if="scanShow">
         <div class="qr-info">Please confirm your browser's camera is available.</div>
@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { TX_FEE, VSYS_PRECISION } from '@/constants'
+import { TX_FEE, VSYS_PRECISION, PROTOCOL, API_VERSION, OPC_TRANSACTION } from '@/constants'
 import crypto from '@/utils/crypto'
 
 export default {
@@ -213,15 +213,23 @@ export default {
             this.paused = true
             try {
                 var jsonObj = JSON.parse(decodeString)
-                if (jsonObj.hasOwnProperty('address')) {
-                    this.recipient = jsonObj.address
-                } else {
-                    this.recipient = ''
-                }
+                this.recipient = jsonObj.address
+                var opc = jsonObj.opc
+                var api = jsonObj.api
+                var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
                     this.amount = this.toNonExp(jsonObj.amount / VSYS_PRECISION)
                 }
-                if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
+                if (protocol !== PROTOCOL) {
+                    this.paused = false
+                    this.qrErrMsg = 'Invalid QR code protocol.'
+                } else if (api !== API_VERSION) {
+                    this.paused = false
+                    this.qrErrMsg = 'API version mismatch.'
+                } else if (opc !== OPC_TRANSACTION) {
+                    this.paused = false
+                    this.qrErrMsg = 'Wrong operation code in QR code.'
+                } else if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                     this.paused = false
                     this.qrErrMsg = 'Invalid recipient address in QR code.'
                 }

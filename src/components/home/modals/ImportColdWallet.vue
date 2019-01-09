@@ -89,7 +89,7 @@
 
 <script>
 import crypto from '@/utils/crypto'
-import { PUBLIC_KEY_LENGTH } from '@/constants.js'
+import { PUBLIC_KEY_LENGTH, PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/constants.js'
 export default {
     name: 'ImportColdWallet',
     props: {
@@ -185,19 +185,22 @@ export default {
         onDecode: function(decodeString) {
             this.paused = true
             try {
-                this.coldAddress = JSON.parse(decodeString).address
-                this.coldPubKey = JSON.parse(decodeString).publicKey
-                this.opc = JSON.parse(decodeString).opc
-                this.api = JSON.parse(decodeString).api
-                this.protocol = JSON.parse(decodeString).protocol
+                var jsonObj = JSON.parse(decodeString)
+                this.coldAddress = jsonObj.address
+                this.coldPubKey = jsonObj.publicKey
+                this.opc = jsonObj.opc
+                this.api = jsonObj.api
+                this.protocol = jsonObj.protocol
             } catch (e) {
                 this.paused = false
             }
             if (!this.isValidAddress) {
                 this.coldAddress = 'please scan QR code of cold wallet address'
                 this.paused = false
-            }
-            if (this.api === '1' && !this.isValidPubKey) {
+            } else if (this.api !== API_VERSION || this.protocol !== PROTOCOL || this.opc !== OPC_ACCOUNT) {
+                this.coldAddress = 'invalid QR code'
+                this.paused = false
+            } else if (!this.isValidPubKey) {
                 this.coldPubKey = 'invalid public key'
                 this.paused = false
             }

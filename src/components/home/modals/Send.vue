@@ -57,7 +57,7 @@
                  @click="scanChange"
                  title="scan qr-code">
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid recipient address.
+              Invalid recipient address (make sure correct QR code is using and scanned).
             </b-form-invalid-feedback>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
@@ -201,7 +201,7 @@
                  title="scan qr-code"
                  @click="scanChange">
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid recipient address.
+              Invalid recipient address (make sure correct QR code is using and scanned).
             </b-form-invalid-feedback>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
@@ -589,15 +589,23 @@ export default {
             this.paused = true
             try {
                 var jsonObj = JSON.parse(decodeString)
-                if (jsonObj.hasOwnProperty('address')) {
-                    this.recipient = jsonObj.address
-                } else {
-                    this.recipient = ''
-                }
+                this.recipient = jsonObj.address
+                var opc = jsonObj.opc
+                var api = jsonObj.api
+                var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
                     this.amount = this.toNonExp(jsonObj.amount / VSYS_PRECISION)
                 }
-                if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
+                if (protocol !== PROTOCOL) {
+                    this.paused = false
+                    this.qrErrMsg = 'Invalid QR code protocol.'
+                } else if (api !== API_VERSION) {
+                    this.paused = false
+                    this.qrErrMsg = 'API version mismatch.'
+                } else if (opc !== OPC_TRANSACTION) {
+                    this.paused = false
+                    this.qrErrMsg = 'Wrong operation code in QR code.'
+                } else if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                     this.paused = false
                 }
             } catch (e) {
@@ -609,15 +617,23 @@ export default {
             this.paused = true
             try {
                 var jsonObj = JSON.parse(decodeString)
-                if (jsonObj.hasOwnProperty('address')) {
-                    this.coldRecipient = jsonObj.address
-                } else {
-                    this.coldRecipient = ''
-                }
+                this.recipient = jsonObj.address
+                var opc = jsonObj.opc
+                var api = jsonObj.api
+                var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
                     this.coldAmount = this.toNonExp(jsonObj.amount / VSYS_PRECISION)
                 }
-                if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
+                if (protocol !== PROTOCOL) {
+                    this.paused = false
+                    this.qrErrMsg = 'Invalid QR code protocol.'
+                } else if (api !== API_VERSION) {
+                    this.paused = false
+                    this.qrErrMsg = 'API version mismatch.'
+                } else if (opc !== OPC_TRANSACTION) {
+                    this.paused = false
+                    this.qrErrMsg = 'Wrong operation code in QR code.'
+                } else if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
                     this.paused = false
                 }
             } catch (e) {
