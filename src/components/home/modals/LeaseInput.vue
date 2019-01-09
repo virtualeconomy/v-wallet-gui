@@ -99,7 +99,7 @@
 </template>
 
 <script>
-import { TX_FEE, VSYS_PRECISION, PROTOCOL, API_VERSION, OPC_TRANSACTION } from '@/constants'
+import { TX_FEE, VSYS_PRECISION, PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/constants'
 import crypto from '@/utils/crypto'
 
 export default {
@@ -226,7 +226,7 @@ export default {
                 } else if (api !== API_VERSION) {
                     this.paused = false
                     this.qrErrMsg = 'API version mismatch.'
-                } else if (opc !== OPC_TRANSACTION) {
+                } else if (opc !== OPC_ACCOUNT) {
                     this.paused = false
                     this.qrErrMsg = 'Wrong operation code in QR code.'
                 } else if (!this.isValidRecipient(this.recipient) || this.recipient === '') {

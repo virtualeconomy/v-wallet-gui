@@ -73,6 +73,7 @@
                        src="../../../assets/imgs/icons/wallet/ic_wait.svg">
                 </qrcode-reader>
               </div>
+              <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
             </div>
           </b-form-group>
           <b-form-group label="Amount"
@@ -217,6 +218,7 @@
                        src="../../../assets/imgs/icons/wallet/ic_wait.svg">
                 </qrcode-reader>
               </div>
+              <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
             </div>
           </b-form-group>
           <b-form-group label="Amount"
@@ -346,7 +348,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_TRANSACTION } from '@/constants.js'
+import { TESTNET_NODE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
@@ -367,6 +369,7 @@ var initData = {
     coldAddress: this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress,
     scanShow: false,
     qrInit: false,
+    qrErrMsg: void 0,
     paused: false,
     sendError: false,
     coldSignature: '',
@@ -535,6 +538,7 @@ export default {
             this.scanShow = false
             this.qrInit = false
             this.paused = false
+            this.qrErrMsg = void 0
             this.sendError = false
             this.coldSignature = ''
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
@@ -602,11 +606,14 @@ export default {
                 } else if (api !== API_VERSION) {
                     this.paused = false
                     this.qrErrMsg = 'API version mismatch.'
-                } else if (opc !== OPC_TRANSACTION) {
+                } else if (opc !== OPC_ACCOUNT) {
                     this.paused = false
                     this.qrErrMsg = 'Wrong operation code in QR code.'
                 } else if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
                     this.paused = false
+                    this.qrErrMsg = 'Invalid address of recipient.'
+                } else {
+                    this.qrErrMsg = void 0
                 }
             } catch (e) {
                 this.recipient = 'please scan QR code of recipient'
@@ -617,7 +624,7 @@ export default {
             this.paused = true
             try {
                 var jsonObj = JSON.parse(decodeString)
-                this.recipient = jsonObj.address
+                this.coldRecipient = jsonObj.address
                 var opc = jsonObj.opc
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
@@ -630,11 +637,14 @@ export default {
                 } else if (api !== API_VERSION) {
                     this.paused = false
                     this.qrErrMsg = 'API version mismatch.'
-                } else if (opc !== OPC_TRANSACTION) {
+                } else if (opc !== OPC_ACCOUNT) {
                     this.paused = false
                     this.qrErrMsg = 'Wrong operation code in QR code.'
                 } else if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
                     this.paused = false
+                    this.qrErrMsg = 'Invalid address of recipient.'
+                } else {
+                    this.qrErrMsg = void 0
                 }
             } catch (e) {
                 this.coldRecipient = 'please scan QR code of recipient'
