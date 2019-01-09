@@ -111,7 +111,7 @@ export default {
         transferAmount() {
             if (this.amount) {
                 var temAmount = parseFloat(this.amount)
-                return temAmount * VSYS_PRECISION
+                return Math.round(temAmount * VSYS_PRECISION)
             }
         }
     },
