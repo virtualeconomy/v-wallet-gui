@@ -63,7 +63,7 @@
 
 <script>
 import jrQrcode from 'jr-qrcode'
-import { API_VERSION, PROTOCOL, OPC_TRANSACTION } from '@/constants.js'
+import { API_VERSION, PROTOCOL, OPC_SIGNATURE } from '@/constants.js'
 import transaction from '../../../utils/transaction'
 export default {
     name: 'ColdSignature',
@@ -142,14 +142,18 @@ export default {
             this.sgError = false
             this.opcError = false
             try {
-                var signature = JSON.parse(decodeString).signature
+                var jsonObj = JSON.parse(decodeString)
+                var opc = jsonObj.opc
+                var api = jsonObj.api
+                var protocol = jsonObj.protocol
+                var signature = jsonObj.signature
                 if (!signature) {
                     this.paused = false
                 } else {
                     var data = JSON.parse(JSON.stringify(this.dataObject))
-                    if (data.api !== API_VERSION) this.apiError = true
-                    if (data.protocol !== PROTOCOL) this.protocolError = true
-                    if (data.opc !== OPC_TRANSACTION) this.opcError = true
+                    if (api !== API_VERSION) this.apiError = true
+                    if (protocol !== PROTOCOL) this.protocolError = true
+                    if (opc !== OPC_SIGNATURE) this.opcError = true
                     delete data.transactionType
                     delete data.api
                     delete data.opc
