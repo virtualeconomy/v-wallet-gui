@@ -20,9 +20,9 @@
       <div class="version">Version {{ vnumber }}
       </div>
       <div class="about_text">
-        V Systems(VSYS) is a blockchain database cloud that aims to create a brand new digital economy era.It is the world's first object-oriented general purpose distributed database.which is empowered to carry nn,mjnm,complex decentralize applicatrions.
+        V Wallet is a reference implementation of cross-platform browser wallet for the V Systems blockchain network. It features basic hot wallet mode and cold wallet interaction/monitoring mode. It implements V Systems wallet format specification 1.0. and V System wallet QR code API 1.0
       </div>
-      <div class="right-reserved">@2018 V SYSTEMS ALL rights reserved
+      <div class="right-reserved">@2018-2019 V SYSTEMS ALL rights reserved
       </div>
     </div>
   </b-modal>

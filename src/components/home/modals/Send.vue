@@ -57,7 +57,7 @@
                  @click="scanChange"
                  title="scan qr-code">
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid recipient address (make sure correct QR code is using and scanned).
+              Invalid recipient address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
@@ -202,7 +202,7 @@
                  title="scan qr-code"
                  @click="scanChange">
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid recipient address (make sure correct QR code is using and scanned).
+              Invalid recipient address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
