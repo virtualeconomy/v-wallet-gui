@@ -36,7 +36,7 @@ v wallet gui based on the basic wallet and cold wallet.
   2. clone this project
 
 ``` bash
-$ git clone https://github.com/excelsia/v-wallet-gui.git
+$ git clone https://github.com/virtualeconomy/v-wallet-gui.git
 ```
 
   3. install packages
