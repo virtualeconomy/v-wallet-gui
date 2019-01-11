@@ -1,6 +1,6 @@
-# VSYS Wallet Gui
+# V Wallet Gui
 
-vsys wallet gui based on the basic wallet and cold wallet.
+v wallet gui based on the basic wallet and cold wallet.
 
 ### Directory Structure
 
