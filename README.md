@@ -1,6 +1,6 @@
-# VSYS Wallet Gui
+# V Wallet Gui
 
-vsys wallet gui based on the basic wallet and cold wallet.
+v wallet gui based on the basic wallet and cold wallet.
 
 ### Directory Structure
 
@@ -36,13 +36,13 @@ vsys wallet gui based on the basic wallet and cold wallet.
   2. clone this project
 
 ``` bash
-$ git clone https://github.com/excelsia/vsys-wallet-gui.git
+$ git clone https://github.com/excelsia/v-wallet-gui.git
 ```
 
   3. install packages
 
 ```bash
-  $ cd vsys-wallet-gui
+  $ cd v-wallet-gui
   $ npm install
 ```
 
@@ -56,6 +56,6 @@ $ npm run dev
   6. if you want the wallet to access data from a different address, edit ```config/nginx.default.conf```
 
 ```bash
-  proxy_pass http://wallet.vee.tech:9922 
+  proxy_pass http://wallet.v.systems:9922 
 ```
 to a particular address
