@@ -15,6 +15,7 @@
         "test-api": "babel-node --presets es2015 test_api.js"
     },
     "dependencies": {
+        "apexcharts": "^2.6.0",
         "bignumber.js": "^7.2.1",
         "bootstrap": "^4.1.1",
         "bootstrap-vue": "^2.0.0-rc.11",
@@ -22,6 +23,7 @@
         "identicon.js": "^2.3.2",
         "jr-qrcode": "^1.1.1",
         "vue": "^2.5.2",
+        "vue-apexcharts": "^1.2.8",
         "vue-json-excel": "^0.2.5",
         "vue-ls": "^3.0.5",
         "vue-m-validator": "^1.0.5",
