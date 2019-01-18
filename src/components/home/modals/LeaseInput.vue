@@ -234,8 +234,12 @@ export default {
                     this.qrErrMsg = 'Invalid recipient address in QR code.'
                 }
             } catch (e) {
-                this.paused = false
-                this.recipient = 'please scan QR code of recipient'
+                if (this.isValidRecipient(decodeString)) {
+                    this.recipient = decodeString
+                } else {
+                    this.paused = false
+                    this.recipient = 'please scan QR code of recipient'
+                }
             }
         },
         isAmountValid(type) {

@@ -616,8 +616,12 @@ export default {
                     this.qrErrMsg = void 0
                 }
             } catch (e) {
-                this.recipient = 'please scan QR code of recipient'
-                this.paused = false
+                if (this.isValidRecipient(decodeString)) {
+                    this.recipient = decodeString
+                } else {
+                    this.recipient = 'please scan QR code of recipient'
+                    this.paused = false
+                }
             }
         },
         onColdDecode: function(decodeString) {
@@ -647,8 +651,12 @@ export default {
                     this.qrErrMsg = void 0
                 }
             } catch (e) {
-                this.coldRecipient = 'please scan QR code of recipient'
-                this.paused = false
+                if (this.isValidRecipient(decodeString)) {
+                    this.coldRecipient = decodeString
+                } else {
+                    this.coldRecipient = 'please scan QR code of recipient'
+                    this.paused = false
+                }
             }
         },
         getSignature: function(signature) {
