@@ -115,7 +115,7 @@
 </template>
 
 <script>
-import { TESTNET_NODE } from '../../../constants'
+import { NODE_IP } from '../../../constants'
 import Record from './Record'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
@@ -195,7 +195,7 @@ export default {
                 const addr = this.address
                 this.changeShowDisable = true
                 const recordLimit = this.showingNum
-                const url = TESTNET_NODE + '/transactions/address/' + addr + '/limit/' + recordLimit
+                const url = NODE_IP + '/transactions/address/' + addr + '/limit/' + recordLimit
                 this.$http.get(url).then(response => {
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]

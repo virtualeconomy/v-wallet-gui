@@ -85,7 +85,7 @@
 
 <script>
 
-import {TESTNET_NODE, LEASE_TX, CANCEL_LEASE_TX} from '../../../constants'
+import {NODE_IP, LEASE_TX, CANCEL_LEASE_TX} from '../../../constants'
 import Vue from 'vue'
 import Record from './Record'
 import browser from '../../../utils/browser'
@@ -167,7 +167,7 @@ export default {
                 this.changeShowDisable = true
                 const recordLimit = this.showingNum
                 this.leaseRecords = []
-                const url = TESTNET_NODE + '/transactions/address/' + addr + '/limit/' + recordLimit
+                const url = NODE_IP + '/transactions/address/' + addr + '/limit/' + recordLimit
                 let self = this
                 this.$http.get(url).then(response => {
                     if (addr === this.address && recordLimit === this.showingNum) {
