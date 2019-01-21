@@ -115,7 +115,7 @@
 </template>
 
 <script>
-import { NODE_IP } from '../../../constants'
+import { NODE_IP, VSYS_PRECISION } from '../../../constants'
 import Record from './Record'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
@@ -204,7 +204,9 @@ export default {
                             if (!rv[aa]) {
                                 Vue.set(rv, aa, [])
                             }
-                            rv[aa].push(x)
+                            rv[aa].push(JSON.parse(JSON.stringify(x)))
+                            x['fee'] = x['fee'] / VSYS_PRECISION
+                            x['amount'] = x['amount'] / VSYS_PRECISION
                             return rv
                         }, {})
                         this.changeShowDisable = false
