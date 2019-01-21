@@ -250,7 +250,7 @@ export default {
             return !isNaN(Number(amount)) && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type)
         },
         isWrongFormat(amount) {
-            if (amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) {
+            if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
                 return true
             } else {
                 return false
