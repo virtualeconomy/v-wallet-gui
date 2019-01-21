@@ -85,7 +85,7 @@
         Insufficient funds
       </b-form-invalid-feedback>
       <b-form-invalid-feedback id="inputLiveFeedback"
-                               v-else-if="isPositive(amount)">
+                               v-else-if="isNegative(amount)">
         Negative number is not allowed.
       </b-form-invalid-feedback>
     </b-form-group>
@@ -251,7 +251,7 @@ export default {
             if (Number(amount) === 0) {
                 return void 0
             }
-            return !isNaN(Number(amount)) && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isPositive(amount)
+            return !isNaN(Number(amount)) && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
         },
         isWrongFormat(amount) {
             if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
@@ -264,7 +264,7 @@ export default {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
             return amount > balance - TX_FEE
         },
-        isPositive(amount) {
+        isNegative(amount) {
             return amount < 0
         },
         nextPage() {
