@@ -5,7 +5,8 @@
         class="brand-logo"
         src="../assets/imgs/icons/signup/vsys_logo.svg">
     </div>
-    <div class="form-login">
+    <div class="form-login"
+         v-if="mutableValue">
       <H1>
         Sign in
       </H1>
@@ -115,16 +116,33 @@
         ><b>Login</b>
         </b-button>
       </div>
-      <p class="flink">
-        or <b-button
-          class="blink"
-          @click="changePage('/restore')"
-          variant="link">
-          restore account
-        </b-button>
-        from backup
-      </p>
     </div>
+    <div v-else
+         class="form-login">
+      <p class="else-content"
+      >The browser cannot find any account for current domain </p>
+      <br>
+      <div class="submit-button">
+        <b-button
+          class="h-input btn-color"
+          :variant="'warning'"
+          :size="'lg'"
+          :block=true
+          @click="changePage('/signup')"
+        ><b>Create New Account</b>
+        </b-button>
+      </div>
+    </div>
+    <p class="flink">
+      Already have an account ?
+      <b-button
+        class="blink"
+        @click="changePage('/restore')"
+        variant="link">
+        restore account
+      </b-button>
+      from backup
+    </p>
   </div>
 </template>
 
@@ -176,9 +194,6 @@ export default {
         }).slice(0, 20)
         this.selectedAddr = this.usrOptions[0]
         this.mutableValue = this.usrOptions[0]
-        if (!this.usrOptions.length) {
-            this.$router.push('/signup')
-        }
     },
 
     mounted() {
@@ -576,5 +591,8 @@ export default {
 }
 .flink {
     margin-top: 20px;
+}
+.else-content {
+    font-size: 18px;
 }
 </style>
