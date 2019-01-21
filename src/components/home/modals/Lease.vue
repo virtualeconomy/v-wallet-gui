@@ -157,7 +157,7 @@ import LeaseInput from './LeaseInput'
 import Confirm from './Confirm'
 import ColdSignature from './ColdSignature'
 import Vue from 'vue'
-import { TX_FEE, VSYS_PRECISION, LEASE_TX, TESTNET_NODE, FEE_SCALE, API_VERSION, OPC_TRANSACTION, PROTOCOL } from '@/constants'
+import { TX_FEE, VSYS_PRECISION, LEASE_TX, NODE_IP, FEE_SCALE, API_VERSION, OPC_TRANSACTION, PROTOCOL } from '@/constants'
 import transaction from '@/utils/transaction'
 import seedLib from '@/libs/seed'
 import LeaseSuccess from './LeaseSuccess'
@@ -308,7 +308,7 @@ export default {
             } else if (walletType === 'coldWallet') {
                 apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress], LEASE_TX)
             }
-            const url = TESTNET_NODE + '/leasing/broadcast/lease'
+            const url = NODE_IP + '/leasing/broadcast/lease'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 this.txId = response.body.id
                 this.txAddress = response.body.recipient

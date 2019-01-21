@@ -70,7 +70,7 @@
 
 <script>
 import Confirm from './Confirm'
-import { CANCEL_LEASE_TX, VSYS_PRECISION, TESTNET_NODE, TX_FEE, FEE_SCALE, API_VERSION, PROTOCOL, OPC_TRANSACTION } from '../../../constants'
+import { CANCEL_LEASE_TX, VSYS_PRECISION, NODE_IP, TX_FEE, FEE_SCALE, API_VERSION, PROTOCOL, OPC_TRANSACTION } from '../../../constants'
 import transaction from '@/utils/transaction'
 import ColdSignature from './ColdSignature'
 import CancelSuccess from './CancelSuccess'
@@ -203,7 +203,7 @@ export default {
                 this.timestamp = dataInfo.timestamp
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(), CANCEL_LEASE_TX)
             }
-            const url = TESTNET_NODE + '/leasing/broadcast/cancel'
+            const url = NODE_IP + '/leasing/broadcast/cancel'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 this.page = 'success'
             }, response => {
