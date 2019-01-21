@@ -19,7 +19,7 @@
                  width="60px"
                  height="60px">
           </div>
-          <div class="cl-amount">{{ formatter(Number(amount)) }} vsys</div>
+          <div class="cl-amount">{{ formatter(amount) }} vsys</div>
         </div>
         <div class="cl-address">
           <label>To</label>
@@ -27,7 +27,7 @@
         </div>
         <div class="cl-fee">
           <label>Fee</label>
-          <span>{{ formatter(Number(fee)) }} vsys</span>
+          <span>{{ formatter(fee) }} vsys</span>
         </div>
       </div>
       <p v-show="sendError"

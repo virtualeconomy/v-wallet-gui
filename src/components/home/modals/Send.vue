@@ -38,7 +38,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">{{ formatter(Number(balances[address])) }} VSYS</span>
+              <span class="balance">{{ formatter(balances[address]) }} VSYS</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -108,7 +108,7 @@
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
-            <label class="fee-remark">Transaction Fee {{ formatter(Number(fee)) }} VSYS</label>
+            <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -187,7 +187,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">{{ formatter(Number(balances[coldAddress])) }} VSYS</span>
+              <span class="balance">{{ formatter(balances[coldAddress]) }} VSYS</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -257,7 +257,7 @@
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
-            <label class="fee-remark">Transaction Fee {{ formatter(Number(coldFee)) }} VSYS</label>
+            <label class="fee-remark">Transaction Fee {{ formatter(coldFee) }} VSYS</label>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -607,7 +607,7 @@ export default {
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = this.formatter(Number(jsonObj.amount / VSYS_PRECISION))
+                    this.amount = this.formatter(jsonObj.amount / VSYS_PRECISION)
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false

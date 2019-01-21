@@ -64,7 +64,7 @@
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span>{{ formatter(Number(txAmount)) }} VSYS</span>
+          <span>{{ formatter(txAmount) }} VSYS</span>
         </div>
       </b-col>
       <b-col class="record-action"

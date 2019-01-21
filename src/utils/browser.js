@@ -4,6 +4,7 @@ export default {
         return /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)
     },
     numberFormatter(num) {
+        num = Number(num)
         if (!(num % 1)) {
             return num.toFixed(2)
         } else {
