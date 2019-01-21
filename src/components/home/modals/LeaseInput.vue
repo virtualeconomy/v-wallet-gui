@@ -84,6 +84,10 @@
                                v-else-if="isInsufficient(amount, walletType)">
         Insufficient funds
       </b-form-invalid-feedback>
+      <b-form-invalid-feedback id="inputLiveFeedback"
+                               v-else-if="isPositive(amount)">
+        Negative number is not allowed.
+      </b-form-invalid-feedback>
     </b-form-group>
     <b-form-group>
       <label class="fee-remark">Transaction Fee {{ formatter(Number(fee)) }} VSYS</label>
@@ -248,7 +252,7 @@ export default {
             if (Number(amount) === 0) {
                 return void 0
             }
-            return !isNaN(Number(amount)) && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type)
+            return !isNaN(Number(amount)) && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isPositive(amount)
         },
         isWrongFormat(amount) {
             if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
@@ -260,6 +264,9 @@ export default {
         isInsufficient(amount, type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
             return amount > balance - TX_FEE
+        },
+        isPositive(amount) {
+            return amount < 0
         },
         nextPage() {
             if (this.walletType === 'hot') {
