@@ -118,9 +118,9 @@
       </div>
     </div>
     <div v-else
-         class="form-else-login">
+         class="form-login">
       <p class="else-content"
-      >The browser cannot found any account for current domain </p>
+      >The browser cannot find any account for current domain </p>
       <br>
       <div class="submit-button">
         <b-button
@@ -362,17 +362,6 @@ export default {
     border-radius: 4px;
     background-color: white;
 }
-.form-else-login {
-    margin-top: 35px;
-    max-width: 680px;
-    max-height: 450px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 40px 50px;
-    border:1px solid #EDEEF2;
-    border-radius: 4px;
-    background-color: white;
-}
 .addr {
     font-size: 80%;
     line-height: 70%;
@@ -604,6 +593,6 @@ export default {
     margin-top: 20px;
 }
 .else-content {
-    font-size: 20px;
+    font-size: 18px;
 }
 </style>
