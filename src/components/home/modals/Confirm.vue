@@ -10,7 +10,7 @@
                     label="Amount"
                     label-for="amount_confirm">
         <b-form-input id="amount_confirm"
-                      :value="amount + ' VSYS'"
+                      :value="formatter(Number(amount)) + ' VSYS'"
                       class="amount"
                       readonly
                       :plaintext="true">
@@ -67,7 +67,7 @@
                     label="Fee"
                     label-for="fee_confirm">
         <b-form-input id="fee_confirm"
-                      :value="fee + 'vsys'"
+                      :value="formatter(Number(fee)) + 'vsys'"
                       class="fee"
                       readonly
                       :plaintext="true">
@@ -78,6 +78,7 @@
 </template>
 
 <script>
+import browser from '../../../utils/browser'
 export default {
     name: 'Confirm',
     props: {
@@ -109,6 +110,11 @@ export default {
             type: String,
             require: true,
             default: ''
+        }
+    },
+    methods: {
+        formatter(num) {
+            return browser.numberFormatter(num)
         }
     }
 }

@@ -39,7 +39,7 @@
                width="60px"
                height="60px">
         </div>
-        <div :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ txAmount }} vsys</div>
+        <div :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(Number(txAmount)) }} vsys</div>
       </div>
       <div class="tx-address">
         <label>{{ (txIcon === 'received' || txIcon === 'leased in' || txIcon === 'leased in canceled') ? 'From' : 'To' }}</label>
@@ -51,7 +51,7 @@
       </div>
       <div class="tx-fee">
         <label>Fee</label>
-        <span>{{ txFee || 0 }} vsys</span>
+        <span>{{ formatter(Number(txFee)) || 0 }} vsys</span>
       </div>
       <div class="tx-attachment"
            v-if="txIcon === 'sent' || txIcon === 'received'">
@@ -63,6 +63,7 @@
 </template>
 
 <script>
+import browser from '../../../utils/browser'
 export default {
     name: 'TxInfoModal',
     props: {
@@ -107,6 +108,9 @@ export default {
     methods: {
         closeModal() {
             this.$refs.infoModal.hide()
+        },
+        formatter(num) {
+            return browser.numberFormatter(num)
         }
     }
 }
