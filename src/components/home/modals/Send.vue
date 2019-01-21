@@ -93,6 +93,10 @@
                                      v-else-if="isInsufficient(amount, 'hot')">
               Insufficient funds
             </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isNegative(amount)">
+              Negative number is not allowed.
+            </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group label="Description"
                         label-for="descriptionInput">
@@ -237,6 +241,10 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isInsufficient(coldAmount, 'cold')">
               Insufficient funds
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isNegative(amount)">
+              Negative number is not allowed.
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group label="Description"
@@ -698,7 +706,7 @@ export default {
             if (Number(amount) === 0) {
                 return void 0
             }
-            return !isNaN(amount) && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type)
+            return !isNaN(amount) && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
         },
         isWrongFormat(amount) {
             if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
@@ -710,6 +718,9 @@ export default {
         isInsufficient(amount, type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
             return amount > balance - TX_FEE
+        },
+        isNegative(amount) {
+            return amount < 0
         },
         toNonExp(num) {
             var m = num.toExponential().match(/\d(?:\.(\d*))?e([+-]\d+)/)
