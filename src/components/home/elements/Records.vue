@@ -147,7 +147,7 @@ export default {
                 'timestamp(in nano second)': 'timestamp',
                 recipient_address: 'recipient',
                 amount: 'amount',
-                attachment: 'attachment'
+                encoded_attachment: 'attachment'
             },
             transType: 'payment',
             myHeight: '0',
