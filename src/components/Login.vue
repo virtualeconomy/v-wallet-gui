@@ -5,7 +5,8 @@
         class="brand-logo"
         src="../assets/imgs/icons/signup/vsys_logo.svg">
     </div>
-    <div class="form-login">
+    <div class="form-login"
+         v-if="mutableValue">
       <H1>
         Sign in
       </H1>
@@ -19,8 +20,7 @@
       <hr class="hr-login">
       <div
         class="dropdown v-select"
-        :class="dropdownClasses"
-        v-if="mutableValue">
+        :class="dropdownClasses">
         <div
           ref="toggle"
           @mousedown.prevent="toggleDropdown"
@@ -85,13 +85,6 @@
           </ul>
         </transition>
       </div>
-      <div v-else>
-        <b-form-input readonly
-                      size="lg"
-                      class="h-input"
-                      value="If it's your first login, please create an account">
-        </b-form-input>
-      </div>
       <div class="input-pwd">
         <b-form-input
           class="h-input"
@@ -123,17 +116,33 @@
         ><b>Login</b>
         </b-button>
       </div>
-      <p class="flink">
-        Already have an account ?
-        <b-button
-          class="blink"
-          @click="changePage('/restore')"
-          variant="link">
-          restore account
-        </b-button>
-        from backup
-      </p>
     </div>
+    <div v-else
+         class="form-else-login">
+      <p class="else-content"
+      >The browser cannot found any account for current domain </p>
+      <br>
+      <div class="submit-button">
+        <b-button
+          class="h-input btn-color"
+          :variant="'warning'"
+          :size="'lg'"
+          :block=true
+          @click="changePage('/signup')"
+        ><b>Create New Account</b>
+        </b-button>
+      </div>
+    </div>
+    <p class="flink">
+      Already have an account ?
+      <b-button
+        class="blink"
+        @click="changePage('/restore')"
+        variant="link">
+        restore account
+      </b-button>
+      from backup
+    </p>
   </div>
 </template>
 
@@ -346,6 +355,17 @@ export default {
 .form-login {
     margin-top: 35px;
     max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 40px 50px;
+    border:1px solid #EDEEF2;
+    border-radius: 4px;
+    background-color: white;
+}
+.form-else-login {
+    margin-top: 35px;
+    max-width: 680px;
+    max-height: 450px;
     margin-left: auto;
     margin-right: auto;
     padding: 40px 50px;
@@ -582,5 +602,8 @@ export default {
 }
 .flink {
     margin-top: 20px;
+}
+.else-content {
+    font-size: 20px;
 }
 </style>
