@@ -38,7 +38,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">{{ balances[address] }} VSYS</span>
+              <span class="balance">{{ formatter(balances[address]) }} VSYS</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -108,7 +108,7 @@
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
-            <label class="fee-remark">Transaction Fee {{ fee }} VSYS</label>
+            <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -187,7 +187,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">{{ balances[coldAddress] }} VSYS</span>
+              <span class="balance">{{ formatter(balances[coldAddress]) }} VSYS</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -257,7 +257,7 @@
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
-            <label class="fee-remark">Transaction Fee {{ coldFee }} VSYS</label>
+            <label class="fee-remark">Transaction Fee {{ formatter(coldFee) }} VSYS</label>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -361,6 +361,7 @@ import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
 import ColdSignature from './ColdSignature'
+import browser from '../../../utils/browser'
 var initData = {
     opc: '',
     recipient: '',
@@ -606,7 +607,7 @@ export default {
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = this.toNonExp(jsonObj.amount / VSYS_PRECISION)
+                    this.amount = this.formatter(jsonObj.amount / VSYS_PRECISION)
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
@@ -641,7 +642,7 @@ export default {
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.coldAmount = this.toNonExp(jsonObj.amount / VSYS_PRECISION)
+                    this.coldAmount = this.formatter((jsonObj.amount / VSYS_PRECISION))
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
@@ -722,10 +723,6 @@ export default {
         isNegative(amount) {
             return amount < 0
         },
-        toNonExp(num) {
-            var m = num.toExponential().match(/\d(?:\.(\d*))?e([+-]\d+)/)
-            return num.toFixed(Math.max(0, (m[1] || '').length - m[2]))
-        },
         options(addrs) {
             return Object.keys(addrs).reduce((options, addr) => {
                 options.push({ value: addr, text: addr })
@@ -734,6 +731,9 @@ export default {
         },
         getKeypair: function(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
+        },
+        formatter(num) {
+            return browser.numberFormatter(num)
         }
     }
 }

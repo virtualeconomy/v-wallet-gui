@@ -4,10 +4,12 @@ export default {
         return /Android|webOS|iPhone|iPod|BlackBerry/i.test(navigator.userAgent)
     },
     numberFormatter(num) {
-        if (!num.toString().includes('.')) {
+        num = Number(num)
+        if (!(num % 1)) {
             return num.toFixed(2)
         } else {
-            return num
+            let m = num.toExponential().match(/\d(?:\.(\d*))?e([+-]\d+)/)
+            return num.toFixed(Math.max(0, (m[1] || '').length - m[2]))
         }
     }
 }

@@ -25,7 +25,7 @@
                width="20"
                height="20">
         </span>
-        <span class="balance">{{ walletType === 'hot' ? balances[address] : balances[coldAddress] }} VSYS</span>
+        <span class="balance">{{ formatter(walletType === 'hot' ? balances[address] : balances[coldAddress]) }} VSYS</span>
       </b-btn>
     </b-form-group>
     <b-form-group label="Recipient"
@@ -90,7 +90,7 @@
       </b-form-invalid-feedback>
     </b-form-group>
     <b-form-group>
-      <label class="fee-remark">Transaction Fee {{ fee }} VSYS</label>
+      <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
     </b-form-group>
     <b-button variant="warning"
               class="btn-continue"
@@ -105,6 +105,7 @@
 <script>
 import { TX_FEE, VSYS_PRECISION, PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/constants'
 import crypto from '@/utils/crypto'
+import browser from '../../../utils/browser'
 
 export default {
     name: 'LeaseInput',
@@ -222,7 +223,7 @@ export default {
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = this.toNonExp(jsonObj.amount / VSYS_PRECISION)
+                    this.amount = this.formatter(jsonObj.amount / VSYS_PRECISION)
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
@@ -274,10 +275,6 @@ export default {
                 this.$emit('get-cold-data', this.recipient, this.amount, this.coldAddress)
             }
         },
-        toNonExp(num) {
-            var m = num.toExponential().match(/\d(?:\.(\d*))?e([+-]\d+)/)
-            return num.toFixed(Math.max(0, (m[1] || '').length - m[2]))
-        },
         options(addrs) {
             var res = Object.keys(addrs).reduce((options, addr) => {
                 options.push({ value: addr, text: addr })
@@ -294,6 +291,9 @@ export default {
             this.paused = false
             this.address = this.selectedWalletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
+        },
+        formatter(num) {
+            return browser.numberFormatter(num)
         }
     }
 }

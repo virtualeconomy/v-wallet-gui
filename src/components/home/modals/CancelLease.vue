@@ -19,7 +19,7 @@
                  width="60px"
                  height="60px">
           </div>
-          <div class="cl-amount">{{ amount }} vsys</div>
+          <div class="cl-amount">{{ formatter(amount) }} vsys</div>
         </div>
         <div class="cl-address">
           <label>To</label>
@@ -27,7 +27,7 @@
         </div>
         <div class="cl-fee">
           <label>Fee</label>
-          <span>{{ fee }} vsys</span>
+          <span>{{ formatter(fee) }} vsys</span>
         </div>
       </div>
       <p v-show="sendError"
@@ -77,6 +77,7 @@ import CancelSuccess from './CancelSuccess'
 import TxInfoModal from '../elements/TxInfoModal'
 import seedLib from '@/libs/seed'
 import Vue from 'vue'
+import browser from '../../../utils/browser'
 export default {
     name: 'CancelLease',
     components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm },
@@ -224,6 +225,9 @@ export default {
         },
         getKeypair() {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addressIndex).keyPair
+        },
+        formatter(num) {
+            return browser.numberFormatter(num)
         }
     }
 }

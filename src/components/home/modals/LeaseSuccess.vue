@@ -3,7 +3,7 @@
     <img src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
     <div>
       <p class="p-tips">Your transaction is on the way!</p>
-      <p class="p-info">You have leased {{ amount }} VSYS</p>
+      <p class="p-info">You have leased {{ formatter(amount) }} VSYS</p>
     </div>
     <b-button variant="warning"
               class="btn-detail"
@@ -13,6 +13,7 @@
 <script>
 import TxInfoModal from '../elements/TxInfoModal'
 import { TX_FEE } from '../../../constants'
+import browser from '../../../utils/browser'
 export default {
     name: 'LeaseSuccess',
     components: { TxInfoModal },
@@ -41,6 +42,9 @@ export default {
     methods: {
         showDetails() {
             this.$emit('show-details')
+        },
+        formatter(num) {
+            return browser.numberFormatter(num)
         }
     }
 }
