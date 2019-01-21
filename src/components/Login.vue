@@ -120,7 +120,7 @@
     <div v-else
          class="form-else-login">
       <p class="else-content"
-      >The browser cannot found any account for current domain </p>
+      >The browser cannot find any account for current domain </p>
       <br>
       <div class="submit-button">
         <b-button
