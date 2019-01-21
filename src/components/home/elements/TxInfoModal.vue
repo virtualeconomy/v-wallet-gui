@@ -47,7 +47,7 @@
       </div>
       <div class="tx-block">
         <label>Timestamp</label>
-        <span>{{ new Date(txTime / 1000000).toGMTString() }}</span>
+        <span>{{ new Date(txTime / 1000000).toLocaleString() }}</span>
       </div>
       <div class="tx-fee">
         <label>Fee</label>
