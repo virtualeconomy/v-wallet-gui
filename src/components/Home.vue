@@ -28,12 +28,31 @@
                  class="pointer unselectable"
                  @click.native="selectWallet(address, 'hotWallet')">
           </Asset>
-          <div class="asset-title">
-            <img
-              src="../assets/imgs/icons/wallet/ic_wallet_line.svg"><b class="title-assets">Cold Wallet</b>
+          <div>
+            <span>
+              <img
+                src="../assets/imgs/icons/wallet/ic_wallet_line.svg"><b class="title-assets">Cold Wallet</b>
+              <b-btn @click="sortStatus"
+                     size="sm"
+                     align="left"
+                     variant="link"
+                     class="sort">
+                <img class="sort-image"
+                     src="../assets/imgs/icons/wallet/ic_sort_down.svg">
+              </b-btn>
+            </span>
           </div>
-          <Asset v-if="coldAddresses"
+          <Asset v-if="coldAddresses&&sortFlag===0"
                  v-for="(coldPubkey, coldAddress) in coldAddresses"
+                 :address="coldAddress"
+                 :key="coldAddress"
+                 :balance="balance[coldAddress]"
+                 :selected="coldAddress === selectedAddress"
+                 class="pointer unselectable"
+                 @click.native="selectWallet(coldAddress, 'coldWallet')">
+          </Asset>
+          <Asset v-if="coldAddresses&&sortFlag===1"
+                 v-for="(coldPubkey, coldAddress) in sortedAddresses"
                  :address="coldAddress"
                  :key="coldAddress"
                  :balance="balance[coldAddress]"
@@ -143,7 +162,9 @@ export default {
             sessionClearTimeout: void 0,
             addresses: {},
             coldAddresses: {},
+            sortedAddresses: {},
             walletType: '',
+            sortFlag: 0,
             transActive: 'trans',
             available: 0,
             leasedIn: 0,
@@ -159,9 +180,16 @@ export default {
             this.getBalance(this.address)
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
+            let unsortedColdAddresses = {}
+            let sortedColdAddresses = {}
             if (this.userInfo && this.userInfo.coldAddresses) {
-                this.coldAddresses = JSON.parse(this.userInfo.coldAddresses)
+                unsortedColdAddresses = JSON.parse(this.userInfo.coldAddresses)
             }
+            Object.keys(unsortedColdAddresses).sort().forEach(function(key) {
+                sortedColdAddresses[key] = unsortedColdAddresses[key]
+            })
+            this.coldAddresses = unsortedColdAddresses
+            this.sortedAddresses = sortedColdAddresses
             this.getAddresses()
             for (const addr in this.addresses) {
                 this.getBalance(addr)
@@ -258,6 +286,12 @@ export default {
         },
         importCold(coldAddress, pubKey) {
             Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : pubKey)
+            let unsortedColdAddresses = this.coldAddresses
+            let sortedColdAddresses = {}
+            Object.keys(unsortedColdAddresses).sort().forEach(function(key) {
+                sortedColdAddresses[key] = unsortedColdAddresses[key]
+            })
+            this.sortedAddresses = sortedColdAddresses
             this.getBalance(coldAddress)
             this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
         },
@@ -294,6 +328,7 @@ export default {
         },
         deleteCold(addr) {
             Vue.delete(this.coldAddresses, addr)
+            Vue.delete(this.sortedAddresses, addr)
             this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
         },
         getAddresses() {
@@ -304,6 +339,10 @@ export default {
                 Vue.set(this.addresses, seed.address, index)
             }
             return addresses
+        },
+        sortStatus() {
+            if (this.sortFlag === 0) this.sortFlag = 1
+            else this.sortFlag = 0
         }
     },
 
@@ -403,5 +442,13 @@ export default {
 }
 .tab-pane {
     padding: 0 !important;
+}
+.sort {
+    left: 0px;
+    margin-left: 55px;
+}
+.sort-image {
+    left: 0px;
+    margin-left: 15px;
 }
 </style>
