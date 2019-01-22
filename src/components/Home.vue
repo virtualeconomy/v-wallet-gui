@@ -281,7 +281,7 @@ export default {
                 this.leasedOut = (response.body.regular - response.body.available) / VSYS_PRECISION
                 this.leasedIn = (response.body.effective - response.body.available) / VSYS_PRECISION
             }, response => {
-                Vue.set(this.balance, address, 0)
+                this.$router.push('/warning')
             })
         },
         importCold(coldAddress, pubKey) {
