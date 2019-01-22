@@ -58,6 +58,14 @@
         <label>Attachment</label>
         <span>{{ txAttachment }}</span>
       </div>
+      <div class="tx-attachment">
+        <label>ID</label>
+        <span>{{ modalId }}</span>
+      </div>
+      <div class="tx-attachment">
+        <label>Block Height</label>
+        <span>{{ txBlock }}</span>
+      </div>
     </div>
   </b-modal>
 </template>
@@ -98,6 +106,10 @@ export default {
         transType: {
             type: String,
             default: 'payment'
+        },
+        txBlock: {
+            type: Number,
+            default: 0
         }
     },
     computed: {
