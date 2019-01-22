@@ -42,7 +42,8 @@
           :cold-addresses="coldAddresses"
           :addresses="addresses"
           :selected-address="address"
-          :wallet-type="walletType"></Send>
+          :wallet-type="walletType"
+          @endSendSignal="endSendSignal"></Send>
     <Receive show="false"
              :address="address"></Receive>
   </div>
@@ -97,6 +98,9 @@ export default {
     methods: {
         formatter(num) {
             return browser.numberFormatter(num)
+        },
+        endSendSignal() {
+            this.$emit('updateInfo')
         }
     }
 }

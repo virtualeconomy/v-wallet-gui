@@ -96,7 +96,8 @@
                               :balances="balance"
                               :cold-addresses="coldAddresses"
                               :total="total"
-                              :addresses="addresses"></trans-pane>
+                              :addresses="addresses"
+                              @updateInfo="updateInfo"></trans-pane>
                 </div>
                 <div class="f-records">
                   <Records :address="selectedAddress"></Records>
@@ -123,14 +124,16 @@
                              :leased-out="leasedOut"
                              :total="total"
                              :address="selectedAddress"
-                             :wallet-type="walletType">
+                             :wallet-type="walletType"
+                             @updateInfo="updateInfo">
                   </LeasePane>
                 </div>
                 <div class="f-records">
                   <LeaseRecords :address="selectedAddress"
                                 :wallet-type="walletType"
                                 :cold-pub-key="coldPubKey"
-                                :address-index="addresses[selectedAddress]"></LeaseRecords>
+                                :address-index="addresses[selectedAddress]"
+                                @updateInfo="updateInfo"></LeaseRecords>
                 </div>
               </b-tab>
             </b-tabs>
@@ -197,6 +200,7 @@ export default {
             for (const addr in this.coldAddresses) {
                 this.getBalance(addr)
             }
+            this.getBalance(this.selectedAddress)
         }
     },
 
@@ -343,6 +347,24 @@ export default {
         sortStatus() {
             if (this.sortFlag === 0) this.sortFlag = 1
             else this.sortFlag = 0
+        },
+        updateInfo() {
+            for (let delayTime = 6000; delayTime < 150100; delayTime *= 5) { //  刷新时间分别为6秒，30秒，150秒
+                setTimeout(() => {
+                    let tmpAddr = this.selectedAddress
+                    this.selectedAddress = ''
+                    setTimeout(() => {
+                        this.selectedAddress = tmpAddr
+                    }, 0)
+                    for (const addr in this.addresses) {
+                        this.getBalance(addr)
+                    }
+                    for (const addr in this.coldAddresses) {
+                        this.getBalance(addr)
+                    }
+                    this.getBalance(tmpAddr)
+                }, delayTime)
+            }
         }
     },
 

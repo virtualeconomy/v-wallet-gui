@@ -506,6 +506,7 @@ export default {
             }, response => {
                 this.sendError = true
             })
+            this.$emit('endSendSignal')
         },
         nextPage: function() {
             this.sendError = false
