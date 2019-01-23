@@ -171,16 +171,18 @@ export default {
                 const url = NODE_IP + '/transactions/address/' + addr + '/limit/' + recordLimit
                 let self = this
                 this.$http.get(url).then(response => {
+                    let rv = []
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
                         this.response.forEach(function(v, i) {
                             if (v.type === LEASE_TX || v.type === CANCEL_LEASE_TX) {
-                                self.leaseRecords.push(v)
+                                rv.push(v)
                                 if (v.type === CANCEL_LEASE_TX) {
                                     Vue.set(self.beCanceledList, v.lease.id, true)
                                 }
                             }
                         })
+                        this.leaseRecords = rv
                         this.changeShowDisable = false
                     }
                 }, response => {
