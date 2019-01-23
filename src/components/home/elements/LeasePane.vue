@@ -85,7 +85,8 @@
            :cold-addresses="coldAddresses"
            :addresses="addresses"
            :selected-address="address"
-           :selected-wallet-type="walletType"></Lease>
+           :selected-wallet-type="walletType"
+           @endLeaseSignal="endLeaseSignal"></Lease>
   </div>
 </template>
 
@@ -148,6 +149,9 @@ export default {
     methods: {
         formatter(num) {
             return browser.numberFormatter(num)
+        },
+        endLeaseSignal() {
+            this.$emit('updateInfo')
         }
     }
 }

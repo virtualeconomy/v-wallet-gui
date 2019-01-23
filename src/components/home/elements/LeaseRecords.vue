@@ -39,7 +39,8 @@
                   :address-index="addressIndex"
                   :address="address"
                   :wallet-type="walletType"
-                  :is-canceled="beCanceledList[record.id]"></Record>
+                  :is-canceled="beCanceledList[record.id]"
+                  @endCancelSignal="endCancelSignal"></Record>
         </div>
       </div>
     </div>
@@ -196,6 +197,9 @@ export default {
                     this.getLeaseRecords()
                 }
             }
+        },
+        endCancelSignal() {
+            this.$emit('updateInfo')
         }
     }
 }
