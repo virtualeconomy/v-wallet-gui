@@ -30,14 +30,34 @@
     </b-form-group>
     <b-form-group label="Recipient"
                   :label-for="'recipient-input' + walletType">
-      <b-form-input :id="'lease-recipient-input' + walletType"
+      <b-form-input v-if="walletType==='hot'"
+                    :id="'lease-recipient-input' + walletType"
                     class="recipient-input"
                     type="text"
                     v-model="recipient"
                     :state="isValidRecipient(recipient)"
+                    list="showHotRecipientList"
                     aria-describedby="inputLiveFeedBack"
                     placeholder="Paste or scan an address.">
       </b-form-input>
+      <b-form-input v-else-if="walletType==='cold'"
+                    :id="'lease-recipient-input' + walletType"
+                    class="recipient-input"
+                    type="text"
+                    v-model="recipient"
+                    :state="isValidRecipient(recipient)"
+                    list="showColdRecipientList"
+                    aria-describedby="inputLiveFeedBack"
+                    placeholder="Paste or scan an address.">
+      </b-form-input>
+      <datalist id="showHotRecipientList">
+        <option v-for="addr in hotRecipientAddressList.keys()"
+                :key="addr">{{ addr }}</option>
+      </datalist>
+      <datalist id="showColdRecipientList">
+        <option v-for="addr in coldRecipientAddressList.keys()"
+                :key="addr">{{ addr }}</option>
+      </datalist>
       <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
            v-b-tooltip.hover
            class="qr-code"
@@ -97,7 +117,7 @@
               size="lg"
               block
               :disabled="isSubmitDisabled"
-              @click="nextPage">Continue
+              @click="nextPage(); addRecipientList()">Continue
     </b-button>
   </b-container>
 </template>
@@ -106,6 +126,7 @@
 import { TX_FEE, VSYS_PRECISION, PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/constants'
 import crypto from '@/utils/crypto'
 import browser from '../../../utils/browser'
+import LRUCache from 'lru-cache'
 
 export default {
     name: 'LeaseInput',
@@ -119,7 +140,9 @@ export default {
             paused: false,
             address: this.selectedWalletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress,
             coldAddress: this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress,
-            fee: TX_FEE
+            fee: TX_FEE,
+            hotRecipientAddressList: {},
+            coldRecipientAddressList: {}
         }
     },
     props: {
@@ -158,6 +181,18 @@ export default {
             type: String,
             default: '',
             require: true
+        }
+    },
+    created() {
+        this.hotRecipientAddressList = new LRUCache(10)
+        this.coldRecipientAddressList = new LRUCache(10)
+        let item = window.localStorage.getItem('Hot ' + this.defaultAddress + ' leaseRecipientAddressList ')
+        if (item) {
+            this.hotRecipientAddressList.load(JSON.parse(item))
+        }
+        item = window.localStorage.getItem('Cold ' + this.defaultColdAddress + ' leaseRecipientAddressList ')
+        if (item) {
+            this.coldRecipientAddressList.load(JSON.parse(item))
         }
     },
     computed: {
@@ -277,9 +312,9 @@ export default {
         },
         options(addrs) {
             var res = Object.keys(addrs).reduce((options, addr) => {
-                options.push({ value: addr, text: addr })
+                options.push({value: addr, text: addr})
                 return options
-            }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
+            }, [{value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true}])
             return res
         },
         resetData() {
@@ -294,6 +329,15 @@ export default {
         },
         formatter(num) {
             return browser.numberFormatter(num)
+        },
+        addRecipientList: function() {
+            if (this.walletType === 'hot') {
+                this.hotRecipientAddressList.set(this.recipient, '1')
+                window.localStorage.setItem('Hot ' + this.defaultAddress + ' leaseRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
+            } else {
+                this.coldRecipientAddressList.set(this.recipient, '1')
+                window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' leaseRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
+            }
         }
     }
 }

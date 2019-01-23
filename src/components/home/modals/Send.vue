@@ -48,9 +48,14 @@
                           type="text"
                           v-model="recipient"
                           :state="isValidRecipient(recipient)"
+                          list="showHotRecipientList"
                           aria-describedby="inputLiveFeedback"
                           placeholder="Paste or scan an address.">
             </b-form-input>
+            <datalist id="showHotRecipientList">
+              <option v-for="addr in hotRecipientAddressList.keys()"
+                      :key="addr">{{ addr }}</option>
+            </datalist>
             <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
                  class="qr-code"
@@ -115,7 +120,7 @@
                     size="lg"
                     block
                     :disabled="isSubmitDisabled"
-                    @click="nextPage">Continue
+                    @click="nextPage(); addHotRecipientList()">Continue
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
@@ -197,9 +202,14 @@
                           type="text"
                           v-model="coldRecipient"
                           :state="isValidRecipient(coldRecipient)"
+                          list="showColdRecipientList"
                           aria-describedby="inputLiveFeedback"
                           placeholder="Paste or scan an address.">
             </b-form-input>
+            <datalist id="showColdRecipientList">
+              <option v-for="addr in coldRecipientAddressList.keys()"
+                      :key="addr">{{ addr }}</option>
+            </datalist>
             <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
                  class="qr-code"
@@ -264,7 +274,7 @@
                     block
                     size="lg"
                     :disabled="isColdSubmitDisabled"
-                    @click="coldNextPage">Continue
+                    @click="coldNextPage(); addColdRecipientList()">Continue
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
@@ -362,6 +372,7 @@ import Success from './Success'
 import crypto from '@/utils/crypto'
 import ColdSignature from './ColdSignature'
 import browser from '../../../utils/browser'
+import LRUCache from 'lru-cache'
 var initData = {
     opc: '',
     recipient: '',
@@ -383,7 +394,9 @@ var initData = {
     sendError: false,
     coldSignature: '',
     timeStamp: (Date.now() - 1) * 1e6,
-    hasConfirmed: false
+    hasConfirmed: false,
+    coldRecipientAddressList: {},
+    hotRecipientAddressList: {}
 }
 export default {
     name: 'Send',
@@ -417,6 +430,18 @@ export default {
     },
     data: function() {
         return initData
+    },
+    created() {
+        this.coldRecipientAddressList = new LRUCache(10)
+        this.hotRecipientAddressList = new LRUCache(10)
+        let item = window.localStorage.getItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ')
+        if (item) {
+            this.coldRecipientAddressList.load(JSON.parse(item))
+        }
+        item = window.localStorage.getItem('Hot ' + this.defaultAddress + ' sendRecipientAddressList ')
+        if (item) {
+            this.hotRecipientAddressList.load(JSON.parse(item))
+        }
     },
     computed: {
         defaultAddress() {
@@ -513,6 +538,14 @@ export default {
             this.timeStamp = Date.now() * 1e6
             this.hasConfirmed = false
             this.pageId++
+        },
+        addColdRecipientList: function() {
+            this.coldRecipientAddressList.set(this.cogldRecipient, '0')
+            window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
+        },
+        addHotRecipientList: function() {
+            this.hotRecipientAddressList.set(this.recipient, '0')
+            window.localStorage.setItem('Hot ' + this.defaultAddress + ' sendRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
         },
         coldNextPage: function() {
             this.sendError = false
