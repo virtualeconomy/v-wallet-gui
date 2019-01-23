@@ -4,6 +4,13 @@
     <div
       class="title-records">
       <span>Transaction Records</span>
+      <div class="show-fee">
+        <span class="show-position"> ShowTxFee </span>
+        <input class="show-fee2"
+               type="checkbox"
+               v-model="feeFlag"
+               @click="showFee">
+      </div>
       <b-dropdown
         class="pd-select"
         router-tag="div"
@@ -56,6 +63,7 @@
             <div v-for="record in records"
                  :key="record.id">
               <Record :tx-record="record"
+                      :fee-flag="feeFlag"
                       :address="address"
                       :wallet-type="walletType"
                       :trans-type="transType"></Record>
@@ -135,6 +143,7 @@ export default {
     },
     data() {
         return {
+            feeFlag: 0,
             txRecords: {},
             showNums: [10, 50, 100, 200, 500, 1000],
             showingNum: 10,
@@ -224,6 +233,10 @@ export default {
                 }
             }
         },
+        showFee() {
+            if (this.feeFlag === 0) this.feeFlag = 1
+            else this.feeFlag = 0
+        },
         exportRecords() {
             if (this.response) {
 
@@ -296,6 +309,29 @@ export default {
         margin-right: 8px;
     }
 }
+.show-fee {
+    position: absolute;
+    right:380px;
+    width: 116px;
+    height: 36px;
+    background-color: #FFF;
+    border-color: #E8E9ED;
+    font-size: 15px;
+    color: #696B8A;
+    letter-spacing: 0;
+    align-items: Center;
+    display: flex;
+    justify-content:center;
+}
+.show-fee2 {
+    position: absolute;
+    right:7px;
+    width: 15px;
+    height: 30px;
+    display: flex;
+    z-index: 100;
+    background-color: #FFF;
+}
 .pd-select {
     position: absolute;
     right: 166px;
@@ -311,5 +347,9 @@ export default {
     font-size: 15px;
     color: #696B8A;
     letter-spacing: 0;
+}
+.show-position {
+    position: absolute;
+    left: 13px;
 }
 </style>
