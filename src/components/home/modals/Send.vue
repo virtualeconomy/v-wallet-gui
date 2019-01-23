@@ -374,8 +374,8 @@ var initData = {
     coldAttachment: '',
     coldPageId: 1,
     coldFee: TX_FEE,
-    address: this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress,
-    coldAddress: this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress,
+    address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
+    coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
     scanShow: false,
     qrInit: false,
     qrErrMsg: void 0,
@@ -411,7 +411,7 @@ export default {
         },
         selectedAddress: {
             type: String,
-            default: this.defaultAddress,
+            default: this ? this.defaultAddress : undefined,
             require: true
         }
     },
