@@ -167,8 +167,9 @@ export default {
     },
     watch: {
         address(newAddr, oldAddr) {
-            this.txRecords = {}
-            this.response = []
+            if (newAddr === '') {
+                return
+            }
             this.changeShowDisable = false
             this.showingNum = 10
             if (this.address && Vue.ls.get('pwd')) {
