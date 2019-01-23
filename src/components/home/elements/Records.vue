@@ -143,7 +143,7 @@ export default {
     },
     data() {
         return {
-            feeFlag: 0,
+            feeFlag: false,
             txRecords: {},
             showNums: [10, 50, 100, 200, 500, 1000],
             showingNum: 10,
@@ -234,8 +234,8 @@ export default {
             }
         },
         showFee() {
-            if (this.feeFlag === 0) this.feeFlag = 1
-            else this.feeFlag = 0
+            if (!this.feeFlag) this.feeFlag = true
+            else this.feeFlag = false
         },
         exportRecords() {
             if (this.response) {

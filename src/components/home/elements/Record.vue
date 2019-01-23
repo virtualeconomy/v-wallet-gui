@@ -155,8 +155,8 @@ export default {
     },
     props: {
         feeFlag: {
-            type: Number,
-            default: 0
+            type: Boolean,
+            default: false
         },
         txRecord: {
             type: Object,
