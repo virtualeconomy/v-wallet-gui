@@ -111,7 +111,7 @@ export default {
     },
     data() {
         return {
-            feeFlag:false,
+            feeFlag: false,
             leaseRecords: [],
             showNums: [10, 50, 100, 200, 500, 1000],
             showingNum: 10,
