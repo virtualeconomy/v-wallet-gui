@@ -349,7 +349,7 @@ export default {
             else this.sortFlag = 0
         },
         updateInfo() {
-            for (let delayTime = 6000; delayTime < 150100; delayTime *= 5) { //  刷新时间分别为6秒，30秒，150秒
+            for (let delayTime = 6000; delayTime < 150100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 setTimeout(() => {
                     let tmpAddr = this.selectedAddress
                     this.selectedAddress = ''
