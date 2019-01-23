@@ -148,8 +148,10 @@ export default {
         }
     },
     watch: {
-        address() {
-            this.leaseRecords = {}
+        address(newAddr, oldAddr) {
+            if (newAddr === '') {
+                return
+            }
             this.response = []
             this.changeShowDisable = false
             this.showingNum = 10
@@ -167,7 +169,6 @@ export default {
                 const addr = this.address
                 this.changeShowDisable = true
                 const recordLimit = this.showingNum
-                this.leaseRecords = []
                 const url = NODE_IP + '/transactions/address/' + addr + '/limit/' + recordLimit
                 let self = this
                 this.$http.get(url).then(response => {

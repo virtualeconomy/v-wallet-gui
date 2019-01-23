@@ -279,11 +279,22 @@ export default {
         getBalance: function(address) {
             const url = NODE_IP + '/addresses/balance/details/' + address
             this.$http.get(url).then(response => {
-                Vue.set(this.balance, address, response.body['available'] / VSYS_PRECISION)
-                this.total = response.body.regular / VSYS_PRECISION
-                this.available = response.body.available / VSYS_PRECISION
-                this.leasedOut = (response.body.regular - response.body.available) / VSYS_PRECISION
-                this.leasedIn = (response.body.effective - response.body.available) / VSYS_PRECISION
+                let value = response.body['available'] / VSYS_PRECISION
+                let changestatus = value === this.balance[address]
+                Vue.set(this.balance, address, value)
+                if (address === this.selectedAddress) {
+                    this.total = response.body.regular / VSYS_PRECISION
+                    this.available = response.body.available / VSYS_PRECISION
+                    this.leasedOut = (response.body.regular - response.body.available) / VSYS_PRECISION
+                    this.leasedIn = (response.body.effective - response.body.available) / VSYS_PRECISION
+                    if (!changestatus) {
+                        let addrtmp = this.selectedAddress
+                        this.selectedAddress = ''
+                        setTimeout(() => {
+                            this.selectedAddress = addrtmp
+                        }, 0)
+                    }
+                }
             }, response => {
                 Vue.set(this.balance, address, 0)
             })
@@ -351,18 +362,12 @@ export default {
         updateInfo() {
             for (let delayTime = 6000; delayTime < 150100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 setTimeout(() => {
-                    let tmpAddr = this.selectedAddress
-                    this.selectedAddress = ''
-                    setTimeout(() => {
-                        this.selectedAddress = tmpAddr
-                    }, 0)
                     for (const addr in this.addresses) {
                         this.getBalance(addr)
                     }
                     for (const addr in this.coldAddresses) {
                         this.getBalance(addr)
                     }
-                    this.getBalance(tmpAddr)
                 }, delayTime)
             }
         }
