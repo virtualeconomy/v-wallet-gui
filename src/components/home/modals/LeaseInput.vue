@@ -398,6 +398,7 @@ export default {
     margin-top: 20px;
 }
 .recipient-input {
+    padding-right: 35px;
     height: 48px;
 }
 .fee-remark {

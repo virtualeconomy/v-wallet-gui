@@ -800,6 +800,7 @@ export default {
     height: 48px !important;
 }
 .recipient-input {
+    padding-right: 35px;
     height: 48px;
 }
 .amount-input {
