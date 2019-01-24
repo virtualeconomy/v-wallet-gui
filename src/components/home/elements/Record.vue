@@ -66,6 +66,10 @@
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
           <span>{{ formatter(txAmount) }} VSYS</span>
         </div>
+        <div class="tx-fee"
+             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out') && feeFlag">Tx Fee: -
+          <span> {{ txFee }} VSYS </span>
+        </div>
       </b-col>
       <b-col class="record-action"
              cols="auto">
@@ -150,6 +154,10 @@ export default {
         }
     },
     props: {
+        feeFlag: {
+            type: Boolean,
+            default: false
+        },
         txRecord: {
             type: Object,
             default: function() {
@@ -449,6 +457,9 @@ export default {
 .record-unit:hover, .record-unit:active {
     background-color: #f8f9fa;
     border-left: 2px solid #1f5af6;
+}
+.tx-fee {
+    font-size: 14px;
 }
 
 </style>
