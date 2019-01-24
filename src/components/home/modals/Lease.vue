@@ -22,6 +22,7 @@
                       :addresses="addresses"
                       :wallet-type="'hot'"
                       :default-address="defaultAddress"
+                      :default-cold-address="defaultColdAddress"
                       ref="addrInput"
                       :selected-address="selectedAddress"
                       :selected-wallet-type="selectedWalletType"></LeaseInput>
@@ -70,6 +71,7 @@
                       v-if="coldPageId===1"
                       :wallet-type="'cold'"
                       :cold-addresses="coldAddresses"
+                      :default-address="defaultAddress"
                       :default-cold-address="defaultColdAddress"
                       ref="coldAddrInput"
                       :selected-address="selectedAddress"
