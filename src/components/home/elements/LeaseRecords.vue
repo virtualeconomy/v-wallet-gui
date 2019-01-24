@@ -298,7 +298,6 @@ export default {
     right:240px;
     width: 116px;
     height: 36px;
-    background-color: #FFF;
     border-color: #E8E9ED;
     font-size: 15px;
     color: #696B8A;
