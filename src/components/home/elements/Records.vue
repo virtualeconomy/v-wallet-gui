@@ -40,14 +40,13 @@
       </b-dropdown>
       <json-excel
         class="csv-export"
-        :data="responseExport"
+        :fetch="exportRecords"
         :fields="resFields"
         :type="downloadFileType"
         :name="'txs_' + exportTime + '_' + address + '.' + downloadFileType">
         <b-btn
           class="btn-export"
           :disabled="changeShowDisable"
-          @click="exportRecords"
           variant="light"><img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
       </json-excel>
     </div>
@@ -248,6 +247,7 @@ export default {
                     item['amount'] = item['amount'] / VSYS_PRECISION
                 })
             }
+            return this.responseExport
         }
     }
 }
