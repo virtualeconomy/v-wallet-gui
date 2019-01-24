@@ -245,6 +245,7 @@ export default {
                 this.responseExport = JSON.parse(JSON.stringify(this.response))
                 this.responseExport.map(function(item) {
                     item['fee'] = item['fee'] / VSYS_PRECISION
+                    item['amount'] = item['amount'] / VSYS_PRECISION
                 })
             }
         }
