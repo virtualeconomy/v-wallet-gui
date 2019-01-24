@@ -40,13 +40,14 @@
       </b-dropdown>
       <json-excel
         class="csv-export"
-        :data="response"
+        :data="responseExport"
         :fields="resFields"
         :type="downloadFileType"
         :name="'txs_' + exportTime + '_' + address + '.' + downloadFileType">
         <b-btn
           class="btn-export"
           :disabled="changeShowDisable"
+          @click="exportRecords"
           variant="light"><img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
       </json-excel>
     </div>
@@ -123,7 +124,7 @@
 </template>
 
 <script>
-import { NODE_IP } from '../../../constants'
+import { NODE_IP, VSYS_PRECISION } from '../../../constants'
 import Record from './Record'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
@@ -149,6 +150,7 @@ export default {
             showingNum: 10,
             changeShowDisable: false,
             response: [],
+            responseExport: [],
             downloadFileType: 'csv',
             resFields: {
                 transaction_id: 'id',
@@ -240,7 +242,10 @@ export default {
         },
         exportRecords() {
             if (this.response) {
-
+                this.responseExport = JSON.parse(JSON.stringify(this.response))
+                this.responseExport.map(function(item) {
+                    item['fee'] = item['fee'] / VSYS_PRECISION
+                })
             }
         }
     }
