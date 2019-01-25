@@ -133,6 +133,7 @@ export default {
     overflow-x: visible;
 }
 .infos {
+    width: 439px;
     margin-top: 30px;
     border-bottom: 1px solid #E8E9ED;
     margin-bottom: 40px;
@@ -153,7 +154,7 @@ export default {
     font-size: 15px;
     color: #181B3A;
     letter-spacing: 0;
-    text-align: left;
+    text-align: right;
 }
 .fee {
     font-size: 15px;
