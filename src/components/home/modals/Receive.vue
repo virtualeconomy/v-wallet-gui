@@ -71,6 +71,7 @@
 <script>
 import jrQrcode from 'jr-qrcode'
 import { API_VERSION, PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION } from '@/constants.js'
+import BigNumber from 'bignumber.js'
 export default {
     name: 'Receive',
     props: {
@@ -110,8 +111,7 @@ export default {
         },
         transferAmount() {
             if (this.amount) {
-                var temAmount = parseFloat(this.amount)
-                return Math.round(temAmount * VSYS_PRECISION)
+                return BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
             }
         }
     },
