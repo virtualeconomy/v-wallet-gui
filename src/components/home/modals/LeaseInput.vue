@@ -127,6 +127,7 @@ import { TX_FEE, VSYS_PRECISION, PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/co
 import crypto from '@/utils/crypto'
 import browser from '../../../utils/browser'
 import LRUCache from 'lru-cache'
+import BigNumber from 'bignumber.js'
 
 export default {
     name: 'LeaseInput',
@@ -258,7 +259,7 @@ export default {
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = this.formatter(jsonObj.amount / VSYS_PRECISION)
+                    this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
