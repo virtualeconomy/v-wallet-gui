@@ -39,7 +39,7 @@
                width="60px"
                height="60px">
         </div>
-        <div :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} vsys</div>
+        <div :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
       </div>
       <div class="tx-address">
         <label>{{ (txIcon === 'received' || txIcon === 'leased in' || txIcon === 'leased in canceled') ? 'From' : 'To' }}</label>
@@ -51,7 +51,7 @@
       </div>
       <div class="tx-fee">
         <label>Fee</label>
-        <span>{{ formatter(txFee) || 0 }} vsys</span>
+        <span>{{ formatter(txFee) || 0 }} VSYS</span>
       </div>
       <div class="tx-attachment"
            v-if="txIcon === 'sent' || txIcon === 'received'">
