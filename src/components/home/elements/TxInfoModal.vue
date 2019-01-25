@@ -1,5 +1,5 @@
 <template>
-  <b-modal :id="'txInfoModal_' + transType + modalId"
+  <b-modal :id="'txInfoModal_' + transType + modalId + selfSend"
            ref="infoModal"
            class="tx-modal"
            lazy
@@ -106,6 +106,10 @@ export default {
         transType: {
             type: String,
             default: 'payment'
+        },
+        selfSend: {
+            type: String,
+            default: ''
         },
         txBlock: {
             type: Number,

@@ -61,7 +61,7 @@
             :key="monthYear+'c'"
             class="record-content">
             <div v-for="record in records"
-                 :key="record.id">
+                 :key="record.index">
               <Record :tx-record="record"
                       :fee-flag="feeFlag"
                       :address="address"
@@ -128,6 +128,8 @@ import Record from './Record'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
 import browser from '../../../utils/browser'
+import base58 from '@/libs/base58'
+import crypto from '@/utils/crypto'
 
 export default {
     name: 'Records',
@@ -210,13 +212,21 @@ export default {
                 this.$http.get(url).then(response => {
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
-                        this.txRecords = response.body[0].reduce((rv, x) => {
-                            const aa = this.getMonthYearStr(x['timestamp'])
-                            if (!rv[aa]) {
-                                Vue.set(rv, aa, [])
+                        let count = 0
+                        this.txRecords = response.body[0].reduce((recList, recItem) => {
+                            const month = this.getMonthYearStr(recItem['timestamp'])
+                            if (!recList[month]) {
+                                Vue.set(recList, month, [])
                             }
-                            rv[aa].push(x)
-                            return rv
+                            recItem['index'] = ++count
+                            recList[month].push(recItem)
+                            if (recItem['recipient'] === this.address && this.address === crypto.buildRawAddress(base58.decode(recItem['proofs'][0]['publicKey']))) { // send to self
+                                let recItemCopy = JSON.parse(JSON.stringify(recItem))
+                                recItemCopy['SelfSend'] = true
+                                recItemCopy['index'] = ++count
+                                recList[month].push(recItemCopy)
+                            }
+                            return recList
                         }, {})
                         this.changeShowDisable = false
                     }

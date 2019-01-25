@@ -110,6 +110,7 @@
                  :tx-block="txBlock"
                  :tx-attachment="txAttachment"
                  :trans-type="transType"
+                 :self-send="selfSend"
                  :v-if="transType==='payment'"></TxInfoModal>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-fee="txFee"
@@ -198,9 +199,16 @@ export default {
         }
     },
     computed: {
+        selfSend() {
+            if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === true) {
+                return 'selfSend'
+            } else {
+                return ''
+            }
+        },
         txType() {
             if (this.txRecord['type'] === PAYMENT_TX) {
-                if (this.txRecord.recipient === this.address) {
+                if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined) {
                     return 'Received'
                 } else {
                     return 'Sent'
@@ -333,7 +341,7 @@ export default {
             this.hovered = false
         },
         showModal() {
-            this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.transType + this.txRecord.id)
+            this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.transType + this.txRecord.id + this.selfSend)
         },
         cancelLeasing() {
             this.$root.$emit('bv::show::modal', 'cancelLeaseModal_' + this.txRecord.id)
