@@ -61,7 +61,7 @@
             :key="monthYear+'c'"
             class="record-content">
             <div v-for="record in records"
-                 :key="record.count">
+                 :key="record.index">
               <Record :tx-record="record"
                       :fee-flag="feeFlag"
                       :address="address"
@@ -213,22 +213,20 @@ export default {
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
                         let count = 0
-                        this.txRecords = response.body[0].reduce((rv, x) => {
-                            const aa = this.getMonthYearStr(x['timestamp'])
-                            if (!rv[aa]) {
-                                Vue.set(rv, aa, [])
+                        this.txRecords = response.body[0].reduce((recList, recItem) => {
+                            const month = this.getMonthYearStr(recItem['timestamp'])
+                            if (!recList[month]) {
+                                Vue.set(recList, month, [])
                             }
-                            x['count'] = count
-                            count = count + 1
-                            rv[aa].push(x)
-                            if (x['recipient'] === this.address && this.address === crypto.buildRawAddress(base58.decode(x['proofs'][0]['publicKey']))) { // send to self
-                                let x0 = JSON.parse(JSON.stringify(x))
-                                x0['SelfSend'] = true
-                                x0['count'] = count
-                                count = count + 1
-                                rv[aa].push(x0)
+                            recItem['index'] = ++count
+                            recList[month].push(recItem)
+                            if (recItem['recipient'] === this.address && this.address === crypto.buildRawAddress(base58.decode(recItem['proofs'][0]['publicKey']))) { // send to self
+                                let recItemCopy = JSON.parse(JSON.stringify(recItem))
+                                recItemCopy['SelfSend'] = true
+                                recItemCopy['index'] = ++count
+                                recList[month].push(recItemCopy)
                             }
-                            return rv
+                            return recList
                         }, {})
                         this.changeShowDisable = false
                     }
