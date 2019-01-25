@@ -52,10 +52,16 @@
                       class="input-t"
                       type="number"
                       v-model="amount"
+                      aria-describedby="inputLiveFeedback"
+                      :state="isWrongFormat(amount)"
                       min="0">
         </b-form-input>
+        <b-form-invalid-feedback id="inputLiveFeedback">
+          The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
+        </b-form-invalid-feedback>
         <div id="address-qrcode">
-          <img :src="getQrCodeImg">
+          <img v-if="isWrongFormat(amount)"
+               :src="getQrCodeImg">
         </div>
         <b-button variant="warning"
                   class="btn-o"
@@ -118,6 +124,9 @@ export default {
     methods: {
         closeModal() {
             this.$refs.receiveModal.hide()
+        },
+        isWrongFormat(amount) {
+            return !((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8))
         },
         copyAddr() {
             this.$refs.addrToCopy.select()
