@@ -61,7 +61,7 @@
             :key="monthYear+'c'"
             class="record-content">
             <div v-for="record in records"
-                 :key="record.id">
+                 :key="record.count">
               <Record :tx-record="record"
                       :fee-flag="feeFlag"
                       :address="address"
@@ -128,6 +128,8 @@ import Record from './Record'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
 import browser from '../../../utils/browser'
+import base58 from '@/libs/base58'
+import crypto from '@/utils/crypto'
 
 export default {
     name: 'Records',
@@ -210,12 +212,22 @@ export default {
                 this.$http.get(url).then(response => {
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
+                        let count = 0
                         this.txRecords = response.body[0].reduce((rv, x) => {
                             const aa = this.getMonthYearStr(x['timestamp'])
                             if (!rv[aa]) {
                                 Vue.set(rv, aa, [])
                             }
+                            x['count'] = count
+                            count = count + 1
                             rv[aa].push(x)
+                            if (x['recipient'] === this.address && this.address === crypto.buildRawAddress(base58.decode(x['proofs'][0]['publicKey']))) { // send to self
+                                let x0 = JSON.parse(JSON.stringify(x))
+                                x0['SelfSend'] = true
+                                x0['count'] = count
+                                count = count + 1
+                                rv[aa].push(x0)
+                            }
                             return rv
                         }, {})
                         this.changeShowDisable = false
