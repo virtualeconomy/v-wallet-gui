@@ -57,7 +57,7 @@
                       min="0">
         </b-form-input>
         <b-form-invalid-feedback id="inputLiveFeedback">
-          The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
+          The number in this field is invalid. The minimum unit of amount is 0.00000001.
         </b-form-invalid-feedback>
         <div id="address-qrcode">
           <img v-if="isWrongFormat(amount)"
@@ -117,7 +117,7 @@ export default {
         },
         transferAmount() {
             if (this.amount) {
-                return BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
+                return (BigNumber(this.amount).multipliedBy(VSYS_PRECISION)).toFixed()
             }
         }
     },
