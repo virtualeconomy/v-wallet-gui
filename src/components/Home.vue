@@ -296,7 +296,7 @@ export default {
                     }
                 }
             }, response => {
-                Vue.set(this.balance, address, 0)
+                this.$router.push('/warning')
             })
         },
         importCold(coldAddress, pubKey) {

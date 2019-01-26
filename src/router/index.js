@@ -5,6 +5,7 @@ import Signup from '../components/Signup.vue'
 import Restore from '../components/Restore.vue'
 import Login from '../components/Login'
 import Terms from '../components/Terms'
+import Warning from '../components/Warning'
 Vue.use(Router)
 
 export default new Router({
@@ -29,6 +30,10 @@ export default new Router({
         path: '/terms',
         name: 'terms',
         component: Terms
+    }, {
+        path: '/warning',
+        name: 'warning',
+        component: Warning
     }
     ]
 })

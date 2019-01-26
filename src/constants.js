@@ -40,7 +40,6 @@ export const DEFAULT_BASIC_CONFIG = {
 };
 
 export const NODE_IP = '/api'
-
 export const ADDRESS_LENGTH = 35;
 
 export const VSYS_PRECISION = 1e8
