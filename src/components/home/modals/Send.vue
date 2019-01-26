@@ -373,6 +373,7 @@ import crypto from '@/utils/crypto'
 import ColdSignature from './ColdSignature'
 import browser from '../../../utils/browser'
 import LRUCache from 'lru-cache'
+import BigNumber from 'bignumber.js'
 var initData = {
     opc: '',
     recipient: '',
@@ -641,7 +642,7 @@ export default {
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = this.formatter(jsonObj.amount / VSYS_PRECISION)
+                    this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
@@ -676,7 +677,7 @@ export default {
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.coldAmount = this.formatter((jsonObj.amount / VSYS_PRECISION))
+                    this.coldAmount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false

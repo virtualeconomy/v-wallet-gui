@@ -52,10 +52,16 @@
                       class="input-t"
                       type="number"
                       v-model="amount"
+                      aria-describedby="inputLiveFeedback"
+                      :state="isWrongFormat(amount)"
                       min="0">
         </b-form-input>
+        <b-form-invalid-feedback id="inputLiveFeedback">
+          The number in this field is invalid. The minimum unit of amount is 0.00000001.
+        </b-form-invalid-feedback>
         <div id="address-qrcode">
-          <img :src="getQrCodeImg">
+          <img v-if="isWrongFormat(amount)"
+               :src="getQrCodeImg">
         </div>
         <b-button variant="warning"
                   class="btn-o"
@@ -71,6 +77,7 @@
 <script>
 import jrQrcode from 'jr-qrcode'
 import { API_VERSION, PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION } from '@/constants.js'
+import BigNumber from 'bignumber.js'
 export default {
     name: 'Receive',
     props: {
@@ -110,14 +117,21 @@ export default {
         },
         transferAmount() {
             if (this.amount) {
-                var temAmount = parseFloat(this.amount)
-                return Math.round(temAmount * VSYS_PRECISION)
+                let tempAmount = BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
+                if (tempAmount.isGreaterThanOrEqualTo(Number.MAX_SAFE_INTEGER)) {
+                    return tempAmount.toFixed()
+                } else {
+                    return tempAmount.toNumber()
+                }
             }
         }
     },
     methods: {
         closeModal() {
             this.$refs.receiveModal.hide()
+        },
+        isWrongFormat(amount) {
+            return !((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8))
         },
         copyAddr() {
             this.$refs.addrToCopy.select()
