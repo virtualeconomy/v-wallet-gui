@@ -1,4 +1,4 @@
-git <template>
+<template>
   <div id="app"
        :class="(isMobile ? 'mobile' : '')">
     <router-view></router-view>
