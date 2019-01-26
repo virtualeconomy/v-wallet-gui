@@ -117,7 +117,12 @@ export default {
         },
         transferAmount() {
             if (this.amount) {
-                return (BigNumber(this.amount).multipliedBy(VSYS_PRECISION)).toFixed()
+                let tempAmount = BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
+                if (tempAmount.isGreaterThanOrEqualTo(Number.MAX_SAFE_INTEGER)) {
+                    return tempAmount.toFixed()
+                } else {
+                    return tempAmount.toNumber()
+                }
             }
         }
     },
