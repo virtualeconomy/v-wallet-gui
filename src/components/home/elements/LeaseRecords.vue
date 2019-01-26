@@ -3,7 +3,8 @@
        class="records">
     <div class="title-records">
       <span>Leasing Records</span>
-      <div class="show-fee">
+      <div class="show-fee"
+           @click="showFee">
         <span class="show-position"> ShowTxFee </span>
         <input class="show-fee2"
                type="checkbox"
@@ -320,6 +321,7 @@ export default {
     height: 30px;
     display: flex;
     z-index: 100;
+    cursor:pointer;
     background-color: #FFF;
 }
 </style>
