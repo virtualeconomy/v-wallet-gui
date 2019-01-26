@@ -22,21 +22,6 @@
           <li>Local javascript is crushed</li>
         </ul>
       </div>
-      <!--
-      <div class="title">
-        Warning
-      </div>
-      <div class="reason">
-        This may be caused by following reasons:
-      </div>
-      <div class="content">
-        <ul>
-          <li>Network is disconnected</li>
-          <li>Can not connect to the api server</li>
-          <li>Local javascript is crushed</li>
-        </ul>
-      </div>
-      -->
     </div>
   </div>
 </template>
@@ -68,7 +53,7 @@ export default {
 .warning{
     width: 100%;
     height: 100%;
-    background-color: #fafafa;
+    background-color: #FFFFFF;
 }
 .note {
     width: 550px;
