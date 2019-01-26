@@ -22,6 +22,21 @@
           <li>Local javascript is crushed</li>
         </ul>
       </div>
+      <!--
+      <div class="title">
+        Warning
+      </div>
+      <div class="reason">
+        This may be caused by following reasons:
+      </div>
+      <div class="content">
+        <ul>
+          <li>Network is disconnected</li>
+          <li>Can not connect to the api server</li>
+          <li>Local javascript is crushed</li>
+        </ul>
+      </div>
+      -->
     </div>
   </div>
 </template>
@@ -55,12 +70,9 @@ export default {
     height: 100%;
     background-color: #fafafa;
 }
-.container logo {
-    margin-left: 0%;
-}
 .note {
-    width: 65%;
-    height: 60%;
+    width: 550px;
+    height: 512px;
     left: 30%;
     margin-left: 35%;
     margin-top:100px;
@@ -68,9 +80,8 @@ export default {
     background-color: #FFFFFF;
 }
 .image {
-    position: absolute;
-    width: 45%;
-    height: 70%;
+    width: 550px;
+    height: 512px;
     margin-left: 27%;
     margin-top: 35px;
     background-color: #FFFFFF;
@@ -80,20 +91,24 @@ export default {
     color: #4F515E;
     font-size: 20px;
     margin-top: 20px;
-    margin-left: -30px;
+    margin-left: 120px;
 }
 .title {
     color: #181B3A;
     font-size: 40px;
-    margin-top: -150px;
-    margin-left:-50px;
+    margin-top: -320px;
+    margin-left:170px;
+    width: 45%;
+    background-color: #FFFFFF;
 }
 .content {
     color: #4F515E;
     text-align: left;
     font-size: 20px;
     margin-top: 10px;
-    margin-left: 160px;
+    margin-left: 135px;
+    width: 70%;
+    background-color: #FFFFFF;
 
 }
 .brand-logo {
@@ -101,5 +116,9 @@ export default {
     margin-top: 16px;
     margin-left: -70px;
     height: 28px;
+}
+.txt {
+    margin-top: 35px;
+    position: absolute;
 }
 </style>
