@@ -27,15 +27,15 @@
       <b-button variant="dark"
                 class="btn-send"
                 v-b-modal.sendModal>
-        <img
-          class="icon-btn"
-          src="../../../assets/imgs/icons/wallet/ic_send.svg"><b>Send</b></b-button>
+        <img v-if="!isMobile"
+             class="icon-btn"
+             src="../../../assets/imgs/icons/wallet/ic_send.svg"><b>Send</b></b-button>
       <b-button variant="dark"
                 class="btn-receive"
                 v-b-modal.receiveModal>
-        <img
-          class="icon-btn"
-          src="../../../assets/imgs/icons/wallet/ic_receive.svg"><b>Receive</b></b-button>
+        <img v-if="!isMobile"
+             class="icon-btn"
+             src="../../../assets/imgs/icons/wallet/ic_receive.svg"><b> {{ !isMobile ? 'Receive':'Recv' }} </b></b-button>
     </div>
     <Send show="false"
           :balances="balances"
@@ -58,6 +58,14 @@ export default {
     components: {
         Receive,
         Send
+    },
+    data() {
+        return {
+            isMobile: false
+        }
+    },
+    created() {
+        this.isMobile = browser.isMobile()
     },
     props: {
         balance: {
