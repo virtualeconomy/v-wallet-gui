@@ -1,6 +1,6 @@
 {
     "name": "vsys-wallet-gui",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "vsys wallet gui ",
     "author": "masonExcelsia <mason@excelsia.io>",
     "private": true,
