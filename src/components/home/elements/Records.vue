@@ -219,9 +219,10 @@ export default {
                             if (!recList[month]) {
                                 Vue.set(recList, month, [])
                             }
+                            let senderAddr = recItem['proofs'] ? crypto.buildRawAddress(base58.decode(recItem['proofs'][0]['publicKey'])) : 'no sender'
                             recItem['index'] = ++count
                             recList[month].push(recItem)
-                            if (recItem['recipient'] === this.address && this.address === crypto.buildRawAddress(base58.decode(recItem['proofs'][0]['publicKey']))) { // send to self
+                            if (recItem['recipient'] === this.address && this.address === senderAddr) { // send to self
                                 let recItemCopy = JSON.parse(JSON.stringify(recItem))
                                 recItemCopy['SelfSend'] = true
                                 recItemCopy['index'] = ++count
