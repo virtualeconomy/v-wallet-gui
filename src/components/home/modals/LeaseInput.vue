@@ -108,6 +108,10 @@
                                v-else-if="isNegative(amount)">
         Negative number is not allowed.
       </b-form-invalid-feedback>
+      <b-form-invalid-feedback id="inputLiveFeedback"
+                               v-else>
+        Invalid Input.
+      </b-form-invalid-feedback>
     </b-form-group>
     <b-form-group>
       <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>

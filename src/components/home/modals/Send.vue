@@ -102,6 +102,10 @@
                                      v-else-if="isNegative(amount)">
               Negative number is not allowed.
             </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else>
+              Invalid Input.
+            </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group label="Description"
                         label-for="descriptionInput">
@@ -255,6 +259,10 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(amount)">
               Negative number is not allowed.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else>
+              Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group label="Description"
