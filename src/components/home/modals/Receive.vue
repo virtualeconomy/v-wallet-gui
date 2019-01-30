@@ -50,17 +50,21 @@
                     label-for="amountInput">
         <b-form-input id="amountInput"
                       class="input-t"
-                      type="number"
                       v-model="amount"
                       aria-describedby="inputLiveFeedback"
-                      :state="isWrongFormat(amount)"
+                      :state="isAmountValid(amount)"
                       min="0">
         </b-form-input>
-        <b-form-invalid-feedback id="inputLiveFeedback">
+        <b-form-invalid-feedback id="inputLiveFeedback"
+                                 v-if="isWrongFormat(amount)">
           The number in this field is invalid. The minimum unit of amount is 0.00000001.
         </b-form-invalid-feedback>
+        <b-form-invalid-feedback id="inputLiveFeedback"
+                                 v-else>
+          Invalid Input.
+        </b-form-invalid-feedback>
         <div id="address-qrcode">
-          <img v-if="isWrongFormat(amount)"
+          <img v-if="!isWrongFormat(amount)"
                :src="getQrCodeImg">
         </div>
         <b-button variant="warning"
@@ -128,10 +132,17 @@ export default {
     },
     methods: {
         closeModal() {
+            this.amount = 0
             this.$refs.receiveModal.hide()
         },
+        isAmountValid(amount) {
+            if (Number(amount) === 0) {
+                return void 0
+            }
+            return !isNaN(amount) && !this.isWrongFormat(amount) && !(/[eE]/.test(amount.toString()))
+        },
         isWrongFormat(amount) {
-            return !((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8))
+            return (amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8)
         },
         copyAddr() {
             this.$refs.addrToCopy.select()
