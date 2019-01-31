@@ -257,7 +257,7 @@
               Insufficient funds
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
+                                     v-else-if="isNegative(coldAmount)">
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -531,7 +531,8 @@ export default {
                 apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress], PAYMENT_TX)
             }
             const url = NODE_IP + '/vsys/broadcast/payment'
-            this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
+            apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') //  The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
+            this.$http.post(url, apiSchema).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
@@ -549,10 +550,16 @@ export default {
             this.pageId++
         },
         addColdRecipientList: function() {
+            if (this.coldAmount !== BigNumber(this.coldAmount).toNumber().toString()) {
+                alert('Warning :The amount  is too large. ' + this.coldAmount + ' will round to ' + BigNumber(this.coldAmount).toNumber().toString() + '.')
+            }
             this.coldRecipientAddressList.set(this.cogldRecipient, '0')
             window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
         },
         addHotRecipientList: function() {
+            if (this.amount !== BigNumber(this.amount).toNumber().toString()) {
+                alert('Warning :The amount  is too large. ' + this.amount + ' will round to ' + BigNumber(this.amount).toNumber().toString() + '.')
+            }
             this.hotRecipientAddressList.set(this.recipient, '0')
             window.localStorage.setItem('Hot ' + this.defaultAddress + ' sendRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
         },
@@ -644,7 +651,7 @@ export default {
         onDecode: function(decodeString) {
             this.paused = true
             try {
-                var jsonObj = JSON.parse(decodeString)
+                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
                 this.recipient = jsonObj.address
                 var opc = jsonObj.opc
                 var api = jsonObj.api
@@ -679,7 +686,7 @@ export default {
         onColdDecode: function(decodeString) {
             this.paused = true
             try {
-                var jsonObj = JSON.parse(decodeString)
+                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
                 this.coldRecipient = jsonObj.address
                 var opc = jsonObj.opc
                 var api = jsonObj.api

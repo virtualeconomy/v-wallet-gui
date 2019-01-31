@@ -106,7 +106,7 @@ export default {
                 background: '#ffffff',
                 foreground: '#000000'
             }
-            const text = JSON.stringify(this.receivedObject)
+            const text = JSON.stringify(this.receivedObject).replace(/"amount":"(\d+)"/g, '"amount":$1') // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
             const imgBase64 = jrQrcode.getQrBase64(text, options)
             return imgBase64
         },

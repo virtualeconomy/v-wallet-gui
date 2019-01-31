@@ -257,7 +257,7 @@ export default {
             this.qrErrMsg = void 0
             this.paused = true
             try {
-                var jsonObj = JSON.parse(decodeString)
+                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
                 this.recipient = jsonObj.address
                 var opc = jsonObj.opc
                 var api = jsonObj.api
@@ -336,6 +336,9 @@ export default {
             return browser.numberFormatter(num)
         },
         addRecipientList: function() {
+            if (this.amount !== BigNumber(this.amount).toNumber().toString()) {
+                alert('Warning :The amount  is too large. ' + this.amount + ' will round to ' + BigNumber(this.amount).toNumber().toString() + '.')
+            }
             if (this.walletType === 'hot') {
                 this.hotRecipientAddressList.set(this.recipient, '1')
                 window.localStorage.setItem('Hot ' + this.defaultAddress + ' leaseRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
