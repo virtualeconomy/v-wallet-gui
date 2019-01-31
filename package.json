@@ -1,7 +1,7 @@
 {
-    "name": "vsys-wallet-gui",
-    "version": "0.1.2",
-    "description": "vsys wallet gui ",
+    "name": "v-wallet-gui",
+    "version": "0.1.3",
+    "description": "web hot wallet of v systems",
     "author": "masonExcelsia <mason@excelsia.io>",
     "private": true,
     "scripts": {
