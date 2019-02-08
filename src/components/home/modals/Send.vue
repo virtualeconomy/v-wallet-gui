@@ -554,7 +554,7 @@ export default {
             let isLongEqual = BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).isEqualTo(roundAmount)
             let roundAmountVSYS = BigNumber(roundAmount).dividedBy(VSYS_PRECISION).toNumber()
             let isDoubleEqual = BigNumber(this.coldAmount).isEqualTo(roundAmountVSYS)
-            if (!isLongEqual||!isDoubleEqual) {
+            if (!isLongEqual || !isDoubleEqual) {
                 alert('Warning: the amount is too large. ' + this.coldAmount + ' will be rounded.\nDisplay amount in wallet: ' + roundAmountVSYS.toString() + ' VSYS\nActual amount in chain (long type):' + roundAmount)
                 this.coldAmount = roundAmountVSYS
             }
@@ -568,7 +568,7 @@ export default {
             let isLongEqual = BigNumber(this.amount).multipliedBy(VSYS_PRECISION).isEqualTo(roundAmount)
             let roundAmountVSYS = BigNumber(roundAmount).dividedBy(VSYS_PRECISION).toNumber()
             let isDoubleEqual = BigNumber(this.amount).isEqualTo(roundAmountVSYS)
-            if (!isLongEqual||!isDoubleEqual) {
+            if (!isLongEqual || !isDoubleEqual) {
                 alert('Warning: the amount is too large. ' + this.amount + ' will be rounded.\nDisplay amount in wallet: ' + roundAmountVSYS.toString() + ' VSYS\nActual amount in chain (long type):' + roundAmount)
                 this.amount = roundAmountVSYS
             }
