@@ -336,8 +336,10 @@ export default {
             return browser.numberFormatter(num)
         },
         checkPrecision: function() {
-            if (!BigNumber(this.amount).multipliedBy(VSYS_PRECISION).isEqualTo(this.amount * VSYS_PRECISION)) {
-                alert('Warning :the amount is too large. ' + this.amount + ' will round to ' + BigNumber(this.amount * VSYS_PRECISION).dividedBy(VSYS_PRECISION) + '.')
+            let roundAmount = Math.round(Number(this.amount) * VSYS_PRECISION) / VSYS_PRECISION
+            if (!BigNumber(this.amount).isEqualTo(roundAmount)) {
+                alert('Warning :the amount is too large. ' + this.amount + ' will round to ' + roundAmount + '.')
+                this.amount = roundAmount
             }
         },
         addRecipientList: function() {
