@@ -1,6 +1,6 @@
 {
     "name": "v-wallet-gui",
-    "version": "0.1.3",
+    "version": "0.1.4",
     "description": "web hot wallet of v systems",
     "author": "masonExcelsia <mason@excelsia.io>",
     "private": true,
