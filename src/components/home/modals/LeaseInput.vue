@@ -121,7 +121,7 @@
               size="lg"
               block
               :disabled="isSubmitDisabled"
-              @click="nextPage(); addRecipientList()">Continue
+              @click="nextPage(); addRecipientList(); checkPrecision()">Continue
     </b-button>
   </b-container>
 </template>
@@ -335,10 +335,12 @@ export default {
         formatter(num) {
             return browser.numberFormatter(num)
         },
-        addRecipientList: function() {
-            if (this.amount !== BigNumber(this.amount).toNumber().toString()) {
-                alert('Warning :The amount  is too large. ' + this.amount + ' will round to ' + BigNumber(this.amount).toNumber().toString() + '.')
+        checkPrecision: function() {
+            if (!BigNumber(this.amount).multipliedBy(VSYS_PRECISION).isEqualTo(this.amount * VSYS_PRECISION)) {
+                alert('Warning :the amount is too large. ' + this.amount + ' will round to ' + BigNumber(this.amount * VSYS_PRECISION).dividedBy(VSYS_PRECISION) + '.')
             }
+        },
+        addRecipientList: function() {
             if (this.walletType === 'hot') {
                 this.hotRecipientAddressList.set(this.recipient, '1')
                 window.localStorage.setItem('Hot ' + this.defaultAddress + ' leaseRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))

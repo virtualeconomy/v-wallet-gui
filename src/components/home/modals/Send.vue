@@ -124,7 +124,7 @@
                     size="lg"
                     block
                     :disabled="isSubmitDisabled"
-                    @click="nextPage(); addHotRecipientList()">Continue
+                    @click="nextPage(); addHotRecipientList(); checkHot()">Continue
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
@@ -282,7 +282,7 @@
                     block
                     size="lg"
                     :disabled="isColdSubmitDisabled"
-                    @click="coldNextPage(); addColdRecipientList()">Continue
+                    @click="coldNextPage(); addColdRecipientList(); checkCold()">Continue
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
@@ -549,17 +549,21 @@ export default {
             this.hasConfirmed = false
             this.pageId++
         },
-        addColdRecipientList: function() {
-            if (this.coldAmount !== BigNumber(this.coldAmount).toNumber().toString()) {
-                alert('Warning :The amount  is too large. ' + this.coldAmount + ' will round to ' + BigNumber(this.coldAmount).toNumber().toString() + '.')
+        checkCold: function() {
+            if (!BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).isEqualTo(this.coldAmount * VSYS_PRECISION)) {
+                alert('Warning :The amount is too large. ' + this.coldAmount + ' will round to ' + BigNumber(this.coldAmount * VSYS_PRECISION).dividedBy(VSYS_PRECISION) + '.')
             }
+        },
+        addColdRecipientList: function() {
             this.coldRecipientAddressList.set(this.cogldRecipient, '0')
             window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
         },
-        addHotRecipientList: function() {
-            if (this.amount !== BigNumber(this.amount).toNumber().toString()) {
-                alert('Warning :The amount  is too large. ' + this.amount + ' will round to ' + BigNumber(this.amount).toNumber().toString() + '.')
+        checkHot: function() {
+            if (!BigNumber(this.amount).multipliedBy(VSYS_PRECISION).isEqualTo(this.amount * VSYS_PRECISION)) {
+                alert('Warning :the amount is too large. ' + this.amount + ' will round to ' + BigNumber(this.amount * VSYS_PRECISION).dividedBy(VSYS_PRECISION) + '.')
             }
+        },
+        addHotRecipientList: function() {
             this.hotRecipientAddressList.set(this.recipient, '0')
             window.localStorage.setItem('Hot ' + this.defaultAddress + ' sendRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
         },
