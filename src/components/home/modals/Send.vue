@@ -550,10 +550,13 @@ export default {
             this.pageId++
         },
         checkCold: function() {
-            let roundAmount = Math.round(Number(this.coldAmount) * VSYS_PRECISION) / VSYS_PRECISION
-            if (!BigNumber(this.coldAmount).isEqualTo(roundAmount)) {
-                alert('Warning :the amount is too large. ' + this.coldAmount + ' will round to ' + roundAmount + '.')
-                this.amount = roundAmount
+            let roundAmount = Math.round(Number(this.coldAmount) * VSYS_PRECISION)
+            let isLongEqual = BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).isEqualTo(roundAmount)
+            let roundAmountVSYS = BigNumber(roundAmount).dividedBy(VSYS_PRECISION).toNumber()
+            let isDoubleEqual = BigNumber(this.coldAmount).isEqualTo(roundAmountVSYS)
+            if (!isLongEqual||!isDoubleEqual) {
+                alert('Warning: the amount is too large. ' + this.coldAmount + ' will be rounded.\nDisplay amount in wallet: ' + roundAmountVSYS.toString() + ' VSYS\nActual amount in chain (long type):' + roundAmount)
+                this.coldAmount = roundAmountVSYS
             }
         },
         addColdRecipientList: function() {
@@ -561,10 +564,13 @@ export default {
             window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
         },
         checkHot: function() {
-            let roundAmount = Math.round(Number(this.amount) * VSYS_PRECISION) / VSYS_PRECISION
-            if (!BigNumber(this.amount).isEqualTo(roundAmount)) {
-                alert('Warning :the amount is too large. ' + this.amount + ' will round to ' + roundAmount + '.')
-                this.amount = roundAmount
+            let roundAmount = Math.round(Number(this.amount) * VSYS_PRECISION)
+            let isLongEqual = BigNumber(this.amount).multipliedBy(VSYS_PRECISION).isEqualTo(roundAmount)
+            let roundAmountVSYS = BigNumber(roundAmount).dividedBy(VSYS_PRECISION).toNumber()
+            let isDoubleEqual = BigNumber(this.amount).isEqualTo(roundAmountVSYS)
+            if (!isLongEqual||!isDoubleEqual) {
+                alert('Warning: the amount is too large. ' + this.amount + ' will be rounded.\nDisplay amount in wallet: ' + roundAmountVSYS.toString() + ' VSYS\nActual amount in chain (long type):' + roundAmount)
+                this.amount = roundAmountVSYS
             }
         },
         addHotRecipientList: function() {
