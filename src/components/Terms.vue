@@ -6,38 +6,118 @@
         <img
           class="brand-logo"
           centered
+          style="width: 350px;opacity: 0.5;"
           src="../assets/imgs/icons/signup/vsys_logo.svg">
       </div>
       <br>
       <div class="title">
-        <h1>Terms&Condition</h1>
+        <h1 style="font-size: 30px">Terms of Service</h1>
       </div>
       <br>
-      <div class="txt"
-           align="left" >
-        <p> Version 0.1.0:Active as of 25th May 2018</p>
-      </div>
-      <div class="smalltitle">
-        <h3 align="left"> Owner and Data Controller</h3>
+      <div>
+        <h3 align="left"> 1. Parties</h3>
       </div>
       <div class="txt"
            align="justify">
-        <p> The Terms of Use includes the terms and conditions (the “Terms” ) set forth herein which applies to the website located at www.v.systems (the “Website”, ”we”, “our" or “us” ). We remind you, before accessing to and using of the Website, you shall carefullyread and fully understand the Terms, including the Prohibited Actions, Representations and Warranties, Indemnification and Disclaimer clauses.</p>
-        <p>  If you choose to access and use the Website and any of its features (collectively, the “Services" ), you agree to abide by all the Terms set forth herein between you and us, and all the applicable laws and regulations. If you do not accept all the Terms, do not use the Website. Your access and use of the Website constitutes an implied consent of yours to the Terms.</p>
-        <p> We reserve the right, at its sole and absolute discretion, to change, modify, supplement, update, add or remove (collectively, the Changes" ) portions of the Terms, at any time, without your prior consent. The Changes are effective immediately upon posting on the Website. We will not be responsible to notify you any Changes. lt is your responsibility to check the Terms every time you access and use the Website. If you continue to use the Website following the posting of changes, it shall mean you accept and agree to the changes.</p>
+        <p>  1.1. This agreement is between you ( ‘You’ or ‘Your’ in this agreement) and V SYSTEMS Company (‘V SYSTEMS’ in this agreement). V SYSTEMS Web Wallet Application is a cryptocurrency wallet application baseon V SYSTEMS blockchain. You acknowledged that any use of V SYSTEMS Web Wallet Application  is subject to these Terms of Service.</p>
+        <p>  1.2. It's your own responsibility to read the Terms of Service carefully before you start to use V SYSTEMS.</p>
+        <br>
       </div>
-      <br>
       <div class="smalltitle">
-        <h3 align="left">
-          Content
+        <h3 align="left">2. Definitions and Services offered
         </h3>
       </div>
       <div class="txt"
            align="justify">
-        <p>The original Proof-of-Work consensus used by Bitcoin is now the breakthrough where it all began. For more than eight years in running, Bitcoin’s system has certainly proved its reliability.</p>
-        <p>However, the rising energy consumption and centralized mining pools have become targets of criticism. This is why Proof-of-Stake consensus was introduced in 2012 through Peercoin [King 2012]. The major difference between Proof-of-Work and Proof-of-Stake is that instead of allocating weight based on computing resource consumption as in the case of Proof-of-Work, Proof-of-Stake consensus systems allocate weight relative to the amount of coin holdings participating in the consensus activity, also known as block minting. This algorithm decouples the consensus security level from system energy consumption level and eliminates the requirement of energy consumption in order to reach consensus, thereby resolving the energy concerns over Proof-of-Work, while reducing overall system operating cost in the process. Proof-of-Stake consensus is a major breakthrough as it significantly lowers the cost of blockchain technology and thus the entry barrier, enabling a vastly diversified blockchain ecosystem.</p>
-        <p> Nevertheless, there are concerns over Proof-of-Work and Proof-of-Stake consensus mechanism, including the lack of incentives for nodes to perform hardware upgrades and the random process of block generation. These are proven to be major obstacles to scaling blockchain. And after careful evaluation, our team has devised the brand new Supernode Proof-of-Stake (SPoS) consensus, to both incorporate the goods and discard the bads with the old mechanisms. SPoS consensus will serve as the enabling technology for blockchain to reach a global scale.</p>
-        <p> Supernode Proof-of-Stake consensus mechanism dictates that elevated nodes (supernodes) act as minting pools while holders of VCoin, native currency of the blockchain, take up the role as minters through leasing their coins to supernodes. Interests will be paid to coin owners who leased their coins to supernodes for minting. This new incentive model does not only ensure the quality of the nodes, but also guarantee a truly decentralized ecosystem where VCoin owners have the actual power to govern the network. At the same time, the system also allows for contention to be supernodes at any moment through determining a winner among contenders by comparing their minting average balance. This innovative mathematical approach ensures the system carries enough stake liquidity while reduces busy contention attack. More detailed information regarding the Supernode Proof-of-Stake consensus mechanism is available in the SPoS whitepaper.</p>
+        <p>V SYSTEMS Wallet is an innovative cryptocurrency infrastructure, which consists of:</p>
+        <p>2.1. V SYSTEMS Web Wallet Application</p>
+        <p>V SYSTEMS has created means for users to access and transfer ownership of VSYS coins (such as bitcoin) under the name "V SYSTEMS Wallet...". By entering into this agreement You will receive a license to use any of the V SYSTEMS Web Wallet Application. You should only use the V SYSTEMS Web Wallet Application if you are familiar with virtual currencies. We highly recommend learning the basics of the specific virtual currency that You plan on using the V SYSTEMS Web Wallet Application before running the application.</p>
+        <p>2.1.1. You Own Your Private Keys</p>
+        <p>V SYSTEMS does not store user’s private keys, backup phrases or passwords ("Private Information"). It is very important that You backup Private Information. If You lose Your Private Information then it will not be possible for V SYSTEMS to recover it for You and You may lose access to Your VSYS coins. If You do not understand the above paragraph then we strictly recommend that You to learn more about virtual currencies before using the V SYSTEMS Web Wallet Application.</p>
+        <p>2.1.2. Transactions</p>
+        <p>The only authentic record of virtual currency transactions is the applicable virtual currency blockchain. The V SYSTEMS Web Wallet Application provides functionality that allows You to receive, send， leasing and cancel leasing virtual currency transfer instructions. V SYSTEMS does not guarantee that all transactions You perform using the V SYSTEMS Web Wallet Application shall be stored in any virtual currency blockchain. You must ensure that Your transactions conform to the applicable rules of the virtual currency software. There may be transaction fees associated with Your virtual currency transactions that are required by the virtual currency system You engaged with. V SYSTEMS should not be responsible for any losses You incur due to transaction fees or losses that occur due to incorrectly set transaction fees (i.e. too low or high). V SYSTEMS does not have access to your transactions (or anyone else's).</p>
+        <br>
+      </div>
+      <div class="smalltitle">
+        <h3 align="left">3. User Obligations
+        </h3>
+      </div>
+      <div class="txt"
+           align="justify">
+        <p>You shall:<br>be of the age of majority in Your local jurisdiction; and, be responsible for Your own VSYS coins; and, backup/write down Your "private key" (restore words) and keep it private; and, carefully guard Your private keys in case of usage V SYSTEMS Web Wallet Application  and, ensure that Your device(s) are fully updated and do not contain viruses, malware or otherwise malicious software. <br>You shall not:<br>deposit VSYS coins into addresses for coins that are not supported by the V SYSTEMS Web Wallet Application; or, use V SYSTEMS in a manner likely to infer with other V SYSTEMS users or virtual currency nodes (e.g. excessive API calls or network spam); or,use V SYSTEMS in a manner contrary to Your local laws.</p>
+        <br>
+      </div>
+      <div class="smalltitle">
+        <h3 align="left">4. Limited Intellectual Property License
+        </h3>
+      </div>
+      <div class="txt"
+           align="justify">
+        <p>This agreement licenses V SYSTEMS services to You on a personal, non-exclusive, royalty-free, non-transferable, worldwide-basis, for the purpose of managing virtual currencies. You are not permitted to re-distribute any of V SYSTEMS services, modify any code or use any V SYSTEMS content, including images and text, as part of any other software or project of any kind.</p>
+        <br>
+      </div>
+      <div class="smalltitle">
+        <h3 align="left">5. Specifically Disclaimed Risks
+        </h3>
+      </div>
+      <div class="txt"
+           align="justify">
+        <p>Using virtual currency software necessarily entails many risks. V SYSTEMS specifically disclaims and shall have no liability to You for the following risks: operating system failures (mobile or desktop); and, interactions between Your hardware, software, and the V SYSTEMS; and, cloud backup software (e.g. certain distributions) may upload your private information to third party services; and, malware, viruses or other malicious software on Your device that is able to take control of or interfere with V SYSTEMS; and, communication delays between Your V SYSTEMS Web Wallet Application and a node or relay service for a virtual currency (and vice versa); and, failure to achieve a certain market value/price for the virtual currency, whether through a third-party service or any other kind of transaction; and, theft of VSYS coins.</p>
+        <br>
+      </div>
+      <div class="smalltitle">
+        <h3 align="left">6. No Warranty
+        </h3>
+      </div>
+      <div class="txt"
+           align="justify">
+        <p>V SYSTEMS is provided to You at no cost, "as-is " and without any warranty whatsoever, to the maximum extent permissible by law. Without limiting the generality of the foregoing, V SYSTEMS does not warrant that V SYSTEMS is fit for Your purpose, even if You have previously provided notice of Your intended purpose, and does not warrant that V SYSTEMS will operate in a bug-free manner.</p>
+        <br>
+      </div>
+      <div class="smalltitle">
+        <h3 align="left">7. Limitation of Liability
+        </h3>
+      </div>
+      <div class="txt"
+           align="justify">
+        <p>V Systems do not have any liability to guarantee any based V Systems web wallet application's investment and related activities.</p>
+        <br>
+      </div>
+      <div class="smalltitle">
+        <h3 align="left">8. Indemnity
+        </h3>
+      </div>
+      <div class="txt"
+           align="justify">
+        <p>You agree to indemnify V SYSTEMS against any claims, damages, losses or legal fees incurred due to Your use (or misuse) of V SYSTEMS.</p>
+        <br>
+      </div>
+      <div class="smalltitle">
+        <h3 align="left">9. Non-Waiver
+        </h3>
+      </div>
+      <div class="txt"
+           align="justify">
+        <p>No action or inaction on the part of V SYSTEMS shall be considered a waiver of any right or obligation by V SYSTEMS.</p>
+        <br>
+      </div>
+      <div class="smalltitle">
+        <h3 align="left">10. Assignment
+        </h3>
+      </div>
+      <div class="txt"
+           align="justify">
+        <p>You may not assign this agreement. V SYSTEMS may assign this agreement to 30 days notice.</p>
+        <br>
+      </div>
+      <div class="smalltitle">
+        <h3 align="left">11. Entire Agreement
+        </h3>
+      </div>
+      <div class="txt"
+           align="justify">
+        <p>This is the entire agreement between the parties and supersedes any other agreement, representations (or misrepresentations),or understanding, however, communicated.</p>
+        <br>
       </div>
     </div>
   </div>
@@ -62,7 +142,7 @@
     top: 20px;
     margin-top: 20px;
     color: #181B3A;
-    font-size: 40px;
+    font-size: 20px;
 }
 .smalltitle {
     color: #181B3A;
@@ -73,7 +153,7 @@
     font-size: 16px;
 }
 .brand-logo {
-    top: 25px;
-    margin-top: 25px;
+    top: 45px;
+    margin-top: 45px;
 }
 </style>
