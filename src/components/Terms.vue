@@ -19,8 +19,8 @@
       </div>
       <div class="txt"
            align="justify">
-        <p>  1.1. This agreement is between you ( ‘You’ or ‘Your’ in this agreement) and V SYSTEMS Company (‘V SYSTEMS’ in this agreement). V SYSTEMS Web Wallet Application is a cryptocurrency wallet application based on V SYSTEMS blockchain. You acknowledged that any use of V SYSTEMS Web Wallet Application  is subject to these Terms of Service.</p>
-        <p>  1.2. It's your own responsibility to read the Terms of Service carefully before you start to use V SYSTEMS.</p>
+        <p>  1.1. This agreement is between you ( ‘You’ or ‘Your’ in this agreement) and V SYSTEMS Limited (‘V SYSTEMS’ in this agreement). V Wallet is a cryptocurrency wallet application base on V SYSTEMS blockchain. You acknowledged that any use of V Wallet is subject to these Terms of Service.</p>
+        <p>  1.2. It's your own responsibility to read the Terms of Service carefully before you start to use V Wallet.</p>
         <br>
       </div>
       <div class="smalltitle">
@@ -29,13 +29,13 @@
       </div>
       <div class="txt"
            align="justify">
-        <p>V SYSTEMS Wallet is an innovative cryptocurrency infrastructure, which consists of:</p>
-        <p>2.1. V SYSTEMS Web Wallet Application</p>
-        <p>V SYSTEMS has created means for users to access and transfer ownership of VSYS coins (such as bitcoin) under the name "V SYSTEMS Wallet...". By entering into this agreement You will receive a license to use any of the V SYSTEMS Web Wallet Application. You should only use the V SYSTEMS Web Wallet Application if you are familiar with crypto currencies. We highly recommend learning the basics of the specific crypto currency that You plan on using the V SYSTEMS Web Wallet Application before running the application.</p>
+        <p>V Wallet is an innovative cryptocurrency infrastructure, which consists of:</p>
+        <p>2.1. V Wallet Web Application</p>
+        <p>V SYSTEMS has created means for users to access and transfer ownership of V coins under the name "V Wallet...". By entering into this agreement You will receive a license to use any of the V Wallet Web Application. It is strongly recommended You only use the V Wallet Web Application after gaining basic knowledge of cryptocurrencies.</p>
         <p>2.1.1. You Own Your Private Keys</p>
-        <p>V SYSTEMS does not store user’s private keys, phrases or passwords ("Private Information"). It is very important that You backup Private Information. If You lose Your Private Information then it will not be possible for V SYSTEMS to recover it for You and You may lose access to Your VSYS coins. If You do not understand the above paragraph then we strictly recommend that You to learn more about crypto currencies before using the V SYSTEMS Web Wallet Application.</p>
+        <p>V SYSTEMS does not store user’s private keys, phrases or passwords ("Private Information"). It is very important that You backup Private Information. If You lose Your Private Information then it will not be possible for V SYSTEMS to recover it for You and You may lose access to Your V coins. If You do not understand the above paragraph then we strongly recommend that You learn more about cryptocurrencies before using the V Wallet Web Application.</p>
         <p>2.1.2. Transactions</p>
-        <p>The only authentic record of crypto currency transactions is the applicable crypto currency blockchain. The V SYSTEMS Web Wallet Application provides functionality that allows You to receive, send， leasing and cancel leasing crypto currency transfer instructions. V SYSTEMS does not guarantee that all transactions You perform using the V SYSTEMS Web Wallet Application shall be stored in any crypto currency blockchain. You must ensure that Your transactions conform to the applicable rules of the crypto currency software. There may be transaction fees associated with Your crypto currency transactions that are required by the crypto currency system You engaged with. V SYSTEMS should not be responsible for any losses You incur due to transaction fees or losses that occur due to incorrectly set transaction fees (i.e. too low or high). V SYSTEMS does not have access to your transactions (or anyone else's).</p>
+        <p>The only authentic record of cryptocurrency transactions is the applicable cryptocurrency blockchain. The V Wallet Web Application provides functionality that allows You to receive, send, lease and cancel lease cryptocurrency transaction instructions. V SYSTEMS does not guarantee that all transactions You perform using the V Wallet Web Application shall be stored in any cryptocurrency blockchain. You must ensure that Your transactions conform to the applicable rules of the cryptocurrency software. There may be transaction fees associated with Your cryptocurrency transactions that are required by the cryptocurrency system You engaged with. V SYSTEMS should not be responsible for any losses You incur due to transaction fees or losses that occur due to incorrectly set transaction fees (i.e. too low or high). V SYSTEMS does not have access to your transactions (or anyone else's).</p>
         <br>
       </div>
       <div class="smalltitle">
@@ -44,7 +44,17 @@
       </div>
       <div class="txt"
            align="justify">
-        <p>You shall:<br>be of the age of majority in Your local jurisdiction; and, be responsible for Your own VSYS coins; and, backup/write down Your "private key" (restore words) and keep it private; and, carefully guard Your private keys in case of usage V SYSTEMS Web Wallet Application  and, ensure that Your device(s) are fully updated and do not contain viruses, malware or otherwise malicious software. <br>You shall not:<br>deposit VSYS coins into addresses for coins that are not supported by the V SYSTEMS Web Wallet Application; or, use V SYSTEMS in a manner likely to infer with other V SYSTEMS users or crypto currency nodes (e.g. excessive API calls or network spam); or,use V SYSTEMS in a manner contrary to Your local laws.</p>
+        <p>You shall:<br>
+          be of the age of majority in Your local jurisdiction; and,<br>
+          be responsible for Your own V coins; and,<br>
+          backup/write down Your seed phrase for wallet recovery and keep it safe and private; and,<br>
+          carefully guard Your seed phrase in case of usage V Wallet Web Application; and,<br>
+          ensure that Your device(s) are fully updated and do not contain viruses, malware or otherwise malicious software.<br>
+          You shall not:<br>
+          deposit V coins into addresses for coins that are not supported by the V Wallet Web Application; or,<br>
+          use V Wallet in a manner likely to interfere with other V SYSTEMS blockchain users or nodes (e.g. excessive API calls or network spam); or,<br>
+          use V Wallet in a manner contrary to Your local laws.
+        </p>
         <br>
       </div>
       <div class="smalltitle">
@@ -53,7 +63,7 @@
       </div>
       <div class="txt"
            align="justify">
-        <p>This agreement licenses V SYSTEMS services to You on a personal, non-exclusive, royalty-free, non-transferable, worldwide-basis, for the purpose of managing crypto currencies. You are not permitted to re-distribute any of V SYSTEMS services, modify any code or use any V SYSTEMS content, including images and text, as part of any other software or project of any kind.</p>
+        <p>This agreement licenses V Wallet services to You on a personal, non-exclusive, royalty-free, non-transferable, worldwide basis, for the purpose of managing cryptocurrencies. You are not permitted to re-distribute any of V Wallet services, modify any code or use any V Wallet content, including images and text, as part of any other software or project of any kind.</p>
         <br>
       </div>
       <div class="smalltitle">
@@ -62,7 +72,14 @@
       </div>
       <div class="txt"
            align="justify">
-        <p>Using crypto currency software necessarily entails many risks. V SYSTEMS specifically disclaims and shall have no liability to You for the following risks: operating system failures (mobile or desktop); and, interactions between Your hardware, software, and the V SYSTEMS; and, cloud backup software (e.g. certain distributions) may upload your private information to third party services; and, malware, viruses or other malicious software on Your device that is able to take control of or interfere with V SYSTEMS; and, communication delays between Your V SYSTEMS Web Wallet Application and a node or relay service for a crypto currency (and vice versa); and, failure to achieve a certain market value/price for the crypto currency, whether through a third-party service or any other kind of transaction; and, theft of VSYS coins.</p>
+        <p>Using cryptocurrency software necessarily entails risks. V SYSTEMS specifically disclaims and shall have no liability to You for loss incurred by any risk including but not limited to the following:<br>
+          operating system failures (mobile or desktop); and,<br>
+          interactions between Your hardware, software, and the V Wallet; and,<br>
+          cloud backup software (e.g. certain distributions) may upload your private information to third party services; and,<br>
+          malware, viruses or other malicious software on Your device that is able to take control of or interfere with V Wallet; and,<br>
+          communication delays between Your V Wallet and a node or relay service for a cryptocurrency (and vice versa); and,<br>
+          failure to achieve a certain market value/price for the cryptocurrency, whether through a third-party service or any other kind of transaction; and, theft of V coins.
+        </p>
         <br>
       </div>
       <div class="smalltitle">
@@ -71,7 +88,7 @@
       </div>
       <div class="txt"
            align="justify">
-        <p>V SYSTEMS is provided to You at no cost, "as-is " and without any warranty whatsoever, to the maximum extent permissible by law. Without limiting the generality of the foregoing, V SYSTEMS does not warrant that V SYSTEMS is fit for Your purpose, even if You have previously provided notice of Your intended purpose, and does not warrant that V SYSTEMS will operate in a bug-free manner.</p>
+        <p>V Wallet is provided to You at no cost, "as-is" and without any warranty whatsoever, to the maximum extent permissible by law. Without limiting the generality of the foregoing, V SYSTEMS does not warrant that V Wallet is fit for Your purpose, even if You have previously provided notice of Your intended purpose, and does not warrant that V Wallet will operate in a bug-free manner.</p>
         <br>
       </div>
       <div class="smalltitle">
@@ -80,7 +97,10 @@
       </div>
       <div class="txt"
            align="justify">
-        <p>V Systems do not have any liability to guarantee any based V Systems web wallet application's investment and related activities.</p>
+        <p>V SYSTEMS shall have no liability to loss incurred by defects or malfunction of V Wallet;<br>
+          V SYSTEMS shall have no liability to loss incurred by any loss of service, or hacking, virus, malware, hijacking attack of the V Wallet service;<br>
+          V SYSTEMS  shall have no liability to loss incurred by  the use of V Wallet for investment purpose and related activities.
+        </p>
         <br>
       </div>
       <div class="smalltitle">
@@ -89,7 +109,7 @@
       </div>
       <div class="txt"
            align="justify">
-        <p>You agree to indemnify V SYSTEMS against any claims, damages, losses or legal fees incurred due to Your use (or misuse) of V SYSTEMS.</p>
+        <p>You agree to indemnify V SYSTEMS against any claims, damages, losses or legal fees incurred due to Your use (or misuse) of V Wallet.</p>
         <br>
       </div>
       <div class="smalltitle">
@@ -116,7 +136,7 @@
       </div>
       <div class="txt"
            align="justify">
-        <p>This is the entire agreement between the parties and supersedes any other agreement, representations (or misrepresentations),or understanding, however, communicated.</p>
+        <p>This is the entire agreement between the parties and supersedes any other agreement, representations (or misrepresentations), or understanding, however, communicated.</p>
         <br>
       </div>
     </div>
