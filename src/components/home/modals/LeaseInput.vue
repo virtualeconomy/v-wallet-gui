@@ -121,7 +121,7 @@
               size="lg"
               block
               :disabled="isSubmitDisabled"
-              @click="nextPage(); addRecipientList()">Continue
+              @click="nextPage(); addRecipientList(); checkPrecision()">Continue
     </b-button>
   </b-container>
 </template>
@@ -257,7 +257,7 @@ export default {
             this.qrErrMsg = void 0
             this.paused = true
             try {
-                var jsonObj = JSON.parse(decodeString)
+                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
                 this.recipient = jsonObj.address
                 var opc = jsonObj.opc
                 var api = jsonObj.api
@@ -334,6 +334,18 @@ export default {
         },
         formatter(num) {
             return browser.numberFormatter(num)
+        },
+        checkPrecision: function() {
+            let convertAmount = Math.round(Number(this.amount) * VSYS_PRECISION)
+            let bigNumAmount = BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
+            let isLongEqual = bigNumAmount.isEqualTo(convertAmount)
+            let convertAmountVSYS = BigNumber(convertAmount).dividedBy(VSYS_PRECISION).toNumber()
+            let isDoubleEqual = BigNumber(this.amount).isEqualTo(convertAmountVSYS)
+            if (!isLongEqual || !isDoubleEqual) {
+                let roundAmount = bigNumAmount.dividedToIntegerBy(100).dividedBy(VSYS_PRECISION / 100)
+                alert('Warning: the amount ' + this.amount + ' is over the precision limit that wallet currently supports. The amount will be rounded to ' + roundAmount.toFixed(8))
+                this.amount = roundAmount.toNumber()
+            }
         },
         addRecipientList: function() {
             if (this.walletType === 'hot') {

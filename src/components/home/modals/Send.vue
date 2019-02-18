@@ -124,7 +124,7 @@
                     size="lg"
                     block
                     :disabled="isSubmitDisabled"
-                    @click="nextPage(); addHotRecipientList()">Continue
+                    @click="nextPage(); addHotRecipientList(); checkHot()">Continue
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
@@ -257,7 +257,7 @@
               Insufficient funds
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
+                                     v-else-if="isNegative(coldAmount)">
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -282,7 +282,7 @@
                     block
                     size="lg"
                     :disabled="isColdSubmitDisabled"
-                    @click="coldNextPage(); addColdRecipientList()">Continue
+                    @click="coldNextPage(); addColdRecipientList(); checkCold()">Continue
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
@@ -531,7 +531,8 @@ export default {
                 apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress], PAYMENT_TX)
             }
             const url = NODE_IP + '/vsys/broadcast/payment'
-            this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
+            apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') //  The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
+            this.$http.post(url, apiSchema).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
@@ -548,9 +549,33 @@ export default {
             this.hasConfirmed = false
             this.pageId++
         },
+        checkCold: function() {
+            let convertAmount = Math.round(Number(this.coldAmount) * VSYS_PRECISION)
+            let bigNumAmount = BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION)
+            let isLongEqual = bigNumAmount.isEqualTo(convertAmount)
+            let convertAmountVSYS = BigNumber(convertAmount).dividedBy(VSYS_PRECISION).toNumber()
+            let isDoubleEqual = BigNumber(this.coldAmount).isEqualTo(convertAmountVSYS)
+            if (!isLongEqual || !isDoubleEqual) {
+                let roundAmount = bigNumAmount.dividedToIntegerBy(100).dividedBy(VSYS_PRECISION / 100)
+                alert('Warning: the amount ' + this.coldAmount + ' is over the precision limit that wallet currently supports. The amount will be rounded to ' + roundAmount.toFixed(8))
+                this.coldAmount = roundAmount.toNumber()
+            }
+        },
         addColdRecipientList: function() {
             this.coldRecipientAddressList.set(this.cogldRecipient, '0')
             window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
+        },
+        checkHot: function() {
+            let convertAmount = Math.round(Number(this.amount) * VSYS_PRECISION)
+            let bigNumAmount = BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
+            let isLongEqual = bigNumAmount.isEqualTo(convertAmount)
+            let convertAmountVSYS = BigNumber(convertAmount).dividedBy(VSYS_PRECISION).toNumber()
+            let isDoubleEqual = BigNumber(this.amount).isEqualTo(convertAmountVSYS)
+            if (!isLongEqual || !isDoubleEqual) {
+                let roundAmount = bigNumAmount.dividedToIntegerBy(100).dividedBy(VSYS_PRECISION / 100)
+                alert('Warning: the amount ' + this.amount + ' is over the precision limit that wallet currently supports. The amount will be rounded to ' + roundAmount.toFixed(8))
+                this.amount = roundAmount.toNumber()
+            }
         },
         addHotRecipientList: function() {
             this.hotRecipientAddressList.set(this.recipient, '0')
@@ -644,7 +669,7 @@ export default {
         onDecode: function(decodeString) {
             this.paused = true
             try {
-                var jsonObj = JSON.parse(decodeString)
+                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
                 this.recipient = jsonObj.address
                 var opc = jsonObj.opc
                 var api = jsonObj.api
@@ -679,7 +704,7 @@ export default {
         onColdDecode: function(decodeString) {
             this.paused = true
             try {
-                var jsonObj = JSON.parse(decodeString)
+                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
                 this.coldRecipient = jsonObj.address
                 var opc = jsonObj.opc
                 var api = jsonObj.api
