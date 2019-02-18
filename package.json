@@ -2,7 +2,11 @@
     "name": "v-wallet-gui",
     "version": "0.1.4",
     "description": "web hot wallet of v systems",
-    "author": "masonExcelsia <mason@excelsia.io>",
+    "author": {
+        "name" : "V SYSTEMS",
+        "email" : "info@v.systems",
+        "url" : "https://www.v.systems/"
+    },
     "private": true,
     "scripts": {
         "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js --mode development",
