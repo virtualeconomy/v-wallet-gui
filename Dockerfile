@@ -2,6 +2,7 @@
 FROM node:9.11.1-alpine as build-stage
 WORKDIR /app
 COPY package*.json ./
+RUN apk add --no-cache git
 RUN npm i -f
 COPY . .
 RUN npm run build
