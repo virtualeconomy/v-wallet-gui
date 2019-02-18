@@ -19,7 +19,7 @@
       </div>
       <div class="txt"
            align="justify">
-        <p>  1.1. This agreement is between you ( ‘You’ or ‘Your’ in this agreement) and V SYSTEMS Limited (‘V SYSTEMS’ in this agreement). V Wallet is a cryptocurrency wallet application base on V SYSTEMS blockchain. You acknowledged that any use of V Wallet is subject to these Terms of Service.</p>
+        <p>  1.1. This agreement is between you ("You" or "Your" in this agreement) and V SYSTEMS Limited ("V SYSTEMS" in this agreement). V Wallet is a cryptocurrency wallet application base on V SYSTEMS blockchain. You acknowledged that any use of V Wallet is subject to these Terms of Service.</p>
         <p>  1.2. It's your own responsibility to read the Terms of Service carefully before you start to use V Wallet.</p>
         <br>
       </div>
@@ -33,7 +33,7 @@
         <p>2.1. V Wallet Web Application</p>
         <p>V SYSTEMS has created means for users to access and transfer ownership of V coins under the name of V Wallet. By entering into this agreement You will receive a license to use any of the V Wallet Web Application. It is strongly recommended You only use the V Wallet Web Application after gaining basic knowledge of cryptocurrencies.</p>
         <p>2.1.1. You Own Your Private Keys</p>
-        <p>V SYSTEMS does not store user’s private keys, phrases or passwords ("Private Information”) on any servers. It is very important that You backup Private Information. If You lose Your Private Information then it will not be possible for V SYSTEMS to recover it for You and You may lose access to Your V coins. If You do not understand the above paragraph then we strongly recommend that You learn more about cryptocurrencies before using the V Wallet Web Application.</p>
+        <p>V SYSTEMS does not store user’s private keys, phrases or passwords ("Private Information") on any servers. It is very important that You backup Private Information. If You lose Your Private Information then it will not be possible for V SYSTEMS to recover it for You and You may lose access to Your V coins. If You do not understand the above paragraph then we strongly recommend that You learn more about cryptocurrencies before using the V Wallet Web Application.</p>
         <p>2.1.2. Transactions</p>
         <p>The only authentic record of cryptocurrency transactions is the applicable cryptocurrency blockchain. The V Wallet Web Application provides functionality that allows You to receive, send, lease and cancel lease cryptocurrency transaction instructions. V SYSTEMS does not guarantee that all transactions You perform using the V Wallet Web Application shall be stored in any cryptocurrency blockchain. You must ensure that Your transactions conform to the applicable rules of the cryptocurrency software. There may be transaction fees associated with Your cryptocurrency transactions that are required by the cryptocurrency system You engaged with. V SYSTEMS should not be responsible for any losses You incur due to transaction fees or losses that occur due to incorrectly set transaction fees (i.e. too low or high). V SYSTEMS does not have access to your transactions (or anyone else's).</p>
         <br>
