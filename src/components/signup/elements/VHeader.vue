@@ -18,6 +18,7 @@ export default {
 .brand-logo {
     margin-left: auto;
     margin-right: auto;
+    margin-top: 20px;
 }
 .logo {
     width: 100%;

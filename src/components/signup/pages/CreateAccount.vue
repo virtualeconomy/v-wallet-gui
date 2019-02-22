@@ -119,7 +119,9 @@
           </b-button>
         </div>
       </form>
-      <p class="flink">or <router-link to="/login">sign in</router-link> with a saved account</p>
+      <p class="flink">or <a class='vsys-color'
+                             href='/login'
+      >sign in</a> with a saved account</p>
     </div>
   </div>
 </template>
