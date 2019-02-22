@@ -107,7 +107,7 @@
           I have read and agree to the <a class='vsys-color'
                                           href="#"
                                           target="_blank"
-                                          @click="openwin()">terms and condition<br></a>
+                                          @click="openwin()">Terms of Service<br></a>
           <b-button
             class="input-height"
             :disabled="isSubmitDisabled"
@@ -119,7 +119,9 @@
           </b-button>
         </div>
       </form>
-      <p class="flink">or <router-link to="/login">sign in</router-link> with a saved account</p>
+      <p class="flink">or <a class='vsys-color'
+                             href='/login'
+      >sign in</a> with a saved account</p>
     </div>
   </div>
 </template>

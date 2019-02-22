@@ -46,11 +46,11 @@ export default {
     width: 100%;
     height: 100%;
     min-width: 200px;
-    background-color: rgb(249, 249, 249);
+    background-color: rgb(255, 255, 255);
 }
 .center {
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
+    left: 50%;
+    transform: translate(-50%,0%);
 }
 </style>
