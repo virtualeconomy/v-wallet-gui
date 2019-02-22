@@ -107,7 +107,7 @@
           I have read and agree to the <a class='vsys-color'
                                           href="#"
                                           target="_blank"
-                                          @click="openwin()">terms and condition<br></a>
+                                          @click="openwin()">Terms of Service<br></a>
           <b-button
             class="input-height"
             :disabled="isSubmitDisabled"
