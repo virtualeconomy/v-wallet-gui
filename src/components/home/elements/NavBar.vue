@@ -15,7 +15,7 @@
         <b-navbar-nav class="ml-auto">
           <div class="block"
                v-if="showHeight">Last Block: {{ currentTime }}
-            <span class="timeHeight">Height: {{ currentHeight }}</span>
+            <span class="time-height">Height: {{ currentHeight }}</span>
           </div>
           <b-nav-item-dropdown
             right
@@ -55,7 +55,7 @@
              :get-pri-key="getPriKey"
              :get-seed-phrase="getSeedPhrase"
              @delete-cold="deleteCold"></Account>
-    <Settings @showParent="childByValue"
+    <Settings @passParamToParent="childByValue"
               :set-usr-local-storage="setUsrLocalStorage"
               :address="address"></Settings>
     <About :set-usr-local-storage="setUsrLocalStorage"
@@ -186,7 +186,6 @@ export default {
             try {
                 oldHeight = window.localStorage.getItem('globalHeight')
             } catch (e) {
-                oldHeight = 0
             }
             return oldHeight
         },
@@ -195,7 +194,6 @@ export default {
             try {
                 oldTime = window.localStorage.getItem('time')
             } catch (e) {
-                oldTime = 0
             }
             return oldTime
         },
@@ -216,7 +214,6 @@ export default {
             try {
                 oldHeightStatus = JSON.parse(window.localStorage.getItem('heightStatus'))
             } catch (e) {
-                oldHeightStatus = false
             }
             return oldHeightStatus
         },
@@ -225,14 +222,11 @@ export default {
             if (this.showHeight) {
                 if (this.interval) {
                     clearInterval(this.interval)
-                    this.interval = setInterval(() => {
-                        setTimeout(this.getBlockHeight, 0)
-                    }, 16000)
-                } else {
-                    this.interval = setInterval(() => {
-                        setTimeout(this.getBlockHeight, 0)
-                    }, 16000)
+                    this.interval = 0
                 }
+                this.interval = setInterval(() => {
+                    setTimeout(this.getBlockHeight, 0)
+                }, 16000)
             } else {
                 if (this.interval) {
                     clearInterval(this.interval)
@@ -278,7 +272,7 @@ export default {
     height:19px;
     color: rgba(0, 0, 0, 0.5);
 }
-.block .timeHeight{
+.block .time-height{
     height:19px;
     top: 15px;
     right: 0;
@@ -287,7 +281,7 @@ export default {
     z-index: 12;
     visibility: hidden;
 }
-.block:hover .timeHeight {
+.block:hover .time-height {
     visibility: visible;
 }
 </style>

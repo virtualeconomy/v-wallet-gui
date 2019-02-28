@@ -53,7 +53,7 @@
           class="btn-confirm"
           variant="warning"
           size="lg"
-          @click="confirm(); showParent();">Confirm
+          @click="confirm(); passParamToParent();">Confirm
         </b-button>
       </b-col>
     </b-row>
@@ -135,7 +135,6 @@ export default {
             try {
                 oldHeightStatus = JSON.parse(window.localStorage.getItem('heightStatus'))
             } catch (e) {
-                oldHeightStatus = false
             }
             return oldHeightStatus
         },
@@ -144,15 +143,14 @@ export default {
             try {
                 oldTimeout = JSON.parse(window.localStorage.getItem(this.address)).sessionTimeout
             } catch (e) {
-                oldTimeout = INITIAL_SESSION_TIMEOUT
             }
             return oldTimeout
         },
         closeModal() {
             this.$refs.settingModal.hide()
         },
-        showParent() {
-            this.$emit('showParent', this.heightStatus)
+        passParamToParent() {
+            this.$emit('passParamToParent', this.heightStatus)
         },
         confirm() {
             this.changeHeightStatus()

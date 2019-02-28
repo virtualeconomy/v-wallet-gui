@@ -341,7 +341,6 @@ export default {
             try {
                 oldHeight = JSON.parse(window.localStorage.getItem('globalHeight'))
             } catch (e) {
-                oldHeight = 0
             }
             return oldHeight
         },
@@ -350,7 +349,6 @@ export default {
             try {
                 oldHeightStatus = JSON.parse(window.localStorage.getItem('heightStatus'))
             } catch (e) {
-                oldHeightStatus = false
             }
             return oldHeightStatus
         },

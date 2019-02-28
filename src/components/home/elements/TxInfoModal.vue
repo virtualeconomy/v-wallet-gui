@@ -69,8 +69,8 @@
       <div v-if="heightStatus"
            class="tx-attachment">
         <label>Block Confirmation</label>
-        <span v-if="differenceHeight >= 30">{{ differenceHeight }}(Confirmed)</span>
-        <span v-else-if="differenceHeight < 30 && differenceHeight >= 0">{{ differenceHeight }}(Unconfirmed)</span>
+        <span v-if="differenceHeight > 30">{{ differenceHeight }}(Confirmed)</span>
+        <span v-else-if="differenceHeight <= 30 && differenceHeight >= 0">{{ differenceHeight }}(Unconfirmed)</span>
       </div>
     </div>
   </b-modal>
