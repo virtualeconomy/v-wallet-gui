@@ -222,7 +222,6 @@ export default {
             if (this.showHeight) {
                 if (this.interval) {
                     clearInterval(this.interval)
-                    this.interval = 0
                 }
                 this.interval = setInterval(() => {
                     setTimeout(this.getBlockHeight, 0)
