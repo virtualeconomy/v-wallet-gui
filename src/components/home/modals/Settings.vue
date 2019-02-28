@@ -29,6 +29,13 @@
                        size="sm">
         </b-form-select>
       </div>
+      <div class="timeout-setting div-t">
+        <input class="show-height"
+               type="checkbox"
+               v-model="heightStatus"
+               @click="showHeight">
+        <label class="label-st">Show Current Block Height</label>
+      </div>
     </div>
     <b-row class="btn-bottom">
       <b-col class="col-lef">
@@ -46,7 +53,7 @@
           class="btn-confirm"
           variant="warning"
           size="lg"
-          @click="confirm">Confirm
+          @click="confirm(); showParent();">Confirm
         </b-button>
       </b-col>
     </b-row>
@@ -75,6 +82,7 @@ export default {
     },
     data() {
         return {
+            heightStatus: this.getHeightStatus(),
             selectedLang: 'en',
             langOptions: [
                 {
@@ -115,6 +123,22 @@ export default {
         changeSession: function() {
             this.setUsrLocalStorage('sessionTimeout', this.selectedSession)
         },
+        showHeight: function() {
+            if (!this.heightStatus) this.heightStatus = true
+            else this.heightStatus = false
+        },
+        changeHeightStatus: function() {
+            window.localStorage.setItem('heightStatus', this.heightStatus)
+        },
+        getHeightStatus: function() {
+            let oldHeightStatus = false
+            try {
+                oldHeightStatus = JSON.parse(window.localStorage.getItem('heightStatus'))
+            } catch (e) {
+                oldHeightStatus = false
+            }
+            return oldHeightStatus
+        },
         getSelectedSession() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT
             try {
@@ -127,11 +151,16 @@ export default {
         closeModal() {
             this.$refs.settingModal.hide()
         },
+        showParent() {
+            this.$emit('showParent', this.heightStatus)
+        },
         confirm() {
+            this.changeHeightStatus()
             this.changeSession()
             this.$refs.settingModal.hide()
         },
         resetSession() {
+            this.heightStatus = this.getHeightStatus()
             this.selectedSession = this.getSelectedSession()
         }
     }
@@ -191,5 +220,10 @@ export default {
     font-size: 15px;
     color: #9091A3;
     letter-spacing: 0;
+}
+.show-height {
+    z-index: 100;
+    cursor:pointer;
+    background-color: #FFF;
 }
 </style>

@@ -102,7 +102,9 @@
               readonly></textarea>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-icon="txIcon"
+                 :height-status="heightStatus"
                  :tx-type="txType"
+                 :difference-height="differenceHeight"
                  :tx-address="txAddress"
                  :tx-time="txRecord.timestamp"
                  :tx-fee="txFee"
@@ -114,6 +116,8 @@
                  :v-if="transType==='payment'"></TxInfoModal>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-fee="txFee"
+                 :difference-height="differenceHeight"
+                 :height-status="heightStatus"
                  :tx-time="cancelTime"
                  :tx-icon="'leased out canceled'"
                  :trans-type="'cancelLease'"
@@ -149,6 +153,8 @@ export default {
     components: { CancelLease, TxInfoModal },
     data: function() {
         return {
+            differenceHeight: 0,
+            heightStatus: false,
             hovered: false,
             cancelTime: 0,
             showCancelDetails: false
@@ -330,6 +336,24 @@ export default {
         }
     },
     methods: {
+        getLastHeight() {
+            let oldHeight = 0
+            try {
+                oldHeight = JSON.parse(window.localStorage.getItem('globalHeight'))
+            } catch (e) {
+                oldHeight = 0
+            }
+            return oldHeight
+        },
+        getHeightStatus: function() {
+            let oldHeightStatus = false
+            try {
+                oldHeightStatus = JSON.parse(window.localStorage.getItem('heightStatus'))
+            } catch (e) {
+                oldHeightStatus = false
+            }
+            return oldHeightStatus
+        },
         copyTxId() {
             this.$refs.tId.select()
             window.document.execCommand('copy')
@@ -341,6 +365,8 @@ export default {
             this.hovered = false
         },
         showModal() {
+            this.differenceHeight = this.getLastHeight() - this.txRecord.height
+            this.heightStatus = this.getHeightStatus()
             this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.transType + this.txRecord.id + this.selfSend)
         },
         cancelLeasing() {

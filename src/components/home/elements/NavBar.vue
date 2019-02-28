@@ -13,6 +13,10 @@
       <b-collapse is-nav
                   id="nav_collapse">
         <b-navbar-nav class="ml-auto">
+          <div class="block"
+               v-if="showHeight">Last Block: {{ currentTime }}
+            <span class="timeHeight">Height: {{ currentHeight }}</span>
+          </div>
           <b-nav-item-dropdown
             right
             no-caret>
@@ -51,7 +55,8 @@
              :get-pri-key="getPriKey"
              :get-seed-phrase="getSeedPhrase"
              @delete-cold="deleteCold"></Account>
-    <Settings :set-usr-local-storage="setUsrLocalStorage"
+    <Settings @showParent="childByValue"
+              :set-usr-local-storage="setUsrLocalStorage"
               :address="address"></Settings>
     <About :set-usr-local-storage="setUsrLocalStorage"
            :address="address"></About>
@@ -64,7 +69,7 @@
 import Settings from '../modals/Settings'
 import Account from '../modals/Account'
 import About from '../modals/About'
-
+import { NODE_IP } from '../../../constants'
 import Vue from 'vue'
 import jdenticon from '@/libs/jdenticon-2.1.0'
 
@@ -130,12 +135,111 @@ export default {
             }
         }
     },
+    data() {
+        return {
+            interval: 0,
+            response: '',
+            currentTime: '',
+            showHeight: false,
+            currentHeight: ''
+        }
+    },
+    created() {
+        this.showHeight = this.getHeightStatus()
+        if (this.showHeight) {
+            this.childByValue(this.showHeight)
+        }
+        this.currentHeight = this.getCurrentHeight()
+        this.currentTime = this.getCurrentTime()
+    },
     mounted() {
         jdenticon()
     },
     computed: {
     },
+    beforeDestroy() {
+        if (this.interval) {
+            clearInterval(this.interval)
+            this.interval = 0
+        }
+    },
     methods: {
+        getTime(date) {
+            const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+            const d = new Date(date / 1e6)
+            let days = d.getDay()
+            let minutes = d.getMinutes()
+            let seconds = d.getSeconds()
+            if (minutes < 10) {
+                minutes = '0' + minutes
+            }
+            if (seconds < 10) {
+                seconds = '0' + seconds
+            }
+            if (days < 10) {
+                days = '0' + days
+            }
+            return d.getHours() + ':' + minutes + ':' + seconds + ',' + monthNames[d.getMonth()] + ' ' + days
+        },
+        getCurrentHeight() {
+            let oldHeight = 0
+            try {
+                oldHeight = window.localStorage.getItem('globalHeight')
+            } catch (e) {
+                oldHeight = 0
+            }
+            return oldHeight
+        },
+        getCurrentTime() {
+            let oldTime = 0
+            try {
+                oldTime = window.localStorage.getItem('time')
+            } catch (e) {
+                oldTime = 0
+            }
+            return oldTime
+        },
+        getBlockHeight() {
+            const url = NODE_IP + '/blocks/last'
+            this.$http.get(url).then(response => {
+                this.response = response.body
+                let tempTime = this.getTime(this.response.timestamp)
+                window.localStorage.setItem('globalHeight', this.response.height)
+                window.localStorage.setItem('time', tempTime)
+                this.currentHeight = this.response.height
+                this.currentTime = tempTime
+            }, response => {
+            })
+        },
+        getHeightStatus() {
+            let oldHeightStatus = false
+            try {
+                oldHeightStatus = JSON.parse(window.localStorage.getItem('heightStatus'))
+            } catch (e) {
+                oldHeightStatus = false
+            }
+            return oldHeightStatus
+        },
+        childByValue: function(heightStatus) {
+            this.showHeight = heightStatus
+            if (this.showHeight) {
+                if (this.interval) {
+                    clearInterval(this.interval)
+                    this.interval = setInterval(() => {
+                        setTimeout(this.getBlockHeight, 0)
+                    }, 16000)
+                } else {
+                    this.interval = setInterval(() => {
+                        setTimeout(this.getBlockHeight, 0)
+                    }, 16000)
+                }
+            } else {
+                if (this.interval) {
+                    clearInterval(this.interval)
+                    this.interval = 0
+                }
+            }
+        },
         logout() {
             Vue.ls.clear()
             this.$router.push('/login')
@@ -165,5 +269,25 @@ export default {
 }
 .nav-item {
     background-color: rgb(240, 240, 240);
+}
+.block {
+    position: relative;
+    display: inline-block;
+    margin-top:15px;
+    margin-right: 10px;
+    height:19px;
+    color: rgba(0, 0, 0, 0.5);
+}
+.block .timeHeight{
+    height:19px;
+    top: 15px;
+    right: 0;
+    color: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    z-index: 12;
+    visibility: hidden;
+}
+.block:hover .timeHeight {
+    visibility: visible;
 }
 </style>
