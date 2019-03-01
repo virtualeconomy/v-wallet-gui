@@ -164,23 +164,6 @@ export default {
         }
     },
     methods: {
-        getTime(date) {
-            const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-            const d = new Date(date / 1e6)
-            let days = d.getDay()
-            let minutes = d.getMinutes()
-            let seconds = d.getSeconds()
-            if (minutes < 10) {
-                minutes = '0' + minutes
-            }
-            if (seconds < 10) {
-                seconds = '0' + seconds
-            }
-            if (days < 10) {
-                days = '0' + days
-            }
-            return d.getHours() + ':' + minutes + ':' + seconds + ',' + monthNames[d.getMonth()] + ' ' + days
-        },
         getCurrentHeight() {
             let oldHeight = 0
             try {
@@ -201,7 +184,7 @@ export default {
             const url = NODE_IP + '/blocks/last'
             this.$http.get(url).then(response => {
                 this.response = response.body
-                let tempTime = this.getTime(this.response.timestamp)
+                let tempTime = new Date(this.response.timestamp / 1e6).toLocaleString()
                 window.localStorage.setItem('globalHeight', this.response.height)
                 window.localStorage.setItem('time', tempTime)
                 this.currentHeight = this.response.height
@@ -274,9 +257,7 @@ export default {
 .block .time-height{
     height:19px;
     top: 15px;
-    right: 0;
     color: rgba(0, 0, 0, 0.5);
-    position: absolute;
     z-index: 12;
     visibility: hidden;
 }
