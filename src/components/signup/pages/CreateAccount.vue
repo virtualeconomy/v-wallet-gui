@@ -412,7 +412,7 @@ export default {
     margin-top: 20px;
 }
 .input-height {
-    top:5px;
+    margin-top: 16px;
     height: 54px;
 }
 .check-right {
@@ -421,6 +421,7 @@ export default {
     margin-right: 16px;
 }
 .flink {
+    margin-top: 16px;
     margin-bottom: 0px;
 }
 .amount-tip {
