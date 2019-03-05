@@ -5,6 +5,9 @@
         class="brand-logo"
         src="../assets/imgs/icons/signup/vsys_logo.svg">
     </div>
+    <div v-if="networkType === 'T'">
+      <p style="color: red">TESTNET:FOR DEVELOPMENT AND TESTING ONLY.<br>DOES NOT PERFORM MAINNET FUNCTIONS</p>
+    </div>
     <div class="form-login"
          v-if="mutableValue">
       <H1>
@@ -148,7 +151,7 @@
 
 <script>
 import Vue from 'vue'
-import { ADDRESS_LENGTH } from '../constants.js'
+import { ADDRESS_LENGTH, NETWORK_BYTE } from '../constants.js'
 import seedLib from '@/libs/seed.js'
 import jdenticon from '@/libs/jdenticon-2.1.0'
 
@@ -157,6 +160,7 @@ export default {
 
     data: function() {
         return {
+            networkType: String.fromCharCode(NETWORK_BYTE),
             selectedAddr: '',
             mutableValue: void 0,
             dropdownOpen: false,
