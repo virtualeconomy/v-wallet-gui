@@ -68,7 +68,7 @@
         </div>
         <div class="tx-fee"
              v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out') && feeFlag">Tx Fee: -
-          <span> {{ txFee }} VSYS </span>
+          <span> {{ formatter(txFee) }} VSYS </span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -147,6 +147,7 @@ import crypto from '@/utils/crypto'
 import CancelLease from '../modals/CancelLease'
 import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '../../../constants'
 import browser from '../../../utils/browser'
+import BigNumber from 'bignumber.js'
 
 export default {
     name: 'Record',
@@ -312,12 +313,12 @@ export default {
         },
         txAmount() {
             if (this.txRecord.lease) {
-                return this.txRecord.lease.amount / VSYS_PRECISION
+                return BigNumber(this.txRecord.lease.amount).dividedBy(VSYS_PRECISION)
             }
-            return this.txRecord.amount / VSYS_PRECISION
+            return BigNumber(this.txRecord.amount).dividedBy(VSYS_PRECISION)
         },
         txFee() {
-            return this.txRecord.fee / VSYS_PRECISION
+            return BigNumber(this.txRecord.fee).dividedBy(VSYS_PRECISION)
         },
         txBlock() {
             return this.txRecord.height
@@ -377,7 +378,7 @@ export default {
             this.$root.$emit('bv::show::modal', 'txInfoModal_cancelLease' + this.txId)
         },
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }

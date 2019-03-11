@@ -78,6 +78,7 @@ import TxInfoModal from '../elements/TxInfoModal'
 import seedLib from '@/libs/seed'
 import Vue from 'vue'
 import browser from '../../../utils/browser'
+import BigNumber from 'bignumber.js'
 export default {
     name: 'CancelLease',
     components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm },
@@ -104,13 +105,17 @@ export default {
             require: true
         },
         amount: {
-            type: Number,
-            default: 0,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
             require: true
         },
         fee: {
-            type: Number,
-            default: TX_FEE,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(TX_FEE)
+            },
             require: true
         },
         recipient: {
@@ -152,7 +157,7 @@ export default {
                 opc: OPC_TRANSACTION,
                 transactionType: CANCEL_LEASE_TX,
                 senderPublicKey: this.coldPubKey,
-                fee: this.fee * VSYS_PRECISION,
+                fee: this.fee.multipliedBy(VSYS_PRECISION),
                 feeScale: FEE_SCALE,
                 txId: this.modalId,
                 timestamp: Date.now(),
@@ -227,7 +232,7 @@ export default {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addressIndex).keyPair
         },
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }

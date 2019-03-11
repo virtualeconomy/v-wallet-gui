@@ -24,6 +24,7 @@
 
 <script>
 import browser from '../../../utils/browser'
+import BigNumber from 'bignumber.js'
 export default {
     name: 'Asset',
     props: {
@@ -36,8 +37,10 @@ export default {
             required: true
         },
         balance: {
-            type: Number,
-            default: 0,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
             required: true
         },
         selected: {
@@ -61,7 +64,7 @@ export default {
     },
     methods: {
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }

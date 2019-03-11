@@ -78,6 +78,7 @@
 
 <script>
 import browser from '../../../utils/browser'
+import BigNumber from 'bignumber.js'
 export default {
     name: 'TxInfoModal',
     props: {
@@ -102,11 +103,11 @@ export default {
             default: ''
         },
         txAmount: {
-            type: Number,
+            type: BigNumber,
             default: 0
         },
         txFee: {
-            type: Number,
+            type: BigNumber,
             default: 0
         },
         txTime: {
@@ -140,7 +141,7 @@ export default {
             this.$refs.infoModal.hide()
         },
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }

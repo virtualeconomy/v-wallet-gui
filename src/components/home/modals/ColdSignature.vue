@@ -65,6 +65,7 @@
 import jrQrcode from 'jr-qrcode'
 import { API_VERSION, PROTOCOL, OPC_SIGNATURE } from '@/constants.js'
 import transaction from '../../../utils/transaction'
+// import BigNumber from 'bignumber.js'
 export default {
     name: 'ColdSignature',
     data: function() {
@@ -99,7 +100,8 @@ export default {
                 background: '#ffffff',
                 foreground: '#000000'
             }
-            const imgBase64 = jrQrcode.getQrBase64(JSON.stringify(this.dataObject), options)
+            const text = JSON.stringify(this.dataObject).replace(/"amount":"(\d+)"/g, '"amount":$1')
+            const imgBase64 = jrQrcode.getQrBase64(text, options)
             return imgBase64
         }
     },
@@ -150,7 +152,7 @@ export default {
                 if (!signature) {
                     this.paused = false
                 } else {
-                    var data = JSON.parse(JSON.stringify(this.dataObject))
+                    var data = JSON.parse(JSON.stringify(this.dataObject).replace(/"amount":"(\d+)"/g, '"amount":"$1"'))
                     if (api !== API_VERSION) this.apiError = true
                     if (protocol !== PROTOCOL) this.protocolError = true
                     if (opc !== OPC_SIGNATURE) this.opcError = true
