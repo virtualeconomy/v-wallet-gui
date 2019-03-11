@@ -143,16 +143,6 @@ export default {
         },
         isWrongFormat(amount) {
             return (amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8)
-        },
-        copyAddr() {
-            this.$refs.addrToCopy.select()
-            window.document.execCommand('copy')
-            this.$root.$emit('bv::show::popover', 'btn-cpy')
-            this.isCpyDisable = true
-            setTimeout(() => {
-                this.$root.$emit('bv::hide::popover', 'btn-cpy')
-                this.isCpyDisable = false
-            }, 400)
         }
     }
 }

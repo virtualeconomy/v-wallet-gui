@@ -3,9 +3,9 @@
     "version": "0.1.4",
     "description": "web hot wallet of v systems",
     "author": {
-        "name" : "V SYSTEMS",
-        "email" : "info@v.systems",
-        "url" : "https://www.v.systems/"
+        "name": "V SYSTEMS",
+        "email": "info@v.systems",
+        "url": "https://www.v.systems/"
     },
     "private": true,
     "scripts": {

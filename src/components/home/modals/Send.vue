@@ -531,7 +531,9 @@ export default {
                 apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress], PAYMENT_TX)
             }
             const url = NODE_IP + '/vsys/broadcast/payment'
+            console.log('api0', JSON.stringify(apiSchema))
             apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') //  The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
+            console.log('api1', JSON.stringify(apiSchema))
             this.$http.post(url, apiSchema).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
