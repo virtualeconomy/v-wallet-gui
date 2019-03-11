@@ -157,7 +157,7 @@ export default {
                 opc: OPC_TRANSACTION,
                 transactionType: CANCEL_LEASE_TX,
                 senderPublicKey: this.coldPubKey,
-                fee: this.fee.multipliedBy(VSYS_PRECISION),
+                fee: this.fee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
                 txId: this.modalId,
                 timestamp: Date.now(),

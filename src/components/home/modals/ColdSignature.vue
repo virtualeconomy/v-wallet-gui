@@ -65,7 +65,6 @@
 import jrQrcode from 'jr-qrcode'
 import { API_VERSION, PROTOCOL, OPC_SIGNATURE } from '@/constants.js'
 import transaction from '../../../utils/transaction'
-// import BigNumber from 'bignumber.js'
 export default {
     name: 'ColdSignature',
     data: function() {
