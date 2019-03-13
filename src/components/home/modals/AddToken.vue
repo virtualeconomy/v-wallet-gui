@@ -55,8 +55,13 @@ export default {
         }
     },
     computed: {
+        seedaddress() {
+            if (Vue.ls.get('address')) {
+                return Vue.ls.get('address')
+            }
+        },
         userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.address))
+            return JSON.parse(window.localStorage.getItem(this.seedaddress))
         }
     },
 
@@ -71,11 +76,11 @@ export default {
             window.localStorage.setItem(this.address, JSON.stringify(this.userInfo))
         },
         okModal() {
+            // this.$refs.addTokenModal.hide()
             if (this.isValidToken(this.tokenId)) {
                 // let balance = this.balance
-                // console.log('curbalance' + balance)
-                this.setUsrLocalStorage('tokenId', JSON.stringify(this.tokenId))
-                // console.log('lalala' + this.localStorage)
+                this.setUsrLocalStorage(this.tokenId, JSON.stringify(this.tokenId))
+                console.log('lalala' + this.tokenId)
                 // console.log('cash' + JSON.parse(this.balance))
                 // console.log('balabala' + JSON.parse(window.localStorage.getItem(this.tokenId)))
             }

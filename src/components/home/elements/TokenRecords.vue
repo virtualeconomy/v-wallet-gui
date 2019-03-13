@@ -9,14 +9,8 @@
            :style="{height: myHeight}">
         <div v-for="record in tokenRecords"
              :key="record.id">
-          <TokenRecord :tx-record="record"
-                       :fee-flag="feeFlag"
-                       :cold-pub-key="coldPubKey"
-                       :trans-type="transType"
-                       :address-index="addressIndex"
-                       :address="address"
-                       :wallet-type="walletType"
-                       :is-canceled="beCanceledList[record.id]"
+          <TokenRecord :address="address"
+                       :token-id="tokenId"
                        @endCancelSignal="endCancelSignal"></TokenRecord>
         </div>
       </div>
@@ -61,7 +55,7 @@ export default {
     },
     data() {
         return {
-            tokenRecords: {},
+            tokenRecords: [],
             showingNum: 10,
             changeShowDisable: false,
             myHeight: '0'
@@ -107,9 +101,11 @@ export default {
                 //   const addr = this.address
                 this.changeShowDisable = true
                 //   const recordLimit = this.showingNum
-                const value = JSON.parse(window.localStorage.getItem(this.address)).tokenId
-                console.log('value' + value)
-                console.log('token' + this.tokenId)
+                // const value = JSON.parse(window.localStorage.getItem(this.address)).tokenI
+                let arr = [1]
+                this.tokenRecords = arr
+                console.log('record' + this.tokenRecords)
+                console.log('height' + this.tokenRecords.length)
                 this.changeShowDisable = false
             }
         },

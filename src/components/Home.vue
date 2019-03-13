@@ -183,6 +183,7 @@ import LeasePane from './home/elements/LeasePane'
 import LeaseRecords from './home/elements/LeaseRecords'
 import TokenPane from './home/elements/TokenPane'
 import TokenRecords from './home/elements/TokenRecords'
+import AddToken from './home/modals/AddToken'
 
 export default {
     name: 'Home',
@@ -410,7 +411,8 @@ export default {
         LeaseRecords,
         LeasePane,
         TokenPane,
-        TokenRecords
+        TokenRecords,
+        AddToken
     }
 }
 </script>
