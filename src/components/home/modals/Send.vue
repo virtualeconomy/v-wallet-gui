@@ -124,13 +124,13 @@
                     size="lg"
                     block
                     :disabled="isSubmitDisabled"
-                    @click="nextPage(); addHotRecipientList(); checkHot()">Continue
+                    @click="nextPage(); addHotRecipientList();">Continue
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
           <Confirm :address="address"
                    :recipient="recipient"
-                   :amount="Number(amount)"
+                   :amount=inputAmount(amount)
                    :fee="fee"
                    :attachment="attachment"
                    :tx-type="'Payment'">
@@ -163,7 +163,7 @@
         <b-container v-if="pageId===3">
           <Success :address="address"
                    :recipient="recipient"
-                   :amount="Number(amount)"
+                   :amount=inputAmount(amount)
                    :fee="fee"
                    :attachment="attachment">
           </Success>
@@ -282,13 +282,13 @@
                     block
                     size="lg"
                     :disabled="isColdSubmitDisabled"
-                    @click="coldNextPage(); addColdRecipientList(); checkCold()">Continue
+                    @click="coldNextPage(); addColdRecipientList()">Continue
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
           <Confirm :address="coldAddress"
                    :recipient="coldRecipient"
-                   :amount="Number(coldAmount)"
+                   :amount=inputAmount(coldAmount)
                    :fee="coldFee"
                    :attachment="coldAttachment"
                    :tx-type="'payment'">
@@ -325,7 +325,7 @@
         <b-container v-show="coldPageId===4">
           <Confirm :address="coldAddress"
                    :recipient="coldRecipient"
-                   :amount="Number(coldAmount)"
+                   :amount=inputAmount(coldAmount)
                    :fee="coldFee"
                    :attachment="coldAttachment"
                    :tx-type="'Payment'">
@@ -355,7 +355,7 @@
         <b-container v-show="coldPageId===5">
           <Success :address="coldAddress"
                    :recipient="coldRecipient"
-                   :amount="Number(coldAmount)"
+                   :amount=inputAmount(coldAmount)
                    :fee="coldFee"
                    :attachment="coldAttachment">
           </Success>
@@ -385,15 +385,15 @@ import BigNumber from 'bignumber.js'
 var initData = {
     opc: '',
     recipient: '',
-    amount: 0,
+    amount: BigNumber(0),
     attachment: '',
     pageId: 1,
-    fee: TX_FEE,
+    fee: BigNumber(TX_FEE),
     coldRecipient: '',
-    coldAmount: 0,
+    coldAmount: BigNumber(0),
     coldAttachment: '',
     coldPageId: 1,
-    coldFee: TX_FEE,
+    coldFee: BigNumber(TX_FEE),
     address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
     coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
     scanShow: false,
@@ -413,7 +413,8 @@ export default {
     props: {
         balances: {
             type: Object,
-            default: function() {},
+            default: function() {
+            },
             require: true
         },
         coldAddresses: {
@@ -474,7 +475,7 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
+            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
         },
         isColdSubmitDisabled() {
             return !(this.coldAddress && this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient) && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold') && this.coldAddress !== '')
@@ -489,7 +490,7 @@ export default {
                 opc: OPC_TRANSACTION,
                 transactionType: PAYMENT_TX,
                 senderPublicKey: this.coldAddresses[this.coldAddress],
-                amount: Number((this.coldAmount * VSYS_PRECISION).toFixed(0)),
+                amount: BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).toFixed(0),
                 fee: this.coldFee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
                 recipient: this.coldRecipient,
@@ -511,6 +512,9 @@ export default {
         }
     },
     methods: {
+        inputAmount(num) {
+            return BigNumber(num)
+        },
         sendData: function(walletType) {
             var apiSchema
             if (walletType === 'hotWallet') {
@@ -520,7 +524,7 @@ export default {
                 this.hasConfirmed = true
                 const dataInfo = {
                     recipient: this.recipient,
-                    amount: Number((this.amount * VSYS_PRECISION).toFixed(0)),
+                    amount: BigNumber(this.amount).multipliedBy(VSYS_PRECISION).toFixed(0),
                     fee: TX_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
@@ -549,33 +553,9 @@ export default {
             this.hasConfirmed = false
             this.pageId++
         },
-        checkCold: function() {
-            let convertAmount = Math.round(Number(this.coldAmount) * VSYS_PRECISION)
-            let bigNumAmount = BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION)
-            let isLongEqual = bigNumAmount.isEqualTo(convertAmount)
-            let convertAmountVSYS = BigNumber(convertAmount).dividedBy(VSYS_PRECISION).toNumber()
-            let isDoubleEqual = BigNumber(this.coldAmount).isEqualTo(convertAmountVSYS)
-            if (!isLongEqual || !isDoubleEqual) {
-                let roundAmount = bigNumAmount.dividedToIntegerBy(100).dividedBy(VSYS_PRECISION / 100)
-                alert('Warning: the amount ' + this.coldAmount + ' is over the precision limit that wallet currently supports. The amount will be rounded to ' + roundAmount.toFixed(8))
-                this.coldAmount = roundAmount.toNumber()
-            }
-        },
         addColdRecipientList: function() {
             this.coldRecipientAddressList.set(this.cogldRecipient, '0')
             window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
-        },
-        checkHot: function() {
-            let convertAmount = Math.round(Number(this.amount) * VSYS_PRECISION)
-            let bigNumAmount = BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
-            let isLongEqual = bigNumAmount.isEqualTo(convertAmount)
-            let convertAmountVSYS = BigNumber(convertAmount).dividedBy(VSYS_PRECISION).toNumber()
-            let isDoubleEqual = BigNumber(this.amount).isEqualTo(convertAmountVSYS)
-            if (!isLongEqual || !isDoubleEqual) {
-                let roundAmount = bigNumAmount.dividedToIntegerBy(100).dividedBy(VSYS_PRECISION / 100)
-                alert('Warning: the amount ' + this.amount + ' is over the precision limit that wallet currently supports. The amount will be rounded to ' + roundAmount.toFixed(8))
-                this.amount = roundAmount.toNumber()
-            }
         },
         addHotRecipientList: function() {
             this.hotRecipientAddressList.set(this.recipient, '0')
@@ -604,11 +584,11 @@ export default {
         resetPage: function() {
             this.opc = ''
             this.recipient = ''
-            this.amount = 0
+            this.amount = BigNumber(0)
             this.attachment = ''
             this.pageId = 1
             this.coldRecipient = ''
-            this.coldAmount = 0
+            this.coldAmount = BigNumber(0)
             this.coldAttachment = ''
             this.coldPageId = 1
             this.coldAddress = ''
@@ -772,10 +752,10 @@ export default {
         },
         isAmountValid(type) {
             var amount = type === 'hot' ? this.amount : this.coldAmount
-            if (Number(amount) === 0) {
+            if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !isNaN(amount) && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
         },
         isWrongFormat(amount) {
             if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
@@ -786,10 +766,10 @@ export default {
         },
         isInsufficient(amount, type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return amount > balance - TX_FEE
+            return BigNumber(amount).isGreaterThan(BigNumber(balance).minus(TX_FEE))
         },
         isNegative(amount) {
-            return amount < 0
+            return BigNumber(amount).isLessThan(0)
         },
         options(addrs) {
             return Object.keys(addrs).reduce((options, addr) => {
@@ -801,7 +781,7 @@ export default {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }

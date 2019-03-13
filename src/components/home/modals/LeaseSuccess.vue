@@ -14,18 +14,21 @@
 import TxInfoModal from '../elements/TxInfoModal'
 import { TX_FEE } from '../../../constants'
 import browser from '../../../utils/browser'
+import BigNumber from 'bignumber.js'
 export default {
     name: 'LeaseSuccess',
     components: { TxInfoModal },
     data: function() {
         return {
-            fee: TX_FEE
+            fee: BigNumber(TX_FEE)
         }
     },
     props: {
         amount: {
-            type: Number,
-            default: 0,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
             require: true
         },
         address: {
@@ -44,7 +47,7 @@ export default {
             this.$emit('show-details')
         },
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }
