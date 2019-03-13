@@ -553,33 +553,9 @@ export default {
             this.hasConfirmed = false
             this.pageId++
         },
-        checkCold: function() {
-            let convertAmount = Math.round(Number(this.coldAmount) * VSYS_PRECISION)
-            let bigNumAmount = BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION)
-            let isLongEqual = bigNumAmount.isEqualTo(convertAmount)
-            let convertAmountVSYS = BigNumber(convertAmount).dividedBy(VSYS_PRECISION).toNumber()
-            let isDoubleEqual = BigNumber(this.coldAmount).isEqualTo(convertAmountVSYS)
-            if (!isLongEqual || !isDoubleEqual) {
-                let roundAmount = bigNumAmount.dividedToIntegerBy(100).dividedBy(VSYS_PRECISION / 100)
-                alert('Warning: the amount ' + this.coldAmount + ' is over the precision limit that wallet currently supports. The amount will be rounded to ' + roundAmount.toFixed(8))
-                this.coldAmount = roundAmount.toNumber()
-            }
-        },
         addColdRecipientList: function() {
             this.coldRecipientAddressList.set(this.cogldRecipient, '0')
             window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
-        },
-        checkHot: function() {
-            let convertAmount = Math.round(Number(this.amount) * VSYS_PRECISION)
-            let bigNumAmount = BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
-            let isLongEqual = bigNumAmount.isEqualTo(convertAmount)
-            let convertAmountVSYS = BigNumber(convertAmount).dividedBy(VSYS_PRECISION).toNumber()
-            let isDoubleEqual = BigNumber(this.amount).isEqualTo(convertAmountVSYS)
-            if (!isLongEqual || !isDoubleEqual) {
-                let roundAmount = bigNumAmount.dividedToIntegerBy(100).dividedBy(VSYS_PRECISION / 100)
-                alert('Warning: the amount ' + this.amount + ' is over the precision limit that wallet currently supports. The amount will be rounded to ' + roundAmount.toFixed(8))
-                this.amount = roundAmount.toNumber()
-            }
         },
         addHotRecipientList: function() {
             this.hotRecipientAddressList.set(this.recipient, '0')

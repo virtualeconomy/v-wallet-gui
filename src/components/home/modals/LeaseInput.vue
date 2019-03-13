@@ -335,18 +335,6 @@ export default {
         formatter(num) {
             return browser.bigNumberFormatter(num)
         },
-        checkPrecision: function() {
-            let convertAmount = Math.round(Number(this.amount) * VSYS_PRECISION)
-            let bigNumAmount = BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
-            let isLongEqual = bigNumAmount.isEqualTo(convertAmount)
-            let convertAmountVSYS = BigNumber(convertAmount).dividedBy(VSYS_PRECISION).toNumber()
-            let isDoubleEqual = BigNumber(this.amount).isEqualTo(convertAmountVSYS)
-            if (!isLongEqual || !isDoubleEqual) {
-                let roundAmount = bigNumAmount.dividedToIntegerBy(100).dividedBy(VSYS_PRECISION / 100)
-                alert('Warning: the amount ' + this.amount + ' is over the precision limit that wallet currently supports. The amount will be rounded to ' + roundAmount.toFixed(8))
-                this.amount = roundAmount.toNumber()
-            }
-        },
         addRecipientList: function() {
             if (this.walletType === 'hot') {
                 this.hotRecipientAddressList.set(this.recipient, '1')
