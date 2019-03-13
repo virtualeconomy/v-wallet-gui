@@ -14,13 +14,6 @@
     <b-container
       fluid
       class="modal-c">
-      <!-- <b-form-group label="Asset"
-                    label-for="assetInput">
-        <b-form-input id="assetInput"
-                      value="VSYS"
-                      readonly>
-        </b-form-input>
-      </b-form-group> -->
       <b-form-group label="Address"
                     class="forms"
                     label-for="addressInput">
@@ -92,7 +85,7 @@ export default {
     },
     data() {
         return {
-            amount: 0
+            amount: BigNumber(0)
         }
     },
     computed: {
@@ -121,12 +114,7 @@ export default {
         },
         transferAmount() {
             if (this.amount) {
-                let tempAmount = BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
-                if (tempAmount.isGreaterThanOrEqualTo(Number.MAX_SAFE_INTEGER)) {
-                    return tempAmount.toFixed()
-                } else {
-                    return tempAmount.toNumber()
-                }
+                return BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
             }
         }
     },
@@ -136,10 +124,10 @@ export default {
             this.$refs.receiveModal.hide()
         },
         isAmountValid(amount) {
-            if (Number(amount) === 0) {
+            if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !isNaN(amount) && !this.isWrongFormat(amount) && !(/[eE]/.test(amount.toString()))
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !(/[eE]/.test(amount.toString()))
         },
         isWrongFormat(amount) {
             return (amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8)

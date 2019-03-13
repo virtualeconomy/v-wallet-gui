@@ -155,6 +155,8 @@ import seedLib from '@/libs/seed.js'
 import Records from './home/elements/Records'
 import LeasePane from './home/elements/LeasePane'
 import LeaseRecords from './home/elements/LeaseRecords'
+import BigNumber from 'bignumber.js'
+import JSONBigNumber from 'json-bignumber'
 
 export default {
     name: 'Home',
@@ -169,10 +171,10 @@ export default {
             walletType: '',
             sortFlag: 0,
             transActive: 'trans',
-            available: 0,
-            leasedIn: 0,
-            leasedOut: 0,
-            total: 0
+            available: BigNumber(0),
+            leasedIn: BigNumber(0),
+            leasedOut: BigNumber(0),
+            total: BigNumber(0)
         }
     },
 
@@ -279,14 +281,15 @@ export default {
         getBalance: function(address) {
             const url = NODE_IP + '/addresses/balance/details/' + address
             this.$http.get(url).then(response => {
-                let value = response.body['available'] / VSYS_PRECISION
+                let tempResponse = JSONBigNumber.parse(response.bodyText)
+                let value = tempResponse.available.dividedBy(VSYS_PRECISION)
                 let changestatus = value === this.balance[address]
                 Vue.set(this.balance, address, value)
                 if (address === this.selectedAddress) {
-                    this.total = response.body.regular / VSYS_PRECISION
-                    this.available = response.body.available / VSYS_PRECISION
-                    this.leasedOut = (response.body.regular - response.body.available) / VSYS_PRECISION
-                    this.leasedIn = (response.body.effective - response.body.available) / VSYS_PRECISION
+                    this.total = tempResponse.regular.dividedBy(VSYS_PRECISION)
+                    this.available = tempResponse.available.dividedBy(VSYS_PRECISION)
+                    this.leasedOut = tempResponse.regular.minus(tempResponse.available).dividedBy(VSYS_PRECISION)
+                    this.leasedIn = tempResponse.effective.minus(tempResponse.available).dividedBy(VSYS_PRECISION)
                     if (!changestatus) {
                         let addrtmp = this.selectedAddress
                         this.selectedAddress = ''

@@ -121,7 +121,7 @@
               size="lg"
               block
               :disabled="isSubmitDisabled"
-              @click="nextPage(); addRecipientList(); checkPrecision()">Continue
+              @click="nextPage(); addRecipientList()">Continue
     </b-button>
   </b-container>
 </template>
@@ -138,14 +138,14 @@ export default {
     data: function() {
         return {
             recipient: '',
-            amount: 0,
+            amount: BigNumber(0),
             scanShow: false,
             qrInit: false,
             qrErrMsg: void 0,
             paused: false,
             address: this.selectedWalletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress,
             coldAddress: this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress,
-            fee: TX_FEE,
+            fee: BigNumber(TX_FEE),
             hotRecipientAddressList: {},
             coldRecipientAddressList: {}
         }
@@ -202,7 +202,7 @@ export default {
     },
     computed: {
         isSubmitDisabled() {
-            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid(this.walletType))
+            return !(this.recipient && BigNumber(this.amount) > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid(this.walletType))
         },
         isSameWithSender() {
             var thisAddr = this.walletType === 'hot' ? this.address : this.coldAddress
@@ -289,10 +289,10 @@ export default {
         },
         isAmountValid(type) {
             var amount = this.amount
-            if (Number(amount) === 0) {
+            if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !isNaN(Number(amount)) && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
         },
         isWrongFormat(amount) {
             if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
@@ -303,10 +303,10 @@ export default {
         },
         isInsufficient(amount, type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return amount > balance - TX_FEE
+            return BigNumber(amount).isGreaterThan(BigNumber(balance).minus(TX_FEE))
         },
         isNegative(amount) {
-            return amount < 0
+            return BigNumber(amount).isLessThan(0)
         },
         nextPage() {
             if (this.walletType === 'hot') {
@@ -324,7 +324,7 @@ export default {
         },
         resetData() {
             this.recipient = ''
-            this.amount = 0
+            this.amount = BigNumber(0)
             this.scanShow = false
             this.qrInit = false
             this.qrErrMsg = void 0
@@ -333,19 +333,7 @@ export default {
             this.coldAddress = this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         formatter(num) {
-            return browser.numberFormatter(num)
-        },
-        checkPrecision: function() {
-            let convertAmount = Math.round(Number(this.amount) * VSYS_PRECISION)
-            let bigNumAmount = BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
-            let isLongEqual = bigNumAmount.isEqualTo(convertAmount)
-            let convertAmountVSYS = BigNumber(convertAmount).dividedBy(VSYS_PRECISION).toNumber()
-            let isDoubleEqual = BigNumber(this.amount).isEqualTo(convertAmountVSYS)
-            if (!isLongEqual || !isDoubleEqual) {
-                let roundAmount = bigNumAmount.dividedToIntegerBy(100).dividedBy(VSYS_PRECISION / 100)
-                alert('Warning: the amount ' + this.amount + ' is over the precision limit that wallet currently supports. The amount will be rounded to ' + roundAmount.toFixed(8))
-                this.amount = roundAmount.toNumber()
-            }
+            return browser.bigNumberFormatter(num)
         },
         addRecipientList: function() {
             if (this.walletType === 'hot') {
