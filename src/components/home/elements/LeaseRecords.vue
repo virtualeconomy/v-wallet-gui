@@ -99,7 +99,7 @@ import {NODE_IP, LEASE_TX, CANCEL_LEASE_TX} from '../../../constants'
 import Vue from 'vue'
 import Record from './Record'
 import browser from '../../../utils/browser'
-
+import JSONBigNumber from 'json-bignumber'
 export default {
     name: 'LeaseRecords',
     components: {
@@ -185,6 +185,12 @@ export default {
                     let rv = []
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
+                        for (var i = 0; i < response.body[0].length; i++) {
+                            this.response[i].amount = JSONBigNumber.parse(response.bodyText)[0][i].amount
+                            if (this.response[i].lease) {
+                                this.response[i].lease.amount = JSONBigNumber.parse(response.bodyText)[0][i].lease.amount
+                            }
+                        }
                         this.response.forEach(function(v, i) {
                             if (v.type === LEASE_TX || v.type === CANCEL_LEASE_TX) {
                                 rv.push(v)

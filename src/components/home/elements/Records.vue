@@ -131,7 +131,7 @@ import JsonExcel from 'vue-json-excel'
 import browser from '../../../utils/browser'
 import base58 from '@/libs/base58'
 import crypto from '@/utils/crypto'
-
+import JSONBigNumber from 'json-bignumber'
 export default {
     name: 'Records',
     components: {
@@ -214,6 +214,14 @@ export default {
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
                         let count = 0
+                        for (var i = 0; i < response.body[0].length; i++) {
+                            response.body[0][i].amount = JSONBigNumber.parse(response.bodyText)[0][i].amount
+                            this.response[i].amount = response.body[0][i].amount
+                            if (response.body[0][i].lease) {
+                                response.body[0][i].lease.amount = JSONBigNumber.parse(response.bodyText)[0][i].lease.amount
+                                this.response[i].lease.amount = response.body[0][i].lease.amount
+                            }
+                        }
                         this.txRecords = response.body[0].reduce((recList, recItem) => {
                             const month = this.getMonthYearStr(recItem['timestamp'])
                             if (!recList[month]) {
@@ -253,11 +261,13 @@ export default {
         },
         exportRecords() {
             if (this.response) {
-                this.responseExport = JSON.parse(JSON.stringify(this.response))
-                this.responseExport.map(function(item) {
-                    item['fee'] = item['fee'] / VSYS_PRECISION
-                    item['amount'] = item['amount'] / VSYS_PRECISION
-                })
+                for (var i = 0; i < this.response.length; i++) {
+                    if (this.response[i].amount) {
+                        this.response[i].amount = this.response[i].amount.dividedBy(VSYS_PRECISION)
+                    }
+                    this.response[i].fee = this.response[i].fee / VSYS_PRECISION
+                }
+                this.responseExport = this.response
             }
             return this.responseExport
         }

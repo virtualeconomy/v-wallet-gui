@@ -165,6 +165,7 @@ import seedLib from '@/libs/seed'
 import LeaseSuccess from './LeaseSuccess'
 import TxInfoModal from '../elements/TxInfoModal'
 import BigNumber from 'bignumber.js'
+import JSONBigNumber from 'json-bignumber'
 export default {
     name: 'Lease',
     components: { LeaseSuccess, Confirm, LeaseInput, ColdSignature, TxInfoModal },
@@ -320,7 +321,7 @@ export default {
                 this.txId = response.body.id
                 this.txAddress = response.body.recipient
                 this.txTimestamp = response.body.timestamp
-                this.txAmount = BigNumber(response.body.amount).dividedBy(VSYS_PRECISION)
+                this.txAmount = JSONBigNumber.parse(response.bodyText).amount.dividedBy(VSYS_PRECISION)
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
