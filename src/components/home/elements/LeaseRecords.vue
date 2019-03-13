@@ -303,7 +303,7 @@ export default {
 }
 .show-fee {
     position: absolute;
-    right:240px;
+    right:250px;
     width: 116px;
     height: 36px;
     border-color: #E8E9ED;
