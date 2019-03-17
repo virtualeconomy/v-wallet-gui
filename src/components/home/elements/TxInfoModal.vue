@@ -78,6 +78,8 @@
 
 <script>
 import browser from '../../../utils/browser'
+import BigNumber from 'bignumber.js'
+import { TX_FEE } from '../../../constants'
 export default {
     name: 'TxInfoModal',
     props: {
@@ -102,12 +104,16 @@ export default {
             default: ''
         },
         txAmount: {
-            type: Number,
-            default: 0
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            }
         },
         txFee: {
-            type: Number,
-            default: 0
+            type: BigNumber,
+            default: function() {
+                return BigNumber(TX_FEE)
+            }
         },
         txTime: {
             type: Number,
@@ -140,7 +146,7 @@ export default {
             this.$refs.infoModal.hide()
         },
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }

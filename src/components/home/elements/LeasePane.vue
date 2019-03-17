@@ -93,6 +93,7 @@
 <script>
 import Lease from '../modals/Lease'
 import browser from '../../../utils/browser'
+import BigNumber from 'bignumber.js'
 
 export default {
     name: 'LeasePane',
@@ -116,23 +117,31 @@ export default {
             require: true
         },
         available: {
-            type: Number,
-            default: 0,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
             require: true
         },
         leasedIn: {
-            type: Number,
-            default: 0,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
             require: true
         },
         leasedOut: {
-            type: Number,
-            default: 0,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
             require: true
         },
         total: {
-            type: Number,
-            default: 0,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
             require: true
         },
         address: {
@@ -148,7 +157,7 @@ export default {
     },
     methods: {
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         },
         endLeaseSignal() {
             this.$emit('updateInfo')

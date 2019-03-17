@@ -53,6 +53,7 @@
 import Receive from '../modals/Receive'
 import Send from '../modals/Send'
 import browser from '../../../utils/browser'
+import BigNumber from 'bignumber.js'
 export default {
     name: 'TransPane',
     components: {
@@ -69,8 +70,10 @@ export default {
     },
     props: {
         balance: {
-            type: Number,
-            default: 0,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
             require: true
         },
         address: {
@@ -89,12 +92,15 @@ export default {
         },
         balances: {
             type: Object,
-            default: function() {},
+            default: function() {
+            },
             require: true
         },
         total: {
-            type: Number,
-            default: 0,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
             require: true
         },
         walletType: {
@@ -105,7 +111,7 @@ export default {
     },
     methods: {
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         },
         endSendSignal() {
             this.$emit('updateInfo')
