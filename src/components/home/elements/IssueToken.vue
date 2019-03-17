@@ -1,22 +1,21 @@
 <template>
-  <b-modal id="sendModal"
+  <b-modal id="issueTokenModal"
            centered
            lazy
-           title="Send"
+           title="issToken"
            hide-footer
            hide-header
-           ref="sendModal"
+           ref="issueTokenModal"
            :busy="true"
            @hidden="resetPage">
     <button
-      :disabled="qrInit"
       class="close btn-close"
       @click="endSend">
       <img src="../../../assets/imgs/icons/operate/ic_close.svg">
     </button>
     <b-tabs @input="hideQrScan">
       <b-tab title="Hot Wallet"
-             :disabled="qrInit && !pageId"
+             :disabled="!pageId"
              :active="walletType==='hotWallet'">
         <b-container
           class="text-left"
@@ -40,46 +39,6 @@
               </span>
               <span class="balance">{{ formatter(balances[address]) }} VSYS</span>
             </b-btn>
-          </b-form-group>
-          <b-form-group label="Recipient"
-                        label-for="recipient-input">
-            <b-form-input id="recipient-input"
-                          class="recipient-input"
-                          type="text"
-                          v-model="recipient"
-                          :state="isValidRecipient(recipient)"
-                          list="showHotRecipientList"
-                          aria-describedby="inputLiveFeedback"
-                          placeholder="Paste or scan an address.">
-            </b-form-input>
-            <datalist id="showHotRecipientList">
-              <option v-for="addr in hotRecipientAddressList.keys()"
-                      :key="addr">{{ addr }}</option>
-            </datalist>
-            <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
-                 v-b-tooltip.hover
-                 class="qr-code"
-                 @click="scanChange"
-                 title="scan qr-code">
-            <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid recipient address (if using QR code scanner, make sure QR code is correct).
-            </b-form-invalid-feedback>
-            <div v-if="scanShow">
-              <div class="qr-info">Please confirm your browser's camera is available.</div>
-              <div class="qr-window">
-                <qrcode-reader @init="onInit"
-                               @decode="onDecode"
-                               :track="repaintLocation"
-                               :paused="paused">
-                  <img v-if="qrInit"
-                       class="qrcode-waiting center"
-                       height="70"
-                       width="70"
-                       src="../../../assets/imgs/icons/wallet/ic_wait.svg">
-                </qrcode-reader>
-              </div>
-              <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
-            </div>
           </b-form-group>
           <b-form-group label="Amount"
                         label-for="amount-input">
@@ -107,15 +66,6 @@
               Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group label="Description"
-                        label-for="descriptionInput">
-            <b-form-textarea id="descriptionInput"
-                             v-model="attachment"
-                             :rows="3"
-                             :no-resize="true"
-                             :state="isValidAttachment">
-            </b-form-textarea>
-          </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
           </b-form-group>
@@ -131,9 +81,7 @@
           <Confirm :address="address"
                    :recipient="recipient"
                    :amount="Number(amount)"
-                   :fee="fee"
-                   :attachment="attachment"
-                   :tx-type="'Payment'">
+                   :fee="fee">
           </Confirm>
           <p
             v-show="sendError"
@@ -162,10 +110,8 @@
         </b-container>
         <b-container v-if="pageId===3">
           <Success :address="address"
-                   :recipient="recipient"
                    :amount="Number(amount)"
-                   :fee="fee"
-                   :attachment="attachment">
+                   :fee="fee">
           </Success>
           <b-button variant="warning"
                     block
@@ -375,23 +321,17 @@ import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { NODE_IP, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
-import Confirm from './Confirm'
-import Success from './Success'
-import crypto from '@/utils/crypto'
-import ColdSignature from './ColdSignature'
+import IssueConfirm from '../elements/IssueConfirm'
+import IssueSuccess from '../elements/IssueSuccess'
+// import crypto from '@/utils/crypto'
+import ColdSignature from '../modals/ColdSignature'
 import browser from '../../../utils/browser'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 var initData = {
-    opc: '',
-    recipient: '',
     amount: 0,
-    attachment: '',
     pageId: 1,
     fee: TX_FEE,
-    coldRecipient: '',
-    coldAmount: 0,
-    coldAttachment: '',
     coldPageId: 1,
     coldFee: TX_FEE,
     address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
@@ -409,19 +349,9 @@ var initData = {
 }
 export default {
     name: 'Send',
-    components: {ColdSignature, Success, Confirm},
+    components: {ColdSignature, IssueSuccess, IssueConfirm},
     props: {
-        balances: {
-            type: Object,
-            default: function() {},
-            require: true
-        },
-        coldAddresses: {
-            type: Object,
-            default: function() {},
-            require: true
-        },
-        addresses: {
+        tokenIds: {
             type: Object,
             default: function() {},
             require: true
@@ -431,9 +361,9 @@ export default {
             default: 'hotWallet',
             require: true
         },
-        selectedAddress: {
-            type: String,
-            default: this ? this.defaultAddress : undefined,
+        addresses: {
+            type: Object,
+            default: function() {},
             require: true
         }
     },
@@ -454,7 +384,6 @@ export default {
     },
     computed: {
         defaultAddress() {
-            console.log('wtf', this.walletType)
             return Vue.ls.get('address')
         },
         defaultColdAddress() {
@@ -605,14 +534,10 @@ export default {
             }
         },
         resetPage: function() {
-            this.opc = ''
-            this.recipient = ''
             this.amount = 0
             this.attachment = ''
             this.pageId = 1
-            this.coldRecipient = ''
             this.coldAmount = 0
-            this.coldAttachment = ''
             this.coldPageId = 1
             this.coldAddress = ''
             this.scanShow = false
@@ -633,40 +558,6 @@ export default {
             }
             if (this.scanShow) {
                 this.paused = false
-            }
-        },
-        isValidRecipient: function(recipient) {
-            if (!recipient) {
-                return void 0
-            }
-            let isValid = false
-            try {
-                isValid = crypto.isValidAddress(recipient)
-            } catch (e) {
-                console.log(e)
-            }
-            return isValid
-        },
-        async onInit(promise) {
-            try {
-                this.qrInit = true
-                await promise
-            } catch (error) {
-                if (error.name === 'NotAllowedError') {
-                    throw Error('user denied camera access permission')
-                } else if (error.name === 'NotFoundError') {
-                    throw Error('no suitable camera device installed')
-                } else if (error.name === 'NotSupportedError') {
-                    throw Error('page is not served over HTTPS (or localhost)')
-                } else if (error.name === 'NotReadableError') {
-                    throw Error('maybe camera is already in use')
-                } else if (error.name === 'OverconstarinedError') {
-                    throw Error('pass constraints do not match any camera')
-                } else {
-                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
-                }
-            } finally {
-                this.qrInit = false
             }
         },
         onDecode: function(decodeString) {

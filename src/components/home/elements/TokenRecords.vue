@@ -11,6 +11,8 @@
              :key="record.id">
           <TokenRecord :address="address"
                        :token-id="tokenId"
+                       :addresses="addresses"
+                       :wallet-type="walletType"
                        @endCancelSignal="endCancelSignal"></TokenRecord>
         </div>
       </div>
@@ -71,6 +73,16 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        walletType: {
+            type: String,
+            default: 'xxxxxx',
+            require: true
+        },
+        addresses: {
+            type: Object,
+            default: function() {},
+            require: true
         }
     },
     watch: {
@@ -106,6 +118,7 @@ export default {
                 this.tokenRecords = arr
                 console.log('record' + this.tokenRecords)
                 console.log('height' + this.tokenRecords.length)
+                console.log('walletyttpe' + this.walletType)
                 this.changeShowDisable = false
             }
         },

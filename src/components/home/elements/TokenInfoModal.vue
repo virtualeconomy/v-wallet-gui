@@ -51,11 +51,21 @@
 <script>
 import browser from '../../../utils/browser'
 export default {
-    name: 'TxInfoModal',
+    name: 'TokenInfoModal',
     props: {
         address: {
             type: String,
             default: ''
+        },
+        walletType: {
+            type: String,
+            default: '',
+            require: true
+        },
+        addresses: {
+            type: Object,
+            default: function() {},
+            require: true
         }
     },
     computed: {
@@ -72,6 +82,9 @@ export default {
             return 'the token is belong to yll'
         },
         txTime() {
+            console.log('info' + this.addresses)
+            console.log('tokenId' + this.tokenId)
+            console.log('type' + this.walletType)
             return '2019.1.1'
         }
     },

@@ -100,7 +100,10 @@
                              @updateInfo="updateInfo"></TokenPane>
                 </div>
                 <div class="f-records">
-                  <TokenRecords :address="selectedAddress"></TokenRecords>
+                  <TokenRecords :address="selectedAddress"
+                                :addresses="addresses"
+                                :wallet-type="walletType">
+                  </TokenRecords>
                 </div>
               </b-tab>
               <b-tab active>

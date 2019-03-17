@@ -39,14 +39,19 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
-          <b-dropdown-item @click="showModal">Issue Token</b-dropdown-item>
+          <b-dropdown-item @click="showIssueModal">Issue Token</b-dropdown-item>
           <b-dropdown-item @click="showModal">Burn Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
     </b-row>
     <TokenInfoModal :token-id="tokenId"
-                    :address="address">
+                    :address="address"
+                    :addresses="addresses">
     </TokenInfoModal>
+    <IssueToken :address="address"
+                :wallet-type="walletType"
+                :addresses="addresses">
+    </IssueToken>
   </b-container>
 </template>
 
@@ -60,9 +65,10 @@
 // import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '../../../constants'
 import browser from '../../../utils/browser'
 import TokenInfoModal from './TokenInfoModal'
+import IssueToken from './IssueToken'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal },
+    components: { TokenInfoModal, IssueToken },
     data: function() {
         return {
             differenceHeight: 0,
@@ -89,17 +95,18 @@ export default {
             type: String,
             default: ''
         },
-        coldPubKey: {
-            type: String,
-            default: ''
-        },
-        addressIndex: {
-            type: Number,
-            default: 0
-        },
         isCanceled: {
             type: Boolean,
             default: false
+        },
+        walletType: {
+            type: String,
+            default: 'hot wallet'
+        },
+        addresses: {
+            type: Object,
+            default: function() {},
+            require: true
         }
     },
     computed: {
@@ -122,6 +129,9 @@ export default {
             this.$refs.infoModal.hide()
         },
         hoverIco() {
+            console.log('info' + this.address)
+            console.log('tokenId' + this.tokenId)
+            console.log('type' + this.walletType)
             this.hovered = true
         },
         unhoverIco() {
@@ -132,6 +142,9 @@ export default {
         },
         showModal() {
             this.$root.$emit('bv::show::modal', 'tokenInfoModal')
+        },
+        showIssueModal() {
+            this.$root.$emit('bv::show::modal', 'issueTokenModal')
         }
     }
 }
