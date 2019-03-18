@@ -86,6 +86,35 @@
                     <img
                       class="img-nonactive"
                       src="../assets/imgs/icons/wallet/ic_transaction_line.svg">
+                    <span class="tab-title">Asset</span>
+                  </div>
+                </template>
+                <div class="token-pane">
+                  <TokenPane :balance="balance[selectedAddress]"
+                             :address="selectedAddress"
+                             :wallet-type="walletType"
+                             :balances="balance"
+                             :cold-addresses="coldAddresses"
+                             :total="total"
+                             :addresses="addresses"
+                             @updateInfo="updateInfo"></TokenPane>
+                </div>
+                <div class="f-records">
+                  <TokenRecords :address="selectedAddress"
+                                :addresses="addresses"
+                                :wallet-type="walletType">
+                  </TokenRecords>
+                </div>
+              </b-tab>
+              <b-tab active>
+                <template slot="title">
+                  <div>
+                    <img
+                      class="img-active"
+                      src="../assets/imgs/icons/wallet/ic_transaction_solid.svg">
+                    <img
+                      class="img-nonactive"
+                      src="../assets/imgs/icons/wallet/ic_transaction_line.svg">
                     <span class="tab-title">Transaction</span>
                   </div>
                 </template>
@@ -155,6 +184,9 @@ import seedLib from '@/libs/seed.js'
 import Records from './home/elements/Records'
 import LeasePane from './home/elements/LeasePane'
 import LeaseRecords from './home/elements/LeaseRecords'
+import TokenPane from './home/elements/TokenPane'
+import TokenRecords from './home/elements/TokenRecords'
+import AddToken from './home/modals/AddToken'
 import BigNumber from 'bignumber.js'
 import JSONBigNumber from 'json-bignumber'
 
@@ -383,7 +415,10 @@ export default {
         Asset,
         Records,
         LeaseRecords,
-        LeasePane
+        LeasePane,
+        TokenPane,
+        TokenRecords,
+        AddToken
     }
 }
 </script>
@@ -395,7 +430,7 @@ export default {
     height: 100%;
     min-width: 1000px;
 }
-.trans-pane, .lease-pane {
+.trans-pane, .lease-pane, .token-pane {
     height:@trxDivH;
     width: 100%;
 }
