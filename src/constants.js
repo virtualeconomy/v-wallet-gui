@@ -39,7 +39,7 @@ export const DEFAULT_BASIC_CONFIG = {
     timeDiff: 0
 };
 
-export const NODE_IP = 'http://test.v.systems:9922'
+export const NODE_IP = '/api'
 export const ADDRESS_LENGTH = 35;
 
 export const VSYS_PRECISION = 1e8
