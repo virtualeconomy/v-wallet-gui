@@ -11,13 +11,13 @@
       <b-col class="record-detail"
              cols="auto">
         <b-row>
-          <b-col class="title">{{ txTitle }}</b-col>
+          <b-col class="title">{{ tokenId }}</b-col>
         </b-row>
       </b-col>
       <b-col class="record-blank"></b-col>
       <b-col cols="auto">
         <div>
-          <span>{{ formatter(txAmount) }} VSYS</span>
+          <span>{{ formatter(txAmount) }} </span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -117,12 +117,12 @@ export default {
                 return addrChars.join('')
             }
         },
-        txTitle() {
-            return this.address
-        },
         txAmount() {
             return 100
-        }
+        },
+        tokenId() {
+            return this.address
+        },
     },
     methods: {
         closeModal() {

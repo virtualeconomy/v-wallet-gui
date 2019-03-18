@@ -4,7 +4,8 @@
     <div class="title-records">
       <span>Leasing Records</span>
       <div class="show-fee"
-           @click="showFee"><span class="show-position"> ShowTxFee </span>
+           @click="showFee">
+        <span class="show-position"> ShowTxFee </span>
         <input class="show-fee2"
                type="checkbox"
                v-model="feeFlag"
@@ -36,7 +37,8 @@
       </b-dropdown>
     </div>
     <div class="inherit-height">
-      <div class="scroll">
+      <div class="scroll"
+           :style="{height: myHeight}">
         <div v-for="record in leaseRecords"
              :key="record.id">
           <Record :tx-record="record"
@@ -307,7 +309,7 @@ export default {
 }
 .show-fee {
     position: absolute;
-    right:240px;
+    right:250px;
     width: 116px;
     height: 36px;
     border-color: #E8E9ED;
