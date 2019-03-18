@@ -660,6 +660,9 @@ export default {
                 if (jsonObj.hasOwnProperty('amount')) {
                     this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
                 }
+                if (jsonObj.hasOwnProperty('invoice')) {
+                    this.attachment = jsonObj.invoice
+                }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
                     this.qrErrMsg = 'Invalid QR code protocol.'
@@ -692,6 +695,9 @@ export default {
                 var opc = jsonObj.opc
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
+                if (jsonObj.hasOwnProperty('invoice')) {
+                    this.coldAttachment = jsonObj.invoice
+                }
                 if (jsonObj.hasOwnProperty('amount')) {
                     this.coldAmount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
                 }
