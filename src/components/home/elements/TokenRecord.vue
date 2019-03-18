@@ -122,7 +122,7 @@ export default {
         },
         tokenId() {
             return this.address
-        },
+        }
     },
     methods: {
         closeModal() {
