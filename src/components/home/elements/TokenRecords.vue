@@ -35,9 +35,7 @@
 
 <script>
 
-// import {NODE_IP, LEASE_TX, CANCEL_LEASE_TX} from '../../../constants'
 import Vue from 'vue'
-// import Record from './Record'
 import browser from '../../../utils/browser'
 import TokenRecord from './TokenRecord'
 import AddToken from '../modals/AddToken'
@@ -109,15 +107,9 @@ export default {
         },
         gettokenRecords() {
             if (this.address) {
-                //   const addr = this.address
                 this.changeShowDisable = true
-                //   const recordLimit = this.showingNum
-                // const value = JSON.parse(window.localStorage.getItem(this.address)).tokenI
                 let arr = [1]
                 this.tokenRecords = arr
-                console.log('record' + this.tokenRecords)
-                console.log('height' + this.tokenRecords.length)
-                console.log('walletyttpe' + this.walletType)
                 this.changeShowDisable = false
             }
         },

@@ -35,9 +35,6 @@
 </template>
 
 <script>
-// import { API_VERSION, PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION } from '@/constants.js'
-// import { NODE_IP, VSYS_PRECISION } from '@/constants.js'
-// import BigNumber from 'bignumber.js'
 import Vue from 'vue'
 export default {
     name: 'AddToken',
@@ -76,25 +73,13 @@ export default {
             window.localStorage.setItem(this.address, JSON.stringify(this.userInfo))
         },
         okModal() {
-            // this.$refs.addTokenModal.hide()
             if (this.isValidToken(this.tokenId)) {
-                // let balance = this.balance
                 this.setUsrLocalStorage(this.tokenId, JSON.stringify(this.tokenId))
-                console.log('lalala' + this.tokenId)
-                // console.log('cash' + JSON.parse(this.balance))
-                // console.log('balabala' + JSON.parse(window.localStorage.getItem(this.tokenId)))
             }
             this.balance = 0
             this.tokenId = ''
             this.$refs.addTokenModal.hide()
         },
-
-        // isAmountValid(amount) {
-        //    if (Number(amount) === 0) {
-        //        return void 0
-        //    }
-        //    return !isNaN(amount) && !this.isWrongFormat(amount) && !(/[eE]/.test(amount.toString()))
-        // },
         isValidToken: function(tokenId) {
             if (!tokenId) {
                 return void 0
@@ -104,23 +89,6 @@ export default {
             if (tokenId === '1') {
                 isValid = false
             }
-            /*
-            else {
-                const url = NODE_IP + '/addresses/balance/details/' + tokenId
-                let value = 0
-                this.$http.get(url).then(response => {
-                    value = response.body['available'] / VSYS_PRECISION
-                }, response => {
-                    value = -1
-                    this.errFlag = true
-                })
-                if (this.errFlag) {
-                } else {
-                    this.balance = value
-
-                }
-            }
-            */
             return isValid
         }
     }

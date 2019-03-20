@@ -82,9 +82,6 @@ export default {
             return 'the token is belong to yll'
         },
         txTime() {
-            console.log('info' + this.addresses)
-            console.log('tokenId' + this.tokenId)
-            console.log('type' + this.walletType)
             return '2019.1.1'
         }
     },

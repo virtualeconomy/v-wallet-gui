@@ -455,7 +455,6 @@ export default {
     },
     computed: {
         defaultAddress() {
-            console.log('wtf', this.walletType)
             return Vue.ls.get('address')
         },
         defaultColdAddress() {

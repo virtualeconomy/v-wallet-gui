@@ -56,13 +56,6 @@
 </template>
 
 <script>
-// import TxInfoModal from './TxInfoModal'
-// import base58 from '@/libs/base58'
-// import converters from '@/libs/converters'
-// import { VSYS_PRECISION } from '@/constants'
-// import crypto from '@/utils/crypto'
-// import CancelLease from '../modals/CancelLease'
-// import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '../../../constants'
 import browser from '../../../utils/browser'
 import TokenInfoModal from './TokenInfoModal'
 import IssueToken from './IssueToken'
@@ -129,9 +122,6 @@ export default {
             this.$refs.infoModal.hide()
         },
         hoverIco() {
-            console.log('info' + this.address)
-            console.log('tokenId' + this.tokenId)
-            console.log('type' + this.walletType)
             this.hovered = true
         },
         unhoverIco() {
