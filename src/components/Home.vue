@@ -4,7 +4,7 @@
     <nav-bar :addresses="addresses"
              :address="selectedAddress"
              class="navibar"
-             :cold-addresses="coldAddresses"
+             :cold-addresses="coldAddressesShow"
              :username="username"
              :avt-hash="avtHash"
              :get-pub-key="getPubKey"
@@ -167,6 +167,7 @@ export default {
             sessionClearTimeout: void 0,
             addresses: {},
             coldAddresses: {},
+            coldAddressesShow: {},
             sortedAddresses: {},
             walletType: '',
             sortFlag: 0,
@@ -201,6 +202,14 @@ export default {
             }
             for (const addr in this.coldAddresses) {
                 this.getBalance(addr)
+            }
+            for (var i in this.coldAddresses) {
+                if (!this.coldAddresses[i].hasOwnProperty('api')) {
+                    let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': i, 'api': 1, 'publicKey': this.coldAddresses[i]}
+                    Vue.set(this.coldAddresses, i, JSON.parse(JSON.stringify(tempObj)))
+                    this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
+                }
+                Vue.set(this.coldAddressesShow, i, this.coldAddresses[i].publicKey)
             }
             this.getBalance(this.selectedAddress)
         }
@@ -247,7 +256,9 @@ export default {
         },
         coldPubKey() {
             if (this.walletType === 'coldWallet') {
-                return this.coldAddresses[this.selectedAddress]
+                if (this.coldAddresses[this.selectedAddress]) {
+                    return this.coldAddresses[this.selectedAddress].publicKey
+                }
             }
         }
     },
@@ -302,8 +313,8 @@ export default {
                 this.$router.push('/warning')
             })
         },
-        importCold(coldAddress, pubKey) {
-            Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : pubKey)
+        importCold(coldAddress, pubKey, jsonObj) {
+            Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : jsonObj)
             let unsortedColdAddresses = this.coldAddresses
             let sortedColdAddresses = {}
             Object.keys(unsortedColdAddresses).sort().forEach(function(key) {

@@ -128,6 +128,7 @@
                  :wallet-type="walletType"
                  :address="txAddress"
                  :amount="txAmount"
+                 :from-address="address"
                  :fee="txFee"
                  :cold-pub-key="coldPubKey"
                  :tx-timestamp="txRecord.timestamp"

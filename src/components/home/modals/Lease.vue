@@ -233,13 +233,13 @@ export default {
                 protocol: PROTOCOL,
                 opc: OPC_TRANSACTION,
                 transactionType: LEASE_TX,
-                senderPublicKey: this.coldAddresses[this.coldAddress],
+                senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
                 amount: BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).toFixed(0),
                 fee: this.fee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
                 recipient: this.coldRecipient,
                 timestamp: Date.now(),
-                api: API_VERSION
+                api: this.coldApi()
             }
         },
         noColdAddress() {
@@ -255,6 +255,13 @@ export default {
     methods: {
         inputAmount(num) {
             return BigNumber(num)
+        },
+        coldApi: function() {
+            if (this.coldAddresses[this.coldAddress].api === 1 && this.coldAmount <= 90000000) {
+                return 1
+            } else {
+                return API_VERSION
+            }
         },
         closeModal() {
             this.$refs.leaseModal.hide()
@@ -313,7 +320,7 @@ export default {
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), LEASE_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress], LEASE_TX)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress].publicKey, LEASE_TX)
             }
             const url = NODE_IP + '/leasing/broadcast/lease'
             apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.

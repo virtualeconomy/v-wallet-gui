@@ -104,6 +104,11 @@ export default {
             default: '',
             require: true
         },
+        fromAddress: {
+            type: String,
+            default: '',
+            require: true
+        },
         amount: {
             type: BigNumber,
             default: function() {
@@ -161,7 +166,7 @@ export default {
                 feeScale: FEE_SCALE,
                 txId: this.modalId,
                 timestamp: Date.now(),
-                api: API_VERSION
+                api: this.coldApi()
             }
         },
         userInfo() {
@@ -182,6 +187,15 @@ export default {
             this.sendError = false
             this.coldSignature = ''
             this.hasConfirmed = false
+        },
+        coldApi: function() {
+            let a = JSON.parse(window.localStorage.getItem(this.defaultAddress)).coldAddresses
+            let tempApi = JSON.parse(a)[this.fromAddress]['api']
+            if (tempApi === 1 && this.amount <= 90000000) {
+                return 1
+            } else {
+                return API_VERSION
+            }
         },
         closeModal() {
             this.$refs.cancelLeaseModal.hide()
