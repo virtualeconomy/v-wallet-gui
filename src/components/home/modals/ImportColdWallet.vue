@@ -101,6 +101,7 @@ export default {
     },
     data: function() {
         return {
+            jsonObj: '',
             qrInit: false,
             paused: false,
             coldAddress: '',
@@ -151,7 +152,7 @@ export default {
             if (this.qrInit || !this.coldAddress || !this.isValidAddress || !this.coldPubKey || !this.isValidPubKey) {
                 evt.preventDefault()
             } else {
-                this.$emit('import-cold', this.coldAddress, this.coldPubKey)
+                this.$emit('import-cold', this.coldAddress, this.coldPubKey, this.jsonObj)
                 this.closeModal()
             }
         },
@@ -185,19 +186,19 @@ export default {
         onDecode: function(decodeString) {
             this.paused = true
             try {
-                var jsonObj = JSON.parse(decodeString)
-                this.coldAddress = jsonObj.address
-                this.coldPubKey = jsonObj.publicKey
-                this.opc = jsonObj.opc
-                this.api = jsonObj.api
-                this.protocol = jsonObj.protocol
+                this.jsonObj = JSON.parse(decodeString)
+                this.coldAddress = this.jsonObj.address
+                this.coldPubKey = this.jsonObj.publicKey
+                this.opc = this.jsonObj.opc
+                this.api = this.jsonObj.api
+                this.protocol = this.jsonObj.protocol
             } catch (e) {
                 this.paused = false
             }
             if (!this.isValidAddress) {
                 this.coldAddress = 'please scan QR code of cold wallet address'
                 this.paused = false
-            } else if (this.api !== API_VERSION || this.protocol !== PROTOCOL || this.opc !== OPC_ACCOUNT) {
+            } else if (this.api > API_VERSION || this.protocol !== PROTOCOL || this.opc !== OPC_ACCOUNT) {
                 this.coldAddress = 'invalid QR code'
                 this.paused = false
             } else if (!this.isValidPubKey) {
