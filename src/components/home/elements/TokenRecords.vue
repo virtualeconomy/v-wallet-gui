@@ -12,8 +12,7 @@
           <TokenRecord :address="address"
                        :token-id="tokenId"
                        :addresses="addresses"
-                       :wallet-type="walletType"
-                       @endCancelSignal="endCancelSignal"></TokenRecord>
+                       :wallet-type="walletType"></TokenRecord>
         </div>
       </div>
     </div>

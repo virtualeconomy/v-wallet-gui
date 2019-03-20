@@ -4,7 +4,7 @@
     <b-row align-v="center">
       <b-col class="record-icon"
              cols="auto">
-        <img src="../../../assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
+        <img src="../../../assets/imgs/icons/wallet/ic_token2.svg"
              width="32px"
              height="32px">
       </b-col>
@@ -138,7 +138,7 @@ export default {
             this.hovered = false
         },
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         },
         showModal() {
             this.$root.$emit('bv::show::modal', 'tokenInfoModal')

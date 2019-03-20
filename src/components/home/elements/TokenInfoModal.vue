@@ -93,7 +93,7 @@ export default {
             this.$refs.tokenInfoModal.hide()
         },
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }

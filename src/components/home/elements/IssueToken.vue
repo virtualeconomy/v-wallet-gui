@@ -695,7 +695,7 @@ export default {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }

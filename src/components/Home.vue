@@ -82,10 +82,10 @@
                   <div>
                     <img
                       class="img-active"
-                      src="../assets/imgs/icons/wallet/ic_transaction_solid.svg">
+                      src="../assets/imgs/icons/wallet/ic_polygon_solid.svg">
                     <img
                       class="img-nonactive"
-                      src="../assets/imgs/icons/wallet/ic_transaction_line.svg">
+                      src="../assets/imgs/icons/wallet/ic_polygon_line.svg">
                     <span class="tab-title">Asset</span>
                   </div>
                 </template>
@@ -96,8 +96,7 @@
                              :balances="balance"
                              :cold-addresses="coldAddresses"
                              :total="total"
-                             :addresses="addresses"
-                             @updateInfo="updateInfo"></TokenPane>
+                             :addresses="addresses"></TokenPane>
                 </div>
                 <div class="f-records">
                   <TokenRecords :address="selectedAddress"

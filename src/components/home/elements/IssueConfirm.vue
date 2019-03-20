@@ -78,7 +78,7 @@ export default {
     },
     methods: {
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }

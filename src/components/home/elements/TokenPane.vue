@@ -29,13 +29,13 @@
                 v-b-modal.addTokenModal>
         <img v-if="!isMobile"
              class="icon-btn"
-             src="../../../assets/imgs/icons/wallet/ic_receive.svg"><b>Add Token</b></b-button>
+             src="../../../assets/imgs/icons/wallet/ic_add.svg"><b>Add Token</b></b-button>
       <b-button variant="dark"
                 class="btn-receive"
                 v-b-modal.addTokenModal>
         <img v-if="!isMobile"
              class="icon-btn"
-             src="../../../assets/imgs/icons/wallet/ic_send.svg"><b>New Token</b></b-button>
+             src="../../../assets/imgs/icons/wallet/ic_new_token.svg"><b>New Token</b></b-button>
     </div>
     <AddToken show="false"
               :address="address"></AddToken>
@@ -45,6 +45,7 @@
 <script>
 import AddToken from '../modals/AddToken'
 import browser from '../../../utils/browser'
+import BigNumber from 'bignumber.js'
 export default {
     name: 'TokenPane',
     components: {
@@ -60,8 +61,10 @@ export default {
     },
     props: {
         balance: {
-            type: Number,
-            default: 0,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
             require: true
         },
         address: {
@@ -84,8 +87,10 @@ export default {
             require: true
         },
         total: {
-            type: Number,
-            default: 0,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
             require: true
         },
         walletType: {
@@ -96,10 +101,7 @@ export default {
     },
     methods: {
         formatter(num) {
-            return browser.numberFormatter(num)
-        },
-        endSendSignal() {
-            this.$emit('updateInfo')
+            return browser.bigNumberFormatter(num)
         }
     }
 }
