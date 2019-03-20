@@ -32,24 +32,32 @@
              src="../../../assets/imgs/icons/wallet/ic_add.svg"><b>Add Token</b></b-button>
       <b-button variant="dark"
                 class="btn-receive"
-                v-b-modal.addTokenModal>
+                v-b-modal.newTokenModal>
         <img v-if="!isMobile"
              class="icon-btn"
              src="../../../assets/imgs/icons/wallet/ic_new_token.svg"><b>New Token</b></b-button>
     </div>
     <AddToken show="false"
               :address="address"></AddToken>
+    <NewToken show="false"
+              :balances="balances"
+              :cold-addresses="coldAddresses"
+              :addresses="addresses"
+              :selected-address="address"
+              :selected-wallet-type="walletType"
+              @endLeaseSignal="endLeaseSignal"></NewToken>
   </div>
 </template>
 
 <script>
 import AddToken from '../modals/AddToken'
+import NewToken from '../modals/NewToken'
 import browser from '../../../utils/browser'
 import BigNumber from 'bignumber.js'
 export default {
     name: 'TokenPane',
     components: {
-        AddToken
+        AddToken, NewToken
     },
     data() {
         return {
@@ -102,6 +110,9 @@ export default {
     methods: {
         formatter(num) {
             return browser.bigNumberFormatter(num)
+        },
+        endLeaseSignal() {
+            this.$emit('updateInfo')
         }
     }
 }
