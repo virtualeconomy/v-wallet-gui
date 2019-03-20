@@ -487,10 +487,10 @@ export default {
         dataObject() {
             return {
                 protocol: PROTOCOL,
-                api: API_VERSION,
+                api: this.coldApi(),
                 opc: OPC_TRANSACTION,
                 transactionType: PAYMENT_TX,
-                senderPublicKey: this.coldAddresses[this.coldAddress],
+                senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
                 amount: BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).toFixed(0),
                 fee: this.coldFee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
@@ -516,6 +516,13 @@ export default {
         inputAmount(num) {
             return BigNumber(num)
         },
+        coldApi: function() {
+            if (this.coldAddresses[this.coldAddress].api === 1 && this.coldAmount <= 90000000) {
+                return 1
+            } else {
+                return API_VERSION
+            }
+        },
         sendData: function(walletType) {
             var apiSchema
             if (walletType === 'hotWallet') {
@@ -533,12 +540,10 @@ export default {
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress], PAYMENT_TX)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress].publicKey, PAYMENT_TX)
             }
             const url = NODE_IP + '/vsys/broadcast/payment'
-            console.log('api0', JSON.stringify(apiSchema))
             apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') //  The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
-            console.log('api1', JSON.stringify(apiSchema))
             this.$http.post(url, apiSchema).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
