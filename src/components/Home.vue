@@ -101,6 +101,7 @@
                 <div class="f-records">
                   <TokenRecords :address="selectedAddress"
                                 :addresses="addresses"
+                                :cold-addresses="coldAddresses"
                                 :wallet-type="walletType">
                   </TokenRecords>
                 </div>

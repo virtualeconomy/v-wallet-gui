@@ -1,12 +1,11 @@
 <template>
   <div>
-    <img src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
     <div class="infos">
       <b-form-group horizontal
                     class="form-line"
-                    label="Amount"
-                    label-for="amount_success">
-        <b-form-input id="amount_success"
+                    label="Burn Amount"
+                    label-for="amount_confirm">
+        <b-form-input id="amount_confirm"
                       :value="formatter(amount) + ' VSYS'"
                       class="amount"
                       readonly
@@ -14,10 +13,21 @@
         </b-form-input>
       </b-form-group>
       <b-form-group horizontal
+                    label="Type"
+                    class="form-line"
+                    label-for="tranType">
+        <b-form-input id="tranType"
+                      :value="txType"
+                      class="des"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group horizontal
                     class="form-line"
                     label="From"
-                    label-for="walletAddress_success">
-        <b-form-input id="walletAddress_success"
+                    label-for="walletAddress_confirm">
+        <b-form-input id="walletAddress_confirm"
                       v-model="address"
                       class="addr"
                       readonly
@@ -27,8 +37,8 @@
       <b-form-group horizontal
                     class="form-line"
                     label="Fee"
-                    label-for="fee_success">
-        <b-form-input id="fee_success"
+                    label-for="fee_confirm">
+        <b-form-input id="fee_confirm"
                       :value="formatter(fee) + ' VSYS'"
                       class="fee"
                       readonly
@@ -46,18 +56,23 @@ export default {
     props: {
         address: {
             type: String,
-            required: true,
+            require: true,
             default: ''
         },
         amount: {
             type: Number,
-            required: true,
+            require: true,
             default: 0
         },
         fee: {
             type: Number,
-            required: true,
+            require: true,
             default: 1
+        },
+        txType: {
+            type: String,
+            require: true,
+            default: ''
         }
     },
     methods: {
@@ -73,10 +88,15 @@ export default {
     margin-bottom: 0px;
     border-top: 1px solid #E8E9ED;
     height: 48px;
-    text-align: right;
+    text-align: center;
     padding-top: 5px;
 }
+.box {
+
+    overflow-x: visible;
+}
 .infos {
+    width: 418px;
     margin-top: 30px;
     border-bottom: 1px solid #E8E9ED;
     margin-bottom: 40px;

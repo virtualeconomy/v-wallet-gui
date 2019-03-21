@@ -1,6 +1,7 @@
 <template>
   <div>
-    <img src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
+    <img class="success-icon"
+         src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
     <div class="infos">
       <b-form-group horizontal
                     class="form-line"
@@ -111,5 +112,8 @@ export default {
     color: #181B3A;
     letter-spacing: 0;
     text-align: right;
+}
+.success-icon {
+     margin-left: 170px;
 }
 </style>

@@ -39,8 +39,8 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
-          <b-dropdown-item @click="IssueToken">Issue Token</b-dropdown-item>
-          <b-dropdown-item @click="showModal">Burn Token</b-dropdown-item>
+          <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
+          <b-dropdown-item @click="burnToken">Burn Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
     </b-row>
@@ -50,8 +50,14 @@
     </TokenInfoModal>
     <IssueToken :address="address"
                 :wallet-type="walletType"
-                :addresses="addresses">
+                :addresses="addresses"
+                :cold-addresses="coldAddresses">
     </IssueToken>
+    <BurnToken :address="address"
+               :wallet-type="walletType"
+               :addresses="addresses"
+               :cold-addresses="coldAddresses">
+    </BurnToken>
   </b-container>
 </template>
 
@@ -59,9 +65,11 @@
 import browser from '../../../utils/browser'
 import TokenInfoModal from './TokenInfoModal'
 import IssueToken from './IssueToken'
+import BigNumber from 'bignumber.js'
+import BurnToken from './BurnToken'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, IssueToken },
+    components: { TokenInfoModal, IssueToken, BurnToken },
     data: function() {
         return {
             differenceHeight: 0,
@@ -72,33 +80,47 @@ export default {
         }
     },
     props: {
-        txRecord: {
-            type: Object,
+        balance: {
+            type: BigNumber,
             default: function() {
-                return {
-                    txType: '',
-                    txAddress: '',
-                    txTime: '',
-                    txAmount: 0,
-                    txAttachment: ''
-                }
-            }
+                return BigNumber(0)
+            },
+            require: true
         },
         address: {
             type: String,
             default: ''
         },
-        isCanceled: {
-            type: Boolean,
-            default: false
-        },
-        walletType: {
-            type: String,
-            default: 'hotWallet'
+        coldAddresses: {
+            type: Object,
+            default: function() {},
+            require: true
         },
         addresses: {
             type: Object,
             default: function() {},
+            require: true
+        },
+        balances: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        total: {
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
+            require: true
+        },
+        walletType: {
+            type: String,
+            default: '',
+            require: true
+        },
+        selectedAddress: {
+            type: String,
+            default: this ? this.defaultAddress : undefined,
             require: true
         }
     },
@@ -133,8 +155,11 @@ export default {
         showModal() {
             this.$root.$emit('bv::show::modal', 'tokenInfoModal')
         },
-        IssueToken() {
+        issueToken() {
             this.$root.$emit('bv::show::modal', 'issueTokenModal')
+        },
+        burnToken() {
+            this.$root.$emit('bv::show::modal', 'burnTokenModal')
         }
     }
 }

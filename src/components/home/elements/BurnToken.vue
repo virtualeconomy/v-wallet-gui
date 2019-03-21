@@ -1,11 +1,11 @@
 <template>
-  <b-modal id="issueTokenModal"
+  <b-modal id="burnTokenModal"
            centered
            lazy
-           title="IssueToken"
+           title="burnToken"
            hide-footer
            hide-header
-           ref="issueTokenModal"
+           ref="burnTokenModal"
            :busy="true"
            @hidden="resetPage">
     <button
@@ -59,11 +59,11 @@
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
-          <TokenConfirm :address="address"
-                        :amount=inputAmount(amount)
-                        :fee="fee"
-                        tx-type="Issue Token">
-          </TokenConfirm>
+          <BurnConfirm :address="address"
+                       :amount=inputAmount(amount)
+                       :fee="fee"
+                       tx-type="Issue Token">
+          </BurnConfirm>
           <p
             v-show="sendError"
             class="text-danger"><small>Sorry, transaction send failed!</small></p>
@@ -89,10 +89,10 @@
           </b-row>
         </b-container>
         <b-container v-if="pageId===3">
-          <TokenSuccess :address="address"
-                        :amount=inputAmount(amount)
-                        :fee="fee">
-          </TokenSuccess>
+          <BurnSuccess :address="address"
+                       :amount=inputAmount(amount)
+                       :fee="fee">
+          </BurnSuccess>
           <b-button variant="warning"
                     block
                     size="lg"
@@ -144,11 +144,11 @@
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
-          <TokenConfirm :address="coldAddress"
-                        :amount=inputAmount(coldAmount)
-                        :fee="coldFee"
-                        tx-type="Issue Token">
-          </TokenConfirm>
+          <BurnConfirm :address="coldAddress"
+                       :amount=inputAmount(coldAmount)
+                       :fee="coldFee"
+                       tx-type="Issue Token">
+          </BurnConfirm>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -179,11 +179,11 @@
                          @prev-page="coldPrevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
-          <TokenConfirm :address="coldAddress"
-                        :amount=inputAmount(coldAmount)
-                        :fee="coldFee"
-                        tx-type="Issue Token">
-          </TokenConfirm>
+          <BurnConfirm :address="coldAddress"
+                       :amount=inputAmount(coldAmount)
+                       :fee="coldFee"
+                       tx-type="Issue Token">
+          </BurnConfirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-row>
             <b-col class="col-lef">
@@ -207,10 +207,10 @@
           </b-row>
         </b-container>
         <b-container v-show="coldPageId===5">
-          <TokenSuccess :address="coldAddress"
-                        :amount=inputAmount(coldAmount)
-                        :fee="coldFee">
-          </TokenSuccess>
+          <BurnSuccess :address="coldAddress"
+                       :amount=inputAmount(coldAmount)
+                       :fee="coldFee">
+          </BurnSuccess>
           <b-button variant="warning"
                     block
                     size="lg"
@@ -227,32 +227,16 @@
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
-import TokenConfirm from '../modals/TokenConfirm'
-import TokenSuccess from '../modals/TokenSuccess'
+import BurnConfirm from './BurnConfirm'
+import BurnSuccess from './BurnSuccess'
 // import crypto from '@/utils/crypto'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '../../../utils/browser'
 // import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
-/*  var initData = {
-    amount: BigNumber(0),
-    attachment: '',
-    pageId: 0,
-    fee: BigNumber(TX_FEE),
-    coldAmount: BigNumber(0),
-    coldPageId: 0,
-    coldFee: BigNumber(TX_FEE),
-    address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
-    coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
-    scanShow: false,
-    sendError: false,
-    coldSignature: '',
-    timeStamp: (Date.now() - 1) * 1e6,
-    hasConfirmed: false
-} */
 export default {
-    name: 'IssueToken',
-    components: {ColdSignature, TokenSuccess, TokenConfirm},
+    name: 'BurnToken',
+    components: {ColdSignature, BurnSuccess, BurnConfirm},
     data: function() {
         return {
             amount: BigNumber(0),
@@ -415,7 +399,7 @@ export default {
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         endSend: function() {
-            this.$refs.issueTokenModal.hide()
+            this.$refs.burnTokenModal.hide()
         },
         scanChange: function(evt) {
             if (!this.qrInit) {
