@@ -43,6 +43,7 @@ export const NODE_IP = '/api'
 export const ADDRESS_LENGTH = 35;
 
 export const VSYS_PRECISION = 1e8
+export const TOKEN_FEE = 100
 export const TX_FEE = 0.1
 export const FEE_SCALE = 100
 export const PROTOCOL = 'v.systems'
