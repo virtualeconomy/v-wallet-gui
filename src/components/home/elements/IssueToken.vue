@@ -2,7 +2,7 @@
   <b-modal id="issueTokenModal"
            centered
            lazy
-           title="issToken"
+           title="IssueToken"
            hide-footer
            hide-header
            ref="issueTokenModal"
@@ -15,7 +15,6 @@
     </button>
     <b-tabs @input="hideQrScan">
       <b-tab title="Hot Wallet"
-             :disabled="!pageId"
              :active="walletType==='hotWallet'">
         <b-container
           class="text-left"
@@ -37,33 +36,16 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">{{ formatter(balances[address]) }} VSYS</span>
+              <span class="balance">Token Balance</span>
             </b-btn>
           </b-form-group>
-          <b-form-group label="Amount"
+          <b-form-group label="Issue Amount"
                         label-for="amount-input">
             <b-form-input id="amount-input"
                           class="amount-input"
-                          v-model="amount"
-                          aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('hot')"
-                          onfocus="this.select()">
+                          v-model="amount">
             </b-form-input>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="isWrongFormat(amount)">
-              The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isInsufficient(amount, 'hot')">
-              Insufficient funds
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
-              Negative number is not allowed.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else>
-              Invalid Input.
+            <b-form-invalid-feedback id="inputLiveFeedback" >Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
@@ -73,16 +55,15 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled"
-                    @click="nextPage(); addHotRecipientList(); checkHot()">Continue
+                    @click="nextPage">Continue
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
-          <Confirm :address="address"
-                   :recipient="recipient"
-                   :amount="Number(amount)"
-                   :fee="fee">
-          </Confirm>
+          <TokenConfirm :address="address"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
+                        tx-type="'Payment'">
+          </TokenConfirm>
           <p
             v-show="sendError"
             class="text-danger"><small>Sorry, transaction send failed!</small></p>
@@ -109,10 +90,10 @@
           </b-row>
         </b-container>
         <b-container v-if="pageId===3">
-          <Success :address="address"
-                   :amount="Number(amount)"
-                   :fee="fee">
-          </Success>
+          <TokenSuccess :address="address"
+                        :amount=inputAmount(amount)
+                        :fee="fee">
+          </TokenSuccess>
           <b-button variant="warning"
                     block
                     size="lg"
@@ -121,7 +102,7 @@
         </b-container>
       </b-tab>
       <b-tab title="Cold Wallet"
-             :disabled="noColdAddress || (qrInit && !coldPageId)"
+             :disabled="!coldPageId"
              :active="walletType==='coldWallet'">
         <b-container v-if="coldPageId===1"
                      class="text-left">
@@ -144,46 +125,6 @@
               </span>
               <span class="balance">{{ formatter(balances[coldAddress]) }} VSYS</span>
             </b-btn>
-          </b-form-group>
-          <b-form-group label="Recipient"
-                        label-for="cold-recipient-input">
-            <b-form-input id="cold-recipient-input"
-                          class="recipient-input"
-                          type="text"
-                          v-model="coldRecipient"
-                          :state="isValidRecipient(coldRecipient)"
-                          list="showColdRecipientList"
-                          aria-describedby="inputLiveFeedback"
-                          placeholder="Paste or scan an address.">
-            </b-form-input>
-            <datalist id="showColdRecipientList">
-              <option v-for="addr in coldRecipientAddressList.keys()"
-                      :key="addr">{{ addr }}</option>
-            </datalist>
-            <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
-                 v-b-tooltip.hover
-                 class="qr-code"
-                 title="scan qr-code"
-                 @click="scanChange">
-            <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid recipient address (if using QR code scanner, make sure QR code is correct).
-            </b-form-invalid-feedback>
-            <div v-if="scanShow">
-              <div class="qr-info">Please confirm your browser's camera is available.</div>
-              <div class="qr-window">
-                <qrcode-reader @init="onInit"
-                               @decode="onColdDecode"
-                               :track="repaintLocation"
-                               :paused="paused">
-                  <img v-if="qrInit"
-                       class="qrcode-waiting center"
-                       height="70"
-                       width="70"
-                       src="../../../assets/imgs/icons/wallet/ic_wait.svg">
-                </qrcode-reader>
-              </div>
-              <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
-            </div>
           </b-form-group>
           <b-form-group label="Amount"
                         label-for="cold-amount-input">
@@ -211,15 +152,6 @@
               Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group label="Description"
-                        label-for="coldDescriptionInput">
-            <b-form-textarea id="coldDescriptionInput"
-                             v-model="coldAttachment"
-                             :rows="3"
-                             :no-resize="true"
-                             :state="isValidColdAttachment">
-            </b-form-textarea>
-          </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(coldFee) }} VSYS</label>
           </b-form-group>
@@ -228,15 +160,13 @@
                     block
                     size="lg"
                     :disabled="isColdSubmitDisabled"
-                    @click="coldNextPage(); addColdRecipientList(); checkCold()">Continue
+                    @click="coldNextPage(); addColdRecipientList()">Continue
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
           <Confirm :address="coldAddress"
-                   :recipient="coldRecipient"
-                   :amount="Number(coldAmount)"
+                   :amount=inputAmount(coldAmount)
                    :fee="coldFee"
-                   :attachment="coldAttachment"
                    :tx-type="'payment'">
           </Confirm>
           <b-row>
@@ -270,10 +200,8 @@
         </b-container>
         <b-container v-show="coldPageId===4">
           <Confirm :address="coldAddress"
-                   :recipient="coldRecipient"
-                   :amount="Number(coldAmount)"
+                   :amount=inputAmount(coldAmount)
                    :fee="coldFee"
-                   :attachment="coldAttachment"
                    :tx-type="'Payment'">
           </Confirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
@@ -300,10 +228,8 @@
         </b-container>
         <b-container v-show="coldPageId===5">
           <Success :address="coldAddress"
-                   :recipient="coldRecipient"
-                   :amount="Number(coldAmount)"
-                   :fee="coldFee"
-                   :attachment="coldAttachment">
+                   :amount=inputAmount(coldAmount)
+                   :fee="coldFee">
           </Success>
           <b-button variant="warning"
                     block
@@ -321,37 +247,63 @@ import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { NODE_IP, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
-import IssueConfirm from '../elements/IssueConfirm'
-import IssueSuccess from '../elements/IssueSuccess'
+import TokenConfirm from '../modals/TokenConfirm'
+import TokenSuccess from '../modals/TokenSuccess'
 // import crypto from '@/utils/crypto'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '../../../utils/browser'
-import LRUCache from 'lru-cache'
+// import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
-var initData = {
-    amount: 0,
-    pageId: 1,
-    fee: TX_FEE,
-    coldPageId: 1,
-    coldFee: TX_FEE,
+/*  var initData = {
+    amount: BigNumber(0),
+    attachment: '',
+    pageId: 0,
+    fee: BigNumber(TX_FEE),
+    coldAmount: BigNumber(0),
+    coldPageId: 0,
+    coldFee: BigNumber(TX_FEE),
     address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
     coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
     scanShow: false,
-    qrInit: false,
-    qrErrMsg: void 0,
-    paused: false,
     sendError: false,
     coldSignature: '',
     timeStamp: (Date.now() - 1) * 1e6,
-    hasConfirmed: false,
-    coldRecipientAddressList: {},
-    hotRecipientAddressList: {}
-}
+    hasConfirmed: false
+} */
 export default {
-    name: 'Send',
-    components: {ColdSignature, IssueSuccess, IssueConfirm},
+    name: 'IssueToken',
+    components: {ColdSignature, TokenSuccess, TokenConfirm},
+    data: function() {
+        return {
+            amount: BigNumber(0),
+            attachment: '',
+            pageId: 1,
+            fee: BigNumber(TX_FEE),
+            coldAmount: BigNumber(0),
+            coldPageId: 0,
+            coldFee: BigNumber(TX_FEE),
+            address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
+            coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
+            scanShow: false,
+            sendError: false,
+            coldSignature: '',
+            timeStamp: (Date.now() - 1) * 1e6,
+            hasConfirmed: false
+        }
+    },
     props: {
-        tokenIds: {
+        balances: {
+            type: Object,
+            default: function() {
+            },
+            require: true
+        },
+        coldAddresses: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        addresses: {
             type: Object,
             default: function() {},
             require: true
@@ -361,25 +313,10 @@ export default {
             default: 'hotWallet',
             require: true
         },
-        addresses: {
-            type: Object,
-            default: function() {},
+        selectedAddress: {
+            type: String,
+            default: this ? this.defaultAddress : undefined,
             require: true
-        }
-    },
-    data: function() {
-        return initData
-    },
-    created() {
-        this.coldRecipientAddressList = new LRUCache(10)
-        this.hotRecipientAddressList = new LRUCache(10)
-        let item = window.localStorage.getItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ')
-        if (item) {
-            this.coldRecipientAddressList.load(JSON.parse(item))
-        }
-        item = window.localStorage.getItem('Hot ' + this.defaultAddress + ' sendRecipientAddressList ')
-        if (item) {
-            this.hotRecipientAddressList.load(JSON.parse(item))
         }
     },
     computed: {
@@ -404,10 +341,10 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(this.recipient && this.amount > 0 && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
+            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
         },
         isColdSubmitDisabled() {
-            return !(this.coldAddress && this.coldRecipient && this.coldAmount > 0 && this.isValidRecipient(this.coldRecipient) && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold') && this.coldAddress !== '')
+            return !(this.coldAddress && this.coldAmount > 0) && (this.isValidColdAttachment) && this.isAmountValid('cold') && this.coldAddress !== ''
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -415,16 +352,14 @@ export default {
         dataObject() {
             return {
                 protocol: PROTOCOL,
-                api: API_VERSION,
+                api: this.coldApi(),
                 opc: OPC_TRANSACTION,
                 transactionType: PAYMENT_TX,
-                senderPublicKey: this.coldAddresses[this.coldAddress],
-                amount: Number((this.coldAmount * VSYS_PRECISION).toFixed(0)),
+                senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
+                amount: BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).toFixed(0),
                 fee: this.coldFee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
-                recipient: this.coldRecipient,
-                timestamp: Date.now(),
-                attachment: this.coldAttachment
+                timestamp: Date.now()
             }
         },
         isValidAttachment() {
@@ -432,15 +367,19 @@ export default {
                 return void 0
             }
             return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
-        },
-        isValidColdAttachment() {
-            if (!this.coldAttachment) {
-                return void 0
-            }
-            return this.coldAttachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         }
     },
     methods: {
+        inputAmount(num) {
+            return BigNumber(num)
+        },
+        coldApi: function() {
+            if (this.coldAddresses[this.coldAddress].api === 1 && this.coldAmount <= 90000000) {
+                return 1
+            } else {
+                return API_VERSION
+            }
+        },
         sendData: function(walletType) {
             var apiSchema
             if (walletType === 'hotWallet') {
@@ -450,7 +389,7 @@ export default {
                 this.hasConfirmed = true
                 const dataInfo = {
                     recipient: this.recipient,
-                    amount: Number((this.amount * VSYS_PRECISION).toFixed(0)),
+                    amount: BigNumber(this.amount).multipliedBy(VSYS_PRECISION).toFixed(0),
                     fee: TX_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
@@ -458,12 +397,10 @@ export default {
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress], PAYMENT_TX)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress].publicKey, PAYMENT_TX)
             }
             const url = NODE_IP + '/vsys/broadcast/payment'
-            console.log('api0', JSON.stringify(apiSchema))
             apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') //  The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
-            console.log('api1', JSON.stringify(apiSchema))
             this.$http.post(url, apiSchema).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
@@ -476,42 +413,7 @@ export default {
             this.$emit('endSendSignal')
         },
         nextPage: function() {
-            this.sendError = false
-            this.timeStamp = Date.now() * 1e6
-            this.hasConfirmed = false
             this.pageId++
-        },
-        checkCold: function() {
-            let convertAmount = Math.round(Number(this.coldAmount) * VSYS_PRECISION)
-            let bigNumAmount = BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION)
-            let isLongEqual = bigNumAmount.isEqualTo(convertAmount)
-            let convertAmountVSYS = BigNumber(convertAmount).dividedBy(VSYS_PRECISION).toNumber()
-            let isDoubleEqual = BigNumber(this.coldAmount).isEqualTo(convertAmountVSYS)
-            if (!isLongEqual || !isDoubleEqual) {
-                let roundAmount = bigNumAmount.dividedToIntegerBy(100).dividedBy(VSYS_PRECISION / 100)
-                alert('Warning: the amount ' + this.coldAmount + ' is over the precision limit that wallet currently supports. The amount will be rounded to ' + roundAmount.toFixed(8))
-                this.coldAmount = roundAmount.toNumber()
-            }
-        },
-        addColdRecipientList: function() {
-            this.coldRecipientAddressList.set(this.cogldRecipient, '0')
-            window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
-        },
-        checkHot: function() {
-            let convertAmount = Math.round(Number(this.amount) * VSYS_PRECISION)
-            let bigNumAmount = BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
-            let isLongEqual = bigNumAmount.isEqualTo(convertAmount)
-            let convertAmountVSYS = BigNumber(convertAmount).dividedBy(VSYS_PRECISION).toNumber()
-            let isDoubleEqual = BigNumber(this.amount).isEqualTo(convertAmountVSYS)
-            if (!isLongEqual || !isDoubleEqual) {
-                let roundAmount = bigNumAmount.dividedToIntegerBy(100).dividedBy(VSYS_PRECISION / 100)
-                alert('Warning: the amount ' + this.amount + ' is over the precision limit that wallet currently supports. The amount will be rounded to ' + roundAmount.toFixed(8))
-                this.amount = roundAmount.toNumber()
-            }
-        },
-        addHotRecipientList: function() {
-            this.hotRecipientAddressList.set(this.recipient, '0')
-            window.localStorage.setItem('Hot ' + this.defaultAddress + ' sendRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
         },
         coldNextPage: function() {
             this.sendError = false
@@ -534,10 +436,9 @@ export default {
             }
         },
         resetPage: function() {
-            this.amount = 0
-            this.attachment = ''
+            this.amount = BigNumber(0)
             this.pageId = 1
-            this.coldAmount = 0
+            this.coldAmount = BigNumber(0)
             this.coldPageId = 1
             this.coldAddress = ''
             this.scanShow = false
@@ -550,7 +451,7 @@ export default {
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         endSend: function() {
-            this.$refs.sendModal.hide()
+            this.$refs.issueTokenModal.hide()
         },
         scanChange: function(evt) {
             if (!this.qrInit) {
@@ -558,6 +459,28 @@ export default {
             }
             if (this.scanShow) {
                 this.paused = false
+            }
+        },
+        async onInit(promise) {
+            try {
+                this.qrInit = true
+                await promise
+            } catch (error) {
+                if (error.name === 'NotAllowedError') {
+                    throw Error('user denied camera access permission')
+                } else if (error.name === 'NotFoundError') {
+                    throw Error('no suitable camera device installed')
+                } else if (error.name === 'NotSupportedError') {
+                    throw Error('page is not served over HTTPS (or localhost)')
+                } else if (error.name === 'NotReadableError') {
+                    throw Error('maybe camera is already in use')
+                } else if (error.name === 'OverconstarinedError') {
+                    throw Error('pass constraints do not match any camera')
+                } else {
+                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
+                }
+            } finally {
+                this.qrInit = false
             }
         },
         onDecode: function(decodeString) {
@@ -570,6 +493,9 @@ export default {
                 var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
                     this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                }
+                if (jsonObj.hasOwnProperty('invoice')) {
+                    this.attachment = jsonObj.invoice
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
@@ -591,41 +517,6 @@ export default {
                     this.recipient = decodeString
                 } else {
                     this.recipient = 'please scan QR code of recipient'
-                    this.paused = false
-                }
-            }
-        },
-        onColdDecode: function(decodeString) {
-            this.paused = true
-            try {
-                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
-                this.coldRecipient = jsonObj.address
-                var opc = jsonObj.opc
-                var api = jsonObj.api
-                var protocol = jsonObj.protocol
-                if (jsonObj.hasOwnProperty('amount')) {
-                    this.coldAmount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                }
-                if (protocol !== PROTOCOL) {
-                    this.paused = false
-                    this.qrErrMsg = 'Invalid QR code protocol.'
-                } else if (api !== API_VERSION) {
-                    this.paused = false
-                    this.qrErrMsg = 'API version mismatch.'
-                } else if (opc !== OPC_ACCOUNT) {
-                    this.paused = false
-                    this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
-                    this.paused = false
-                    this.qrErrMsg = 'Invalid address of recipient.'
-                } else {
-                    this.qrErrMsg = void 0
-                }
-            } catch (e) {
-                if (this.isValidRecipient(decodeString)) {
-                    this.coldRecipient = decodeString
-                } else {
-                    this.coldRecipient = 'please scan QR code of recipient'
                     this.paused = false
                 }
             }
@@ -666,10 +557,10 @@ export default {
         },
         isAmountValid(type) {
             var amount = type === 'hot' ? this.amount : this.coldAmount
-            if (Number(amount) === 0) {
+            if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !isNaN(amount) && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
         },
         isWrongFormat(amount) {
             if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
@@ -680,10 +571,10 @@ export default {
         },
         isInsufficient(amount, type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return amount > balance - TX_FEE
+            return BigNumber(amount).isGreaterThan(BigNumber(balance).minus(TX_FEE))
         },
         isNegative(amount) {
-            return amount < 0
+            return BigNumber(amount).isLessThan(0)
         },
         options(addrs) {
             return Object.keys(addrs).reduce((options, addr) => {

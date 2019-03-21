@@ -39,7 +39,7 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
-          <b-dropdown-item @click="showIssueModal">Issue Token</b-dropdown-item>
+          <b-dropdown-item @click="IssueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item @click="showModal">Burn Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
@@ -94,7 +94,7 @@ export default {
         },
         walletType: {
             type: String,
-            default: 'hot wallet'
+            default: 'hotWallet'
         },
         addresses: {
             type: Object,
@@ -133,7 +133,7 @@ export default {
         showModal() {
             this.$root.$emit('bv::show::modal', 'tokenInfoModal')
         },
-        showIssueModal() {
+        IssueToken() {
             this.$root.$emit('bv::show::modal', 'issueTokenModal')
         }
     }
