@@ -46,9 +46,16 @@ export default {
     },
     data() {
         return {
+            tokens: {},
             tokenId: '',
             balance: 0,
-            errFlag: false
+            errFlag: false,
+            jsonObj: 'true'
+        }
+    },
+    created() {
+        if (this.userInfo && this.userInfo.tokens) {
+            this.tokens = JSON.parse(this.userInfo.tokens)
         }
     },
     computed: {
@@ -68,13 +75,15 @@ export default {
             this.tokenId = ''
             this.$refs.addTokenModal.hide()
         },
-        setUsrLocalStorage(feildname, value) {
-            Vue.set(this.userInfo, feildname, value)
-            window.localStorage.setItem(this.address, JSON.stringify(this.userInfo))
+        setUsrLocalStorage(fieldname, value) {
+            Vue.set(this.userInfo, fieldname, value)
+            window.localStorage.setItem(this.seedaddress, JSON.stringify(this.userInfo))
+            console.log('storage', window.localStorage)
         },
         okModal() {
             if (this.isValidToken(this.tokenId)) {
-                this.setUsrLocalStorage(this.tokenId, JSON.stringify(this.tokenId))
+                Vue.set(this.tokens, this.tokenId, this.jsonObj)
+                this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
             }
             this.balance = 0
             this.tokenId = ''
