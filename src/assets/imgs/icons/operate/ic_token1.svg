@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_token1</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Export" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(-243.000000, -106.000000)" fill="#B4E0A8" id="ic_token1">
+            <g transform="translate(243.000000, 106.000000)">
+                <path d="M16,32 C7.163444,32 0,24.836556 0,16 C0,7.163444 7.163444,0 16,0 C24.836556,0 32,7.163444 32,16 C32,24.836556 24.836556,32 16,32 Z M16,24.5 C19.8659932,24.5 23,21.3659932 23,17.5 C23,14.9376501 20.7806592,11.3525612 16.3641965,6.65742023 C16.166761,6.44752659 15.833239,6.44752659 15.6358035,6.65742023 C11.2193408,11.3525612 9,14.9376501 9,17.5 C9,21.3659932 12.1340068,24.5 16,24.5 Z M10,17.5 C10,15.3403488 11.9932193,12.0579349 16,7.73269701 C20.0067807,12.0579349 22,15.3403488 22,17.5 C22,20.8137085 19.3137085,23.5 16,23.5 C12.6862915,23.5 10,20.8137085 10,17.5 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg>

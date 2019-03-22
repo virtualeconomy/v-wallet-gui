@@ -12,6 +12,7 @@
           <TokenRecord :address="address"
                        :token-id="tokenId"
                        :addresses="addresses"
+                       :cold-addresses="coldAddresses"
                        :wallet-type="walletType"></TokenRecord>
         </div>
       </div>
@@ -39,7 +40,7 @@ import Vue from 'vue'
 import browser from '../../../utils/browser'
 import TokenRecord from './TokenRecord'
 import AddToken from '../modals/AddToken'
-
+// import BigNumber from 'bignumber.js'
 export default {
     name: 'TokenRecords',
     components: {
@@ -63,22 +64,21 @@ export default {
     props: {
         address: {
             type: String,
-            default: '',
-            require: true
+            default: ''
         },
-        tokenId: {
-            type: String,
-            default: '',
-            require: true
-        },
-        walletType: {
-            type: String,
-            default: 'xxxxxx',
+        coldAddresses: {
+            type: Object,
+            default: function() {},
             require: true
         },
         addresses: {
             type: Object,
             default: function() {},
+            require: true
+        },
+        walletType: {
+            type: String,
+            default: '',
             require: true
         }
     },
