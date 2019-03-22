@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
+    <img src="../../../assets/imgs/icons/operate/ic_burn.svg">
     <div class="infos">
       <b-form-group horizontal
                     class="form-line"

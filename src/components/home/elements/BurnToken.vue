@@ -89,7 +89,8 @@
           </b-row>
         </b-container>
         <b-container v-if="pageId===3">
-          <BurnSuccess :address="address"
+          <BurnSuccess class="tokenSucced"
+                       :address="address"
                        :amount=inputAmount(amount)
                        :fee="fee">
           </BurnSuccess>
@@ -207,7 +208,8 @@
           </b-row>
         </b-container>
         <b-container v-show="coldPageId===5">
-          <BurnSuccess :address="coldAddress"
+          <BurnSuccess class="tokenSucced"
+                       :address="coldAddress"
                        :amount=inputAmount(coldAmount)
                        :fee="coldFee">
           </BurnSuccess>
@@ -646,5 +648,8 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.tokenSucced {
+    text-align: center;
 }
 </style>
