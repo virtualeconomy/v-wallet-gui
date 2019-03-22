@@ -1,7 +1,6 @@
 <template>
   <div>
-    <img class="burn-icon"
-         src="../../../assets/imgs/icons/operate/ic_burn.svg">
+    <img src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
     <div class="infos">
       <b-form-group horizontal
                     class="form-line"
@@ -106,7 +105,11 @@ export default {
     letter-spacing: 0;
     text-align: right;
 }
-.burn-icon {
-    margin-left: 170px;
+.tx-title {
+    padding: 24px 0;
+    border-bottom: 1px solid #1111;
+}
+.tx-icon {
+    margin-bottom: 10px;
 }
 </style>

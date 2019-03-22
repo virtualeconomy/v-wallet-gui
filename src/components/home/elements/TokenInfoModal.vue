@@ -14,7 +14,7 @@
       </button>
       <div class="tx-title">
         <div class="tx-icon">
-          <img src="../../../assets/imgs/icons/wallet/ic_received.svg"
+          <img src="../../../assets/imgs/icons/operate/ic_token2.svg"
                width="60px"
                height="60px">
         </div>

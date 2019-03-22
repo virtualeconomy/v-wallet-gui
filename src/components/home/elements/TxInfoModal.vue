@@ -153,15 +153,15 @@ export default {
 </script>
 
 <style scoped lang="less">
-.tx-modal {
-    text-align: center;
+     .tx-modal {
+         text-align: center;
+     }
     .tx-title {
         padding: 24px 0;
         border-bottom: 1px solid #1111;
         .tx-icon {
             margin-bottom: 10px;
         }
-    }
     .tx-address {
         text-align: left;
         border-bottom: 1px solid #E8E9ED;
