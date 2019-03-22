@@ -1,10 +1,26 @@
 <template>
   <div>
-    <img src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
+    <img v-if="txType==='IssueToken'"
+         src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
+    <img v-else-if="txType==='BurnToken'"
+         src="../../../assets/imgs/icons/operate/ic_burn.svg">
     <div class="infos">
-      <b-form-group horizontal
+      <b-form-group v-if="txType==='BurnToken'"
+                    horizontal
                     class="form-line"
-                    label="Total Tokens"
+                    label="Burn Amount"
+                    label-for="amount_success">
+        <b-form-input id="amount_success"
+                      :value="formatter(amount) + ' VSYS'"
+                      class="amount"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group v-else
+                    horizontal
+                    class="form-line"
+                    label="Issue Amount"
                     label-for="amount_success">
         <b-form-input id="amount_success"
                       :value="formatter(amount) + ' VSYS'"
@@ -64,6 +80,11 @@ export default {
             default: function() {
                 return BigNumber(TOKEN_FEE)
             }
+        },
+        txType: {
+            type: String,
+            required: true,
+            default: ''
         }
     },
     methods: {

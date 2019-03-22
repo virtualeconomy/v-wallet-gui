@@ -62,7 +62,7 @@
           <TokenConfirm :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        tx-type="Issue Token">
+                        :tx-type="'IssueToken'">
           </TokenConfirm>
           <p
             v-show="sendError"
@@ -92,7 +92,8 @@
           <TokenSuccess class="tokenSucced"
                         :address="address"
                         :amount=inputAmount(amount)
-                        :fee="fee">
+                        :fee="fee"
+                        :tx-type="'IssueToken'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -148,7 +149,7 @@
           <TokenConfirm :address="coldAddress"
                         :amount=inputAmount(coldAmount)
                         :fee="coldFee"
-                        tx-type="Issue Token">
+                        :tx-type="'IssueToken'">
           </TokenConfirm>
           <b-row>
             <b-col class="col-lef">
@@ -183,7 +184,7 @@
           <TokenConfirm :address="coldAddress"
                         :amount=inputAmount(coldAmount)
                         :fee="coldFee"
-                        tx-type="Issue Token">
+                        :tx-type="'IssueToken'">
           </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-row>
@@ -211,7 +212,8 @@
           <TokenSuccess class="tokenSucced"
                         :address="coldAddress"
                         :amount=inputAmount(coldAmount)
-                        :fee="coldFee">
+                        :fee="coldFee"
+                        :tx-type="'IssueToken'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
