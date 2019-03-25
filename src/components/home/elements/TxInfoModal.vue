@@ -60,7 +60,12 @@
       </div>
       <div class="tx-attachment">
         <label>ID</label>
-        <span>{{ modalId }}</span>
+        <span style="float: none;">{{ modalId }}</span>
+        <img class="href-img"
+             src="../../../assets/imgs/icons/wallet/ic_magnifier.svg"
+             @click="txInfo"
+             width="18px"
+             height="22px">
       </div>
       <div class="tx-attachment">
         <label>Block Height</label>
@@ -79,7 +84,7 @@
 <script>
 import browser from '../../../utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE } from '../../../constants'
+import { TX_FEE, TX_TEST_EXPLORER, NETWORK_BYTE, TX_EXPLORER } from '../../../constants'
 export default {
     name: 'TxInfoModal',
     props: {
@@ -136,12 +141,24 @@ export default {
             default: 0
         }
     },
+    data: function() {
+        return {
+            networkType: String.fromCharCode(NETWORK_BYTE)
+        }
+    },
     computed: {
         txClass() {
             return this.txIcon.replace(/\s+/g, '')
         }
     },
     methods: {
+        txInfo() {
+            if (this.networkType === 'T') {
+                window.open(TX_TEST_EXPLORER + this.modalId)
+            } else {
+                window.open(TX_EXPLORER + this.modalId)
+            }
+        },
         closeModal() {
             this.$refs.infoModal.hide()
         },
@@ -292,6 +309,9 @@ export default {
         padding: 40px 24px;
         padding-top: 0;
     }
+}
+.href-img {
+    float: right;
 }
 .btn-close {
     position: absolute;

@@ -41,7 +41,8 @@ export const DEFAULT_BASIC_CONFIG = {
 
 export const NODE_IP = '/api'
 export const ADDRESS_LENGTH = 35;
-
+export const TX_TEST_EXPLORER = 'https://testexplorer.v.systems/transactions/'
+export const TX_EXPLORER = 'https://explorer.v.systems/transactions/'
 export const VSYS_PRECISION = 1e8
 export const TX_FEE = 0.1
 export const FEE_SCALE = 100
