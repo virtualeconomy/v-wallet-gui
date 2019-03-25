@@ -40,8 +40,15 @@
                src="../../../assets/imgs/icons/wallet/ic_wait.svg">
         </qrcode-reader>
       </div>
-      <p class="flink"
-         v-if="qrError">Wrong QRCode. Please
+      <div class="flink"
+           v-if="qrError">
+        <div class="qr-invalid">
+          <p v-if="protocolError">Wrong Protocol. Please</p>
+          <p v-else-if="opcError">Wrong Opc. Please</p>
+          <p v-else-if="apiError">Wrong Api. Please</p>
+          <P v-else-if="sgError">Invalid Signature. Please</P>
+          <p v-else>Wrong QRCode. Please</p>
+        </div>
         <b-button
           class="blink"
           @click="scanAgain"
@@ -49,7 +56,7 @@
           scan again
         </b-button>
         .
-      </p>
+      </div>
       <b-button variant="warning"
                 class="btn-continue"
                 size="lg"
@@ -149,6 +156,8 @@ export default {
                 var signature = jsonObj.signature
                 if (!signature) {
                     this.paused = false
+                    this.sgError = true
+                    this.qrError = true
                 } else {
                     var data = JSON.parse(JSON.stringify(this.dataObject))
                     if (api !== API_VERSION) this.apiError = true
@@ -159,7 +168,6 @@ export default {
                     delete data.opc
                     delete data.protocol
                     data.timestamp *= 1e6
-                    if (this.sgError || this.apiError || this.opcError || this.protocolError) this.qrError = true
                     if (transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType) && !this.qrError) {
                         var _this = this
                         setTimeout(function() {
@@ -168,6 +176,7 @@ export default {
                     } else {
                         this.sgError = true
                     }
+                    if (this.sgError || this.apiError || this.opcError || this.protocolError) this.qrError = true
                 }
             } catch (e) {
                 this.paused = false
@@ -176,6 +185,11 @@ export default {
         },
         scanAgain: function() {
             this.paused = false
+            this.qrError = false
+            this.protocolError = false
+            this.apiError = false
+            this.sgError = false
+            this.opcError = false
         },
         prevPage: function() {
             if (this.isScanPage) {
@@ -254,13 +268,19 @@ export default {
     padding-left: 10px;
 }
 .blink {
+    display: inline-block;
     padding-top: 3px;
     padding-left: 0px;
     padding-right: 0px;
 }
 .flink {
+    display: inline-block;
     margin-top: 0px;
     margin-bottom: 20px;
+}
+.qr-invalid {
+    margin-left: 80px;
+    display: inline-block;
 }
 .btn-continue {
     font-size: 17px;
