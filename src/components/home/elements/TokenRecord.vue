@@ -48,12 +48,14 @@
                     :address="address"
                     :addresses="addresses">
     </TokenInfoModal>
-    <IssueToken :address="address"
+    <IssueToken :token-id="tokenId"
+                :address="address"
                 :wallet-type="walletType"
                 :addresses="addresses"
                 :cold-addresses="coldAddresses">
     </IssueToken>
-    <BurnToken :address="address"
+    <BurnToken :token-id="tokenId"
+               :address="address"
                :wallet-type="walletType"
                :addresses="addresses"
                :cold-addresses="coldAddresses">
@@ -122,6 +124,11 @@ export default {
             type: String,
             default: this ? this.defaultAddress : undefined,
             require: true
+        },
+        tokenId: {
+            type: String,
+            default: '',
+            require: true
         }
     },
     computed: {
@@ -134,9 +141,6 @@ export default {
         },
         txAmount() {
             return 100
-        },
-        tokenId() {
-            return this.address
         }
     },
     methods: {
@@ -153,13 +157,13 @@ export default {
             return browser.bigNumberFormatter(num)
         },
         showModal() {
-            this.$root.$emit('bv::show::modal', 'tokenInfoModal')
+            this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
         },
         issueToken() {
-            this.$root.$emit('bv::show::modal', 'issueTokenModal')
+            this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)
         },
         burnToken() {
-            this.$root.$emit('bv::show::modal', 'burnTokenModal')
+            this.$root.$emit('bv::show::modal', 'burnTokenModal_' + this.tokenId)
         }
     }
 }

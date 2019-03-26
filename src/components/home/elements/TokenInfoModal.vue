@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="tokenInfoModal"
+  <b-modal :id="'tokenInfoModal_' + tokenId"
            ref="tokenInfoModal"
            class="tx-modal"
            lazy
@@ -22,7 +22,7 @@
       </div>
       <div class="tx-address">
         <label>TokenId</label>
-        <span>{{ address }}</span>
+        <span>{{ tokenId }}</span>
       </div>
       <div class="tx-block">
         <label>Issuer</label>
@@ -65,6 +65,11 @@ export default {
         addresses: {
             type: Object,
             default: function() {},
+            require: true
+        },
+        tokenId: {
+            type: String,
+            default: '',
             require: true
         }
     },
