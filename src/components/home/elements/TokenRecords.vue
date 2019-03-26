@@ -21,13 +21,8 @@
     <div class="title-records">
       <span>Token Watch List</span>
     </div>
-    <img height="50"
-         width="50"
-         v-if="changeShowDisable"
-         src="../../../assets/imgs/icons/wallet/ic_wait.svg">
-    <div v-if="!changeShowDisable"
-         class="empty">
-      There are no token contracts.
+    <div class="empty">
+      There are no token in watch list.
     </div>
   </div>
 </template>
