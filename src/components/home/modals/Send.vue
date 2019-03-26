@@ -561,7 +561,7 @@ export default {
             this.pageId++
         },
         addColdRecipientList: function() {
-            this.coldRecipientAddressList.set(this.cogldRecipient, '0')
+            this.coldRecipientAddressList.set(this.coldRecipient, '0')
             window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
         },
         addHotRecipientList: function() {

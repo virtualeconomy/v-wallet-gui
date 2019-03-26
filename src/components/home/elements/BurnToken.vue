@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="burnTokenModal"
+  <b-modal :id="'burnTokenModal_' + tokenId"
            centered
            lazy
            title="burnToken"
@@ -290,6 +290,11 @@ export default {
         walletType: {
             type: String,
             default: 'hotWallet',
+            require: true
+        },
+        tokenId: {
+            type: String,
+            default: '',
             require: true
         }
     },

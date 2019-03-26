@@ -21,6 +21,7 @@
         <b-form-invalid-feedback id="inputLiveFeedback">
           Token does not exist!
         </b-form-invalid-feedback>
+
         <br>
         <br>
         <b-button variant="warning"
@@ -48,9 +49,13 @@ export default {
         return {
             tokens: {},
             tokenId: '',
+            issuer: '',
+            registerTime: '',
+            description: '',
             balance: 0,
             errFlag: false,
-            jsonObj: 'true'
+            tokenObj: '',
+            identifyFlag: 'true'
         }
     },
     created() {
@@ -78,27 +83,25 @@ export default {
         setUsrLocalStorage(fieldname, value) {
             Vue.set(this.userInfo, fieldname, value)
             window.localStorage.setItem(this.seedaddress, JSON.stringify(this.userInfo))
-            console.log('storage', window.localStorage)
         },
         okModal() {
             if (this.isValidToken(this.tokenId)) {
-                Vue.set(this.tokens, this.tokenId, this.jsonObj)
+                let obj = {'tokenId': this.tokenId, 'description': 'this token is belong to me ', 'issuer': 'll yang', 'flag': 'true'}
+                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(obj)))
                 this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
             }
             this.balance = 0
             this.tokenId = ''
             this.$refs.addTokenModal.hide()
         },
-        isValidToken: function(tokenId) {
-            if (!tokenId) {
-                return void 0
-            }
-            let isValid = true
-            this.balance = 100
-            if (tokenId === '1') {
-                isValid = false
-            }
-            return isValid
+        isValidToken: function(token) {
+            return !this.isWrongFormat() && !this.inexistAddr()
+        },
+        inexistAddr(token) {
+            return false
+        },
+        isWrongFormat(token) {
+            return false
         }
     }
 

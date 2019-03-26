@@ -1,20 +1,18 @@
 <template>
-  <div v-if="tokenRecords.length > 0"
+  <div v-if="Object.keys(tokenRecords).length > 0"
        class="records">
     <div class="title-records">
       <span>Token Watch List</span>
     </div>
     <div class="inherit-height">
-      <div class="scroll"
-           :style="{height: myHeight}">
-        <div v-for="record in tokenRecords"
-             :key="record.id">
-          <TokenRecord :address="address"
-                       :token-id="tokenId"
-                       :addresses="addresses"
-                       :cold-addresses="coldAddresses"
-                       :wallet-type="walletType"></TokenRecord>
-        </div>
+      <div class="scroll">
+        <TokenRecord v-for="(index,tokenId) in tokenRecords"
+                     :key="tokenId"
+                     :token-id="tokenId"
+                     :address="address"
+                     :addresses="addresses"
+                     :cold-addresses="coldAddresses"
+                     :wallet-type="walletType"></TokenRecord>
       </div>
     </div>
   </div>
@@ -55,7 +53,7 @@ export default {
     },
     data() {
         return {
-            tokenRecords: [],
+            tokenRecords: {},
             showingNum: 10,
             changeShowDisable: false,
             myHeight: '0'
@@ -82,22 +80,15 @@ export default {
             require: true
         }
     },
-    watch: {
-        address(newAddr, oldAddr) {
-            if (newAddr === '') {
-                return
-            }
-            this.changeShowDisable = false
-            this.showingNum = 10
-            if (this.address && Vue.ls.get('pwd')) {
-                this.gettokenRecords()
-            }
-        }
-    },
 
     computed: {
+        seedaddress() {
+            if (Vue.ls.get('address')) {
+                return Vue.ls.get('address')
+            }
+        },
         userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.address))
+            return JSON.parse(window.localStorage.getItem(this.seedaddress))
         }
     },
 
@@ -108,17 +99,10 @@ export default {
         gettokenRecords() {
             if (this.address) {
                 this.changeShowDisable = true
-                let arr = [1]
-                this.tokenRecords = arr
+                let records = {}
+                records = JSON.parse(this.userInfo.tokens)
+                this.tokenRecords = records
                 this.changeShowDisable = false
-            }
-        },
-        changeShowNum(newNum) {
-            if (!this.changeShowDisable) {
-                this.showingNum = newNum
-                if (this.address && Vue.ls.get('pwd')) {
-                    this.gettokenRecords()
-                }
             }
         }
     }
