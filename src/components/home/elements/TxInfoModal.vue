@@ -3,6 +3,7 @@
            ref="infoModal"
            class="tx-modal"
            lazy
+           size="lg"
            centered
            hide-header
            hide-footer>
@@ -58,14 +59,11 @@
         <label>Attachment</label>
         <span>{{ txAttachment }}</span>
       </div>
-      <div class="tx-attachment">
+      <div class="tx-id">
         <label>ID</label>
-        <span style="float: none;">{{ modalId }}</span>
-        <img class="href-img"
-             src="../../../assets/imgs/icons/wallet/ic_magnifier.svg"
-             @click="txInfo"
-             width="18px"
-             height="22px">
+        <img src="../../../assets/imgs/icons/wallet/ic_magnifier.svg"
+             @click="txInfo">
+        <span>{{ modalId }}</span>
       </div>
       <div class="tx-attachment">
         <label>Block Height</label>
@@ -202,6 +200,11 @@ export default {
         border-bottom: 1px solid #E8E9ED;
         height: 48px;
         padding-top: 15px;
+        img {
+            width: 30px;
+            height: 22px;
+            float: right;
+        }
         span {
             float:right;
             font-size: 15px;
@@ -309,9 +312,6 @@ export default {
         padding: 40px 24px;
         padding-top: 0;
     }
-}
-.href-img {
-    float: right;
 }
 .btn-close {
     position: absolute;
