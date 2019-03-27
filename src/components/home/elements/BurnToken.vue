@@ -59,11 +59,11 @@
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
-          <BurnConfirm :address="address"
-                       :amount=inputAmount(amount)
-                       :fee="fee"
-                       tx-type="Issue Token">
-          </BurnConfirm>
+          <TokenConfirm :address="address"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
+                        :tx-type="'BurnToken'">
+          </TokenConfirm>
           <p
             v-show="sendError"
             class="text-danger"><small>Sorry, transaction send failed!</small></p>
@@ -89,11 +89,12 @@
           </b-row>
         </b-container>
         <b-container v-if="pageId===3">
-          <BurnSuccess class="tokenSucced"
-                       :address="address"
-                       :amount=inputAmount(amount)
-                       :fee="fee">
-          </BurnSuccess>
+          <TokenSuccess class="tokenSucced"
+                        :address="address"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
+                        :tx-type="'BurnToken'">
+          </TokenSuccess>
           <b-button variant="warning"
                     block
                     size="lg"
@@ -145,11 +146,11 @@
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
-          <BurnConfirm :address="coldAddress"
-                       :amount=inputAmount(coldAmount)
-                       :fee="coldFee"
-                       tx-type="Issue Token">
-          </BurnConfirm>
+          <TokenConfirm :address="coldAddress"
+                        :amount=inputAmount(coldAmount)
+                        :fee="coldFee"
+                        :tx-type="'BurnToken'">
+          </TokenConfirm>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -180,11 +181,11 @@
                          @prev-page="coldPrevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
-          <BurnConfirm :address="coldAddress"
-                       :amount=inputAmount(coldAmount)
-                       :fee="coldFee"
-                       tx-type="Issue Token">
-          </BurnConfirm>
+          <TokenConfirm :address="coldAddress"
+                        :amount=inputAmount(coldAmount)
+                        :fee="coldFee"
+                        :tx-type="'BurnToken'">
+          </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-row>
             <b-col class="col-lef">
@@ -208,11 +209,12 @@
           </b-row>
         </b-container>
         <b-container v-show="coldPageId===5">
-          <BurnSuccess class="tokenSucced"
-                       :address="coldAddress"
-                       :amount=inputAmount(coldAmount)
-                       :fee="coldFee">
-          </BurnSuccess>
+          <TokenSuccess class="tokenSucced"
+                        :address="coldAddress"
+                        :amount=inputAmount(coldAmount)
+                        :fee="coldFee"
+                        :tx-type="'BurnToken'">
+          </TokenSuccess>
           <b-button variant="warning"
                     block
                     size="lg"
@@ -229,8 +231,8 @@
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
-import BurnConfirm from './BurnConfirm'
-import BurnSuccess from './BurnSuccess'
+import TokenConfirm from '../modals/TokenConfirm'
+import TokenSuccess from '../modals/TokenSuccess'
 // import crypto from '@/utils/crypto'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '../../../utils/browser'
@@ -238,7 +240,7 @@ import browser from '../../../utils/browser'
 import BigNumber from 'bignumber.js'
 export default {
     name: 'BurnToken',
-    components: {ColdSignature, BurnSuccess, BurnConfirm},
+    components: {ColdSignature, TokenSuccess, TokenConfirm},
     data: function() {
         return {
             amount: BigNumber(0),
