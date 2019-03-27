@@ -3,6 +3,7 @@
            ref="infoModal"
            class="tx-modal"
            lazy
+           size="lg"
            centered
            hide-header
            hide-footer>
@@ -58,8 +59,10 @@
         <label>Attachment</label>
         <span>{{ txAttachment }}</span>
       </div>
-      <div class="tx-attachment">
+      <div class="tx-id">
         <label>ID</label>
+        <img src="../../../assets/imgs/icons/wallet/ic_magnifier.svg"
+             @click="txInfo">
         <span>{{ modalId }}</span>
       </div>
       <div class="tx-attachment">
@@ -79,7 +82,7 @@
 <script>
 import browser from '../../../utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE } from '../../../constants'
+import { TX_FEE, TX_TEST_EXPLORER, NETWORK_BYTE, TX_EXPLORER } from '../../../constants'
 export default {
     name: 'TxInfoModal',
     props: {
@@ -136,12 +139,24 @@ export default {
             default: 0
         }
     },
+    data: function() {
+        return {
+            networkType: String.fromCharCode(NETWORK_BYTE)
+        }
+    },
     computed: {
         txClass() {
             return this.txIcon.replace(/\s+/g, '')
         }
     },
     methods: {
+        txInfo() {
+            if (this.networkType === 'T') {
+                window.open(TX_TEST_EXPLORER + this.modalId)
+            } else {
+                window.open(TX_EXPLORER + this.modalId)
+            }
+        },
         closeModal() {
             this.$refs.infoModal.hide()
         },
@@ -185,6 +200,11 @@ export default {
         border-bottom: 1px solid #E8E9ED;
         height: 48px;
         padding-top: 15px;
+        img {
+            width: 30px;
+            height: 22px;
+            float: right;
+        }
         span {
             float:right;
             font-size: 15px;
