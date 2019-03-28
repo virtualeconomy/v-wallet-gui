@@ -516,7 +516,7 @@ export default {
             return BigNumber(num)
         },
         coldApi: function() {
-            if (this.coldAddresses[this.coldAddress].api === 1 && this.coldAmount <= 90000000) {
+            if (this.coldAddresses[this.coldAddress].api === 1 && BigNumber(this.coldAmount).isLessThan(BigNumber(Number.MAX_SAFE_INTEGER).dividedBy(1e8))) {
                 return 1
             } else {
                 return API_VERSION
@@ -561,7 +561,7 @@ export default {
             this.pageId++
         },
         addColdRecipientList: function() {
-            this.coldRecipientAddressList.set(this.cogldRecipient, '0')
+            this.coldRecipientAddressList.set(this.coldRecipient, '0')
             window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
         },
         addHotRecipientList: function() {
