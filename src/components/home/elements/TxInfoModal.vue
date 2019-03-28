@@ -44,7 +44,7 @@
       </div>
       <div class="tx-address">
         <label>{{ (txIcon === 'received' || txIcon === 'leased in' || txIcon === 'leased in canceled') ? 'From' : 'To' }}</label>
-        <span>{{ txAddress }}</span>
+        <span>{{ displayAddress }}</span>
       </div>
       <div class="tx-block">
         <label>Timestamp</label>
@@ -63,7 +63,7 @@
         <label>ID</label>
         <img src="../../../assets/imgs/icons/wallet/ic_magnifier.svg"
              @click="txInfo">
-        <span>{{ modalId }}</span>
+        <span>{{ displayId }}</span>
       </div>
       <div class="tx-attachment">
         <label>Block Height</label>
@@ -147,9 +147,26 @@ export default {
     computed: {
         txClass() {
             return this.txIcon.replace(/\s+/g, '')
+        },
+        displayId() {
+            if (this.isMobile() && this.modalId.length > 24) {
+                return this.modalId.substring(0, 23) + '...'
+            } else {
+                return this.modalId
+            }
+        },
+        displayAddress() {
+            if (this.isMobile() && this.txAddress.length > 24) {
+                return this.txAddress.substring(0, 23) + '...'
+            } else {
+                return this.txAddress
+            }
         }
     },
     methods: {
+        isMobile() {
+            return browser.isMobile()
+        },
         txInfo() {
             if (this.networkType === 'T') {
                 window.open(TX_TEST_EXPLORER + this.modalId)
