@@ -670,7 +670,7 @@ export default {
                 if (protocol !== PROTOCOL) {
                     this.paused = false
                     this.qrErrMsg = 'Invalid QR code protocol.'
-                } else if (api !== API_VERSION) {
+                } else if (api > API_VERSION) {
                     this.paused = false
                     this.qrErrMsg = 'API version mismatch.'
                 } else if (opc !== OPC_ACCOUNT) {
@@ -708,7 +708,7 @@ export default {
                 if (protocol !== PROTOCOL) {
                     this.paused = false
                     this.qrErrMsg = 'Invalid QR code protocol.'
-                } else if (api !== API_VERSION) {
+                } else if (api > API_VERSION) {
                     this.paused = false
                     this.qrErrMsg = 'API version mismatch.'
                 } else if (opc !== OPC_ACCOUNT) {
