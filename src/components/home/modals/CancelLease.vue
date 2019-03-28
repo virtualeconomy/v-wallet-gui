@@ -190,8 +190,8 @@ export default {
         },
         coldApi: function() {
             let a = JSON.parse(window.localStorage.getItem(this.defaultAddress)).coldAddresses
-            let tempApi = JSON.parse(a)[this.fromAddress]['api']
-            if (tempApi === 1 && this.amount <= 90000000) {
+            let tempApi = JSON.parse(a)[this.fromAddress].api
+            if (tempApi === 1 && BigNumber(this.amount).isLessThan(BigNumber(Number.MAX_SAFE_INTEGER).dividedBy(1e8))) {
                 return 1
             } else {
                 return API_VERSION
