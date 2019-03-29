@@ -150,7 +150,8 @@
                  :tx-time="txTimestamp"
                  :tx-fee="fee"
                  :tx-amount="txAmount"
-                 :trans-type="'lease'"></TxInfoModal>
+                 :trans-type="'lease'"
+                 :self-send="isRaisingLease"></TxInfoModal>
   </div>
 </template>
 
@@ -187,7 +188,8 @@ export default {
             txTimestamp: 0,
             txAmount: BigNumber(0),
             timestamp: 0,
-            hasConfirmed: false
+            hasConfirmed: false,
+            isRaisingLease: 'true'
         }
     },
     props: {
@@ -345,8 +347,8 @@ export default {
             this.coldPageId++
         },
         showDetails() {
-            this.$root.$emit('bv::hide::modal', 'txInfoModal_lease' + this.txId)
-            this.$root.$emit('bv::show::modal', 'txInfoModal_lease' + this.txId)
+            this.$root.$emit('bv::hide::modal', 'txInfoModal_lease' + this.txId + this.isRaisingLease)
+            this.$root.$emit('bv::show::modal', 'txInfoModal_lease' + this.txId + this.isRaisingLease)
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

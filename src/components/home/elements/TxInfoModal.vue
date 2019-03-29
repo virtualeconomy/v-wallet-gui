@@ -64,7 +64,8 @@
              @click="txInfo">
         <span>{{ displayId }}</span>
       </div>
-      <div class="tx-attachment">
+      <div v-if="txBlock"
+           class="tx-attachment">
         <label>Block Height</label>
         <span>{{ txBlock }}</span>
       </div>
