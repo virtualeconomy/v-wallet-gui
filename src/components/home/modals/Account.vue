@@ -207,11 +207,11 @@
           <b-form-input readonly
                         size="sm"
                         class="input-t"
-                        :value="tagOfColdWallet[addr] ? pubkey : addr">
+                        :value="tagOfColdWallet[addr] ? pubkey.publicKey : addr">
           </b-form-input>
           <b-input-group-append>
             <textarea id="coldToCopy"
-                      :value="tagOfColdWallet[addr] ? pubkey : addr"
+                      :value="tagOfColdWallet[addr] ? pubkey.publicKey : addr"
                       ref="coldToCopy"
                       class="hidden"
                       readonly>

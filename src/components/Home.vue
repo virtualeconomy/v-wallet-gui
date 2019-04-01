@@ -4,7 +4,7 @@
     <nav-bar :addresses="addresses"
              :address="selectedAddress"
              class="navibar"
-             :cold-addresses="coldAddressesShow"
+             :cold-addresses="coldAddresses"
              :username="username"
              :avt-hash="avtHash"
              :get-pub-key="getPubKey"
@@ -166,7 +166,6 @@ export default {
             sessionClearTimeout: void 0,
             addresses: {},
             coldAddresses: {},
-            coldAddressesShow: {},
             sortedAddresses: {},
             walletType: '',
             sortFlag: 0,
@@ -209,7 +208,6 @@ export default {
                     let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': addr, 'api': 1, 'publicKey': this.coldAddresses[addr]}
                     Vue.set(this.coldAddresses, addr, JSON.parse(JSON.stringify(tempObj)))
                 }
-                Vue.set(this.coldAddressesShow, addr, this.coldAddresses[addr].publicKey)
             }
             if (localChanging) {
                 this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
@@ -318,7 +316,6 @@ export default {
         },
         importCold(coldAddress, pubKey, jsonObj) {
             Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : jsonObj)
-            Vue.set(this.coldAddressesShow, coldAddress, !pubKey ? '' : pubKey)
             let unsortedColdAddresses = this.coldAddresses
             let sortedColdAddresses = {}
             Object.keys(unsortedColdAddresses).sort().forEach(function(key) {
@@ -362,7 +359,6 @@ export default {
         deleteCold(addr) {
             Vue.delete(this.coldAddresses, addr)
             Vue.delete(this.sortedAddresses, addr)
-            Vue.delete(this.coldAddressesShow, addr)
             this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
         },
         getAddresses() {
