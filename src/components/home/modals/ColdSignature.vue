@@ -151,7 +151,7 @@ export default {
                 if (!signature) {
                     this.paused = false
                 } else {
-                    var data = JSON.parse(JSON.stringify(this.dataObject).replace(/"amount":"(\d+)"/g, '"amount":"$1"'))
+                    var data = JSON.parse(JSON.stringify(this.dataObject))
                     if (api > API_VERSION) this.apiError = true
                     if (protocol !== PROTOCOL) this.protocolError = true
                     if (opc !== OPC_SIGNATURE) this.opcError = true
