@@ -202,14 +202,18 @@ export default {
             for (const addr in this.coldAddresses) {
                 this.getBalance(addr)
             }
-            for (var i in this.coldAddresses) {
-                if (!this.coldAddresses[i].hasOwnProperty('api')) {
-                    let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': i, 'api': 1, 'publicKey': this.coldAddresses[i]}
-                    Vue.set(this.coldAddresses, i, JSON.parse(JSON.stringify(tempObj)))
+            let localChanging = false
+            for (const addr in this.coldAddresses) {
+                if (!this.coldAddresses[addr].hasOwnProperty('api')) {
+                    localChanging = true
+                    let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': addr, 'api': 1, 'publicKey': this.coldAddresses[addr]}
+                    Vue.set(this.coldAddresses, addr, JSON.parse(JSON.stringify(tempObj)))
                 }
-                Vue.set(this.coldAddressesShow, i, this.coldAddresses[i].publicKey)
+                Vue.set(this.coldAddressesShow, addr, this.coldAddresses[addr].publicKey)
             }
-            this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
+            if (localChanging) {
+                this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
+            }
             this.getBalance(this.selectedAddress)
         }
     },
