@@ -206,10 +206,10 @@ export default {
                 if (!this.coldAddresses[i].hasOwnProperty('api')) {
                     let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': i, 'api': 1, 'publicKey': this.coldAddresses[i]}
                     Vue.set(this.coldAddresses, i, JSON.parse(JSON.stringify(tempObj)))
-                    this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
                 }
                 Vue.set(this.coldAddressesShow, i, this.coldAddresses[i].publicKey)
             }
+            this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
             this.getBalance(this.selectedAddress)
         }
     },
