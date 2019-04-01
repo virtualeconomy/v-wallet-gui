@@ -318,6 +318,7 @@ export default {
         },
         importCold(coldAddress, pubKey, jsonObj) {
             Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : jsonObj)
+            Vue.set(this.coldAddressesShow, coldAddress, !pubKey ? '' : pubKey)
             let unsortedColdAddresses = this.coldAddresses
             let sortedColdAddresses = {}
             Object.keys(unsortedColdAddresses).sort().forEach(function(key) {
@@ -361,6 +362,7 @@ export default {
         deleteCold(addr) {
             Vue.delete(this.coldAddresses, addr)
             Vue.delete(this.sortedAddresses, addr)
+            Vue.delete(this.coldAddressesShow, addr)
             this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
         },
         getAddresses() {
