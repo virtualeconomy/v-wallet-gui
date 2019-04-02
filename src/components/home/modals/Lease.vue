@@ -28,7 +28,7 @@
                       :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="pageId===2">
             <Confirm :tx-type="'Lease'"
-                     :amount="Number(amount)"
+                     :amount=inputAmount(amount)
                      :address="address"
                      :recipient="recipient"
                      :fee="fee"></Confirm>
@@ -59,7 +59,7 @@
             </b-row>
           </b-container>
           <LeaseSuccess v-else-if="pageId===3"
-                        :amount="Number(amount)"
+                        :amount=inputAmount(amount)
                         :address="recipient"
                         @show-details="showDetails"></LeaseSuccess>
         </b-tab>
@@ -78,7 +78,7 @@
                       :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="coldPageId===2">
             <Confirm :tx-type="'lease'"
-                     :amount="Number(coldAmount)"
+                     :amount=inputAmount(coldAmount)
                      :address="coldAddress"
                      :recipient="coldRecipient"
                      :fee="fee"></Confirm>
@@ -109,7 +109,7 @@
                          @prev-page="prevColdPage"></ColdSignature>
           <b-container v-else-if="coldPageId===4">
             <Confirm :tx-type="'Lease'"
-                     :amount="Number(coldAmount)"
+                     :amount=inputAmount(coldAmount)
                      :address="coldAddress"
                      :recipient="coldRecipient"
                      :fee="fee"></Confirm>
@@ -139,7 +139,7 @@
             </b-row>
           </b-container>
           <LeaseSuccess v-else-if="coldPageId===5"
-                        :amount="Number(coldAmount)"
+                        :amount=inputAmount(coldAmount)
                         @show-details="showDetails"></LeaseSuccess>
         </b-tab>
       </b-tabs>
@@ -150,7 +150,8 @@
                  :tx-time="txTimestamp"
                  :tx-fee="fee"
                  :tx-amount="txAmount"
-                 :trans-type="'lease'"></TxInfoModal>
+                 :trans-type="'lease'"
+                 :self-send="isRaisingLease"></TxInfoModal>
   </div>
 </template>
 
@@ -164,18 +165,20 @@ import transaction from '@/utils/transaction'
 import seedLib from '@/libs/seed'
 import LeaseSuccess from './LeaseSuccess'
 import TxInfoModal from '../elements/TxInfoModal'
+import BigNumber from 'bignumber.js'
+import JSONBigNumber from 'json-bignumber'
 export default {
     name: 'Lease',
     components: { LeaseSuccess, Confirm, LeaseInput, ColdSignature, TxInfoModal },
     data: function() {
         return {
-            amount: 0,
-            coldAmount: 0,
+            amount: BigNumber(0),
+            coldAmount: BigNumber(0),
             recipient: '',
             coldRecipient: '',
             pageId: 1,
             coldPageId: 1,
-            fee: TX_FEE,
+            fee: BigNumber(TX_FEE),
             sendError: false,
             coldSignature: '',
             address: '',
@@ -183,9 +186,10 @@ export default {
             txId: '',
             txAddress: '',
             txTimestamp: 0,
-            txAmount: 0,
+            txAmount: BigNumber(0),
             timestamp: 0,
-            hasConfirmed: false
+            hasConfirmed: false,
+            isRaisingLease: 'true'
         }
     },
     props: {
@@ -231,13 +235,13 @@ export default {
                 protocol: PROTOCOL,
                 opc: OPC_TRANSACTION,
                 transactionType: LEASE_TX,
-                senderPublicKey: this.coldAddresses[this.coldAddress],
-                amount: Number((this.coldAmount * VSYS_PRECISION).toFixed(0)),
+                senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
+                amount: BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).toFixed(0),
                 fee: this.fee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
                 recipient: this.coldRecipient,
                 timestamp: Date.now(),
-                api: API_VERSION
+                api: this.coldApi()
             }
         },
         noColdAddress() {
@@ -251,12 +255,22 @@ export default {
         }
     },
     methods: {
+        inputAmount(num) {
+            return BigNumber(num)
+        },
+        coldApi: function() {
+            if (this.coldAddresses[this.coldAddress].api === 1 && BigNumber(this.coldAmount).isLessThan(BigNumber(Number.MAX_SAFE_INTEGER).dividedBy(1e8))) {
+                return 1
+            } else {
+                return API_VERSION
+            }
+        },
         closeModal() {
             this.$refs.leaseModal.hide()
         },
         getData(recipient, amount, address) {
             this.recipient = recipient
-            this.amount = amount
+            this.amount = BigNumber(amount)
             this.address = address
             this.timestamp = Date.now() * 1e6
             this.hasConfirmed = false
@@ -264,18 +278,18 @@ export default {
         },
         getColdData(recipient, amount, coldAddress) {
             this.coldRecipient = recipient
-            this.coldAmount = amount
+            this.coldAmount = BigNumber(amount)
             this.coldAddress = coldAddress
             this.coldPageId++
         },
         resetPage() {
-            this.amount = 0
-            this.coldAmount = 0
+            this.amount = BigNumber(0)
+            this.coldAmount = BigNumber(0)
             this.recipient = ''
             this.coldRecipient = ''
             this.pageId = 1
             this.coldPageId = 1
-            this.fee = TX_FEE
+            this.fee = BigNumber(TX_FEE)
             this.sendError = false
             this.coldSignature = ''
             this.coldAddress = ''
@@ -301,14 +315,14 @@ export default {
                 this.hasConfirmed = true
                 const dataInfo = {
                     recipient: this.recipient,
-                    amount: Number((this.amount * VSYS_PRECISION).toFixed(0)),
+                    amount: BigNumber(this.amount).multipliedBy(VSYS_PRECISION).toFixed(0),
                     fee: TX_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timestamp
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), LEASE_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress], LEASE_TX)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress].publicKey, LEASE_TX)
             }
             const url = NODE_IP + '/leasing/broadcast/lease'
             apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
@@ -316,7 +330,7 @@ export default {
                 this.txId = response.body.id
                 this.txAddress = response.body.recipient
                 this.txTimestamp = response.body.timestamp
-                this.txAmount = response.body.amount / VSYS_PRECISION
+                this.txAmount = JSONBigNumber.parse(response.bodyText).amount.dividedBy(VSYS_PRECISION)
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
@@ -333,8 +347,8 @@ export default {
             this.coldPageId++
         },
         showDetails() {
-            this.$root.$emit('bv::hide::modal', 'txInfoModal_lease' + this.txId)
-            this.$root.$emit('bv::show::modal', 'txInfoModal_lease' + this.txId)
+            this.$root.$emit('bv::hide::modal', 'txInfoModal_lease' + this.txId + this.isRaisingLease)
+            this.$root.$emit('bv::show::modal', 'txInfoModal_lease' + this.txId + this.isRaisingLease)
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

@@ -43,7 +43,7 @@
       </div>
       <div class="tx-address">
         <label>{{ (txIcon === 'received' || txIcon === 'leased in' || txIcon === 'leased in canceled') ? 'From' : 'To' }}</label>
-        <span>{{ txAddress }}</span>
+        <span>{{ displayAddress }}</span>
       </div>
       <div class="tx-block">
         <label>Timestamp</label>
@@ -58,11 +58,14 @@
         <label>Attachment</label>
         <span>{{ txAttachment }}</span>
       </div>
-      <div class="tx-attachment">
+      <div class="tx-id">
         <label>ID</label>
-        <span>{{ modalId }}</span>
+        <img src="../../../assets/imgs/icons/wallet/ic_magnifier.svg"
+             @click="txInfo">
+        <span>{{ displayId }}</span>
       </div>
-      <div class="tx-attachment">
+      <div v-if="txBlock"
+           class="tx-attachment">
         <label>Block Height</label>
         <span>{{ txBlock }}</span>
       </div>
@@ -78,6 +81,8 @@
 
 <script>
 import browser from '../../../utils/browser'
+import BigNumber from 'bignumber.js'
+import { TX_FEE, TX_TEST_EXPLORER, NETWORK_BYTE, TX_EXPLORER } from '../../../constants'
 export default {
     name: 'TxInfoModal',
     props: {
@@ -102,12 +107,16 @@ export default {
             default: ''
         },
         txAmount: {
-            type: Number,
-            default: 0
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            }
         },
         txFee: {
-            type: Number,
-            default: 0
+            type: BigNumber,
+            default: function() {
+                return BigNumber(TX_FEE)
+            }
         },
         txTime: {
             type: Number,
@@ -130,17 +139,46 @@ export default {
             default: 0
         }
     },
+    data: function() {
+        return {
+            networkType: String.fromCharCode(NETWORK_BYTE)
+        }
+    },
     computed: {
         txClass() {
             return this.txIcon.replace(/\s+/g, '')
+        },
+        displayId() {
+            if (this.isMobile() && this.modalId.length > 24) {
+                return this.modalId.substring(0, 23) + '...'
+            } else {
+                return this.modalId
+            }
+        },
+        displayAddress() {
+            if (this.isMobile() && this.txAddress.length > 24) {
+                return this.txAddress.substring(0, 23) + '...'
+            } else {
+                return this.txAddress
+            }
         }
     },
     methods: {
+        isMobile() {
+            return browser.isMobile()
+        },
+        txInfo() {
+            if (this.networkType === 'T') {
+                window.open(TX_TEST_EXPLORER + this.modalId)
+            } else {
+                window.open(TX_EXPLORER + this.modalId)
+            }
+        },
         closeModal() {
             this.$refs.infoModal.hide()
         },
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }
@@ -163,7 +201,7 @@ export default {
         padding-top: 15px;
         span {
             float:right;
-            font-size: 15px;
+            font-size: 13px;
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
@@ -179,9 +217,14 @@ export default {
         border-bottom: 1px solid #E8E9ED;
         height: 48px;
         padding-top: 15px;
+        img {
+            width: 30px;
+            height: 22px;
+            float: right;
+        }
         span {
             float:right;
-            font-size: 15px;
+            font-size: 13px;
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
@@ -199,7 +242,7 @@ export default {
         padding-top: 15px;
         span {
             float:right;
-            font-size: 15px;
+            font-size: 13px;
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
@@ -217,7 +260,7 @@ export default {
         padding-top: 15px;
         span {
             float:right;
-            font-size: 15px;
+            font-size: 13px;
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
@@ -235,7 +278,7 @@ export default {
         padding-top: 15px;
         span {
             float:right;
-            font-size: 15px;
+            font-size: 13px;
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;

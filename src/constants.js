@@ -9,7 +9,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
-export const WALLET_VERSION = '0.1.4'
+export const WALLET_VERSION = '0.1.5'
 export const INITIAL_SESSION_TIMEOUT = 5
 export const NETWORK_BYTE = 'M'.charCodeAt(0);
 export const INITIAL_NONCE = 0;
@@ -41,12 +41,13 @@ export const DEFAULT_BASIC_CONFIG = {
 
 export const NODE_IP = '/api'
 export const ADDRESS_LENGTH = 35;
-
+export const TX_TEST_EXPLORER = 'https://testexplorer.v.systems/transactions/'
+export const TX_EXPLORER = 'https://explorer.v.systems/transactions/'
 export const VSYS_PRECISION = 1e8
 export const TX_FEE = 0.1
 export const FEE_SCALE = 100
 export const PROTOCOL = 'v.systems'
-export const API_VERSION = 1
+export const API_VERSION = 2
 export const OPC_TRANSACTION = 'transaction'
 export const OPC_ACCOUNT = 'account'
 export const OPC_SIGNATURE = 'signature'

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="14px" height="14px" viewBox="0 0 14 14" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_magnifier</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="33A_Burn" transform="translate(-936.000000, -428.000000)" fill="#FF8737" fill-rule="nonzero">
+            <g id="Window" transform="translate(450.000000, 118.000000)">
+                <g id="01" transform="translate(40.000000, 293.000000)">
+                    <path d="M456.581527,26.8744205 L459.853553,30.1464466 C460.048816,30.3417088 460.048816,30.6582912 459.853553,30.8535534 C459.658291,31.0488155 459.341709,31.0488155 459.146447,30.8535534 L455.874421,27.5815273 C454.829079,28.4664216 453.476852,29 452,29 C448.686292,29 446,26.3137085 446,23 C446,19.6862915 448.686292,17 452,17 C455.313708,17 458,19.6862915 458,23 C458,24.4768516 457.466422,25.8290793 456.581527,26.8744205 Z M452,28 C454.761424,28 457,25.7614237 457,23 C457,20.2385763 454.761424,18 452,18 C449.238576,18 447,20.2385763 447,23 C447,25.7614237 449.238576,28 452,28 Z" id="ic_magnifier"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

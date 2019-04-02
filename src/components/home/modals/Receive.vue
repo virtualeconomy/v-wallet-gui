@@ -14,13 +14,6 @@
     <b-container
       fluid
       class="modal-c">
-      <!-- <b-form-group label="Asset"
-                    label-for="assetInput">
-        <b-form-input id="assetInput"
-                      value="VSYS"
-                      readonly>
-        </b-form-input>
-      </b-form-group> -->
       <b-form-group label="Address"
                     class="forms"
                     label-for="addressInput">
@@ -60,27 +53,41 @@
           The number in this field is invalid. The minimum unit of amount is 0.00000001.
         </b-form-invalid-feedback>
         <b-form-invalid-feedback id="inputLiveFeedback"
+                                 v-else-if="isNegative(amount)">
+          Negative number is not allowed.
+        </b-form-invalid-feedback>
+        <b-form-invalid-feedback id="inputLiveFeedback"
                                  v-else>
           Invalid Input.
         </b-form-invalid-feedback>
-        <div id="address-qrcode">
-          <img v-if="!isWrongFormat(amount)"
-               :src="getQrCodeImg">
-        </div>
-        <b-button variant="warning"
-                  class="btn-o"
-                  block
-                  size="lg"
-                  @click="closeModal">OK
-        </b-button>
       </b-form-group>
+      <b-form-group label="Invoice"
+                    style="text-align: left"
+                    label-for="descriptionInput">
+        <b-form-textarea id="descriptionInput"
+                         v-model="invoice"
+                         :rows="3"
+                         :no-resize="true"
+                         :state="isValidInvoice">
+        </b-form-textarea>
+      </b-form-group>
+      <div id="address-qrcode">
+        <img v-if="isValid(amount,invoice)"
+             :src="getQrCodeImg">
+      </div>
+      <b-button variant="warning"
+                class="btn-o"
+                block
+                size="lg"
+                @click="closeModal">OK
+      </b-button>
     </b-container>
   </b-modal>
 </template>
 
 <script>
 import jrQrcode from 'jr-qrcode'
-import { API_VERSION, PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION } from '@/constants.js'
+import { API_VERSION, PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION, TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants.js'
 import BigNumber from 'bignumber.js'
 export default {
     name: 'Receive',
@@ -92,10 +99,37 @@ export default {
     },
     data() {
         return {
-            amount: 0
+            invoice: '',
+            amount: BigNumber(0)
         }
     },
     computed: {
+        receivedObject() {
+            if (this.invoice === '') {
+                return {
+                    protocol: PROTOCOL,
+                    api: 1,
+                    opc: OPC_ACCOUNT,
+                    address: this.address,
+                    amount: this.transferAmount
+                }
+            } else {
+                return {
+                    protocol: PROTOCOL,
+                    api: API_VERSION,
+                    opc: OPC_ACCOUNT,
+                    address: this.address,
+                    amount: this.transferAmount,
+                    invoice: this.invoice
+                }
+            }
+        },
+        isValidInvoice() {
+            if (!this.invoice) {
+                return void 0
+            }
+            return this.invoice.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+        },
         getQrCodeImg() {
             const options = {
                 padding: 10,
@@ -110,23 +144,9 @@ export default {
             const imgBase64 = jrQrcode.getQrBase64(text, options)
             return imgBase64
         },
-        receivedObject() {
-            return {
-                protocol: PROTOCOL,
-                api: API_VERSION,
-                opc: OPC_ACCOUNT,
-                address: this.address,
-                amount: this.transferAmount
-            }
-        },
         transferAmount() {
             if (this.amount) {
-                let tempAmount = BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
-                if (tempAmount.isGreaterThanOrEqualTo(Number.MAX_SAFE_INTEGER)) {
-                    return tempAmount.toFixed()
-                } else {
-                    return tempAmount.toNumber()
-                }
+                return BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
             }
         }
     },
@@ -136,13 +156,19 @@ export default {
             this.$refs.receiveModal.hide()
         },
         isAmountValid(amount) {
-            if (Number(amount) === 0) {
+            if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !isNaN(amount) && !this.isWrongFormat(amount) && !(/[eE]/.test(amount.toString()))
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !/[eE]/.test(amount.toString())
+        },
+        isNegative(amount) {
+            return BigNumber(amount).isLessThan(0)
         },
         isWrongFormat(amount) {
             return (amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8)
+        },
+        isValid(amount, invoice) {
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && invoice.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         copyAddr() {
             this.$refs.addrToCopy.select()

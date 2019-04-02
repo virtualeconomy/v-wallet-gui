@@ -48,8 +48,7 @@
                   :address-index="addressIndex"
                   :address="address"
                   :wallet-type="walletType"
-                  :is-canceled="beCanceledList[record.id]"
-                  @endCancelSignal="endCancelSignal"></Record>
+                  :is-canceled="beCanceledList[record.id]"></Record>
         </div>
       </div>
     </div>
@@ -99,7 +98,7 @@ import {NODE_IP, LEASE_TX, CANCEL_LEASE_TX} from '../../../constants'
 import Vue from 'vue'
 import Record from './Record'
 import browser from '../../../utils/browser'
-
+import JSONBigNumber from 'json-bignumber'
 export default {
     name: 'LeaseRecords',
     components: {
@@ -185,6 +184,13 @@ export default {
                     let rv = []
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
+                        let tempResponse = JSONBigNumber.parse(response.bodyText)[0]
+                        for (var i = 0; i < response.body[0].length; i++) {
+                            this.response[i].amount = tempResponse[i].amount
+                            if (this.response[i].lease) {
+                                this.response[i].lease.amount = tempResponse[i].lease.amount
+                            }
+                        }
                         this.response.forEach(function(v, i) {
                             if (v.type === LEASE_TX || v.type === CANCEL_LEASE_TX) {
                                 rv.push(v)
@@ -214,9 +220,6 @@ export default {
                     this.getLeaseRecords()
                 }
             }
-        },
-        endCancelSignal() {
-            this.$emit('updateInfo')
         }
     }
 }

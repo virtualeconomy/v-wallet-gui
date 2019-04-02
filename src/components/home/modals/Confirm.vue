@@ -79,6 +79,8 @@
 
 <script>
 import browser from '../../../utils/browser'
+import BigNumber from 'bignumber.js'
+import { TX_FEE } from '../../../constants'
 export default {
     name: 'Confirm',
     props: {
@@ -93,14 +95,18 @@ export default {
             default: ''
         },
         amount: {
-            type: Number,
+            type: BigNumber,
             require: true,
-            default: 0
+            default: function() {
+                return BigNumber(0)
+            }
         },
         fee: {
-            type: Number,
+            type: BigNumber,
             require: true,
-            default: 1
+            default: function() {
+                return BigNumber(TX_FEE)
+            }
         },
         attachment: {
             type: String,
@@ -114,7 +120,7 @@ export default {
     },
     methods: {
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }

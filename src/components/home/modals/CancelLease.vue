@@ -78,6 +78,7 @@ import TxInfoModal from '../elements/TxInfoModal'
 import seedLib from '@/libs/seed'
 import Vue from 'vue'
 import browser from '../../../utils/browser'
+import BigNumber from 'bignumber.js'
 export default {
     name: 'CancelLease',
     components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm },
@@ -103,14 +104,23 @@ export default {
             default: '',
             require: true
         },
+        fromAddress: {
+            type: String,
+            default: '',
+            require: true
+        },
         amount: {
-            type: Number,
-            default: 0,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(0)
+            },
             require: true
         },
         fee: {
-            type: Number,
-            default: TX_FEE,
+            type: BigNumber,
+            default: function() {
+                return BigNumber(TX_FEE)
+            },
             require: true
         },
         recipient: {
@@ -156,7 +166,7 @@ export default {
                 feeScale: FEE_SCALE,
                 txId: this.modalId,
                 timestamp: Date.now(),
-                api: API_VERSION
+                api: this.coldApi()
             }
         },
         userInfo() {
@@ -177,6 +187,15 @@ export default {
             this.sendError = false
             this.coldSignature = ''
             this.hasConfirmed = false
+        },
+        coldApi: function() {
+            let a = JSON.parse(window.localStorage.getItem(this.defaultAddress)).coldAddresses
+            let tempApi = JSON.parse(a)[this.fromAddress].api
+            if (tempApi === 1 && BigNumber(this.amount).isLessThan(BigNumber(Number.MAX_SAFE_INTEGER).dividedBy(1e8))) {
+                return 1
+            } else {
+                return API_VERSION
+            }
         },
         closeModal() {
             this.$refs.cancelLeaseModal.hide()
@@ -227,7 +246,7 @@ export default {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addressIndex).keyPair
         },
         formatter(num) {
-            return browser.numberFormatter(num)
+            return browser.bigNumberFormatter(num)
         }
     }
 }
