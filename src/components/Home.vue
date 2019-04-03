@@ -181,6 +181,7 @@ export default {
         if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
         } else {
+            this.getBlockHeight()
             this.getBalance(this.address)
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
@@ -310,7 +311,17 @@ export default {
                         }, 0)
                     }
                 }
-            }, response => {
+            }, respError => {
+                Vue.set(this.balance, address, new BigNumber(NaN))
+            })
+        },
+        getBlockHeight() {
+            const url = NODE_IP + '/blocks/last'
+            this.$http.get(url).then(response => {
+                let tempTime = new Date(response.body.timestamp / 1e6).toLocaleString()
+                window.localStorage.setItem('globalHeight', response.body.height)
+                window.localStorage.setItem('time', tempTime)
+            }, respError => {
                 this.$router.push('/warning')
             })
         },
