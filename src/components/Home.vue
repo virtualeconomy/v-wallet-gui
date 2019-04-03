@@ -311,7 +311,7 @@ export default {
                         }, 0)
                     }
                 }
-            }, response => {
+            }, respError => {
                 Vue.set(this.balance, address, new BigNumber(NaN))
             })
         },
@@ -321,7 +321,7 @@ export default {
                 let tempTime = new Date(response.body.timestamp / 1e6).toLocaleString()
                 window.localStorage.setItem('globalHeight', response.body.height)
                 window.localStorage.setItem('time', tempTime)
-            }, response => {
+            }, respError => {
                 this.$router.push('/warning')
             })
         },

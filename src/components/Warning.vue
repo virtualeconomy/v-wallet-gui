@@ -44,7 +44,7 @@ export default {
             if (response.body.height) {
                 this.$router.push('/login')
             }
-        }, response => {
+        }, respError => {
             this.$router.push('/warning')
         })
     }
