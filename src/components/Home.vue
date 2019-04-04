@@ -108,11 +108,11 @@
                   <div>
                     <img
                       class="img-active"
-                      src="../assets/imgs/icons/wallet/ic_card_solid.svg">
+                      src="../assets/imgs/icons/wallet/ic_minting_Solid.svg">
                     <img
                       class="img-nonactive"
-                      src="../assets/imgs/icons/wallet/ic_card_line.svg">
-                    <span class="tab-title">Leasing</span>
+                      src="../assets/imgs/icons/wallet/ic_minting_Line.svg">
+                    <span class="tab-title">Minting</span>
                   </div>
                 </template>
                 <div class="lease-pane">
