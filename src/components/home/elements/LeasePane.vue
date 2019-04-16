@@ -46,6 +46,10 @@
       </p>
     </div>
     <div class="col align-self-center text-right">
+      <b-button class="btn-list"
+                @click="redirectToVsysrate()">
+        <b>List of nodes</b>
+      </b-button>
       <b-button variant="dark"
                 class="btn-leasing"
                 v-b-modal.leaseModal>
@@ -75,9 +79,8 @@
           <span>You can cancel a leasing transaction as soon as it appears in the blockchain which usually occurs in a minute or less.</span>
         </div>
         <div class="description-split"></div>
-        <div>
-          <a href="javascript: void 0" >List of nodes</a>
-        </div>
+        <div><a href="http://vsysrate.com"
+                target="_blank" >List of nodes</a><span> You can lease your coins to supernode to get lease rewards</span></div>
       </div>
     </b-popover>
     <Lease show="false"
@@ -156,6 +159,9 @@ export default {
         }
     },
     methods: {
+        redirectToVsysrate() {
+            window.open('http://vsysrate.com')
+        },
         formatter(num) {
             return browser.bigNumberFormatter(num)
         },
@@ -192,8 +198,23 @@ export default {
     letter-spacing: 0;
     width: 144px;
     height: 42px;
+    margin-left: 8px;
 }
 .btn-leasing:active, .btn-leasing:hover {
+    background-color: #EB7D34 !important;
+    border: 1px solid #EB7D34 !important;
+}
+.btn-list{
+    background: #FFFFFF;
+    border-radius: 4px;
+    border: 1px solid #E8E9ED;
+    font-size: 17px;
+    color: #FF8737;
+    letter-spacing: 0;
+    width: 144px;
+    height: 42px;
+}
+.btn-list:active, .btn-leasing:hover {
     background-color: #EB7D34 !important;
     border: 1px solid #EB7D34 !important;
 }

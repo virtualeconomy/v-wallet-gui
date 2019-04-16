@@ -150,7 +150,8 @@
                  :tx-time="txTimestamp"
                  :tx-fee="fee"
                  :tx-amount="txAmount"
-                 :trans-type="'lease'"></TxInfoModal>
+                 :trans-type="'lease'"
+                 :self-send="isRaisingLease"></TxInfoModal>
   </div>
 </template>
 
@@ -187,7 +188,8 @@ export default {
             txTimestamp: 0,
             txAmount: BigNumber(0),
             timestamp: 0,
-            hasConfirmed: false
+            hasConfirmed: false,
+            isRaisingLease: 'true'
         }
     },
     props: {
@@ -257,7 +259,7 @@ export default {
             return BigNumber(num)
         },
         coldApi: function() {
-            if (this.coldAddresses[this.coldAddress].api === 1 && this.coldAmount <= 90000000) {
+            if (this.coldAddresses[this.coldAddress].api === 1 && (BigNumber(this.coldAmount).isLessThan(BigNumber(Number.MAX_SAFE_INTEGER).dividedBy(1e8)) || BigNumber(this.coldAmount).multipliedBy(1e8).mod(100).isEqualTo(0))) {
                 return 1
             } else {
                 return API_VERSION
@@ -345,8 +347,8 @@ export default {
             this.coldPageId++
         },
         showDetails() {
-            this.$root.$emit('bv::hide::modal', 'txInfoModal_lease' + this.txId)
-            this.$root.$emit('bv::show::modal', 'txInfoModal_lease' + this.txId)
+            this.$root.$emit('bv::hide::modal', 'txInfoModal_lease' + this.txId + this.isRaisingLease)
+            this.$root.$emit('bv::show::modal', 'txInfoModal_lease' + this.txId + this.isRaisingLease)
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

@@ -192,7 +192,7 @@
       <b-form-group label="Cold Wallet Address">
         <b-input-group class="mb-2"
                        v-if="coldWalletNum > 0"
-                       v-for="(pubkey, addr) in coldAddresses"
+                       v-for="(coldAccount, addr) in coldAddresses"
                        :key="addr">
           <b-dropdown :text="tagOfColdWallet[addr] ? 'public key' : 'address'"
                       class="pd-select2 input-t"
@@ -207,11 +207,11 @@
           <b-form-input readonly
                         size="sm"
                         class="input-t"
-                        :value="tagOfColdWallet[addr] ? pubkey : addr">
+                        :value="tagOfColdWallet[addr] ? coldAccount.publicKey : addr">
           </b-form-input>
           <b-input-group-append>
             <textarea id="coldToCopy"
-                      :value="tagOfColdWallet[addr] ? pubkey : addr"
+                      :value="tagOfColdWallet[addr] ? coldAccount.publicKey : addr"
                       ref="coldToCopy"
                       class="hidden"
                       readonly>

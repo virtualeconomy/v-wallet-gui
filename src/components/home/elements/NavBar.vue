@@ -146,7 +146,7 @@ export default {
             response: '',
             currentTime: '',
             showHeight: false,
-            currentHeight: ''
+            currentHeight: 0
         }
     },
     created() {
@@ -155,8 +155,7 @@ export default {
         if (this.showHeight) {
             this.childByValue(this.showHeight)
         }
-        this.currentHeight = this.getCurrentHeight()
-        this.currentTime = this.getCurrentTime()
+        this.getBlockHeight()
     },
     mounted() {
         jdenticon()
@@ -170,22 +169,6 @@ export default {
         }
     },
     methods: {
-        getCurrentHeight() {
-            let oldHeight = 0
-            try {
-                oldHeight = window.localStorage.getItem('globalHeight')
-            } catch (e) {
-            }
-            return oldHeight
-        },
-        getCurrentTime() {
-            let oldTime = 0
-            try {
-                oldTime = window.localStorage.getItem('time')
-            } catch (e) {
-            }
-            return oldTime
-        },
         getBlockHeight() {
             const url = NODE_IP + '/blocks/last'
             this.$http.get(url).then(response => {

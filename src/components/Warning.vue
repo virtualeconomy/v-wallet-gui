@@ -39,10 +39,12 @@ export default {
         }
     },
     created() {
-        const url = NODE_IP + '/blocks/height'
+        const url = NODE_IP + '/blocks/last'
         this.$http.get(url).then(response => {
-            this.$router.push('/login')
-        }, response => {
+            if (response.body.height) {
+                this.$router.push('/login')
+            }
+        }, respError => {
             this.$router.push('/warning')
         })
     }

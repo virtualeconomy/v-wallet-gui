@@ -214,11 +214,12 @@ export default {
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.response = response.body[0]
                         let count = 0
+                        let tempResponse = JSONBigNumber.parse(response.bodyText)[0]
                         for (var i = 0; i < response.body[0].length; i++) {
-                            response.body[0][i].amount = JSONBigNumber.parse(response.bodyText)[0][i].amount
+                            response.body[0][i].amount = tempResponse[i].amount
                             this.response[i].amount = response.body[0][i].amount
                             if (response.body[0][i].lease) {
-                                response.body[0][i].lease.amount = JSONBigNumber.parse(response.bodyText)[0][i].lease.amount
+                                response.body[0][i].lease.amount = tempResponse[i].lease.amount
                                 this.response[i].lease.amount = response.body[0][i].lease.amount
                             }
                         }

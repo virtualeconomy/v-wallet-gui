@@ -70,7 +70,7 @@
 
 <script>
 import Confirm from './Confirm'
-import { CANCEL_LEASE_TX, VSYS_PRECISION, NODE_IP, TX_FEE, FEE_SCALE, API_VERSION, PROTOCOL, OPC_TRANSACTION } from '../../../constants'
+import { CANCEL_LEASE_TX, VSYS_PRECISION, NODE_IP, TX_FEE, FEE_SCALE, PROTOCOL, OPC_TRANSACTION } from '../../../constants'
 import transaction from '@/utils/transaction'
 import ColdSignature from './ColdSignature'
 import CancelSuccess from './CancelSuccess'
@@ -189,13 +189,7 @@ export default {
             this.hasConfirmed = false
         },
         coldApi: function() {
-            let a = JSON.parse(window.localStorage.getItem(this.defaultAddress)).coldAddresses
-            let tempApi = JSON.parse(a)[this.fromAddress]['api']
-            if (tempApi === 1 && this.amount <= 90000000) {
-                return 1
-            } else {
-                return API_VERSION
-            }
+            return 1
         },
         closeModal() {
             this.$refs.cancelLeaseModal.hide()

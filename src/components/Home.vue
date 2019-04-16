@@ -137,11 +137,11 @@
                   <div>
                     <img
                       class="img-active"
-                      src="../assets/imgs/icons/wallet/ic_card_solid.svg">
+                      src="../assets/imgs/icons/wallet/ic_minting_Solid.svg">
                     <img
                       class="img-nonactive"
-                      src="../assets/imgs/icons/wallet/ic_card_line.svg">
-                    <span class="tab-title">Leasing</span>
+                      src="../assets/imgs/icons/wallet/ic_minting_Line.svg">
+                    <span class="tab-title">Minting</span>
                   </div>
                 </template>
                 <div class="lease-pane">
@@ -161,8 +161,7 @@
                   <LeaseRecords :address="selectedAddress"
                                 :wallet-type="walletType"
                                 :cold-pub-key="coldPubKey"
-                                :address-index="addresses[selectedAddress]"
-                                @updateInfo="updateInfo"></LeaseRecords>
+                                :address-index="addresses[selectedAddress]"></LeaseRecords>
                 </div>
               </b-tab>
             </b-tabs>
@@ -215,6 +214,7 @@ export default {
         if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
         } else {
+            this.getBlockHeight()
             this.getBalance(this.address)
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
@@ -235,13 +235,16 @@ export default {
             for (const addr in this.coldAddresses) {
                 this.getBalance(addr)
             }
-            for (var i in this.coldAddresses) {
-                if (!this.coldAddresses[i].hasOwnProperty('api')) {
-                    let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': i, 'api': 1, 'publicKey': this.coldAddresses[i]}
-                    Vue.set(this.coldAddresses, i, JSON.parse(JSON.stringify(tempObj)))
-                    this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
+            let localChanging = false
+            for (const addr in this.coldAddresses) {
+                if (!this.coldAddresses[addr].hasOwnProperty('api')) {
+                    localChanging = true
+                    let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': addr, 'api': 1, 'publicKey': this.coldAddresses[addr]}
+                    Vue.set(this.coldAddresses, addr, JSON.parse(JSON.stringify(tempObj)))
                 }
-                Vue.set(this.coldAddressesShow, i, this.coldAddresses[i].publicKey)
+            }
+            if (localChanging) {
+                this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
             }
             this.getBalance(this.selectedAddress)
         }
@@ -341,7 +344,17 @@ export default {
                         }, 0)
                     }
                 }
-            }, response => {
+            }, respError => {
+                Vue.set(this.balance, address, new BigNumber(NaN))
+            })
+        },
+        getBlockHeight() {
+            const url = NODE_IP + '/blocks/last'
+            this.$http.get(url).then(response => {
+                let tempTime = new Date(response.body.timestamp / 1e6).toLocaleString()
+                window.localStorage.setItem('globalHeight', response.body.height)
+                window.localStorage.setItem('time', tempTime)
+            }, respError => {
                 this.$router.push('/warning')
             })
         },

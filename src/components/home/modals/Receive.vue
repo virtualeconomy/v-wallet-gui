@@ -53,27 +53,41 @@
           The number in this field is invalid. The minimum unit of amount is 0.00000001.
         </b-form-invalid-feedback>
         <b-form-invalid-feedback id="inputLiveFeedback"
+                                 v-else-if="isNegative(amount)">
+          Negative number is not allowed.
+        </b-form-invalid-feedback>
+        <b-form-invalid-feedback id="inputLiveFeedback"
                                  v-else>
           Invalid Input.
         </b-form-invalid-feedback>
-        <div id="address-qrcode">
-          <img v-if="!isWrongFormat(amount)"
-               :src="getQrCodeImg">
-        </div>
-        <b-button variant="warning"
-                  class="btn-o"
-                  block
-                  size="lg"
-                  @click="closeModal">OK
-        </b-button>
       </b-form-group>
+      <b-form-group label="Invoice"
+                    style="text-align: left"
+                    label-for="descriptionInput">
+        <b-form-textarea id="descriptionInput"
+                         v-model="invoice"
+                         :rows="3"
+                         :no-resize="true"
+                         :state="isValidInvoice">
+        </b-form-textarea>
+      </b-form-group>
+      <div id="address-qrcode">
+        <img v-if="isValid(amount,invoice)"
+             :src="getQrCodeImg">
+      </div>
+      <b-button variant="warning"
+                class="btn-o"
+                block
+                size="lg"
+                @click="closeModal">OK
+      </b-button>
     </b-container>
   </b-modal>
 </template>
 
 <script>
 import jrQrcode from 'jr-qrcode'
-import { API_VERSION, PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION } from '@/constants.js'
+import { API_VERSION, PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION, TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants.js'
 import BigNumber from 'bignumber.js'
 export default {
     name: 'Receive',
@@ -85,10 +99,37 @@ export default {
     },
     data() {
         return {
+            invoice: '',
             amount: BigNumber(0)
         }
     },
     computed: {
+        receivedObject() {
+            if (this.invoice === '') {
+                return {
+                    protocol: PROTOCOL,
+                    api: 1,
+                    opc: OPC_ACCOUNT,
+                    address: this.address,
+                    amount: this.transferAmount
+                }
+            } else {
+                return {
+                    protocol: PROTOCOL,
+                    api: API_VERSION,
+                    opc: OPC_ACCOUNT,
+                    address: this.address,
+                    amount: this.transferAmount,
+                    invoice: this.invoice
+                }
+            }
+        },
+        isValidInvoice() {
+            if (!this.invoice) {
+                return void 0
+            }
+            return this.invoice.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+        },
         getQrCodeImg() {
             const options = {
                 padding: 10,
@@ -102,15 +143,6 @@ export default {
             const text = JSON.stringify(this.receivedObject).replace(/"amount":"(\d+)"/g, '"amount":$1') // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
             const imgBase64 = jrQrcode.getQrBase64(text, options)
             return imgBase64
-        },
-        receivedObject() {
-            return {
-                protocol: PROTOCOL,
-                api: API_VERSION,
-                opc: OPC_ACCOUNT,
-                address: this.address,
-                amount: this.transferAmount
-            }
         },
         transferAmount() {
             if (this.amount) {
@@ -127,10 +159,16 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !(/[eE]/.test(amount.toString()))
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !/[eE]/.test(amount.toString())
+        },
+        isNegative(amount) {
+            return BigNumber(amount).isLessThan(0)
         },
         isWrongFormat(amount) {
             return (amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8)
+        },
+        isValid(amount, invoice) {
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && invoice.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         copyAddr() {
             this.$refs.addrToCopy.select()
