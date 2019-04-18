@@ -35,10 +35,9 @@
                 v-b-modal.newTokenModal>
         <img v-if="!isMobile"
              class="icon-btn"
-             src="../../../assets/imgs/icons/wallet/ic_new_token.svg"><b>New Token</b></b-button>
+             src="../../../assets/imgs/icons/wallet/ic_new_token.svg"><b>Create Token</b></b-button>
     </div>
-    <AddToken show="false"
-              :address="address"></AddToken>
+    <AddToken show="false"></AddToken>
     <NewToken show="false"
               :balances="balances"
               :cold-addresses="coldAddresses"
