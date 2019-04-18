@@ -100,7 +100,8 @@
                               @updateInfo="updateInfo"></trans-pane>
                 </div>
                 <div class="f-records">
-                  <Records :address="selectedAddress"></Records>
+                  <Records :address="selectedAddress"
+                           :tab-active="tabActive"></Records>
                 </div>
               </b-tab>
               <b-tab>
@@ -130,6 +131,7 @@
                 </div>
                 <div class="f-records">
                   <LeaseRecords :address="selectedAddress"
+                                :tab-active="tabActive"
                                 :wallet-type="walletType"
                                 :cold-pub-key="coldPubKey"
                                 :address-index="addresses[selectedAddress]"></LeaseRecords>
@@ -169,7 +171,7 @@ export default {
             sortedAddresses: {},
             walletType: '',
             sortFlag: 0,
-            transActive: 'trans',
+            tabActive: 'trans',
             available: BigNumber(0),
             leasedIn: BigNumber(0),
             leasedOut: BigNumber(0),
@@ -182,7 +184,6 @@ export default {
             this.$router.push('/login')
         } else {
             this.getBlockHeight()
-            this.getBalance(this.address)
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
             let unsortedColdAddresses = {}
@@ -213,7 +214,6 @@ export default {
             if (localChanging) {
                 this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
             }
-            this.getBalance(this.selectedAddress)
         }
     },
 
@@ -281,9 +281,9 @@ export default {
         },
         tranTabChange(tabIndex) {
             if (tabIndex === 0) {
-                this.transActive = 'trans'
+                this.tabActive = 'trans'
             } else if (tabIndex === 1) {
-                this.transActive = 'lease'
+                this.tabActive = 'lease'
                 this.getBalance(this.selectedAddress)
             }
         },
@@ -303,7 +303,7 @@ export default {
                     this.available = tempResponse.available.dividedBy(VSYS_PRECISION)
                     this.leasedOut = tempResponse.regular.minus(tempResponse.available).dividedBy(VSYS_PRECISION)
                     this.leasedIn = tempResponse.effective.minus(tempResponse.available).dividedBy(VSYS_PRECISION)
-                    if (!changestatus) {
+                    if (changestatus) {
                         let addrtmp = this.selectedAddress
                         this.selectedAddress = ''
                         setTimeout(() => {
