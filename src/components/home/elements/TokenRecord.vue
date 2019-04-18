@@ -172,6 +172,9 @@ export default {
                 this.issuer = response.body.info[0]['data']
                 this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
             }, respError => {
+                this.issuer = 'Failed to get issuer'
+                this.registerTime = 'Failed to get time'
+                this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
             })
         },
         issueToken() {
