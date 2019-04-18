@@ -33,6 +33,7 @@ import Vue from 'vue'
 import browser from '../../../utils/browser'
 import TokenRecord from './TokenRecord'
 import AddToken from '../modals/AddToken'
+import bus from '../../../assets/bus'
 // import BigNumber from 'bignumber.js'
 export default {
     name: 'TokenRecords',
@@ -51,7 +52,8 @@ export default {
             tokenRecords: {},
             showingNum: 10,
             changeShowDisable: false,
-            myHeight: '0'
+            myHeight: '0',
+            flagNum: 0
         }
     },
     props: {
@@ -75,7 +77,22 @@ export default {
             require: true
         }
     },
-
+    watch: {
+        address(newAddr, oldAddr) {
+            if (newAddr === '') {
+                return
+            }
+            this.response = []
+            this.changeShowDisable = false
+            this.showingNum = 10
+            if (this.address && Vue.ls.get('pwd')) {
+                this.gettokenRecords()
+            }
+        },
+        flagNum(val) {
+            this.gettokenRecords()
+        }
+    },
     computed: {
         seedaddress() {
             if (Vue.ls.get('address')) {
@@ -86,7 +103,12 @@ export default {
             return JSON.parse(window.localStorage.getItem(this.seedaddress))
         }
     },
-
+    mounted() {
+        bus.$on('sendFlag', (data) => {
+            this.gettokenRecords()
+            this.flagNum++
+        })
+    },
     methods: {
         isMobile() {
             return browser.isMobile()
@@ -94,9 +116,10 @@ export default {
         gettokenRecords() {
             if (this.address) {
                 this.changeShowDisable = true
-                let records = {}
-                records = JSON.parse(this.userInfo.tokens)
-                this.tokenRecords = records
+                let records = JSON.parse(window.localStorage.getItem(this.seedaddress))
+                if (records.tokens) {
+                    this.tokenRecords = JSON.parse(records.tokens)
+                }
                 this.changeShowDisable = false
             }
         }
