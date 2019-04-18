@@ -17,7 +17,7 @@
       <b-col class="record-blank"></b-col>
       <b-col cols="auto">
         <div>
-          <span>{{ formatter(txAmount) }} </span>
+          <span>{{ formatter(totalSupply) }} </span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -45,8 +45,11 @@
       </b-col>
     </b-row>
     <TokenInfoModal :token-id="tokenId"
-                    :address="address"
-                    :addresses="addresses">
+                    :issuer="issuer"
+                    :total-supply="formatter(totalSupply)"
+                    :issued-tokens="formatter(issuedTokens)"
+                    :description="description"
+                    :register-time="registerTime">
     </TokenInfoModal>
     <IssueToken :token-id="tokenId"
                 :address="address"
@@ -64,11 +67,13 @@
 </template>
 
 <script>
-import browser from '../../../utils/browser'
+import base58 from '@/libs/base58'
+import converters from '@/libs/converters'
 import TokenInfoModal from './TokenInfoModal'
 import IssueToken from './IssueToken'
 import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
+import { NODE_IP } from '../../../constants.js'
 export default {
     name: 'TokenRecord',
     components: { TokenInfoModal, IssueToken, BurnToken },
@@ -78,17 +83,12 @@ export default {
             heightStatus: false,
             hovered: false,
             cancelTime: 0,
-            showCancelDetails: false
+            showCancelDetails: false,
+            issuer: '',
+            registerTime: '2019'
         }
     },
     props: {
-        balance: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
         address: {
             type: String,
             default: ''
@@ -108,13 +108,6 @@ export default {
             default: function() {},
             require: true
         },
-        total: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
         walletType: {
             type: String,
             default: '',
@@ -123,6 +116,11 @@ export default {
         selectedAddress: {
             type: String,
             default: this ? this.defaultAddress : undefined,
+            require: true
+        },
+        tokenRecord: {
+            type: Array,
+            default: function() {},
             require: true
         },
         tokenId: {
@@ -139,8 +137,19 @@ export default {
                 return addrChars.join('')
             }
         },
-        txAmount() {
-            return 100
+        totalSupply() {
+            return this.tokenRecord[0]['data']
+        },
+        issuedTokens() {
+            return this.tokenRecord[3]['data']
+        },
+        description() {
+            let bytes = base58.decode(this.tokenRecord[2]['data'])
+            try {
+                return converters.byteArrayToString(bytes)
+            } catch (e) {
+                return ''
+            }
         }
     },
     methods: {
@@ -154,10 +163,16 @@ export default {
             this.hovered = false
         },
         formatter(num) {
-            return browser.bigNumberFormatter(num)
+            num = BigNumber(num)
+            return num.toFixed(Math.log10(this.tokenRecord[1]['data']))
         },
         showModal() {
-            this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
+            const url = NODE_IP + '/contract/info/' + 'CFAGtf7AEsKzQxBQvJnKFbLST44Wzupmiw2'
+            this.$http.get(url).then(response => {
+                this.issuer = response.body.info[0]['data']
+                this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
+            }, respError => {
+            })
         },
         issueToken() {
             this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)

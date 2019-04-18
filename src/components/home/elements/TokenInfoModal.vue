@@ -26,48 +26,58 @@
       </div>
       <div class="tx-block">
         <label>Issuer</label>
-        <span>{{ address }}</span>
+        <span>{{ issuer }}</span>
       </div>
       <div class="tx-fee">
-        <label>Regist Time</label>
-        <span>{{ txTime }}</span>
+        <label>Register Time</label>
+        <span>{{ registerTime }}</span>
       </div>
       <div class="tx-attachment">
         <label>Total Supply</label>
-        <span>{{ tokenAmount }}</span>
+        <span>{{ totalSupply }}</span>
       </div>
       <div class="tx-attachment">
         <label>Issued tokens</label>
         <span>{{ issuedTokens }}</span>
       </div>
       <div class="tx-attachment">
-        <label>Desription</label>
-        <span>{{ tokenDescription }}</span>
+        <label>Description</label>
+        <span>{{ description }}</span>
       </div>
     </div>
   </b-modal>
 </template>
 
 <script>
-import browser from '../../../utils/browser'
 export default {
     name: 'TokenInfoModal',
     props: {
-        address: {
-            type: String,
-            default: ''
-        },
-        walletType: {
+        tokenId: {
             type: String,
             default: '',
             require: true
         },
-        addresses: {
-            type: Object,
-            default: function() {},
+        totalSupply: {
+            type: String,
+            default: '',
             require: true
         },
-        tokenId: {
+        issuedTokens: {
+            type: String,
+            default: '',
+            require: true
+        },
+        description: {
+            type: String,
+            default: '',
+            require: true
+        },
+        issuer: {
+            type: String,
+            default: '',
+            require: true
+        },
+        registerTime: {
             type: String,
             default: '',
             require: true
@@ -76,26 +86,11 @@ export default {
     computed: {
         txClass() {
             return this.txIcon.replace(/\s+/g, '')
-        },
-        tokenAmount() {
-            return '100VSYS'
-        },
-        issuedTokens() {
-            return '1VSYS'
-        },
-        tokenDescription() {
-            return 'the token is belong to yll'
-        },
-        txTime() {
-            return '2019.1.1'
         }
     },
     methods: {
         closeModal() {
             this.$refs.tokenInfoModal.hide()
-        },
-        formatter(num) {
-            return browser.bigNumberFormatter(num)
         }
     }
 }
