@@ -3,64 +3,67 @@
            ref="addTokenModal"
            centered
            hide-footer
+           hide-header
            lazy
-           title="Add Token">
-    <b-container
-      fluid
-      class="modal-c">
-      <b-form-group label="Token ID"
-                    class="forms"
-                    label-for="amountInput">
-        <b-form-input id="amountInput"
-                      class="input-t"
-                      v-model="tokenId"
-                      aria-describedby="inputLiveFeedback"
-                      :state="isValidToken(tokenId)"
-                      min="0">
-        </b-form-input>
-        <b-form-invalid-feedback id="inputLiveFeedback">
-          Token does not exist!
-        </b-form-invalid-feedback>
-
-        <br>
-        <br>
-        <b-button variant="warning"
-                  class="btn-o"
-                  block
-                  size="lg"
-                  @click="okModal">OK
-        </b-button>
-      </b-form-group>
-    </b-container>
+           :busy="true"
+           title="Add Token"
+           @hidden="closeModal">
+    <button class="close btn-close"
+            @click="closeModal">
+      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+    </button>
+    <b-tabs>
+      <b-tab title="Add Token">
+        <b-container
+          class="text-left">
+          <b-form-group label="Token ID"
+                        class="forms"
+                        label-for="amountInput">
+            <b-form-input id="amountInput"
+                          class="input-t"
+                          v-model="tokenId"
+                          aria-describedby="inputLiveFeedback"
+                          :state="isValidToken()">
+            </b-form-input>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     style="font-size: 15px;margin-top: 10px">
+              Token does not exist!
+            </b-form-invalid-feedback>
+            <b-button variant="warning"
+                      class="btn-o"
+                      block
+                      size="lg"
+                      :disabled="isAddable"
+                      @click="addModal">Add
+            </b-button>
+          </b-form-group>
+        </b-container>
+      </b-tab>
+    </b-tabs>
   </b-modal>
 </template>
 
 <script>
 import Vue from 'vue'
+import { NODE_IP } from '../../../constants.js'
 export default {
     name: 'AddToken',
-    props: {
-        address: {
-            type: String,
-            default: ''
-        }
-    },
     data() {
         return {
             tokens: {},
             tokenId: '',
-            issuer: '',
-            registerTime: '',
-            description: '',
-            balance: 0,
-            errFlag: false,
-            tokenObj: '',
-            identifyFlag: 'true'
+            init: false,
+            responseErr: false
         }
     },
     created() {
         if (this.userInfo && this.userInfo.tokens) {
             this.tokens = JSON.parse(this.userInfo.tokens)
+        }
+    },
+    watch: {
+        tokenId() {
+            this.responseErr = false
         }
     },
     computed: {
@@ -71,12 +74,16 @@ export default {
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.seedaddress))
+        },
+        isAddable() {
+            return !this.tokenId.length > 0
         }
     },
 
     methods: {
         closeModal() {
-            this.balance = 0
+            this.init = false
+            this.responseErr = false
             this.tokenId = ''
             this.$refs.addTokenModal.hide()
         },
@@ -84,24 +91,24 @@ export default {
             Vue.set(this.userInfo, fieldname, value)
             window.localStorage.setItem(this.seedaddress, JSON.stringify(this.userInfo))
         },
-        okModal() {
-            if (this.isValidToken(this.tokenId)) {
-                let obj = {'tokenId': this.tokenId, 'description': 'this token is belong to me ', 'issuer': 'll yang', 'flag': 'true'}
-                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(obj)))
+        addModal() {
+            this.init = true
+            this.tokens = JSON.parse(this.userInfo.tokens)
+            const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
+            this.$http.get(url).then(response => {
+                this.responseErr = false
+                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(response.body['info'])))
                 this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
+                this.$refs.addTokenModal.hide()
+            }, respError => {
+                this.responseErr = true
+            })
+        },
+        isValidToken() {
+            if (!this.init || this.tokenId.length === 0 || this.responseErr === false) {
+                return void 0
             }
-            this.balance = 0
-            this.tokenId = ''
-            this.$refs.addTokenModal.hide()
-        },
-        isValidToken: function(token) {
-            return !this.isWrongFormat() && !this.inexistAddr()
-        },
-        inexistAddr(token) {
-            return false
-        },
-        isWrongFormat(token) {
-            return false
+            return !this.responseErr
         }
     }
 
@@ -138,14 +145,15 @@ input[type=number]::-webkit-outer-spin-button {
     position: absolute;
     right: 0;
     margin-right: 20px;
-    margin-top: 4px;
+    margin-top: 20px;
 }
 .btn-o {
     font-size: 17px;
     color: #FFFFFF;
     letter-spacing: 0;
     text-align: center;
-    height: 44px;
+    height: 48px;
+    margin-top: 10px;
 }
 .btn-copy {
     position: absolute;

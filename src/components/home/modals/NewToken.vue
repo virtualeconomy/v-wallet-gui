@@ -41,7 +41,7 @@
               <span class="balance">{{ formatter(balances[address]) }} VSYS</span>
             </b-btn>
           </b-form-group>
-          <b-form-group label="Total Tokens"
+          <b-form-group label="Total Supply"
                         label-for="amount-input">
             <b-form-input id="amount-input"
                           class="amount-input"

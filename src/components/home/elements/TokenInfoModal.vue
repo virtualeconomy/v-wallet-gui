@@ -33,7 +33,7 @@
         <span>{{ txTime }}</span>
       </div>
       <div class="tx-attachment">
-        <label>Total Tokens</label>
+        <label>Total Supply</label>
         <span>{{ tokenAmount }}</span>
       </div>
       <div class="tx-attachment">
