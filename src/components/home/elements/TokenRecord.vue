@@ -181,7 +181,7 @@ export default {
             window.localStorage.setItem(this.seedaddress, JSON.stringify(this.userInfo))
         },
         removeToken() {
-            var isRemove = confirm('Are you sure to removing this token ?')
+            var isRemove = confirm('Are you sure to remove this token ?')
             if (isRemove) {
                 var user = JSON.parse(window.localStorage.getItem(this.seedaddress))
                 var arr = JSON.parse(user.tokens)
