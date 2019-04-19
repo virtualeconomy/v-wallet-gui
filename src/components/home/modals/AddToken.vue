@@ -93,7 +93,9 @@ export default {
         },
         addModal() {
             this.init = true
-            this.tokens = JSON.parse(this.userInfo.tokens)
+            if (this.userInfo.tokens) {
+                this.tokens = JSON.parse(this.userInfo.tokens)
+            }
             const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(url).then(response => {
                 this.responseErr = false
