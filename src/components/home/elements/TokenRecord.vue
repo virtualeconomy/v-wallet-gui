@@ -17,7 +17,7 @@
       <b-col class="record-blank"></b-col>
       <b-col cols="auto">
         <div>
-          <span>{{ formatter(txAmount) }} </span>
+          <span>{{ formatter(totalSupply) }} </span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -46,8 +46,10 @@
       </b-col>
     </b-row>
     <TokenInfoModal :token-id="tokenId"
-                    :address="address"
-                    :addresses="addresses">
+                    :issuer="issuer"
+                    :total-supply="formatter(totalSupply)"
+                    :issued-tokens="formatter(issuedTokens)"
+                    :description="description">
     </TokenInfoModal>
     <IssueToken :token-id="tokenId"
                 :address="address"
@@ -65,33 +67,28 @@
 </template>
 
 <script>
-import browser from '../../../utils/browser'
+import base58 from '@/libs/base58'
+import converters from '@/libs/converters'
 import TokenInfoModal from './TokenInfoModal'
 import IssueToken from './IssueToken'
 import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
+import { NODE_IP } from '../../../constants.js'
 import Vue from 'vue'
 export default {
     name: 'TokenRecord',
     components: { TokenInfoModal, IssueToken, BurnToken },
     data: function() {
         return {
-            differenceHeight: 0,
-            heightStatus: false,
+            tokens: {},
             hovered: false,
             cancelTime: 0,
             showCancelDetails: false,
-            removeFlag: false
+            removeFlag: false，
+            issuer: ''
         }
     },
     props: {
-        balance: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
         address: {
             type: String,
             default: ''
@@ -111,13 +108,6 @@ export default {
             default: function() {},
             require: true
         },
-        total: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
         walletType: {
             type: String,
             default: '',
@@ -128,6 +118,11 @@ export default {
             default: this ? this.defaultAddress : undefined,
             require: true
         },
+        tokenRecord: {
+            type: Array,
+            default: function() {},
+            require: true
+        },
         tokenId: {
             type: String,
             default: '',
@@ -135,6 +130,14 @@ export default {
         }
     },
     computed: {
+        seedaddress() {
+            if (Vue.ls.get('address')) {
+                return Vue.ls.get('address')
+            }
+        },
+        userInfo() {
+            return JSON.parse(window.localStorage.getItem(this.seedaddress))
+        },
         txAddressShow() {
             if (this.txAddress) {
                 const addrChars = this.txAddress.split('')
@@ -152,9 +155,32 @@ export default {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
             }
+        },
+        totalSupply() {
+            return this.tokenRecord[0]['data']
+        },
+        issuedTokens() {
+            return this.tokenRecord[3]['data']
+        },
+        contract() {
+            let bytes = base58.decode(this.tokenId)
+            bytes = bytes.slice(0, bytes.length - 4)
+            return base58.encode(bytes)
+        },
+        description() {
+            let bytes = base58.decode(this.tokenRecord[2]['data'])
+            try {
+                return converters.byteArrayToString(bytes)
+            } catch (e) {
+                return ''
+            }
         }
     },
     methods: {
+        setUsrLocalStorage(fieldname, value) {
+            Vue.set(this.userInfo, fieldname, value)
+            window.localStorage.setItem(this.seedaddress, JSON.stringify(this.userInfo))
+        },
         closeModal() {
             this.$refs.infoModal.hide()
         },
@@ -165,10 +191,28 @@ export default {
             this.hovered = false
         },
         formatter(num) {
-            return browser.bigNumberFormatter(num)
+            num = BigNumber(num)
+            return num.toFixed(Math.log10(this.tokenRecord[1]['data']))
         },
         showModal() {
-            this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
+            if (this.userInfo && this.userInfo.tokens) {
+                this.tokens = JSON.parse(this.userInfo.tokens)
+            }
+            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
+            this.$http.get(tokenUrl).then(response => {
+                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(response.body['info'])))
+                this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
+            }, respError => {
+            })
+            const url = NODE_IP + '/contract/info/' + this.contract
+            this.$http.get(url).then(response => {
+                this.issuer = response.body.info[0]['data']
+                this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
+            }, respError => {
+                this.issuer = 'Failed to get issuer'
+                this.registerTime = 'Failed to get time'
+                this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
+            })
         },
         issueToken() {
             this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)

@@ -5,10 +5,12 @@
       <span>Token Watch List</span>
     </div>
     <div class="inherit-height">
-      <div class="scroll">
+      <div class="scroll"
+           :style="{height: myHeight}">
         <TokenRecord v-for="(index,tokenId) in tokenRecords"
                      :key="tokenId"
                      :token-id="tokenId"
+                     :token-record="index"
                      :address="address"
                      :addresses="addresses"
                      :cold-addresses="coldAddresses"
@@ -34,7 +36,7 @@ import Vue from 'vue'
 import browser from '../../../utils/browser'
 import TokenRecord from './TokenRecord'
 import AddToken from '../modals/AddToken'
-// import BigNumber from 'bignumber.js'
+import bus from '../../../assets/bus'
 export default {
     name: 'TokenRecords',
     components: {
@@ -50,7 +52,6 @@ export default {
     data() {
         return {
             tokenRecords: {},
-            showingNum: 10,
             changeShowDisable: false,
             myHeight: '0'
         }
@@ -76,7 +77,6 @@ export default {
             require: true
         }
     },
-
     computed: {
         seedaddress() {
             if (Vue.ls.get('address')) {
@@ -87,7 +87,11 @@ export default {
             return JSON.parse(window.localStorage.getItem(this.seedaddress))
         }
     },
-
+    mounted() {
+        bus.$on('sendFlag', (data) => {
+            setTimeout(() => { this.gettokenRecords() }, 3000)
+        })
+    },
     methods: {
         isMobile() {
             return browser.isMobile()
