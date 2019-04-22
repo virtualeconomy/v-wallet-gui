@@ -74,16 +74,14 @@ import IssueToken from './IssueToken'
 import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
 import { NODE_IP } from '../../../constants.js'
+import Vue from 'vue'
 export default {
     name: 'TokenRecord',
     components: { TokenInfoModal, IssueToken, BurnToken },
     data: function() {
         return {
-            differenceHeight: 0,
-            heightStatus: false,
+            tokens: {},
             hovered: false,
-            cancelTime: 0,
-            showCancelDetails: false,
             issuer: '',
             registerTime: '2019'
         }
@@ -130,6 +128,14 @@ export default {
         }
     },
     computed: {
+        seedaddress() {
+            if (Vue.ls.get('address')) {
+                return Vue.ls.get('address')
+            }
+        },
+        userInfo() {
+            return JSON.parse(window.localStorage.getItem(this.seedaddress))
+        },
         txAddressShow() {
             if (this.txAddress) {
                 const addrChars = this.txAddress.split('')
@@ -153,6 +159,10 @@ export default {
         }
     },
     methods: {
+        setUsrLocalStorage(fieldname, value) {
+            Vue.set(this.userInfo, fieldname, value)
+            window.localStorage.setItem(this.seedaddress, JSON.stringify(this.userInfo))
+        },
         closeModal() {
             this.$refs.infoModal.hide()
         },
@@ -167,6 +177,16 @@ export default {
             return num.toFixed(Math.log10(this.tokenRecord[1]['data']))
         },
         showModal() {
+            if (this.userInfo && this.userInfo.tokens) {
+                this.tokens = JSON.parse(this.userInfo.tokens)
+            }
+            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
+            this.$http.get(tokenUrl).then(response => {
+                console.log('test', response, this.tokens)
+                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(response.body['info'])))
+                this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
+            }, respError => {
+            })
             const url = NODE_IP + '/contract/info/' + 'CFAGtf7AEsKzQxBQvJnKFbLST44Wzupmiw2'
             this.$http.get(url).then(response => {
                 this.issuer = response.body.info[0]['data']
