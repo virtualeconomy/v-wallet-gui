@@ -5,10 +5,11 @@
       <span>Token Watch List</span>
     </div>
     <div class="inherit-height">
-      <div v-for="(record, tokenId) in tokenRecords"
-           :key="record.index">
-        <TokenRecord :token-id="tokenId"
-                     :token-record="record"
+      <div class="scroll"
+           :style="{height: myHeight}">
+        <TokenRecord v-for="(index,tokenId) in tokenRecords"
+                     :key="tokenId"
+                     :token-id="tokenId"
                      :address="address"
                      :addresses="addresses"
                      :cold-addresses="coldAddresses"
@@ -33,6 +34,7 @@ import Vue from 'vue'
 import browser from '../../../utils/browser'
 import TokenRecord from './TokenRecord'
 import AddToken from '../modals/AddToken'
+import bus from '../../../assets/bus'
 export default {
     name: 'TokenRecords',
     components: {
@@ -73,7 +75,6 @@ export default {
             require: true
         }
     },
-
     computed: {
         seedaddress() {
             if (Vue.ls.get('address')) {
@@ -84,7 +85,11 @@ export default {
             return JSON.parse(window.localStorage.getItem(this.seedaddress))
         }
     },
-
+    mounted() {
+        bus.$on('sendFlag', (data) => {
+            setTimeout(() => { this.gettokenRecords() }, 3000)
+        })
+    },
     methods: {
         isMobile() {
             return browser.isMobile()
@@ -92,9 +97,10 @@ export default {
         gettokenRecords() {
             if (this.address) {
                 this.changeShowDisable = true
-                let records = {}
-                records = JSON.parse(this.userInfo.tokens)
-                this.tokenRecords = records
+                let records = JSON.parse(window.localStorage.getItem(this.seedaddress))
+                if (records.tokens) {
+                    this.tokenRecords = JSON.parse(records.tokens)
+                }
                 this.changeShowDisable = false
             }
         }

@@ -46,6 +46,7 @@
 <script>
 import Vue from 'vue'
 import { NODE_IP } from '../../../constants.js'
+import bus from '../../../assets/bus'
 export default {
     name: 'AddToken',
     data() {
@@ -53,7 +54,8 @@ export default {
             tokens: {},
             tokenId: '',
             init: false,
-            responseErr: false
+            responseErr: false,
+            sendFlag: false
         }
     },
     created() {
@@ -105,6 +107,9 @@ export default {
             }, respError => {
                 this.responseErr = true
             })
+            this.sendFlag = true
+            bus.$emit('sendFlag', this.sendFlag)
+            this.sendFlag = false
         },
         isValidToken() {
             if (!this.init || this.tokenId.length === 0 || this.responseErr === false) {
