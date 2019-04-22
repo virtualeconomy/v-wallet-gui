@@ -10,6 +10,7 @@
         <TokenRecord v-for="(index,tokenId) in tokenRecords"
                      :key="tokenId"
                      :token-id="tokenId"
+                     :token-record="index"
                      :address="address"
                      :addresses="addresses"
                      :cold-addresses="coldAddresses"
