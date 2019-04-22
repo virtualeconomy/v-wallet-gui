@@ -84,7 +84,7 @@ export default {
             hovered: false,
             cancelTime: 0,
             showCancelDetails: false,
-            removeFlag: false，
+            removeFlag: false,
             issuer: ''
         }
     },
@@ -130,14 +130,6 @@ export default {
         }
     },
     computed: {
-        seedaddress() {
-            if (Vue.ls.get('address')) {
-                return Vue.ls.get('address')
-            }
-        },
-        userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.seedaddress))
-        },
         txAddressShow() {
             if (this.txAddress) {
                 const addrChars = this.txAddress.split('')
@@ -219,10 +211,6 @@ export default {
         },
         burnToken() {
             this.$root.$emit('bv::show::modal', 'burnTokenModal_' + this.tokenId)
-        },
-        setUsrLocalStorage(fieldname, value) {
-            Vue.set(this.userInfo, fieldname, value)
-            window.localStorage.setItem(this.seedaddress, JSON.stringify(this.userInfo))
         },
         removeToken() {
             var isRemove = confirm('Are you sure to remove this token ?')
