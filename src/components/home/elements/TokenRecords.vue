@@ -14,7 +14,8 @@
                      :address="address"
                      :addresses="addresses"
                      :cold-addresses="coldAddresses"
-                     :wallet-type="walletType"></TokenRecord>
+                     :wallet-type="walletType"
+                     @removeFlag="removeToken"></TokenRecord>
       </div>
     </div>
   </div>
@@ -103,6 +104,11 @@ export default {
                     this.tokenRecords = JSON.parse(records.tokens)
                 }
                 this.changeShowDisable = false
+            }
+        },
+        removeToken(remove) {
+            if (remove === true) {
+                this.gettokenRecords()
             }
         }
     }

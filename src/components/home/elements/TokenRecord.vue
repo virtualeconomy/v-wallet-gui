@@ -41,6 +41,7 @@
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
           <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item @click="burnToken">Burn Token</b-dropdown-item>
+          <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
     </b-row>
@@ -81,6 +82,9 @@ export default {
         return {
             tokens: {},
             hovered: false,
+            cancelTime: 0,
+            showCancelDetails: false,
+            removeFlag: false,
             issuer: ''
         }
     },
@@ -126,19 +130,22 @@ export default {
         }
     },
     computed: {
-        seedaddress() {
-            if (Vue.ls.get('address')) {
-                return Vue.ls.get('address')
-            }
-        },
-        userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.seedaddress))
-        },
         txAddressShow() {
             if (this.txAddress) {
                 const addrChars = this.txAddress.split('')
                 addrChars.splice(6, 23, '******')
                 return addrChars.join('')
+            }
+        },
+        txAmount() {
+            return 100
+        },
+        userInfo() {
+            return JSON.parse(window.localStorage.getItem(this.seedaddress))
+        },
+        seedaddress() {
+            if (Vue.ls.get('address')) {
+                return Vue.ls.get('address')
             }
         },
         totalSupply() {
@@ -204,6 +211,22 @@ export default {
         },
         burnToken() {
             this.$root.$emit('bv::show::modal', 'burnTokenModal_' + this.tokenId)
+        },
+        removeToken() {
+            var isRemove = confirm('Are you sure to remove this token ?')
+            if (isRemove) {
+                var user = JSON.parse(window.localStorage.getItem(this.seedaddress))
+                var arr = JSON.parse(user.tokens)
+                for (var key in arr) {
+                    if (key === this.tokenId) {
+                        delete arr[key]
+                    }
+                }
+                this.setUsrLocalStorage('tokens', JSON.stringify(arr))
+                this.removeFlag = true
+                this.$emit('removeFlag', this.removeFlag)
+                this.removeFlag = false
+            }
         }
     }
 }
