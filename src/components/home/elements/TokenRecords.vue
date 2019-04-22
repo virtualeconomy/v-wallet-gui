@@ -35,7 +35,6 @@ import browser from '../../../utils/browser'
 import TokenRecord from './TokenRecord'
 import AddToken from '../modals/AddToken'
 import bus from '../../../assets/bus'
-// import BigNumber from 'bignumber.js'
 export default {
     name: 'TokenRecords',
     components: {
@@ -51,7 +50,6 @@ export default {
     data() {
         return {
             tokenRecords: {},
-            showingNum: 10,
             changeShowDisable: false,
             myHeight: '0'
         }

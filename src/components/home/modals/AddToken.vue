@@ -95,7 +95,7 @@ export default {
         },
         addModal() {
             this.init = true
-            if (this.userInfo.tokens) {
+            if (this.userInfo && this.userInfo.tokens) {
                 this.tokens = JSON.parse(this.userInfo.tokens)
             }
             const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
