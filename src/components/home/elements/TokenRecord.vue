@@ -217,11 +217,7 @@ export default {
             if (isRemove) {
                 var user = JSON.parse(window.localStorage.getItem(this.seedaddress))
                 var arr = JSON.parse(user.tokens)
-                for (var key in arr) {
-                    if (key === this.tokenId) {
-                        delete arr[key]
-                    }
-                }
+                Vue.delete(arr, this.tokenId)
                 this.setUsrLocalStorage('tokens', JSON.stringify(arr))
                 this.removeFlag = true
                 this.$emit('removeFlag', this.removeFlag)

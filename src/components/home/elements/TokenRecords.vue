@@ -7,10 +7,10 @@
     <div class="inherit-height">
       <div class="scroll"
            :style="{height: myHeight}">
-        <TokenRecord v-for="(index,tokenId) in tokenRecords"
-                     :key="tokenId"
+        <TokenRecord v-for="(record,tokenId) in tokenRecords"
+                     :key="record.index"
                      :token-id="tokenId"
-                     :token-record="index"
+                     :token-record="record"
                      :address="address"
                      :addresses="addresses"
                      :cold-addresses="coldAddresses"
@@ -46,7 +46,7 @@ export default {
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
         if (this.address && Vue.ls.get('pwd')) {
-            this.gettokenRecords()
+            this.getTokenRecords()
         }
     },
     data() {
@@ -89,14 +89,14 @@ export default {
     },
     mounted() {
         bus.$on('sendFlag', (data) => {
-            setTimeout(() => { this.gettokenRecords() }, 3000)
+            this.getTokenRecords()
         })
     },
     methods: {
         isMobile() {
             return browser.isMobile()
         },
-        gettokenRecords() {
+        getTokenRecords() {
             if (this.address) {
                 this.changeShowDisable = true
                 let records = JSON.parse(window.localStorage.getItem(this.seedaddress))
@@ -108,7 +108,7 @@ export default {
         },
         removeToken(remove) {
             if (remove === true) {
-                this.gettokenRecords()
+                this.getTokenRecords()
             }
         }
     }

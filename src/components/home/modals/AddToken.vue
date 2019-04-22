@@ -102,14 +102,15 @@ export default {
             this.$http.get(url).then(response => {
                 this.responseErr = false
                 Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(response.body['info'])))
+                Vue.delete(this.tokens, '')
                 this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
+                this.sendFlag = true
+                bus.$emit('sendFlag', this.sendFlag)
+                this.sendFlag = false
                 this.$refs.addTokenModal.hide()
             }, respError => {
                 this.responseErr = true
             })
-            this.sendFlag = true
-            bus.$emit('sendFlag', this.sendFlag)
-            this.sendFlag = false
         },
         isValidToken() {
             if (!this.init || this.tokenId.length === 0 || this.responseErr === false) {
