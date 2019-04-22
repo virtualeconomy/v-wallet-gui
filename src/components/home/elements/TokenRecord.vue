@@ -149,6 +149,11 @@ export default {
         issuedTokens() {
             return this.tokenRecord[3]['data']
         },
+        contract() {
+            let bytes = base58.decode(this.tokenId)
+            bytes = bytes.slice(0, bytes.length - 4)
+            return base58.encode(bytes)
+        },
         description() {
             let bytes = base58.decode(this.tokenRecord[2]['data'])
             try {
@@ -182,12 +187,11 @@ export default {
             }
             const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(tokenUrl).then(response => {
-                console.log('test', response, this.tokens)
                 Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(response.body['info'])))
                 this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
             }, respError => {
             })
-            const url = NODE_IP + '/contract/info/' + 'CFAGtf7AEsKzQxBQvJnKFbLST44Wzupmiw2'
+            const url = NODE_IP + '/contract/info/' + this.contract
             this.$http.get(url).then(response => {
                 this.issuer = response.body.info[0]['data']
                 this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
