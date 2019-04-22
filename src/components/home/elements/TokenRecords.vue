@@ -5,7 +5,8 @@
       <span>Token Watch List</span>
     </div>
     <div class="inherit-height">
-      <div class="scroll">
+      <div class="scroll"
+           :style="{height: myHeight}">
         <TokenRecord v-for="(index,tokenId) in tokenRecords"
                      :key="tokenId"
                      :token-id="tokenId"
