@@ -140,7 +140,7 @@ export default {
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
-        if (this.address && Vue.ls.get('pwd')) {
+        if (this.address && Vue.ls.get('pwd') && this.tabActive === 'trans') {
             this.getTxRecords()
         }
     },
@@ -176,11 +176,15 @@ export default {
         walletType: {
             type: String,
             default: ''
+        },
+        tabActive: {
+            type: String,
+            default: 'trans'
         }
     },
     watch: {
         address(newAddr, oldAddr) {
-            if (newAddr === '') {
+            if (newAddr === '' || this.tabActive !== 'trans') {
                 return
             }
             this.changeShowDisable = false

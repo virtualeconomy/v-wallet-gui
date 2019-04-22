@@ -106,7 +106,7 @@ export default {
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
-        if (this.address && Vue.ls.get('pwd')) {
+        if (this.address && Vue.ls.get('pwd') && this.tabActive === 'lease') {
             this.getLeaseRecords()
         }
     },
@@ -154,11 +154,15 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        tabActive: {
+            type: String,
+            default: 'trans'
         }
     },
     watch: {
         address(newAddr, oldAddr) {
-            if (newAddr === '') {
+            if (newAddr === '' || this.tabActive !== 'lease') {
                 return
             }
             this.response = []
