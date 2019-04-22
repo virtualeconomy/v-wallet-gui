@@ -28,10 +28,6 @@
         <label>Issuer</label>
         <span>{{ issuer }}</span>
       </div>
-      <div class="tx-fee">
-        <label>Register Time</label>
-        <span>{{ registerTime }}</span>
-      </div>
       <div class="tx-attachment">
         <label>Total Supply</label>
         <span>{{ totalSupply }}</span>
@@ -73,11 +69,6 @@ export default {
             require: true
         },
         issuer: {
-            type: String,
-            default: '',
-            require: true
-        },
-        registerTime: {
             type: String,
             default: '',
             require: true

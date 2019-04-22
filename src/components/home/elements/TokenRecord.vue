@@ -48,8 +48,7 @@
                     :issuer="issuer"
                     :total-supply="formatter(totalSupply)"
                     :issued-tokens="formatter(issuedTokens)"
-                    :description="description"
-                    :register-time="registerTime">
+                    :description="description">
     </TokenInfoModal>
     <IssueToken :token-id="tokenId"
                 :address="address"
@@ -82,8 +81,7 @@ export default {
         return {
             tokens: {},
             hovered: false,
-            issuer: '',
-            registerTime: '2019'
+            issuer: ''
         }
     },
     props: {
