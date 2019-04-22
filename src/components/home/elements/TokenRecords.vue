@@ -52,8 +52,7 @@ export default {
             tokenRecords: {},
             showingNum: 10,
             changeShowDisable: false,
-            myHeight: '0',
-            flagNum: 0
+            myHeight: '0'
         }
     },
     props: {
@@ -77,22 +76,6 @@ export default {
             require: true
         }
     },
-    watch: {
-        address(newAddr, oldAddr) {
-            if (newAddr === '') {
-                return
-            }
-            this.response = []
-            this.changeShowDisable = false
-            this.showingNum = 10
-            if (this.address && Vue.ls.get('pwd')) {
-                this.gettokenRecords()
-            }
-        },
-        flagNum(val) {
-            this.gettokenRecords()
-        }
-    },
     computed: {
         seedaddress() {
             if (Vue.ls.get('address')) {
@@ -105,8 +88,7 @@ export default {
     },
     mounted() {
         bus.$on('sendFlag', (data) => {
-            this.gettokenRecords()
-            this.flagNum++
+            setTimeout(() => { this.gettokenRecords() }, 3000)
         })
     },
     methods: {

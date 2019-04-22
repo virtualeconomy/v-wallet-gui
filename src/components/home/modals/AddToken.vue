@@ -55,7 +55,7 @@ export default {
             tokenId: '',
             init: false,
             responseErr: false,
-            sendFlag: 1
+            sendFlag: false
         }
     },
     created() {
@@ -107,7 +107,9 @@ export default {
             }, respError => {
                 this.responseErr = true
             })
+            this.sendFlag = true
             bus.$emit('sendFlag', this.sendFlag)
+            this.sendFlag = false
         },
         isValidToken() {
             if (!this.init || this.tokenId.length === 0 || this.responseErr === false) {
