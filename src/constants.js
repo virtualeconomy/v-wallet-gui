@@ -39,7 +39,6 @@ export const DEFAULT_BASIC_CONFIG = {
     timeDiff: 0
 };
 
-// export const NODE_IP = 'http://13.231.219.162:9922'
 export const NODE_IP = '/api'
 export const ADDRESS_LENGTH = 35;
 export const TX_TEST_EXPLORER = 'https://testexplorer.v.systems/transactions/'
