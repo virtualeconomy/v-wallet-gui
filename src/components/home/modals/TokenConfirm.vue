@@ -1,10 +1,22 @@
 <template>
   <div>
     <div class="infos">
-      <b-form-group v-if="txType==='BurnToken'"
+      <b-form-group v-if="txType==='Burn Token'"
                     horizontal
                     class="form-line"
-                    label="BurnToken"
+                    label="Burn Amount"
+                    label-for="amount_confirm">
+        <b-form-input id="amount_confirm"
+                      :value="formatter(amount)"
+                      class="amount"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group v-else-if="txType==='Register New Token'"
+                    horizontal
+                    class="form-line"
+                    label="Total Supply"
                     label-for="amount_confirm">
         <b-form-input id="amount_confirm"
                       :value="formatter(amount)"
@@ -16,7 +28,7 @@
       <b-form-group v-else
                     horizontal
                     class="form-line"
-                    label="IssueToken"
+                    label="Issue Amount"
                     label-for="amount_confirm">
         <b-form-input id="amount_confirm"
                       :value="formatter(amount)"

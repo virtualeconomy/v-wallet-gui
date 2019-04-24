@@ -1,14 +1,26 @@
 <template>
   <div>
-    <img v-if="txType==='IssueToken'"
-         src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
-    <img v-else-if="txType==='BurnToken'"
+    <img v-if="txType==='Burn Token'"
          src="../../../assets/imgs/icons/operate/ic_burn.svg">
+    <img v-else
+         src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
     <div class="infos">
-      <b-form-group v-if="txType==='BurnToken'"
+      <b-form-group v-if="txType==='Burn Token'"
                     horizontal
                     class="form-line"
                     label="Burn Amount"
+                    label-for="amount_success">
+        <b-form-input id="amount_success"
+                      :value="formatter(amount) + ' VSYS'"
+                      class="amount"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group v-else-if="txType==='Register New Token'"
+                    horizontal
+                    class="form-line"
+                    label="Total Supply"
                     label-for="amount_success">
         <b-form-input id="amount_success"
                       :value="formatter(amount) + ' VSYS'"

@@ -39,7 +39,7 @@
               <span class="balance">Token Balance</span>
             </b-btn>
           </b-form-group>
-          <b-form-group label="Issue Amount"
+          <b-form-group label="Burn Amount"
                         label-for="amount-input">
             <b-form-input id="amount-input"
                           class="amount-input"
@@ -62,7 +62,7 @@
           <TokenConfirm :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'BurnToken'">
+                        :tx-type="'Burn Token'">
           </TokenConfirm>
           <p
             v-show="sendError"
@@ -93,7 +93,7 @@
                         :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'BurnToken'">
+                        :tx-type="'Burn Token'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
