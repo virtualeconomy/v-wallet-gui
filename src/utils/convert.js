@@ -53,6 +53,28 @@ exports.default = {
         }
         return bytes;
     },
+    amountToByteArray: function (input) {
+        if (typeof input !== 'number') {
+            throw new Error('Numeric input is expected');
+        }
+        var bytes = new Array(7);
+        for (var k = 7; k >= 0; k--) {
+            bytes[k] = input & (16);
+            input = input / 16;
+        }
+        return bytes;
+    },
+    lengthToByteArray: function (input) {
+        if (typeof input !== 'number') {
+            throw new Error('Numeric input is expected');
+        }
+        var bytes = new Array(2);
+        for (var k = 1; k >= 0; k--) {
+            bytes[k] = input & (255);
+            input = input / 256;
+        }
+        return bytes;
+    },
     bigNumberToByteArray: function (input) {
         if (!(input instanceof bignumber_1.default)) {
             throw new Error('BigNumber input is expected');
