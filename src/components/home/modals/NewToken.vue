@@ -7,6 +7,7 @@
            hide-header
            ref="newTokenModal"
            :busy="true"
+           style="padding-left: 0px;"
            @hidden="resetPage">
     <button
       :disabled="qrInit"
@@ -19,7 +20,7 @@
              :disabled="qrInit && !pageId"
              :active="walletType==='hotWallet'">
         <b-container
-          class="text-left"
+          style="text-align: left;"
           v-if="pageId===1">
           <b-form-group label="Wallet Address"
                         label-for="address-input">
@@ -34,12 +35,20 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
-                     width="20"
-                     height="20">
+                Balance
               </span>
               <span class="balance">{{ formatter(balances[address]) }} VSYS</span>
             </b-btn>
+          </b-form-group>
+          <b-form-group label="Description"
+                        label-for="descriptionInput">
+            <b-form-textarea id="descriptionInput"
+                             v-model="attachment"
+                             :rows="2"
+                             :no-resize="true"
+                             placeholder="You can not change the description later"
+                             :state="isValidAttachment">
+            </b-form-textarea>
           </b-form-group>
           <b-form-group label="Total Supply"
                         label-for="amount-input">
@@ -67,16 +76,30 @@
               Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group label="Description"
-                        label-for="descriptionInput">
-            <b-form-textarea id="descriptionInput"
-                             v-model="attachment"
-                             :rows="3"
-                             :no-resize="true"
-                             :state="isValidAttachment">
-            </b-form-textarea>
-          </b-form-group>
           <b-form-group>
+            <span style="font-size: 15px !important;color: #9091A3;">Unity: 10^{{ unity }}</span>
+            <div style="margin-top: 10px;">
+              <span class="unity-number">10<sup>0</sup></span>
+              <button class="bar-minus"
+                      @click="minus">-</button>
+              <b-progress :value="unity"
+                          :max="maxUnity"
+                          variant="warning"
+                          show-value
+                          class="pg-bar"></b-progress>
+              <button class="bar-plus"
+                      @click="plus">+</button>
+              <span class="unity-number"
+                    style="margin-left: 360px">10<sup>16</sup></span>
+            </div>
+          </b-form-group>
+          <div style="margin-top: 10px;">
+            <img id="img_read"
+                 @click="changeicon"
+                 style="font-size: 15px;"
+                 src="../../../assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
+          </div>
+          <b-form-group style="margin-top: 10px;">
             <label class="fee-remark">Transaction Fee {{ Number(fee) }} VSYS</label>
           </b-form-group>
           <b-button variant="warning"
@@ -121,7 +144,8 @@
         <b-container v-if="pageId===3">
           <TokenSuccess :address="address"
                         :amount=inputAmount(amount)
-                        :fee="fee">
+                        :fee="fee"
+                        :tx-type="'Register New Token'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -284,14 +308,17 @@
 // import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_TRANSACTION } from '@/constants.js'
+import { NODE_IP, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_TRANSACTION } from '@/constants.js'
 import TokenConfirm from './TokenConfirm'
 import TokenSuccess from './TokenSuccess'
 import ColdSignature from './ColdSignature'
 import browser from '../../../utils/browser'
 import BigNumber from 'bignumber.js'
+import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
+import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
 var initData = {
     opc: '',
+    support: false,
     recipient: '',
     amount: BigNumber(0),
     attachment: '',
@@ -308,8 +335,10 @@ var initData = {
     qrInit: false,
     qrErrMsg: void 0,
     paused: false,
+    unity: 8,
     sendError: false,
     coldSignature: '',
+    maxUnity: 16,
     timeStamp: (Date.now() - 1) * 1e6,
     hasConfirmed: false
 }
@@ -406,8 +435,27 @@ export default {
         }
     },
     methods: {
+        changeicon() {
+            if (this.support === false) {
+                document.getElementById('img_read').src = imgread1
+                this.support = true
+            } else {
+                document.getElementById('img_read').src = imgread2
+                this.support = false
+            }
+        },
         inputAmount(num) {
             return BigNumber(num)
+        },
+        minus() {
+            if (this.unity > 0) {
+                this.unity--
+            }
+        },
+        plus() {
+            if (this.unity < 16) {
+                this.unity++
+            }
         },
         coldApi: function() {
             if (this.coldAddresses[this.coldAddress].api === 1 && this.coldAmount <= 90000000) {
@@ -417,40 +465,38 @@ export default {
             }
         },
         sendData: function(walletType) {
-            // var apiSchema
+            let apiSchema
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
                     return
                 }
                 this.hasConfirmed = true
-                // const dataInfo = {
-                //     recipient: this.recipient,
-                //     amount: BigNumber(this.amount).multipliedBy(VSYS_PRECISION).toFixed(0),
-                //     fee: TOKEN_FEE * VSYS_PRECISION,
-                //     feeScale: FEE_SCALE,
-                //     timestamp: this.timeStamp,
-                //     attachment: this.attachment
-                // }
+                const dataInfo = {
+                    senderPublicKey: this.address,
+                    contract: '',
+                    data: '',
+                    fee: TOKEN_FEE * VSYS_PRECISION,
+                    feeScale: FEE_SCALE,
+                    timestamp: this.timeStamp,
+                    description: this.attachment
+                }
+                apiSchema = dataInfo
                 // apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
             } else if (walletType === 'coldWallet') {
+                apiSchema = ''
                 // apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress].publicKey, PAYMENT_TX)
             }
-            // const url = NODE_IP + '/vsys/broadcast/payment'
+            const url = NODE_IP + '/contract/broadcast/register'
             // apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') //  The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
-            // this.$http.post(url, apiSchema).then(response => {
-            //     if (walletType === 'hotWallet') {
-            //         this.pageId++
-            //     } else {
-            //         this.coldPageId++
-            //     }
-            // }, response => {
-            //     this.sendError = true
-            // })
-            if (walletType === 'hotWallet') {
-                this.pageId++
-            } else {
-                this.coldPageId++
-            }
+            this.$http.post(url, apiSchema).then(response => {
+                if (walletType === 'hotWallet') {
+                    this.pageId++
+                } else {
+                    this.coldPageId++
+                }
+            }, response => {
+                this.sendError = true
+            })
             this.$emit('endSendSignal')
         },
         nextPage: function() {
@@ -481,6 +527,7 @@ export default {
         },
         resetPage: function() {
             this.opc = ''
+            this.unity = 8
             this.recipient = ''
             this.amount = BigNumber(0)
             this.attachment = ''
@@ -607,6 +654,15 @@ export default {
 .scan-ok-btn, .scan-again-btn {
     margin-top: 10px;
 }
+
+textarea::-webkit-input-placeholder {
+    font-family: Roboto-Regular;
+    text-align: left;
+    font-size: 15px;
+    color: #C0C1CC;
+    padding-top: 5px;
+    letter-spacing: 0;
+}
 .qr-code {
     width: 26px;
     cursor: pointer;
@@ -709,5 +765,47 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.col-form-label {
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    color: red !important;
+    letter-spacing: 0;
+}
+.bar-minus {
+    position: absolute;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    margin-left: 2px;
+    color: #fff !important;
+    background-color: #FF8737 !important;
+    border-color: #FF8737 !important;
+    border-radius: 50%;
+}
+.bar-plus {
+    position: absolute;
+    margin-left: 330px;
+    margin-right: 2px;
+    color: #fff !important;
+    background-color: #FF8737 !important;
+    border-color: #FF8737 !important;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+.pg-bar {
+    position: absolute;
+    margin-top: -18px;
+    margin-left: 55px;
+    padding-top: 0px;
+    width: 301px;
+    height: 16px;
+}
+.unity-number {
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    color: #181B3A;
+    letter-spacing: 0;
 }
 </style>

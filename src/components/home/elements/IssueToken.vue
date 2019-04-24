@@ -62,7 +62,7 @@
           <TokenConfirm :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'IssueToken'">
+                        :tx-type="'Issue Token'">
           </TokenConfirm>
           <p
             v-show="sendError"
