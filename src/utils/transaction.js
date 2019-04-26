@@ -13,7 +13,6 @@ var crypto_1 = require("./crypto");
 var concat_1 = require("./concat");
 var base58_1 = require("../libs/base58");
 var remap_1 = require("./remap");
-var constants = require("../constants");
 var secure_random_1 = require("../libs/secure-random");
 var convert_1 = require("../utils/convert");
 
@@ -211,14 +210,15 @@ export default {
         var bytess = []
         bytess[0] = 8 & (255)
         var contractBytes = convert_1.default.bytesToByteArrayWithSize(base58_1.default.decode(contract))
-        var dataBytes = base58_1.default.decode(data[1])
+        var dataBytes = convert_1.default.bytesToByteArrayWithSize(data[0])
         console.log(typeof dataBytes, dataBytes, data[0])
         var desBytes = convert_1.default.stringToByteArray(description)
         var feeBytes = convert_1.default.bigNumberToByteArray(fee)
         var feeScaleBytes = convert_1.default.shortToByteArray(feeScale)
         var timeBytes = convert_1.default.bigNumberToByteArray(time)
-        var signBytes = bytess.concat(contractBytes.concat(data[0].concat(desBytes.concat(feeBytes.concat(feeScaleBytes.concat(timeBytes))))))
-        console.log(signBytes)
+        console.log('data0', data[0], desBytes)
+        var signBytes = bytess.concat(contractBytes.concat(dataBytes.concat(desBytes.concat(feeBytes.concat(feeScaleBytes.concat(timeBytes))))))
+        console.log(signBytes, Uint8Array.from(signBytes))
         var privateKeyBytes = base58_1.default.decode(privateKey);
         var signature = axlsign_1.default.sign(privateKeyBytes, Uint8Array.from(signBytes), secure_random_1.default.randomUint8Array(64));
         return base58_1.default.encode(signature)

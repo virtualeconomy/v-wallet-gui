@@ -306,8 +306,7 @@
 </template>
 
 <script>
-import base58 from '@/libs/base58'
-import converters from '@/libs/converters'
+// import converters from '@/libs/converters'
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import { CONTRACT } from '../../../contract'
@@ -320,6 +319,7 @@ import browser from '../../../utils/browser'
 import BigNumber from 'bignumber.js'
 import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
+import base58 from '../../../libs/base58'
 var initData = {
     opc: '',
     support: false,
@@ -484,8 +484,8 @@ export default {
                     fee: TOKEN_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    data: transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment)[1],
-                    description: '',
+                    data: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment)[0]),
+                    description: [],
                     signature: transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
