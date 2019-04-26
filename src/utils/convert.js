@@ -64,11 +64,11 @@ exports.default = {
         }
         return bytes;
     },
-    lengthToByteArray: function (input) {
+    idxToByteArray: function (input) {
         if (typeof input !== 'number') {
             throw new Error('Numeric input is expected');
         }
-        var bytes = new Array(2);
+        var bytes = new Array(4);
         for (var k = 1; k >= 0; k--) {
             bytes[k] = input & (255);
             input = input / 256;

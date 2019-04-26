@@ -16,7 +16,11 @@ var constants = require("../constants");
 
 var convert_1 = require("../utils/convert");
 
-
+var constants = require("../constants");
+var INT_TYPE = constants.INT_TYPE
+var ACCOUNT_TYPE = constants.ACCOUNT_TYPE
+var AMOUNT_TYPE = constants.AMOUNT_TYPE
+var SHORTTEXT_TYPE = constants.SHORTTEXT_TYPE
 // Fields of the original data object
 var paymentField = {
     timestamp: new ByteProcessor_1.Long('timestamp'),
@@ -130,18 +134,17 @@ function castToAPISchema(data, tx_type) {
     __assign(apiSchema, { recipient : transformRecipient() })
     return apiSchema
 }
-function transferInt() {
-    var oldBytes = convert_1.default.stringToByteArray('40004');
-    var newBytes = oldBytes
-    for (var key in newBytes) {
-        newBytes[key] = (oldBytes[key]-48)
-    }
-    return newBytes
+function transferInt(tokenIdx) {
+    var byteArr = convert_1.default.idxToByteArray(tokenIdx)
+
+    var newBytes = []
+    newBytes[0] = INT_TYPE
+    return newBytes.concat(byteArr)
 }
 function transferAmount(amountData) {
-    var byteArr = convert_1.default.longToByteArray(amountData)
+    var byteArr = convert_1.default.bigNumberToByteArray(amountData)
     var typeArr = new Array(1);
-    typeArr[0] = 3 & (255);
+    typeArr[0] = AMOUNT_TYPE;
     var dataArr = typeArr.concat(byteArr);
     return dataArr
 }
@@ -149,10 +152,10 @@ function transferShortTxt(description) {
     var byteArr = convert_1.default.stringToByteArray(description)
 
     var typeArr = new Array(1);
-    typeArr[0] = 5 & (255);
+    typeArr[0] = SHORTTEXT_TYPE ;
 
     var length = byteArr.length
-    var lengthArr = convert_1.default.lengthToByteArray(length)
+    var lengthArr = convert_1.default.shortToByteArray(length)
 
     return typeArr.concat(lengthArr.concat(byteArr))
 }
@@ -160,7 +163,7 @@ function transferAccount(account) {
     var accountArr = base58_1.default.decode(account)
 
     var typeArr = new Array(1)
-    typeArr[0] = 7 & (255)
+    typeArr[0] = ACCOUNT_TYPE
 
     return typeArr.concat(accountArr)
 }
@@ -180,14 +183,15 @@ export default {
         return __assign({}, (tx_type ? {transactionType: tx_type} : {}), {senderPublicKey: publicKey}, castToAPISchema(userData, tx_type), {signature:signature})
     },
     prepareIssueAndBurn: function(amountData) {
-        var tokenIdx = transferInt()
+        var tokenIdx = 0
+        var tokenIdxArr = transferInt(tokenIdx)
         var amountArr = transferAmount(amountData)
 
         var typeArr = new Array(2)
-        typeArr[0] = 0 & (255)
-        typeArr[1] = 2 & (255)
+        typeArr[0] = 0
+        typeArr[1] = 2
 
-        var encodeArr = typeArr.concat(amountArr.concat(tokenIdx))
+        var encodeArr = typeArr.concat(amountArr.concat(tokenIdxArr))
         return base58_1.default.encode(Uint8Array.from(encodeArr));
     },
     prepareCreate: function(max, unity, tokenDescription) {
@@ -196,22 +200,23 @@ export default {
         var desArr = transferShortTxt(tokenDescription)
 
         var typeArr = new Array(2)
-        typeArr[0] = 0 & (255)
-        typeArr[1] = 3 & (255)
+        typeArr[0] = 0
+        typeArr[1] = 3
 
         var encodeArr = typeArr.concat(maxArr.concat(unityArr.concat(desArr)))
         return base58_1.default.encode(Uint8Array.from(encodeArr));
     },
     prepareSend: function(recipient, amount) {
         var accountArr = transferAccount(recipient)
-        var tokenIdx = transferInt()
+        var tokenIdx = 0
+        var tokenIdxArr = transferInt(tokenIdx)
         var amountArr = transferAmount(amount)
 
         var typeArr = new Array(2)
-        typeArr[0] = 0 & (255)
-        typeArr[1] = 3 & (255)
+        typeArr[0] = 0
+        typeArr[1] = 3
 
-        var encodeArr = typeArr.concat(accountArr.concat(amountArr.concat(tokenIdx)))
+        var encodeArr = typeArr.concat(accountArr.concat(amountArr.concat(tokenIdxArr)))
         return base58_1.default.encode(Uint8Array.from(encodeArr))
     }
 };
