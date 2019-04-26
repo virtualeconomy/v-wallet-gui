@@ -223,7 +223,7 @@ export default {
         bytess[0] = 8 & (255)
         var contractBytes = convert_1.default.bytesToByteArrayWithSize(base58_1.default.decode(contract))
         var dataBytes = base58_1.default.decode(data)
-        var desBytes = convert_1.default.stringToByteArray(description)
+        var desBytes = convert_1.default.bytesToByteArrayWithSize(convert_1.default.stringToByteArray(description))
         var feeBytes = convert_1.default.bigNumberToByteArray(fee)
         var feeScaleBytes = convert_1.default.shortToByteArray(feeScale)
         var timeBytes = convert_1.default.bigNumberToByteArray(time)

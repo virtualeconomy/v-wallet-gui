@@ -485,7 +485,7 @@ export default {
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
                     data: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment)[0]),
-                    description: [],
+                    description: '',
                     signature: transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
