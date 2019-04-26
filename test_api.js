@@ -1,4 +1,4 @@
-import tx_util from './src/utils/transaction.js'
+import tx_util from './src/utils/transaction1.js'
 import seed_lib from './src/libs/seed.js'
 import {VSYS_PRECISION, TX_FEE, FEE_SCALE} from './src/constants.js'
 var request = require('request')
@@ -35,8 +35,8 @@ var post_tx_request = (tx_info, tx_type, tx_url) => {
     console.log('tx data:')
     console.log(api_data)
     request({
-        url: tx_url, 
-        method: 'POST', 
+        url: tx_url,
+        method: 'POST',
         json: api_data
     }, solve_response)
 }

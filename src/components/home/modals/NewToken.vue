@@ -291,7 +291,8 @@
         <b-container v-show="coldPageId===5">
           <TokenSuccess :address="coldAddress"
                         :amount=inputAmount(coldAmount)
-                        :fee="coldFee">
+                        :fee="coldFee"
+                        :tx-type="'Register New Token'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -305,8 +306,11 @@
 </template>
 
 <script>
-// import transaction from '@/utils/transaction'
+import base58 from '@/libs/base58'
+import converters from '@/libs/converters'
+import transaction from '@/utils/transaction'
 import Vue from 'vue'
+import { CONTRACT } from '../../../contract'
 import seedLib from '@/libs/seed.js'
 import { NODE_IP, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_TRANSACTION } from '@/constants.js'
 import TokenConfirm from './TokenConfirm'
@@ -471,16 +475,23 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
+                console.log((3).toString(16))
+                this.fee = TOKEN_FEE * VSYS_PRECISION
+                this.feeScale = 100
                 const dataInfo = {
-                    senderPublicKey: this.address,
-                    contract: '',
-                    data: '',
+                    contract: CONTRACT,
+                    senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
                     fee: TOKEN_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    description: this.attachment
+                    data: transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment)[1],
+                    description: '',
+                    signature: transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
+                console.log(apiSchema)
+                // console.log(converters.byteArrayToString(transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)), 'descrip')
+                // console.log((base58.decode(apiSchema.data)))
                 // apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
             } else if (walletType === 'coldWallet') {
                 apiSchema = ''
@@ -618,7 +629,7 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount)
         },
         isWrongFormat(amount) {
             if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
