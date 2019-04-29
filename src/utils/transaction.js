@@ -202,6 +202,7 @@ export default {
         var typeArr = new Array(2)
         typeArr[0] = 0
         typeArr[1] = 3
+
         var encodeArr = typeArr.concat(maxArr.concat(unityArr.concat(desArr)))
         return [encodeArr, base58_1.default.encode(encodeArr)]
     },
@@ -239,7 +240,6 @@ export default {
         var privateKeyBytes = base58_1.default.decode(privateKey);
         var signature = axlsign_1.default.sign(privateKeyBytes, Uint8Array.from(signBytes), secure_random_1.default.randomUint8Array(64));
         return base58_1.default.encode(signature)
-
     },
     prepareSend: function(recipient, amount) {
         var accountArr = transferAccount(recipient)
@@ -255,7 +255,7 @@ export default {
         return base58_1.default.encode(Uint8Array.from(encodeArr))
     },
     contractIDToTokenID(contraID) {
-        let testde = base58_1.default.decode(contraID)
+        let testde = base58_1.default.decode(contraID
         let tmpa = []
         for (var j = 0; j < testde.length; j++) {
             tmpa.push(testde[j])
