@@ -255,7 +255,7 @@ export default {
         return base58_1.default.encode(Uint8Array.from(encodeArr))
     },
     contractIDToTokenID(contraID) {
-        let testde = base58_1.default.decode(contraID
+        let testde = base58_1.default.decode(contraID)
         let tmpa = []
         for (var j = 0; j < testde.length; j++) {
             tmpa.push(testde[j])

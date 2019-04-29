@@ -39,6 +39,7 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
+          <b-dropdown-item @click="sendToken">Send Token</b-dropdown-item>
           <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item @click="burnToken">Burn Token</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
@@ -57,6 +58,12 @@
                 :addresses="addresses"
                 :cold-addresses="coldAddresses">
     </IssueToken>
+    <SendToken :token-id="tokenId"
+               :address="address"
+               :wallet-type="walletType"
+               :addresses="addresses"
+               :cold-addresses="coldAddresses">
+    </SendToken>
     <BurnToken :token-id="tokenId"
                :address="address"
                :wallet-type="walletType"
@@ -70,6 +77,7 @@
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import TokenInfoModal from './TokenInfoModal'
+import SendToken from './SendToken'
 import IssueToken from './IssueToken'
 import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
@@ -77,7 +85,7 @@ import { NODE_IP } from '../../../constants.js'
 import Vue from 'vue'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, IssueToken, BurnToken },
+    components: { TokenInfoModal, SendToken, IssueToken, BurnToken },
     data: function() {
         return {
             tokens: {},
@@ -190,7 +198,7 @@ export default {
             num = BigNumber(num)
             return num.toFixed(Math.log10(this.tokenRecord[1]['data']))
         },
-        showModal() {
+        getTokenInfo() {
             if (this.userInfo && this.userInfo.tokens) {
                 this.tokens = JSON.parse(this.userInfo.tokens)
             }
@@ -203,12 +211,18 @@ export default {
             const url = NODE_IP + '/contract/info/' + this.contract
             this.$http.get(url).then(response => {
                 this.issuer = response.body.info[0]['data']
-                this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
             }, respError => {
                 this.issuer = 'Failed to get issuer'
                 this.registerTime = 'Failed to get time'
-                this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
             })
+        },
+        showModal() {
+            this.getTokenInfo()
+            this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
+        },
+        sendToken() {
+            this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId)
+            console.log('emit send end')
         },
         issueToken() {
             this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)
