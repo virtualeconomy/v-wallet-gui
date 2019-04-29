@@ -152,7 +152,11 @@ export default {
             return this.tokenRecord[0]['data']
         },
         issuedTokens() {
-            return this.tokenRecord[3]['data']
+            if (this.tokenRecord.length < 4) {
+                return 0
+            } else {
+                return this.tokenRecord[3]['data']
+            }
         },
         contract() {
             let bytes = base58.decode(this.tokenId)

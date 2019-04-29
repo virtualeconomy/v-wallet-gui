@@ -320,6 +320,7 @@ import BigNumber from 'bignumber.js'
 import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
 import base58 from '../../../libs/base58'
+import bus from '../../../assets/bus'
 var initData = {
     opc: '',
     support: false,
@@ -344,7 +345,9 @@ var initData = {
     coldSignature: '',
     maxUnity: 16,
     timeStamp: (Date.now() - 1) * 1e6,
-    hasConfirmed: false
+    hasConfirmed: false,
+    tokenId: '',
+    tokens: {}
 }
 export default {
     name: 'NewToken',
@@ -383,6 +386,11 @@ export default {
     computed: {
         defaultAddress() {
             return Vue.ls.get('address')
+        },
+        seedaddress() {
+            if (Vue.ls.get('address')) {
+                return Vue.ls.get('address')
+            }
         },
         defaultColdAddress() {
             if (this.noColdAddress) return ''
@@ -475,8 +483,7 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                console.log((3).toString(16))
-                this.fee = TOKEN_FEE * VSYS_PRECISION
+                this.fee = BigNumber(TOKEN_FEE * VSYS_PRECISION)
                 this.feeScale = 100
                 const dataInfo = {
                     contract: CONTRACT,
@@ -484,27 +491,22 @@ export default {
                     fee: TOKEN_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    data: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment)[0]),
-                    description: '',
-                    signature: transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    data: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment)[0]),
+                    description: this.attachment,
+                    signature: transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
-                console.log(apiSchema)
-                // console.log(converters.byteArrayToString(transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)), 'descrip')
-                // console.log((base58.decode(apiSchema.data)))
-                // apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
             } else if (walletType === 'coldWallet') {
                 apiSchema = ''
-                // apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress].publicKey, PAYMENT_TX)
             }
             const url = NODE_IP + '/contract/broadcast/register'
-            // apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') //  The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
             this.$http.post(url, apiSchema).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
                     this.coldPageId++
                 }
+                this.tokenId = transaction.contractIDToTokenID(response.body.contractId)
             }, response => {
                 this.sendError = true
             })
@@ -558,7 +560,26 @@ export default {
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         endSend: function() {
+            setTimeout(this.sendToAdd, 30000)
             this.$refs.newTokenModal.hide()
+        },
+        sendToAdd: function() {
+            if (this.userInfo && this.userInfo.tokens) {
+                this.tokens = JSON.parse(this.userInfo.tokens)
+            }
+            const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
+            this.$http.get(url).then(response => {
+                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(response.body['info'])))
+                Vue.delete(this.tokens, '')
+                this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
+                let sendFlag = true
+                bus.$emit('sendFlag', sendFlag)
+            }, respError => {
+            })
+        },
+        setUsrLocalStorage(fieldname, value) {
+            Vue.set(this.userInfo, fieldname, value)
+            window.localStorage.setItem(this.seedaddress, JSON.stringify(this.userInfo))
         },
         scanChange: function(evt) {
             if (!this.qrInit) {

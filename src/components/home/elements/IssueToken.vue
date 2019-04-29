@@ -230,7 +230,7 @@
 // import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, ISSUE_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 // import crypto from '@/utils/crypto'
@@ -238,6 +238,8 @@ import ColdSignature from '../modals/ColdSignature'
 import browser from '../../../utils/browser'
 // import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
+import transaction from '@/utils/transaction'
+// import base58 from '../../../libs/base58'
 /*  var initData = {
     amount: BigNumber(0),
     attachment: '',
@@ -272,7 +274,8 @@ export default {
             sendError: false,
             coldSignature: '',
             timeStamp: (Date.now() - 1) * 1e6,
-            hasConfirmed: false
+            hasConfirmed: false,
+            contractId: ''
         }
     },
     props: {
@@ -378,12 +381,40 @@ export default {
             }
         },
         sendData: function(walletType) {
+            let apiSchema
             if (walletType === 'hotWallet') {
-                this.pageId++
-            } else {
-                this.coldPageId++
+                if (this.hasConfirmed) {
+                    return
+                }
+                this.hasConfirmed = true
+                this.contractId = transaction.tokenIDToContractID(this.tokenId)
+                this.fee = BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION)
+                this.feeScale = 100
+                const dataInfo = {
+                    contractId: this.contractId,
+                    senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
+                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
+                    feeScale: FEE_SCALE,
+                    timestamp: this.timeStamp,
+                    description: '',
+                    funcIdx: ISSUE_FUNCIDX,
+                    data: transaction.prepareIssueAndBurn(BigNumber(this.amount)),
+                    signature: transaction.prepareIssueSignature(this.contractId, ISSUE_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                }
+                apiSchema = dataInfo
+            } else if (walletType === 'coldWallet') {
+                apiSchema = ''
             }
-            this.$emit('endSendSignal')
+            const url = NODE_IP + '/contract/broadcast/execute'
+            this.$http.post(url, apiSchema).then(response => {
+                if (walletType === 'hotWallet') {
+                    this.pageId++
+                } else {
+                    this.coldPageId++
+                }
+            }, response => {
+                this.sendError = true
+            })
         },
         nextPage: function() {
             this.pageId++
