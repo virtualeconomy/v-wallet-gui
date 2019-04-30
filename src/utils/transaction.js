@@ -160,11 +160,13 @@ function transferShortTxt(description) {
     return typeArr.concat(lengthArr.concat(byteArr))
 }
 function transferAccount(account) {
+    console.log('tranacco: ' + account)
     var accountArr = base58_1.default.decode(account)
 
     var typeArr = new Array(1)
     typeArr[0] = ACCOUNT_TYPE
 
+    console.log('return tranacco: ' + typeArr.concat(accountArr))
     return typeArr.concat(accountArr)
 }
 export default {
@@ -253,6 +255,26 @@ export default {
 
         var encodeArr = typeArr.concat(accountArr.concat(amountArr.concat(tokenIdxArr)))
         return base58_1.default.encode(Uint8Array.from(encodeArr))
+    },
+    prepareSendSignature: function(contractId, funIdx, data, description, fee, feeScale, time, privateKey) {
+        var bytess = []
+        bytess[0] = 9 & (255)
+        var contractIdBytes = base58_1.default.decode(contractId)
+        var temBytes = []
+        for (var len = 0 ; len < contractIdBytes.length; ++len) {
+            temBytes [len] = contractIdBytes[len]
+        }
+        var funIdxBytes = convert_1.default.shortToByteArray(funIdx)
+        var databyte = base58_1.default.decode(data)
+        var dataBytes = convert_1.default.bytesToByteArrayWithSize(databyte)
+        var desBytes = convert_1.default.bytesToByteArrayWithSize(convert_1.default.stringToByteArray(description))
+        var feeBytes = convert_1.default.bigNumberToByteArray(fee)
+        var feeScaleBytes = convert_1.default.shortToByteArray(feeScale)
+        var timeBytes = convert_1.default.bigNumberToByteArray(time)
+        var signBytes = bytess.concat(temBytes.concat(funIdxBytes.concat(dataBytes.concat(desBytes.concat(feeBytes.concat(feeScaleBytes.concat(timeBytes)))))))
+        var privateKeyBytes = base58_1.default.decode(privateKey);
+        var signature = axlsign_1.default.sign(privateKeyBytes, Uint8Array.from(signBytes), secure_random_1.default.randomUint8Array(64));
+        return base58_1.default.encode(signature)
     },
     contractIDToTokenID(contraID) {
         let testde = base58_1.default.decode(contraID)

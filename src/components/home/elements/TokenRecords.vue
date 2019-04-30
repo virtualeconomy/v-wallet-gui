@@ -15,7 +15,8 @@
                      :addresses="addresses"
                      :cold-addresses="coldAddresses"
                      :wallet-type="walletType"
-                     @removeFlag="removeToken"></TokenRecord>
+                     @removeFlag="removeToken"
+                     @endSendSignal="endSendSignal"></TokenRecord>
       </div>
     </div>
   </div>
@@ -110,6 +111,9 @@ export default {
             if (remove === true) {
                 this.getTokenRecords()
             }
+        },
+        endSendSignal() {
+            this.$emit('updateInfo')
         }
     }
 }

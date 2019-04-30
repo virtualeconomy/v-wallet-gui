@@ -54,7 +54,7 @@
             </b-form-input>
             <datalist id="showHotRecipientList">
               <option v-for="addr in hotRecipientAddressList.keys()"
-                      :key="addr">'addr'</option>
+                      :key="addr">{{ addr }}</option>
             </datalist>
             <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
@@ -211,7 +211,7 @@
             </b-form-input>
             <datalist id="showColdRecipientList">
               <option v-for="addr in coldRecipientAddressList.keys()"
-                      :key="addr">'addr'}</option>
+                      :key="addr"> {{ addr }}</option>
             </datalist>
             <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
@@ -372,7 +372,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, SEND_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION, TX_FEE } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import crypto from '@/utils/crypto'
@@ -409,7 +409,7 @@ export default {
     name: 'Send',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     props: {
-        balances: {
+        maxAmount: {
             type: Object,
             default: function() {
             },
@@ -447,11 +447,11 @@ export default {
     created() {
         this.coldRecipientAddressList = new LRUCache(10)
         this.hotRecipientAddressList = new LRUCache(10)
-        let item = window.localStorage.getItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ')
+        let item = window.localStorage.getItem('Cold ' + this.defaultColdAddress + ' sendTokenRecipientAddressList ')
         if (item) {
             this.coldRecipientAddressList.load(JSON.parse(item))
         }
-        item = window.localStorage.getItem('Hot ' + this.defaultAddress + ' sendRecipientAddressList ')
+        item = window.localStorage.getItem('Hot ' + this.defaultAddress + ' sendTokenRecipientAddressList ')
         if (item) {
             this.hotRecipientAddressList.load(JSON.parse(item))
         }
@@ -527,26 +527,38 @@ export default {
         },
         sendData: function(walletType) {
             var apiSchema
+            console.log('addresses: ' + JSON.stringify(this.addresses))
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
                     return
                 }
                 this.hasConfirmed = true
+                this.contractId = transaction.tokenIDToContractID(this.tokenId)
+                this.fee = BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION)
+                this.feeScale = 100
                 const dataInfo = {
-                    recipient: this.recipient,
-                    amount: BigNumber(this.amount).multipliedBy(VSYS_PRECISION).toFixed(0),
-                    fee: TX_FEE * VSYS_PRECISION,
+                    contractId: this.contractId,
+                    senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
+                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    attachment: this.attachment
+                    description: this.attachment,
+                    funcIdx: SEND_FUNCIDX,
+                    data: transaction.prepareSend(this.recipient, BigNumber(this.amount)),
+                    signature: transaction.prepareIssueSignature(this.contractId, SEND_FUNCIDX, transaction.prepareSend(this.recipient, BigNumber(this.amount)), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
-                apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
+                console.log('pissue ' + transaction.prepareIssueAndBurn(BigNumber(this.amount)))
+                console.log('psend ' + transaction.prepareSend(this.recipient, BigNumber(this.amount)))
+                console.log('amount ' + this.amount)
+                console.log('tokenid ' + this.tokenId)
+                console.log('sendInfo: ' + JSON.stringify(dataInfo))
+                apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress].publicKey, PAYMENT_TX)
+                apiSchema = ''
             }
-            const url = NODE_IP + '/vsys/broadcast/payment'
-            apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') //  The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
+            const url = NODE_IP + '/contract/broadcast/execute'
             this.$http.post(url, apiSchema).then(response => {
+                console.log('response: ' + JSON.stringify(response))
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
@@ -565,11 +577,11 @@ export default {
         },
         addColdRecipientList: function() {
             this.coldRecipientAddressList.set(this.coldRecipient, '0')
-            window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
+            window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendTokenRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
         },
         addHotRecipientList: function() {
             this.hotRecipientAddressList.set(this.recipient, '0')
-            window.localStorage.setItem('Hot ' + this.defaultAddress + ' sendRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
+            window.localStorage.setItem('Hot ' + this.defaultAddress + ' sendTokenRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
         },
         coldNextPage: function() {
             this.sendError = false
@@ -781,7 +793,7 @@ export default {
             }
         },
         isInsufficient(amount, type) {
-            return true
+            return false
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)

@@ -560,8 +560,10 @@ export default {
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         endSend: function() {
-            setTimeout(this.sendToAdd, 30000)
             this.$refs.newTokenModal.hide()
+            for (let delayTime = 6000; delayTime < 150100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                setTimeout(this.sendToAdd, delayTime)
+            }
         },
         sendToAdd: function() {
             if (this.userInfo && this.userInfo.tokens) {

@@ -53,16 +53,19 @@
                     :description="description">
     </TokenInfoModal>
     <IssueToken :token-id="tokenId"
+                :issuer="issuer"
                 :address="address"
                 :wallet-type="walletType"
                 :addresses="addresses"
                 :cold-addresses="coldAddresses">
     </IssueToken>
     <SendToken :token-id="tokenId"
-               :address="address"
-               :wallet-type="walletType"
+               :balances="balances"
+               :cold-addresses="coldAddresses"
                :addresses="addresses"
-               :cold-addresses="coldAddresses">
+               :selected-address="address"
+               :wallet-type="walletType"
+               @endSendSignal="endSendSignal">
     </SendToken>
     <BurnToken :token-id="tokenId"
                :address="address"
@@ -241,6 +244,9 @@ export default {
                 this.$emit('removeFlag', this.removeFlag)
                 this.removeFlag = false
             }
+        },
+        endSendSignal() {
+            this.$emit('endSendSignal')
         }
     }
 }

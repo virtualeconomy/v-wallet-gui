@@ -24,7 +24,12 @@
             <b-form-select id=address-input
                            class="addr-input"
                            v-model="address"
-                           :options="options(addresses)"></b-form-select>
+                           :options="options(addresses)"
+                           :state="isValidRecipient(recipient)"
+                           aria-describedby="inputLiveFeedback"></b-form-select>
+            <b-form-invalid-feedback id="inputLiveFeedback">
+              Invalid recipient address (if using QR code scanner, make sure QR code is correct).
+            </b-form-invalid-feedback>
             <b-btn
               block
               variant="light"
@@ -317,6 +322,11 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        issuer: {
+            type: String,
+            default: '',
+            require: true
         }
     },
     computed: {
@@ -348,6 +358,9 @@ export default {
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
+        },
+        isValidRecipient: function(recipient) {
+            return recipient === this.issuer
         },
         dataObject() {
             return {
