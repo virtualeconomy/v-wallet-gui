@@ -25,7 +25,7 @@
                            class="addr-input"
                            v-model="address"
                            :options="options(addresses)"
-                           :state="isValidRecipient(address)"
+                           :state="isValidIssuer(address)"
                            aria-describedby="inputLiveFeedback"></b-form-select>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
@@ -330,16 +330,13 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
+            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
         },
         isColdSubmitDisabled() {
             return !(this.coldAddress && this.coldAmount > 0) && (this.isValidColdAttachment) && this.isAmountValid('cold') && this.coldAddress !== ''
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
-        },
-        isValidRecipient: function(recipient) {
-            return recipient === this.issuer
         },
         dataObject() {
             return {
@@ -371,6 +368,9 @@ export default {
             } else {
                 return API_VERSION
             }
+        },
+        isValidIssuer: function(recipient) {
+            return recipient === this.issuer
         },
         sendData: function(walletType) {
             let apiSchema
@@ -508,14 +508,14 @@ export default {
                 } else if (opc !== OPC_ACCOUNT) {
                     this.paused = false
                     this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
+                } else if (!this.isValidIssuer(this.recipient) || this.recipient === '') {
                     this.paused = false
                     this.qrErrMsg = 'Invalid address of recipient.'
                 } else {
                     this.qrErrMsg = void 0
                 }
             } catch (e) {
-                if (this.isValidRecipient(decodeString)) {
+                if (this.isValidIssuer(decodeString)) {
                     this.recipient = decodeString
                 } else {
                     this.recipient = 'please scan QR code of recipient'
