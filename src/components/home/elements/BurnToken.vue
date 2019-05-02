@@ -36,7 +36,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token Balance</span>
+              <span class="balance">Token Balance{{ formatter(balance) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Burn Amount"
@@ -376,10 +376,10 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    description: '',
-                    funcIdx: BURN_FUNCIDX,
-                    data: transaction.prepareIssueAndBurn(BigNumber(this.amount)),
-                    signature: transaction.prepareIssueSignature(this.contractId, BURN_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    attachment: '',
+                    functionIndex: BURN_FUNCIDX,
+                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount)),
+                    signature: transaction.prepareIssueSignature(this.contractId, BURN_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
@@ -435,7 +435,13 @@ export default {
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         endSend: function() {
+            for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                setTimeout(this.sendBalanceChange, delayTime)
+            }
             this.$refs.burnTokenModal.hide()
+        },
+        sendBalanceChange: function() {
+            this.$emit('updateBalance', 'update')
         },
         scanChange: function(evt) {
             if (!this.qrInit) {

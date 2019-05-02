@@ -160,13 +160,11 @@ function transferShortTxt(description) {
     return typeArr.concat(lengthArr.concat(byteArr))
 }
 function transferAccount(account) {
-    console.log('tranacco: ' + account)
     var accountArr = base58_1.default.decode(account)
 
     var typeArr = new Array(1)
     typeArr[0] = ACCOUNT_TYPE
 
-    console.log('return tranacco: ' + typeArr.concat(accountArr))
     return typeArr.concat(accountArr)
 }
 export default {
@@ -185,15 +183,14 @@ export default {
         return __assign({}, (tx_type ? {transactionType: tx_type} : {}), {senderPublicKey: publicKey}, castToAPISchema(userData, tx_type), {signature:signature})
     },
     prepareIssueAndBurn: function(amountData) {
-        var tokenIdx = 0
-        var tokenIdxArr = transferInt(tokenIdx)
+
         var amountArr = transferAmount(amountData)
 
         var typeArr = new Array(2)
         typeArr[0] = 0
-        typeArr[1] = 2
+        typeArr[1] = 1
 
-        var encodeArr = typeArr.concat(amountArr.concat(tokenIdxArr))
+        var encodeArr = typeArr.concat(amountArr)
         return base58_1.default.encode(Uint8Array.from(encodeArr));
     },
     prepareCreate: function(max, unity, tokenDescription) {

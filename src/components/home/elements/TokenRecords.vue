@@ -17,6 +17,7 @@
                      :wallet-type="walletType"
                      @removeFlag="removeToken"
                      @endSendSignal="endSendSignal"></TokenRecord>
+
       </div>
     </div>
   </div>
@@ -54,7 +55,8 @@ export default {
         return {
             tokenRecords: {},
             changeShowDisable: false,
-            myHeight: '0'
+            myHeight: '0',
+            records: {}
         }
     },
     props: {
@@ -99,12 +101,12 @@ export default {
         },
         getTokenRecords() {
             if (this.address) {
-                this.changeShowDisable = true
+                // this.changeShowDisable = true
                 let records = JSON.parse(window.localStorage.getItem(this.seedaddress))
                 if (records.tokens) {
                     this.tokenRecords = JSON.parse(records.tokens)
                 }
-                this.changeShowDisable = false
+                // this.changeShowDisable = false
             }
         },
         removeToken(remove) {

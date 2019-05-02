@@ -11,7 +11,7 @@
                     label="Burn Amount"
                     label-for="amount_success">
         <b-form-input id="amount_success"
-                      :value="formatter(amount) + ' VSYS'"
+                      :value="formatter(amount)"
                       class="amount"
                       readonly
                       :plaintext="true">
@@ -35,7 +35,7 @@
                     label="Issue Amount"
                     label-for="amount_success">
         <b-form-input id="amount_success"
-                      :value="formatter(amount) + ' VSYS'"
+                      :value="formatter(amount)"
                       class="amount"
                       readonly
                       :plaintext="true">

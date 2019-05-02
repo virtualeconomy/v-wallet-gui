@@ -491,7 +491,7 @@ export default {
                     fee: TOKEN_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    data: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment)[0]),
+                    initData: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment)[0]),
                     description: this.attachment,
                     signature: transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
@@ -570,9 +570,9 @@ export default {
                 this.tokens = JSON.parse(this.userInfo.tokens)
             }
             const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
+            console.log('the data' + this.tokenId)
             this.$http.get(url).then(response => {
-                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(response.body['info'])))
-                Vue.delete(this.tokens, '')
+                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
                 this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
                 let sendFlag = true
                 bus.$emit('sendFlag', sendFlag)

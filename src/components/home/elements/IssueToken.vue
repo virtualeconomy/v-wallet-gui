@@ -25,7 +25,6 @@
                            class="addr-input"
                            v-model="address"
                            :options="options(addresses)"
-                           :state="isValidRecipient(recipient)"
                            aria-describedby="inputLiveFeedback"></b-form-select>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
@@ -41,7 +40,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token Balance</span>
+              <span class="balance">Token Balance{{ formatter(balance) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Issue Amount"
@@ -129,7 +128,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token Balance</span>
+              <span class="balance">{{ formatter(balance) }}Token Balance</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Issue Amount"
@@ -245,22 +244,6 @@ import browser from '../../../utils/browser'
 import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
 // import base58 from '../../../libs/base58'
-/*  var initData = {
-    amount: BigNumber(0),
-    attachment: '',
-    pageId: 0,
-    fee: BigNumber(TX_FEE),
-    coldAmount: BigNumber(0),
-    coldPageId: 0,
-    coldFee: BigNumber(TX_FEE),
-    address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
-    coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
-    scanShow: false,
-    sendError: false,
-    coldSignature: '',
-    timeStamp: (Date.now() - 1) * 1e6,
-    hasConfirmed: false
-} */
 export default {
     name: 'IssueToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -270,9 +253,9 @@ export default {
             coldAmount: BigNumber(0),
             attachment: '',
             pageId: 1,
-            fee: BigNumber(TOKEN_FEE),
+            fee: BigNumber(CONTRACT_EXEC_FEE),
             coldPageId: 5,
-            coldFee: BigNumber(TOKEN_FEE),
+            coldFee: BigNumber(CONTRACT_EXEC_FEE),
             address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
             coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
             scanShow: false,
@@ -287,7 +270,6 @@ export default {
         balance: {
             type: BigNumber,
             default: function() {
-                return BigNumber(0)
             },
             require: true
         },
@@ -401,7 +383,7 @@ export default {
                 }
                 this.hasConfirmed = true
                 this.contractId = transaction.tokenIDToContractID(this.tokenId)
-                this.fee = BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION)
+                this.fee = BigNumber(CONTRACT_EXEC_FEE)
                 this.feeScale = 100
                 const dataInfo = {
                     contractId: this.contractId,
@@ -409,10 +391,10 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    description: '',
-                    funcIdx: ISSUE_FUNCIDX,
-                    data: transaction.prepareIssueAndBurn(BigNumber(this.amount)),
-                    signature: transaction.prepareIssueSignature(this.contractId, ISSUE_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    attachment: '',
+                    functionIndex: ISSUE_FUNCIDX,
+                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount)),
+                    signature: transaction.prepareIssueSignature(this.contractId, ISSUE_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
@@ -468,7 +450,13 @@ export default {
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         endSend: function() {
+            for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                setTimeout(this.sendBalanceChange, delayTime)
+            }
             this.$refs.issueTokenModal.hide()
+        },
+        sendBalanceChange: function() {
+            this.$emit('updateBalance', 'update')
         },
         scanChange: function(evt) {
             if (!this.qrInit) {
