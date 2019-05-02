@@ -36,7 +36,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token Balance</span>
+              <span class="balance">Token Balance{{ formatter(balance) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Burn Amount"
@@ -229,12 +229,13 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, BURN_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '../../../utils/browser'
 import BigNumber from 'bignumber.js'
+import transaction from '@/utils/transaction'
 export default {
     name: 'BurnToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -359,12 +360,40 @@ export default {
             }
         },
         sendData: function(walletType) {
+            let apiSchema
             if (walletType === 'hotWallet') {
-                this.pageId++
-            } else {
-                this.coldPageId++
+                if (this.hasConfirmed) {
+                    return
+                }
+                this.hasConfirmed = true
+                this.fee = BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION)
+                this.feeScale = 100
+                this.contractId = transaction.tokenIDToContractID(this.tokenId)
+                const dataInfo = {
+                    contractId: this.contractId,
+                    senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
+                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
+                    feeScale: FEE_SCALE,
+                    timestamp: this.timeStamp,
+                    attachment: '',
+                    functionIndex: BURN_FUNCIDX,
+                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount)),
+                    signature: transaction.prepareExecContractSignature(this.contractId, BURN_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                }
+                apiSchema = dataInfo
+            } else if (walletType === 'coldWallet') {
+                apiSchema = ''
             }
-            this.$emit('endSendSignal')
+            const url = NODE_IP + '/contract/broadcast/execute'
+            this.$http.post(url, apiSchema).then(response => {
+                if (walletType === 'hotWallet') {
+                    this.pageId++
+                } else {
+                    this.coldPageId++
+                }
+            }, response => {
+                this.sendError = true
+            })
         },
         nextPage: function() {
             this.pageId++
@@ -405,7 +434,13 @@ export default {
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         endSend: function() {
+            for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                setTimeout(this.sendBalanceChange, delayTime)
+            }
             this.$refs.burnTokenModal.hide()
+        },
+        sendBalanceChange: function() {
+            this.$emit('updateBalance', 'update')
         },
         scanChange: function(evt) {
             if (!this.qrInit) {
