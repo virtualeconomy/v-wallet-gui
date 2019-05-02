@@ -545,7 +545,7 @@ export default {
                     description: this.attachment,
                     funcIdx: SEND_FUNCIDX,
                     data: transaction.prepareSend(this.recipient, BigNumber(this.amount)),
-                    signature: transaction.prepareIssueSignature(this.contractId, SEND_FUNCIDX, transaction.prepareSend(this.recipient, BigNumber(this.amount)), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    signature: transaction.prepareExecContractSignature(this.contractId, SEND_FUNCIDX, transaction.prepareSend(this.recipient, BigNumber(this.amount)), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 console.log('pissue ' + transaction.prepareIssueAndBurn(BigNumber(this.amount)))
                 console.log('psend ' + transaction.prepareSend(this.recipient, BigNumber(this.amount)))

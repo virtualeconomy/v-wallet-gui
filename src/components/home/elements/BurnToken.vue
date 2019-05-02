@@ -227,7 +227,6 @@
 </template>
 
 <script>
-// import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { NODE_IP, CONTRACT_EXEC_FEE, BURN_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
@@ -379,7 +378,7 @@ export default {
                     attachment: '',
                     functionIndex: BURN_FUNCIDX,
                     functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount)),
-                    signature: transaction.prepareIssueSignature(this.contractId, BURN_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    signature: transaction.prepareExecContractSignature(this.contractId, BURN_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {

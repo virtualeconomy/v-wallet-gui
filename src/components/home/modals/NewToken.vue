@@ -306,7 +306,6 @@
 </template>
 
 <script>
-// import converters from '@/libs/converters'
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import { CONTRACT } from '../../../contract'
@@ -493,7 +492,7 @@ export default {
                     timestamp: this.timeStamp,
                     initData: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment)[0]),
                     description: this.attachment,
-                    signature: transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    signature: transaction.prepareRegContractSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {

@@ -232,19 +232,15 @@
 </template>
 
 <script>
-// import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { NODE_IP, CONTRACT_EXEC_FEE, ISSUE_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
-// import crypto from '@/utils/crypto'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '../../../utils/browser'
-// import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
-// import base58 from '../../../libs/base58'
 export default {
     name: 'IssueToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -395,7 +391,7 @@ export default {
                     attachment: '',
                     functionIndex: ISSUE_FUNCIDX,
                     functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount)),
-                    signature: transaction.prepareIssueSignature(this.contractId, ISSUE_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    signature: transaction.prepareExecContractSignature(this.contractId, ISSUE_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
