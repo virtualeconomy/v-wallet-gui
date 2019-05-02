@@ -491,7 +491,6 @@ export default {
                 apiSchema = ''
             }
             const url = NODE_IP + '/contract/broadcast/register'
-            console.log(apiSchema)
             this.$http.post(url, apiSchema).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
