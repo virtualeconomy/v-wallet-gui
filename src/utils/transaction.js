@@ -235,12 +235,14 @@ export default {
         var privateKeyBytes = base58_1.default.decode(privateKey);
         var signature = axlsign_1.default.sign(privateKeyBytes, Uint8Array.from(signBytes), secure_random_1.default.randomUint8Array(64));
         return base58_1.default.encode(signature)
+
     },
     prepareSend: function(recipient, amount) {
         var accountArr = transferAccount(recipient)
         var amountArr = transferAmount(amount)
 
         var parametersNum = convert_1.default.shortToByteArray(2)
+
 
         var encodeArr = parametersNum.concat(accountArr.concat(amountArr))
         return base58_1.default.encode(Uint8Array.from(encodeArr))
