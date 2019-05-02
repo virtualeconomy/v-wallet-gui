@@ -25,6 +25,7 @@
                            class="addr-input"
                            v-model="address"
                            :options="options(addresses)"
+                           :state="isValidRecipient(address)"
                            aria-describedby="inputLiveFeedback"></b-form-select>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
@@ -333,7 +334,7 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
+            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
         },
         isColdSubmitDisabled() {
             return !(this.coldAddress && this.coldAmount > 0) && (this.isValidColdAttachment) && this.isAmountValid('cold') && this.coldAddress !== ''
