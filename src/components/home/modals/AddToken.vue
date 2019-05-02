@@ -58,11 +58,6 @@ export default {
             sendFlag: false
         }
     },
-    created() {
-        if (this.userInfo && this.userInfo.tokens) {
-            this.tokens = JSON.parse(this.userInfo.tokens)
-        }
-    },
     watch: {
         tokenId() {
             this.responseErr = false
@@ -87,6 +82,7 @@ export default {
             this.init = false
             this.responseErr = false
             this.tokenId = ''
+            this.tokens = {}
             this.$refs.addTokenModal.hide()
         },
         setUsrLocalStorage(fieldname, value) {
@@ -95,15 +91,18 @@ export default {
         },
         addModal() {
             this.init = true
-            if (this.userInfo && this.userInfo.tokens) {
-                this.tokens = JSON.parse(this.userInfo.tokens)
+            this.tokens = {}
+            var tmpUserInfo = JSON.parse(window.localStorage.getItem(this.seedaddress))
+            if (tmpUserInfo && tmpUserInfo.tokens) {
+                this.tokens = JSON.parse(tmpUserInfo.tokens)
             }
             const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(url).then(response => {
                 this.responseErr = false
-                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(response.body['info'])))
-                Vue.delete(this.tokens, '')
+                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
                 this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
+                var usInfo = JSON.parse(window.localStorage.getItem(this.seedaddress))
+                console.log(usInfo.tokens)
                 this.sendFlag = true
                 bus.$emit('sendFlag', this.sendFlag)
                 this.sendFlag = false

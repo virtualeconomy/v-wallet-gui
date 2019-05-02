@@ -35,8 +35,8 @@ var post_tx_request = (tx_info, tx_type, tx_url) => {
     console.log('tx data:')
     console.log(api_data)
     request({
-        url: tx_url, 
-        method: 'POST', 
+        url: tx_url,
+        method: 'POST',
         json: api_data
     }, solve_response)
 }

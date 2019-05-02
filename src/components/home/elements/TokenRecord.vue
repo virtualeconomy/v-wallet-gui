@@ -11,13 +11,13 @@
       <b-col class="record-detail"
              cols="auto">
         <b-row>
-          <b-col class="title">{{ tokenId }}</b-col>
+          <b-col class="title">{{ tokenRecord }}</b-col>
         </b-row>
       </b-col>
       <b-col class="record-blank"></b-col>
       <b-col cols="auto">
         <div>
-          <span>{{ formatter(totalSupply) }} </span>
+          <span>{{ formatter(balance) }} </span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -39,6 +39,7 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
+          <b-dropdown-item @click="sendToken">Send Token</b-dropdown-item>
           <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item @click="burnToken">Burn Token</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
@@ -52,17 +53,32 @@
                     :description="description">
     </TokenInfoModal>
     <IssueToken :token-id="tokenId"
+                :issuer="issuer"
                 :address="address"
                 :wallet-type="walletType"
                 :addresses="addresses"
-                :cold-addresses="coldAddresses">
+                :cold-addresses="coldAddresses"
+                :balance="balance"
+                @updateBalance="updateBalance">
     </IssueToken>
+    <!--
+    <SendToken :token-id="tokenId"
+               :balances="balances"
+               :cold-addresses="coldAddresses"
+               :addresses="addresses"
+               :selected-address="address"
+               :wallet-type="walletType"
+               @endSendSignal="endSendSignal">
+    </SendToken>
+    -->
     <BurnToken :token-id="tokenId"
+               :issuer="issuer"
                :address="address"
                :wallet-type="walletType"
                :addresses="addresses"
-               :cold-addresses="coldAddresses">
-    </BurnToken>
+               :cold-addresses="coldAddresses"
+               :balance="balance"
+               @updateBalance="updateBalance"></BurnToken>
   </b-container>
 </template>
 
@@ -70,6 +86,7 @@
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import TokenInfoModal from './TokenInfoModal'
+import SendToken from './SendToken'
 import IssueToken from './IssueToken'
 import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
@@ -77,7 +94,7 @@ import { NODE_IP } from '../../../constants.js'
 import Vue from 'vue'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, IssueToken, BurnToken },
+    components: { TokenInfoModal, SendToken, IssueToken, BurnToken },
     data: function() {
         return {
             tokens: {},
@@ -85,7 +102,8 @@ export default {
             cancelTime: 0,
             showCancelDetails: false,
             removeFlag: false,
-            issuer: ''
+            issuer: '',
+            balance: BigNumber(0)
         }
     },
     props: {
@@ -103,11 +121,6 @@ export default {
             default: function() {},
             require: true
         },
-        balances: {
-            type: Object,
-            default: function() {},
-            require: true
-        },
         walletType: {
             type: String,
             default: '',
@@ -119,7 +132,7 @@ export default {
             require: true
         },
         tokenRecord: {
-            type: Array,
+            type: String,
             default: function() {},
             require: true
         },
@@ -129,6 +142,15 @@ export default {
             require: true
         }
     },
+    created() {
+        this.getTokenInfo()
+        const url = NODE_IP + '/contract/balance/' + this.address + '/' + this.tokenId
+        this.$http.get(url).then(response => {
+            this.balance = BigNumber(response.body.balance)
+        }, respError => {
+        })
+    },
+
     computed: {
         txAddressShow() {
             if (this.txAddress) {
@@ -149,18 +171,27 @@ export default {
             }
         },
         totalSupply() {
-            return this.tokenRecord[0]['data']
+            if (this.tokens) {
+                return this.tokens.max
+            } else return ''
         },
         issuedTokens() {
-            return this.tokenRecord[3]['data']
+            if (this.tokens) {
+                return this.tokens.total
+            } else return ''
         },
         contract() {
-            let bytes = base58.decode(this.tokenId)
-            bytes = bytes.slice(0, bytes.length - 4)
-            return base58.encode(bytes)
+            if (this.tokenId) {
+                let bytes = base58.decode(this.tokenId)
+                bytes = bytes.slice(0, bytes.length - 4)
+                return base58.encode(bytes)
+            }
+        },
+        unity() {
+            return this.tokens.unity
         },
         description() {
-            let bytes = base58.decode(this.tokenRecord[2]['data'])
+            let bytes = base58.decode(this.tokens.description)
             try {
                 return converters.byteArrayToString(bytes)
             } catch (e) {
@@ -183,30 +214,40 @@ export default {
             this.hovered = false
         },
         formatter(num) {
-            num = BigNumber(num)
-            return num.toFixed(Math.log10(this.tokenRecord[1]['data']))
+            if (this.tokens.unity) {
+                return num.toFixed(Math.log10(this.tokens.unity))
+            } else return num
         },
-        showModal() {
-            if (this.userInfo && this.userInfo.tokens) {
-                this.tokens = JSON.parse(this.userInfo.tokens)
-            }
+        updateBalance() {
+            const url = NODE_IP + '/contract/balance/' + this.address + '/' + this.tokenId
+            this.$http.get(url).then(response => {
+                this.balance = BigNumber(response.body.balance)
+            }, respError => {
+            })
+        },
+        getTokenInfo() {
             const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(tokenUrl).then(response => {
-                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(response.body['info'])))
-                this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
+                this.tokens = response.body
             }, respError => {
             })
             const url = NODE_IP + '/contract/info/' + this.contract
             this.$http.get(url).then(response => {
-                this.issuer = response.body.info[0]['data']
-                this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
+                this.issuer = response.body.info[0].data
             }, respError => {
                 this.issuer = 'Failed to get issuer'
                 this.registerTime = 'Failed to get time'
-                this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
             })
         },
+        showModal() {
+            this.getTokenInfo()
+            this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
+        },
+        sendToken() {
+            this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId)
+        },
         issueToken() {
+            this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)
         },
         burnToken() {
@@ -223,6 +264,9 @@ export default {
                 this.$emit('removeFlag', this.removeFlag)
                 this.removeFlag = false
             }
+        },
+        endSendSignal() {
+            this.$emit('endSendSignal')
         }
     }
 }

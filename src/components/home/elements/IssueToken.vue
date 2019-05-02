@@ -24,7 +24,12 @@
             <b-form-select id=address-input
                            class="addr-input"
                            v-model="address"
-                           :options="options(addresses)"></b-form-select>
+                           :options="options(addresses)"
+                           :state="isValidRecipient(address)"
+                           aria-describedby="inputLiveFeedback"></b-form-select>
+            <b-form-invalid-feedback id="inputLiveFeedback">
+              Invalid recipient address (if using QR code scanner, make sure QR code is correct).
+            </b-form-invalid-feedback>
             <b-btn
               block
               variant="light"
@@ -36,7 +41,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token Balance</span>
+              <span class="balance">Token Balance{{ formatter(balance) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Issue Amount"
@@ -124,7 +129,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token Balance</span>
+              <span class="balance">{{ formatter(balance) }}Token Balance</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Issue Amount"
@@ -230,7 +235,7 @@
 // import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, ISSUE_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 // import crypto from '@/utils/crypto'
@@ -238,22 +243,8 @@ import ColdSignature from '../modals/ColdSignature'
 import browser from '../../../utils/browser'
 // import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
-/*  var initData = {
-    amount: BigNumber(0),
-    attachment: '',
-    pageId: 0,
-    fee: BigNumber(TX_FEE),
-    coldAmount: BigNumber(0),
-    coldPageId: 0,
-    coldFee: BigNumber(TX_FEE),
-    address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
-    coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
-    scanShow: false,
-    sendError: false,
-    coldSignature: '',
-    timeStamp: (Date.now() - 1) * 1e6,
-    hasConfirmed: false
-} */
+import transaction from '@/utils/transaction'
+// import base58 from '../../../libs/base58'
 export default {
     name: 'IssueToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -263,23 +254,23 @@ export default {
             coldAmount: BigNumber(0),
             attachment: '',
             pageId: 1,
-            fee: BigNumber(TOKEN_FEE),
+            fee: BigNumber(CONTRACT_EXEC_FEE),
             coldPageId: 5,
-            coldFee: BigNumber(TOKEN_FEE),
+            coldFee: BigNumber(CONTRACT_EXEC_FEE),
             address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
             coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
             scanShow: false,
             sendError: false,
             coldSignature: '',
             timeStamp: (Date.now() - 1) * 1e6,
-            hasConfirmed: false
+            hasConfirmed: false,
+            contractId: ''
         }
     },
     props: {
         balance: {
             type: BigNumber,
             default: function() {
-                return BigNumber(0)
             },
             require: true
         },
@@ -314,6 +305,11 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        issuer: {
+            type: String,
+            default: '',
+            require: true
         }
     },
     computed: {
@@ -338,13 +334,16 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
+            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
         },
         isColdSubmitDisabled() {
             return !(this.coldAddress && this.coldAmount > 0) && (this.isValidColdAttachment) && this.isAmountValid('cold') && this.coldAddress !== ''
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
+        },
+        isValidRecipient: function(recipient) {
+            return recipient === this.issuer
         },
         dataObject() {
             return {
@@ -378,12 +377,40 @@ export default {
             }
         },
         sendData: function(walletType) {
+            let apiSchema
             if (walletType === 'hotWallet') {
-                this.pageId++
-            } else {
-                this.coldPageId++
+                if (this.hasConfirmed) {
+                    return
+                }
+                this.hasConfirmed = true
+                this.contractId = transaction.tokenIDToContractID(this.tokenId)
+                this.fee = BigNumber(CONTRACT_EXEC_FEE)
+                this.feeScale = 100
+                const dataInfo = {
+                    contractId: this.contractId,
+                    senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
+                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
+                    feeScale: FEE_SCALE,
+                    timestamp: this.timeStamp,
+                    attachment: '',
+                    functionIndex: ISSUE_FUNCIDX,
+                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount)),
+                    signature: transaction.prepareIssueSignature(this.contractId, ISSUE_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                }
+                apiSchema = dataInfo
+            } else if (walletType === 'coldWallet') {
+                apiSchema = ''
             }
-            this.$emit('endSendSignal')
+            const url = NODE_IP + '/contract/broadcast/execute'
+            this.$http.post(url, apiSchema).then(response => {
+                if (walletType === 'hotWallet') {
+                    this.pageId++
+                } else {
+                    this.coldPageId++
+                }
+            }, response => {
+                this.sendError = true
+            })
         },
         nextPage: function() {
             this.pageId++
@@ -424,7 +451,13 @@ export default {
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         endSend: function() {
+            for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                setTimeout(this.sendBalanceChange, delayTime)
+            }
             this.$refs.issueTokenModal.hide()
+        },
+        sendBalanceChange: function() {
+            this.$emit('updateBalance', 'update')
         },
         scanChange: function(evt) {
             if (!this.qrInit) {

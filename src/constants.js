@@ -11,11 +11,13 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 };
 export const WALLET_VERSION = '0.1.5'
 export const INITIAL_SESSION_TIMEOUT = 5
-export const NETWORK_BYTE = 'M'.charCodeAt(0);
+export const NETWORK_BYTE = 'T'.charCodeAt(0);
 export const INITIAL_NONCE = 0;
 export const ADDRESS_VERSION = 5;
 export const PAYMENT_TX = 2;
 export const LEASE_TX = 3;
+export const CONTRACT_CREATE_TX = 8;
+export const CONTRACT_EXEC_TX =9;
 export const CANCEL_LEASE_TX = 4;
 export const INT_TYPE = 4;
 export const ACCOUNT_TYPE = 7;
@@ -42,8 +44,7 @@ export const DEFAULT_BASIC_CONFIG = {
     logLevel: 'warning',
     timeDiff: 0
 };
-
-export const NODE_IP = '/api'
+export const NODE_IP = 'http://3.19.103.180:29928'
 export const ADDRESS_LENGTH = 35;
 export const TX_TEST_EXPLORER = 'https://testexplorer.v.systems/transactions/'
 export const TX_EXPLORER = 'https://explorer.v.systems/transactions/'
@@ -52,6 +53,10 @@ export const TOKEN_FEE = 100
 export const TX_FEE = 0.1
 export const FEE_SCALE = 100
 export const PROTOCOL = 'v.systems'
+export const CONTRACT_EXEC_FEE = 0.3
+export const ISSUE_FUNCIDX = 1
+export const BURN_FUNCIDX = 2
+export const SEND_FUNCIDX = 3
 export const API_VERSION = 2
 export const OPC_TRANSACTION = 'transaction'
 export const OPC_ACCOUNT = 'account'
