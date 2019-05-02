@@ -183,15 +183,11 @@ export default {
         return __assign({}, (tx_type ? {transactionType: tx_type} : {}), {senderPublicKey: publicKey}, castToAPISchema(userData, tx_type), {signature:signature})
     },
     prepareIssueAndBurn: function(amountData) {
-        var tokenIdx = 0
-        var tokenIdxArr = transferInt(tokenIdx)
         var amountArr = transferAmount(amountData)
 
-        var typeArr = new Array(2)
-        typeArr[0] = 0
-        typeArr[1] = 2
+        var parametersNum = convert_1.default.shortToByteArray(1)
 
-        var encodeArr = typeArr.concat(amountArr.concat(tokenIdxArr))
+        var encodeArr = parametersNum.concat(amountArr)
         return base58_1.default.encode(Uint8Array.from(encodeArr));
     },
     prepareCreate: function(max, unity, tokenDescription) {
@@ -199,11 +195,9 @@ export default {
         var unityArr = transferAmount(unity)
         var desArr = transferShortTxt(tokenDescription)
 
-        var typeArr = new Array(2)
-        typeArr[0] = 0
-        typeArr[1] = 3
-        var encodeArr = typeArr.concat(maxArr.concat(unityArr.concat(desArr)))
-        console.log(maxArr, unityArr, desArr, encodeArr)
+        var parametersNum = convert_1.default.shortToByteArray(3)
+
+        var encodeArr = parametersNum.concat(maxArr.concat(unityArr.concat(desArr)))
         return [encodeArr, base58_1.default.encode(encodeArr)]
     },
     prepareSignature: function(contract, data, description, fee, feeScale, time, privateKey) {
@@ -211,14 +205,11 @@ export default {
         bytess[0] = 8 & (255)
         var contractBytes = convert_1.default.bytesToByteArrayWithSize(base58_1.default.decode(contract))
         var dataBytes = convert_1.default.bytesToByteArrayWithSize(data[0])
-        console.log(typeof dataBytes, dataBytes, data[0])
         var desBytes = convert_1.default.bytesToByteArrayWithSize(convert_1.default.stringToByteArray(description))
         var feeBytes = convert_1.default.bigNumberToByteArray(fee)
         var feeScaleBytes = convert_1.default.shortToByteArray(feeScale)
         var timeBytes = convert_1.default.bigNumberToByteArray(time)
-        console.log('data0', data[0], desBytes)
         var signBytes = bytess.concat(contractBytes.concat(dataBytes.concat(desBytes.concat(feeBytes.concat(feeScaleBytes.concat(timeBytes))))))
-        console.log(signBytes, Uint8Array.from(signBytes))
         var privateKeyBytes = base58_1.default.decode(privateKey);
         var signature = axlsign_1.default.sign(privateKeyBytes, Uint8Array.from(signBytes), secure_random_1.default.randomUint8Array(64));
         return base58_1.default.encode(signature)
@@ -226,15 +217,11 @@ export default {
     },
     prepareSend: function(recipient, amount) {
         var accountArr = transferAccount(recipient)
-        var tokenIdx = 0
-        var tokenIdxArr = transferInt(tokenIdx)
         var amountArr = transferAmount(amount)
 
-        var typeArr = new Array(2)
-        typeArr[0] = 0
-        typeArr[1] = 3
+        var parametersNum = convert_1.default.shortToByteArray(3)
 
-        var encodeArr = typeArr.concat(accountArr.concat(amountArr.concat(tokenIdxArr)))
+        var encodeArr = parametersNum.concat(accountArr.concat(amountArr))
         return base58_1.default.encode(Uint8Array.from(encodeArr))
     }
 };

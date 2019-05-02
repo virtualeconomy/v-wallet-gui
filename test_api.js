@@ -1,4 +1,4 @@
-import tx_util from './src/utils/transaction1.js'
+import tx_util from './src/utils/transaction.js'
 import seed_lib from './src/libs/seed.js'
 import {VSYS_PRECISION, TX_FEE, FEE_SCALE} from './src/constants.js'
 var request = require('request')

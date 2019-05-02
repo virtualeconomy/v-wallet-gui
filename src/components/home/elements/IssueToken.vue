@@ -227,33 +227,15 @@
 </template>
 
 <script>
-// import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
-// import crypto from '@/utils/crypto'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '../../../utils/browser'
-// import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
-/*  var initData = {
-    amount: BigNumber(0),
-    attachment: '',
-    pageId: 0,
-    fee: BigNumber(TX_FEE),
-    coldAmount: BigNumber(0),
-    coldPageId: 0,
-    coldFee: BigNumber(TX_FEE),
-    address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
-    coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
-    scanShow: false,
-    sendError: false,
-    coldSignature: '',
-    timeStamp: (Date.now() - 1) * 1e6,
-    hasConfirmed: false
-} */
+
 export default {
     name: 'IssueToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},

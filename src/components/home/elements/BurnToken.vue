@@ -227,16 +227,13 @@
 </template>
 
 <script>
-// import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
-// import crypto from '@/utils/crypto'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '../../../utils/browser'
-// import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 export default {
     name: 'BurnToken',

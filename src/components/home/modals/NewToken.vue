@@ -306,7 +306,6 @@
 </template>
 
 <script>
-// import converters from '@/libs/converters'
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import { CONTRACT } from '../../../contract'
@@ -475,7 +474,6 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                console.log((3).toString(16))
                 this.fee = TOKEN_FEE * VSYS_PRECISION
                 this.feeScale = 100
                 const dataInfo = {
@@ -484,21 +482,16 @@ export default {
                     fee: TOKEN_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    data: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment)[0]),
+                    initData: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment)[0]),
                     description: '',
-                    signature: transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    signature: transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
-                console.log(apiSchema)
-                // console.log(converters.byteArrayToString(transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(this.unity), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)), 'descrip')
-                // console.log((base58.decode(apiSchema.data)))
-                // apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
             } else if (walletType === 'coldWallet') {
                 apiSchema = ''
-                // apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress].publicKey, PAYMENT_TX)
             }
             const url = NODE_IP + '/contract/broadcast/register'
-            // apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') //  The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
+            console.log(apiSchema)
             this.$http.post(url, apiSchema).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++

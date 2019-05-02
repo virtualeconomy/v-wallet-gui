@@ -71,7 +71,7 @@
 <script>
 import jrQrcode from 'jr-qrcode'
 import { API_VERSION, PROTOCOL, OPC_SIGNATURE } from '@/constants.js'
-import transaction from '../../../utils/transaction1'
+import transaction from '../../../utils/transaction'
 export default {
     name: 'ColdSignature',
     data: function() {
