@@ -28,6 +28,14 @@
              src="../../../assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
              width="32px"
              height="32px">
+        <img v-else-if="txIcon==='create contract'"
+             src="../../../assets/imgs/icons/wallet/ic_contract_signup.svg"
+             width="32px"
+             height="32px">
+        <img v-else-if="txIcon==='execution contract'"
+             src="../../../assets/imgs/icons/wallet/ic_contract_implement.svg"
+             width="32px"
+             height="32px">
       </b-col>
       <b-col class="record-detail"
              v-if="transType==='payment'"
@@ -64,10 +72,12 @@
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span>{{ formatter(txAmount) }} VSYS</span>
+          <span v-else-if="txIcon === 'create contract' || txIcon === 'execution contract'">-</span>
+          <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ formatter(txAmount) }} VSYS</span>
+          <span v-else-if="txIcon === 'create contract' || txIcon === 'execution contract'">{{ formatter(txFee) }} VSYS</span>
         </div>
         <div class="tx-fee"
-             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out') && feeFlag">Tx Fee: -
+             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'create contract' || txIcon === 'execution contract') && feeFlag">Tx Fee: -
           <span> {{ formatter(txFee) }} VSYS </span>
         </div>
       </b-col>
@@ -146,7 +156,7 @@ import converters from '@/libs/converters'
 import { VSYS_PRECISION } from '@/constants'
 import crypto from '@/utils/crypto'
 import CancelLease from '../modals/CancelLease'
-import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '../../../constants'
+import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '../../../constants'
 import browser from '../../../utils/browser'
 import BigNumber from 'bignumber.js'
 
@@ -233,6 +243,10 @@ export default {
                 } else {
                     return 'Leased Out Canceled'
                 }
+            } else if (this.txRecord['type'] === CONTRACT_CREATE_TX) {
+                return 'Create Contract'
+            } else if (this.txRecord['type'] === CONTRACT_EXEC_TX) {
+                return 'Execution Contract'
             } else {
                 return 'Received'
             }
@@ -473,6 +487,20 @@ export default {
       text-align: right;
       padding-right: 0px;
     }
+    .amount-createcontract {
+      font-size: 17px;
+      color: #F5354B;
+      letter-spacing: 0;
+      text-align: right;
+      padding-right: 0px;
+}
+    .amount-executioncontract {
+      font-size: 17px;
+      color: #F5354B;
+      letter-spacing: 0;
+      text-align: right;
+      padding-right: 0px;
+}
     .record-action {
         padding-left: 0px;
         .more-btn {
