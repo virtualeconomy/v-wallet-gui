@@ -7,13 +7,13 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
+var axlsign_1 = require("../libs/axlsign");
 var ByteProcessor_1 = require("./byteProcessor");
 var crypto_1 = require("./crypto");
 var concat_1 = require("./concat");
 var base58_1 = require("../libs/base58");
 var remap_1 = require("./remap");
-var constants = require("../constants");
-
+var secure_random_1 = require("../libs/secure-random");
 var convert_1 = require("../utils/convert");
 
 var constants = require("../constants");
@@ -108,7 +108,7 @@ function getBytes(transferData, tx_type) {
 
 function getExactBytes(fieldName) {
     if (!(fieldName in storedFields)) {
-         throw new Error("There is no field '" + fieldName + "' in transfer transaction");
+        throw new Error("There is no field '" + fieldName + "' in transfer transaction");
     }
     return storedFields[fieldName].process(userData[fieldName]);
 }
@@ -183,15 +183,11 @@ export default {
         return __assign({}, (tx_type ? {transactionType: tx_type} : {}), {senderPublicKey: publicKey}, castToAPISchema(userData, tx_type), {signature:signature})
     },
     prepareIssueAndBurn: function(amountData) {
-        var tokenIdx = 0
-        var tokenIdxArr = transferInt(tokenIdx)
         var amountArr = transferAmount(amountData)
 
-        var typeArr = new Array(2)
-        typeArr[0] = 0
-        typeArr[1] = 2
+        var parametersNum = convert_1.default.shortToByteArray(1)
 
-        var encodeArr = typeArr.concat(amountArr.concat(tokenIdxArr))
+        var encodeArr = parametersNum.concat(amountArr)
         return base58_1.default.encode(Uint8Array.from(encodeArr));
     },
     prepareCreate: function(max, unity, tokenDescription) {
@@ -199,25 +195,33 @@ export default {
         var unityArr = transferAmount(unity)
         var desArr = transferShortTxt(tokenDescription)
 
-        var typeArr = new Array(2)
-        typeArr[0] = 0
-        typeArr[1] = 3
+        var parametersNum = convert_1.default.shortToByteArray(3)
 
-        var encodeArr = typeArr.concat(maxArr.concat(unityArr.concat(desArr)))
-        return base58_1.default.encode(Uint8Array.from(encodeArr));
+        var encodeArr = parametersNum.concat(maxArr.concat(unityArr.concat(desArr)))
+        return [encodeArr, base58_1.default.encode(encodeArr)]
+    },
+    prepareSignature: function(contract, data, description, fee, feeScale, time, privateKey) {
+        var bytess = []
+        bytess[0] = 8 & (255)
+        var contractBytes = convert_1.default.bytesToByteArrayWithSize(base58_1.default.decode(contract))
+        var dataBytes = convert_1.default.bytesToByteArrayWithSize(data[0])
+        var desBytes = convert_1.default.bytesToByteArrayWithSize(convert_1.default.stringToByteArray(description))
+        var feeBytes = convert_1.default.bigNumberToByteArray(fee)
+        var feeScaleBytes = convert_1.default.shortToByteArray(feeScale)
+        var timeBytes = convert_1.default.bigNumberToByteArray(time)
+        var signBytes = bytess.concat(contractBytes.concat(dataBytes.concat(desBytes.concat(feeBytes.concat(feeScaleBytes.concat(timeBytes))))))
+        var privateKeyBytes = base58_1.default.decode(privateKey);
+        var signature = axlsign_1.default.sign(privateKeyBytes, Uint8Array.from(signBytes), secure_random_1.default.randomUint8Array(64));
+        return base58_1.default.encode(signature)
+
     },
     prepareSend: function(recipient, amount) {
         var accountArr = transferAccount(recipient)
-        var tokenIdx = 0
-        var tokenIdxArr = transferInt(tokenIdx)
         var amountArr = transferAmount(amount)
 
-        var typeArr = new Array(2)
-        typeArr[0] = 0
-        typeArr[1] = 3
+        var parametersNum = convert_1.default.shortToByteArray(3)
 
-        var encodeArr = typeArr.concat(accountArr.concat(amountArr.concat(tokenIdxArr)))
+        var encodeArr = parametersNum.concat(accountArr.concat(amountArr))
         return base58_1.default.encode(Uint8Array.from(encodeArr))
     }
 };
-

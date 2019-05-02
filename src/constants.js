@@ -42,7 +42,10 @@ export const DEFAULT_BASIC_CONFIG = {
     logLevel: 'warning',
     timeDiff: 0
 };
-
+export const INT_TYPE = 4;
+export const ACCOUNT_TYPE = 7;
+export const SHORTTEXT_TYPE = 5;
+export const AMOUNT_TYPE = 3;
 export const NODE_IP = '/api'
 export const ADDRESS_LENGTH = 35;
 export const TX_TEST_EXPLORER = 'https://testexplorer.v.systems/transactions/'

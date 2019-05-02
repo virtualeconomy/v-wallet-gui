@@ -291,7 +291,8 @@
         <b-container v-show="coldPageId===5">
           <TokenSuccess :address="coldAddress"
                         :amount=inputAmount(coldAmount)
-                        :fee="coldFee">
+                        :fee="coldFee"
+                        :tx-type="'Register New Token'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -305,8 +306,9 @@
 </template>
 
 <script>
-// import transaction from '@/utils/transaction'
+import transaction from '@/utils/transaction'
 import Vue from 'vue'
+import { CONTRACT } from '../../../contract'
 import seedLib from '@/libs/seed.js'
 import { NODE_IP, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_TRANSACTION } from '@/constants.js'
 import TokenConfirm from './TokenConfirm'
@@ -316,6 +318,7 @@ import browser from '../../../utils/browser'
 import BigNumber from 'bignumber.js'
 import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
+import base58 from '../../../libs/base58'
 var initData = {
     opc: '',
     support: false,
@@ -471,23 +474,23 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
+                this.fee = TOKEN_FEE * VSYS_PRECISION
+                this.feeScale = 100
                 const dataInfo = {
-                    senderPublicKey: this.address,
-                    contract: '',
-                    data: '',
+                    contract: CONTRACT,
+                    senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
                     fee: TOKEN_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    description: this.attachment
+                    initData: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment)[0]),
+                    description: '',
+                    signature: transaction.prepareSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
-                // apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
             } else if (walletType === 'coldWallet') {
                 apiSchema = ''
-                // apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress].publicKey, PAYMENT_TX)
             }
             const url = NODE_IP + '/contract/broadcast/register'
-            // apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') //  The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
             this.$http.post(url, apiSchema).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
@@ -618,7 +621,7 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount)
         },
         isWrongFormat(amount) {
             if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
