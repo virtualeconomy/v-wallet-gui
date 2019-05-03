@@ -394,7 +394,6 @@ export default {
                     signature: transaction.prepareExecContractSignature(this.contractId, ISSUE_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
-                console.log('issue: ' + JSON.stringify(dataInfo))
             } else if (walletType === 'coldWallet') {
                 apiSchema = ''
             }
