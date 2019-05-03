@@ -141,6 +141,16 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        update: {
+            type: Number,
+            default: 0,
+            require: true
+        }
+    },
+    watch: {
+        update(newAddr, oldAddr) {
+            this.updateBalance()
         }
     },
     created() {

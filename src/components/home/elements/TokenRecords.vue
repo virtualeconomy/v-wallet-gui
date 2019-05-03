@@ -15,6 +15,7 @@
                      :addresses="addresses"
                      :cold-addresses="coldAddresses"
                      :wallet-type="walletType"
+                     :update = "update"
                      @removeFlag="removeToken"
                      @endSendSignal="endSendSignal"></TokenRecord>
 
@@ -56,7 +57,8 @@ export default {
             tokenRecords: {},
             changeShowDisable: false,
             myHeight: '0',
-            records: {}
+            records: {},
+            update: 100
         }
     },
     props: {
@@ -78,6 +80,12 @@ export default {
             type: String,
             default: '',
             require: true
+        }
+    },
+    watch: {
+        address(newAddr, oldAddr) {
+            this.update += 1
+            this.getTokenRecords()
         }
     },
     computed: {
