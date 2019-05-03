@@ -366,7 +366,6 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                this.fee = BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION)
                 this.feeScale = 100
                 this.contractId = transaction.tokenIDToContractID(this.tokenId)
                 const dataInfo = {

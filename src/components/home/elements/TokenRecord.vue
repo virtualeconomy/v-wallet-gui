@@ -229,6 +229,7 @@ export default {
         },
         getTokenBalances() {
             for (const addr in this.addresses) {
+                Vue.set(this.balances, addr, BigNumber(0))
                 let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
                 this.$http.get(turl).then(response => {
                     let value = BigNumber(response.body.balance)
@@ -237,6 +238,7 @@ export default {
                 })
             }
             for (const addr in this.coldAddresses) {
+                Vue.set(this.balances, addr, BigNumber(0))
                 let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
                 this.$http.get(turl).then(response => {
                     let value = BigNumber(response.body.balance)

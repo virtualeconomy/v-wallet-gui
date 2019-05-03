@@ -38,7 +38,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token </span>
+              <span class="balance">Token Balance {{ formatter(balances[address]) }} </span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -133,7 +133,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :attachment="attachment"
-                        :tx-type="'Payment'">
+                        :tx-type="'Send Token'">
           </TokenConfirm>
           <p
             v-show="sendError"
@@ -162,7 +162,8 @@
         </b-container>
         <b-container v-if="pageId===3">
           <TokenSuccess class="tokenSucced"
-                        :address="recipient"
+                        :address="address"
+                        :recipient="recipient"
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :tx-type="'Send Token'">
@@ -196,7 +197,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token</span>
+              <span class="balance">Token Balance {{ formatter(balances[coldAddresses]) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -351,7 +352,8 @@
         </b-container>
         <b-container v-show="coldPageId===5">
           <TokenSuccess class="tokenSucced"
-                        :address="coldRecipient"
+                        :address="coldAddress"
+                        :recipient="coldRecipient"
                         :amount=inputAmount(coldAmount)
                         :fee="coldFee"
                         :tx-type="'Send Token'">
@@ -371,7 +373,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION, TX_FEE, SEND_FUNCIDX } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION, SEND_FUNCIDX } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import crypto from '@/utils/crypto'
@@ -385,12 +387,12 @@ var initData = {
     amount: BigNumber(0),
     attachment: '',
     pageId: 1,
-    fee: BigNumber(TX_FEE),
+    fee: BigNumber(CONTRACT_EXEC_FEE),
     coldRecipient: '',
     coldAmount: BigNumber(0),
     coldAttachment: '',
     coldPageId: 1,
-    coldFee: BigNumber(TX_FEE),
+    coldFee: BigNumber(CONTRACT_EXEC_FEE),
     address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
     coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
     scanShow: false,
@@ -539,7 +541,6 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                this.fee = BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION)
                 this.feeScale = 100
                 const dataInfo = {
                     contractId: this.contractId,
@@ -823,7 +824,7 @@ export default {
     cursor: pointer;
     position: absolute;
     margin-top: -37px;
-    margin-left: 380px;
+    margin-left: 350px;
 }
 .qr-info {
     text-align: left;

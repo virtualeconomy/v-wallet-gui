@@ -53,10 +53,9 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group v-if="txType==='Send Token'"
-                    horizontal
+      <b-form-group horizontal
                     class="form-line"
-                    label="To"
+                    label="From"
                     label-for="walletAddress_success">
         <b-form-input id="walletAddress_success"
                       v-model="address"
@@ -65,13 +64,13 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group v-else
+      <b-form-group v-if="txType==='Send Token'"
                     horizontal
                     class="form-line"
-                    label="From"
-                    label-for="walletAddress_success">
-        <b-form-input id="walletAddress_success"
-                      v-model="address"
+                    label="To"
+                    label-for="toAddress_success">
+        <b-form-input id="toAddress_success"
+                      v-model="recipient"
                       class="addr"
                       readonly
                       :plaintext="true">
@@ -121,6 +120,10 @@ export default {
         txType: {
             type: String,
             required: true,
+            default: ''
+        },
+        recipient: {
+            type: String,
             default: ''
         }
     },
