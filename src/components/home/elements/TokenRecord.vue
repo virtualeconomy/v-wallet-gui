@@ -61,7 +61,6 @@
                 :balance="balance"
                 @updateBalance="updateBalance">
     </IssueToken>
-    <!--
     <SendToken :token-id="tokenId"
                :balances="balances"
                :cold-addresses="coldAddresses"
@@ -70,7 +69,6 @@
                :wallet-type="walletType"
                @endSendSignal="endSendSignal">
     </SendToken>
-    -->
     <BurnToken :token-id="tokenId"
                :issuer="issuer"
                :address="address"

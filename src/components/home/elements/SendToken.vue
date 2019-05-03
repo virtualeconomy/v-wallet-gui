@@ -528,6 +528,8 @@ export default {
         sendData: function(walletType) {
             var apiSchema
             console.log('addresses: ' + JSON.stringify(this.addresses))
+            console.log('tokenID: ' + this.tokenId)
+            console.log('recip: ' + this.recipient)
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
                     return
@@ -542,10 +544,10 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    description: this.attachment,
-                    funcIdx: SEND_FUNCIDX,
-                    data: transaction.prepareSend(this.recipient, BigNumber(this.amount)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, SEND_FUNCIDX, transaction.prepareSend(this.recipient, BigNumber(this.amount)), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    attachment: this.attachment,
+                    functionIndex: SEND_FUNCIDX,
+                    functionData: transaction.prepareSend(this.recipient, BigNumber(this.amount)),
+                    signature: transaction.prepareExecContractSignature(this.contractId, SEND_FUNCIDX, transaction.prepareSend(this.recipient, BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 console.log('pissue ' + transaction.prepareIssueAndBurn(BigNumber(this.amount)))
                 console.log('psend ' + transaction.prepareSend(this.recipient, BigNumber(this.amount)))
