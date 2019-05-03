@@ -15,5 +15,3 @@ selenium-debug.log
 *.njsproj
 *.sln
 vsys-hot-wallet.code-workspace
-package-lock.json
-src/constants.js
