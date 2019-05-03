@@ -21,10 +21,15 @@
           v-if="pageId===1">
           <b-form-group label="Wallet Address"
                         label-for="address-input">
-            <b-form-select id=address-input
-                           class="addr-input"
-                           v-model="address"
-                           :options="options(addresses)"></b-form-select>
+            <b-form-input id=address-input
+                          class="address-input"
+                          readonly
+                          v-model="address"
+                          :state="isValidIssuer(address)"
+                          aria-describedby="inputLiveFeedback"></b-form-input>
+            <b-form-invalid-feedback id="inputLiveFeedback">
+              Cannot issue token. You are not issuer of this token.
+            </b-form-invalid-feedback>
             <b-btn
               block
               variant="light"
@@ -32,11 +37,11 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+                <img src="../../../assets/imgs/icons/wallet/ic_token2.svg"
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token Balance{{ formatter(balance) }}</span>
+              <span class="balance">Burn Available{{ formatter(balance) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Burn Amount"
@@ -229,7 +234,7 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, BURN_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, BURN_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -245,10 +250,10 @@ export default {
             coldAmount: BigNumber(0),
             attachment: '',
             pageId: 1,
-            fee: BigNumber(TOKEN_FEE),
+            fee: BigNumber(CONTRACT_EXEC_FEE),
             coldPageId: 5,
-            coldFee: BigNumber(TOKEN_FEE),
-            address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
+            coldFee: BigNumber(CONTRACT_EXEC_FEE),
+            // address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
             coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
             scanShow: false,
             sendError: false,
@@ -280,12 +285,9 @@ export default {
             default: function() {},
             require: true
         },
-        total: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
+        address: {
+            type: String,
+            default: ''
         },
         walletType: {
             type: String,
@@ -293,6 +295,11 @@ export default {
             require: true
         },
         tokenId: {
+            type: String,
+            default: '',
+            require: true
+        },
+        issuer: {
             type: String,
             default: '',
             require: true
@@ -430,7 +437,6 @@ export default {
             this.qrErrMsg = void 0
             this.sendError = false
             this.coldSignature = ''
-            this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         endSend: function() {
@@ -560,7 +566,7 @@ export default {
         },
         isInsufficient(amount, type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return BigNumber(amount).isGreaterThan(BigNumber(balance).minus(TOKEN_FEE))
+            return BigNumber(amount).isGreaterThan(BigNumber(balance).minus(CONTRACT_EXEC_FEE))
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
@@ -576,6 +582,9 @@ export default {
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
+        },
+        isValidIssuer: function(recipient) {
+            return recipient === this.issuer
         }
     }
 }
@@ -596,7 +605,7 @@ export default {
     text-align: left;
     color: #9091a3;
 }
-.addr-input {
+.address-input {
     border: 1px solid #E8E9ED;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;

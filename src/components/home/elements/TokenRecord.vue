@@ -48,7 +48,7 @@
     </b-row>
     <TokenInfoModal :token-id="tokenId"
                     :issuer="issuer"
-                    :total-supply="formatter(totalSupply)"
+                    :total-supply="totalSupply"
                     :issued-tokens="formatter(issuedTokens)"
                     :description="description">
     </TokenInfoModal>
@@ -59,6 +59,7 @@
                 :addresses="addresses"
                 :cold-addresses="coldAddresses"
                 :balance="balance"
+                :total-supply="totalSupply"
                 @updateBalance="updateBalance">
     </IssueToken>
     <!--
@@ -172,7 +173,7 @@ export default {
         },
         totalSupply() {
             if (this.tokens) {
-                return this.tokens.max
+                return BigNumber(this.tokens.max)
             } else return ''
         },
         issuedTokens() {
@@ -181,7 +182,7 @@ export default {
             } else return ''
         },
         contract() {
-            if (this.tokenId) {
+            if (this.tokenId && this.tokenId !== undefined) {
                 let bytes = base58.decode(this.tokenId)
                 bytes = bytes.slice(0, bytes.length - 4)
                 return base58.encode(bytes)
@@ -191,11 +192,13 @@ export default {
             return this.tokens.unity
         },
         description() {
-            let bytes = base58.decode(this.tokens.description)
-            try {
-                return converters.byteArrayToString(bytes)
-            } catch (e) {
-                return ''
+            if (this.tokens.description && this.tokens.description !== undefined) {
+                let bytes = base58.decode(this.tokens.description)
+                try {
+                    return converters.byteArrayToString(bytes)
+                } catch (e) {
+                    return ''
+                }
             }
         }
     },

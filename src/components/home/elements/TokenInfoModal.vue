@@ -30,7 +30,7 @@
       </div>
       <div class="tx-attachment">
         <label>Total Supply</label>
-        <span>{{ totalSupply }}</span>
+        <span>{{ formatter(totalSupply) }}</span>
       </div>
       <div class="tx-attachment">
         <label>Issued tokens</label>
@@ -45,6 +45,8 @@
 </template>
 
 <script>
+import BigNumber from 'bignumber.js'
+import browser from '../../../utils/browser'
 export default {
     name: 'TokenInfoModal',
     props: {
@@ -54,7 +56,7 @@ export default {
             require: true
         },
         totalSupply: {
-            type: String,
+            type: BigNumber,
             default: '',
             require: true
         },
@@ -82,6 +84,9 @@ export default {
     methods: {
         closeModal() {
             this.$refs.tokenInfoModal.hide()
+        },
+        formatter(num) {
+            return browser.bigNumberFormatter(num)
         }
     }
 }

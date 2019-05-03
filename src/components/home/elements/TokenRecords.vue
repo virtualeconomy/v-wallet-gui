@@ -1,5 +1,5 @@
 <template>
-  <div v-if="Object.keys(tokenRecords).length > 0"
+  <div v-if="Object.keys(tokenRecords).length > 0 && Object.keys(tokenRecords) !== undefined"
        class="records">
     <div class="title-records">
       <span>Token Watch List</span>
