@@ -67,6 +67,7 @@
                :addresses="addresses"
                :selected-address="address"
                :wallet-type="walletType"
+               :function-index="functionIndex"
                @endSendSignal="endSendSignal">
     </SendToken>
     <BurnToken :token-id="tokenId"
@@ -81,6 +82,7 @@
 </template>
 
 <script>
+import transaction from '@/utils/transaction'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import TokenInfoModal from './TokenInfoModal'
@@ -88,13 +90,15 @@ import SendToken from './SendToken'
 import IssueToken from './IssueToken'
 import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
-import { NODE_IP } from '../../../constants.js'
+import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '../../../constants.js'
+import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract.js'
 import Vue from 'vue'
 export default {
     name: 'TokenRecord',
     components: { TokenInfoModal, SendToken, IssueToken, BurnToken },
     data: function() {
         return {
+            balances: {},
             tokens: {},
             hovered: false,
             cancelTime: 0,
@@ -223,12 +227,31 @@ export default {
             }, respError => {
             })
         },
+        getTokenBalances() {
+            for (const addr in this.addresses) {
+                let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
+                this.$http.get(turl).then(response => {
+                    let value = BigNumber(response.body.balance)
+                    Vue.set(this.balances, addr, value)
+                }, respError => {
+                })
+            }
+            for (const addr in this.coldAddresses) {
+                let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
+                this.$http.get(turl).then(response => {
+                    let value = BigNumber(response.body.balance)
+                    Vue.set(this.balances, addr, value)
+                }, respError => {
+                })
+            }
+        },
         getTokenInfo() {
             const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(tokenUrl).then(response => {
                 this.tokens = response.body
             }, respError => {
             })
+
             const url = NODE_IP + '/contract/info/' + this.contract
             this.$http.get(url).then(response => {
                 this.issuer = response.body.info[0].data
@@ -236,12 +259,30 @@ export default {
                 this.issuer = 'Failed to get issuer'
                 this.registerTime = 'Failed to get time'
             })
+
+            var contractId = transaction.tokenIDToContractID(this.tokenId)
+            const url2 = NODE_IP + '/contract/content/' + contractId
+            this.$http.get(url2).then(response => {
+                var tokentype = response.body.textual.descriptors
+                this.functionIndex = -9
+                if (tokentype === CONTRACT_DESCRIPTOR) {
+                    this.functionIndex = SEND_FUNCIDX
+                } else if (tokentype === CONTRACT_WITH_SPLIT_DESCRIPTOR) {
+                    this.functionIndex = SEND_FUNCIDX_SPLIT
+                } else {
+                    this.functionIndex = -999
+                }
+            }, respError => {
+                console.log('failed to load tokentype ')
+            })
         },
         showModal() {
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
         },
         sendToken() {
+            this.getTokenBalances()
+            this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId)
         },
         issueToken() {

@@ -18,7 +18,7 @@ var convert_1 = require("../utils/convert");
 
 var constants = require("../constants");
 var INT_TYPE = constants.INT_TYPE
-var ACCOUNT_TYPE = constants.ACCOUNT_TYPE
+var ACCOUNT_TYPE = constants.ACCOUNT_ADDR_TYPE
 var AMOUNT_TYPE = constants.AMOUNT_TYPE
 var SHORTTEXT_TYPE = constants.SHORTTEXT_TYPE
 // Fields of the original data object
@@ -200,8 +200,6 @@ export default {
 
 
         var encodeArr = parametersNum.concat(accountArr.concat(amountArr))
-        console.log('encodeArr Arr: ' + encodeArr)
-        console.log('amountArr Arr: ' + Uint8Array.from(encodeArr))
         return base58_1.default.encode(Uint8Array.from(encodeArr))
     },
     prepareCreate: function(max, unity, tokenDescription) {

@@ -29,6 +29,18 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
+      <b-form-group v-else-if="txType==='Send Token'"
+                    horizontal
+                    class="form-line"
+                    label="Send Amount"
+                    label-for="amount_success">
+        <b-form-input id="amount_success"
+                      :value="formatter(amount) + ' VSYS'"
+                      class="amount"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
       <b-form-group v-else
                     horizontal
                     class="form-line"
@@ -41,7 +53,20 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group v-if="txType==='Send Token'"
+                    horizontal
+                    class="form-line"
+                    label="To"
+                    label-for="walletAddress_success">
+        <b-form-input id="walletAddress_success"
+                      v-model="address"
+                      class="addr"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group v-else
+                    horizontal
                     class="form-line"
                     label="From"
                     label-for="walletAddress_success">
