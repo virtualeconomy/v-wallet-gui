@@ -64,7 +64,7 @@
               The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isInsufficient(amount, 'hot')">
+                                     v-else-if="isInsufficient('hot')">
               Insufficient funds
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -89,8 +89,7 @@
                           class="pg-bar"></b-progress>
               <button class="bar-plus"
                       @click="plus">+</button>
-              <span class="unity-number"
-                    style="margin-left: 360px">10<sup>16</sup></span>
+              <span class="unity-number-second">10<sup>16</sup></span>
             </div>
           </b-form-group>
           <div style="margin-top: 10px;">
@@ -193,7 +192,7 @@
               The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isInsufficient(coldAmount, 'cold')">
+                                     v-else-if="isInsufficient('cold')">
               Insufficient funds
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -308,7 +307,7 @@
 <script>
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
-import { CONTRACT } from '../../../contract'
+import { CONTRACT, CONTRACT_WITH_SPLIT } from '../../../contract'
 import seedLib from '@/libs/seed.js'
 import { NODE_IP, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_TRANSACTION } from '@/constants.js'
 import TokenConfirm from './TokenConfirm'
@@ -409,7 +408,7 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(BigNumber(this.amount).isGreaterThan(0) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
+            return !(BigNumber(this.amount).isGreaterThan(0) && this.isInsufficient('hot') && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
         },
         isColdSubmitDisabled() {
             return !(this.coldAddress && this.coldAmount > 0 && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold') && this.coldAddress !== '')
@@ -485,14 +484,14 @@ export default {
                 this.fee = BigNumber(TOKEN_FEE * VSYS_PRECISION)
                 this.feeScale = 100
                 const dataInfo = {
-                    contract: CONTRACT,
+                    contract: this.support === true ? CONTRACT : CONTRACT_WITH_SPLIT,
                     senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
                     fee: TOKEN_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
                     initData: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment)[0]),
                     description: this.attachment,
-                    signature: transaction.prepareRegContractSignature(CONTRACT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    signature: transaction.prepareRegContractSignature(this.support === true ? CONTRACT : CONTRACT_WITH_SPLIT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
@@ -660,9 +659,9 @@ export default {
                 return false
             }
         },
-        isInsufficient(amount, type) {
+        isInsufficient(type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return BigNumber(amount).isGreaterThan(BigNumber(balance).minus(TOKEN_FEE))
+            return BigNumber(balance).isGreaterThan(BigNumber(TOKEN_FEE))
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
@@ -818,7 +817,7 @@ textarea::-webkit-input-placeholder {
 }
 .bar-plus {
     position: absolute;
-    margin-left: 330px;
+    margin-left: 307px;
     margin-right: 2px;
     color: #fff !important;
     background-color: #FF8737 !important;
@@ -832,10 +831,19 @@ textarea::-webkit-input-placeholder {
     margin-top: -18px;
     margin-left: 55px;
     padding-top: 0px;
-    width: 301px;
+    width: 271px;
     height: 16px;
 }
 .unity-number {
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    color: #181B3A;
+    letter-spacing: 0;
+}
+.unity-number-second {
+    position:absolute;
+    margin-left: 332px;
+    margin-top: 2px;
     font-family: Roboto-Regular;
     font-size: 15px;
     color: #181B3A;
