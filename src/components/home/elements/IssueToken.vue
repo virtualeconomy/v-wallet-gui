@@ -21,14 +21,14 @@
           v-if="pageId===1">
           <b-form-group label="Wallet Address"
                         label-for="address-input">
-            <b-form-select id=address-input
-                           class="addr-input"
-                           v-model="address"
-                           :options="options(addresses)"
-                           :state="isValidIssuer(address)"
-                           aria-describedby="inputLiveFeedback"></b-form-select>
+            <b-form-input id=address-input
+                          class="address-input"
+                          readonly
+                          v-model="address"
+                          :state="isValidIssuer(address)"
+                          aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid recipient address (if using QR code scanner, make sure QR code is correct).
+              Cannot issue token. You are not issuer of this token.
             </b-form-invalid-feedback>
             <b-btn
               block
@@ -37,11 +37,11 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+                <img src="../../../assets/imgs/icons/wallet/ic_token2.svg"
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token Balance{{ formatter(balance) }}</span>
+              <span class="balance">Issue Available{{ formatter(totalSupply - balance) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Issue Amount"
@@ -116,8 +116,7 @@
                         label-for="wallet-address">
             <b-form-select id=wallet-address
                            class="addr-input"
-                           v-model="coldAddress"
-                           :options="options(coldAddresses)"></b-form-select>
+                           v-model="coldAddress"></b-form-select>
             <b-btn
               block
               variant="light"
@@ -253,7 +252,7 @@ export default {
             fee: BigNumber(CONTRACT_EXEC_FEE),
             coldPageId: 5,
             coldFee: BigNumber(CONTRACT_EXEC_FEE),
-            address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
+            // address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
             coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
             scanShow: false,
             sendError: false,
@@ -280,15 +279,9 @@ export default {
             default: function() {},
             require: true
         },
-        balances: {
-            type: Object,
-            default: function() {},
-            require: true
-        },
-        total: {
+        totalSupply: {
             type: BigNumber,
             default: function() {
-                return BigNumber(0)
             },
             require: true
         },
@@ -306,6 +299,10 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        address: {
+            type: String,
+            default: ''
         }
     },
     computed: {
@@ -443,8 +440,7 @@ export default {
             this.qrErrMsg = void 0
             this.sendError = false
             this.coldSignature = ''
-            this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
-            this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
+            this.coldAddress = ''
         },
         endSend: function() {
             for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
@@ -578,12 +574,6 @@ export default {
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
         },
-        options(addrs) {
-            return Object.keys(addrs).reduce((options, addr) => {
-                options.push({ value: addr, text: addr })
-                return options
-            }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
-        },
         getKeypair: function(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
@@ -609,7 +599,7 @@ export default {
     text-align: left;
     color: #9091a3;
 }
-.addr-input {
+.address-input {
     border: 1px solid #E8E9ED;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
