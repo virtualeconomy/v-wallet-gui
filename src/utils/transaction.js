@@ -202,6 +202,9 @@ export default {
         var encodeArr = parametersNum.concat(accountArr.concat(amountArr))
         return base58_1.default.encode(Uint8Array.from(encodeArr))
     },
+    prepareSendAttachment: function(description) {
+        return base58_1.default.encode(convert_1.default.stringToByteArray(description))
+    },
     prepareCreate: function(max, unity, tokenDescription) {
         var maxArr = transferAmount(max)
         var unityArr = transferAmount(unity)

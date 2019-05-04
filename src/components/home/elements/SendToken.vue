@@ -548,7 +548,7 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    attachment: '',
+                    attachment: transaction.prepareSendAttachment(this.attachment),
                     functionIndex: this.functionIndex,
                     functionData: transaction.prepareSend(this.recipient, BigNumber(this.amount)),
                     signature: transaction.prepareExecContractSignature(this.contractId, this.functionIndex, transaction.prepareSend(this.recipient, BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
