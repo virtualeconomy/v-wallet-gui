@@ -38,7 +38,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token </span>
+              <span class="balance">Token Balance {{ formatter(balances[address]) }} </span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -123,6 +123,7 @@
                     class="btn-continue"
                     size="lg"
                     block
+                    :disabled="isSubmitDisabled"
                     @click="nextPage(); addHotRecipientList();">Continue
           </b-button>
         </b-container>
@@ -132,7 +133,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :attachment="attachment"
-                        :tx-type="'Payment'">
+                        :tx-type="'Send Token'">
           </TokenConfirm>
           <p
             v-show="sendError"
@@ -160,12 +161,13 @@
           </b-row>
         </b-container>
         <b-container v-if="pageId===3">
-          <Success :address="address"
-                   :recipient="recipient"
-                   :amount=inputAmount(amount)
-                   :fee="fee"
-                   :attachment="attachment">
-          </Success>
+          <TokenSuccess class="tokenSucced"
+                        :address="address"
+                        :recipient="recipient"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
+                        :tx-type="'Send Token'">
+          </TokenSuccess>
           <b-button variant="warning"
                     block
                     size="lg"
@@ -195,7 +197,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token</span>
+              <span class="balance">Token Balance {{ formatter(balances[coldAddresses]) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -321,13 +323,11 @@
                          @prev-page="coldPrevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
-          <Confirm :address="coldAddress"
-                   :recipient="coldRecipient"
-                   :amount=inputAmount(coldAmount)
-                   :fee="coldFee"
-                   :attachment="coldAttachment"
-                   :tx-type="'Payment'">
-          </Confirm>
+          <TokenConfirm :address="coldAddress"
+                        :amount=inputAmount(coldAmount)
+                        :fee="coldFee"
+                        :tx-type="'IssueToken'">
+          </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-row>
             <b-col class="col-lef">
@@ -351,12 +351,13 @@
           </b-row>
         </b-container>
         <b-container v-show="coldPageId===5">
-          <Success :address="coldAddress"
-                   :recipient="coldRecipient"
-                   :amount=inputAmount(coldAmount)
-                   :fee="coldFee"
-                   :attachment="coldAttachment">
-          </Success>
+          <TokenSuccess class="tokenSucced"
+                        :address="coldAddress"
+                        :recipient="coldRecipient"
+                        :amount=inputAmount(coldAmount)
+                        :fee="coldFee"
+                        :tx-type="'Send Token'">
+          </TokenSuccess>
           <b-button variant="warning"
                     block
                     size="lg"
@@ -372,7 +373,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, SEND_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION, TX_FEE } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION, SEND_FUNCIDX } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import crypto from '@/utils/crypto'
@@ -386,12 +387,12 @@ var initData = {
     amount: BigNumber(0),
     attachment: '',
     pageId: 1,
-    fee: BigNumber(TX_FEE),
+    fee: BigNumber(CONTRACT_EXEC_FEE),
     coldRecipient: '',
     coldAmount: BigNumber(0),
     coldAttachment: '',
     coldPageId: 1,
-    coldFee: BigNumber(TX_FEE),
+    coldFee: BigNumber(CONTRACT_EXEC_FEE),
     address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
     coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
     scanShow: false,
@@ -409,12 +410,6 @@ export default {
     name: 'Send',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     props: {
-        maxAmount: {
-            type: Object,
-            default: function() {
-            },
-            require: true
-        },
         coldAddresses: {
             type: Object,
             default: function() {},
@@ -439,6 +434,17 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        balances: {
+            type: Object,
+            default: function() {
+            },
+            require: true
+        },
+        functionIndex: {
+            type: Number,
+            default: SEND_FUNCIDX,
+            require: true
         }
     },
     data: function() {
@@ -457,6 +463,9 @@ export default {
         }
     },
     computed: {
+        contractId() {
+            return transaction.tokenIDToContractID(this.tokenId)
+        },
         defaultAddress() {
             return Vue.ls.get('address')
         },
@@ -527,14 +536,11 @@ export default {
         },
         sendData: function(walletType) {
             var apiSchema
-            console.log('addresses: ' + JSON.stringify(this.addresses))
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
                     return
                 }
                 this.hasConfirmed = true
-                this.contractId = transaction.tokenIDToContractID(this.tokenId)
-                this.fee = BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION)
                 this.feeScale = 100
                 const dataInfo = {
                     contractId: this.contractId,
@@ -542,23 +548,17 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    description: this.attachment,
-                    funcIdx: SEND_FUNCIDX,
-                    data: transaction.prepareSend(this.recipient, BigNumber(this.amount)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, SEND_FUNCIDX, transaction.prepareSend(this.recipient, BigNumber(this.amount)), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    attachment: transaction.prepareSendAttachment(this.attachment),
+                    functionIndex: this.functionIndex,
+                    functionData: transaction.prepareSend(this.recipient, BigNumber(this.amount)),
+                    signature: transaction.prepareExecContractSignature(this.contractId, this.functionIndex, transaction.prepareSend(this.recipient, BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
-                console.log('pissue ' + transaction.prepareIssueAndBurn(BigNumber(this.amount)))
-                console.log('psend ' + transaction.prepareSend(this.recipient, BigNumber(this.amount)))
-                console.log('amount ' + this.amount)
-                console.log('tokenid ' + this.tokenId)
-                console.log('sendInfo: ' + JSON.stringify(dataInfo))
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
                 apiSchema = ''
             }
             const url = NODE_IP + '/contract/broadcast/execute'
             this.$http.post(url, apiSchema).then(response => {
-                console.log('response: ' + JSON.stringify(response))
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
@@ -793,7 +793,8 @@ export default {
             }
         },
         isInsufficient(amount, type) {
-            return false
+            var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
+            return BigNumber(amount).isGreaterThan(BigNumber(balance))
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
@@ -823,7 +824,7 @@ export default {
     cursor: pointer;
     position: absolute;
     margin-top: -37px;
-    margin-left: 380px;
+    margin-left: 350px;
 }
 .qr-info {
     text-align: left;

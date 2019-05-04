@@ -1,9 +1,11 @@
 <template>
   <div>
-    <img v-if="txType==='Burn Token'"
-         src="../../../assets/imgs/icons/operate/ic_burn.svg">
-    <img v-else
-         src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
+    <div class="token-succ-icon">
+      <img v-if="txType==='Burn Token'"
+           src="../../../assets/imgs/icons/operate/ic_burn.svg">
+      <img v-else
+           src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
+    </div>
     <div class="infos">
       <b-form-group v-if="txType==='Burn Token'"
                     horizontal
@@ -21,6 +23,18 @@
                     horizontal
                     class="form-line"
                     label="Total Supply"
+                    label-for="amount_success">
+        <b-form-input id="amount_success"
+                      :value="formatter(amount) + ' VSYS'"
+                      class="amount"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group v-else-if="txType==='Send Token'"
+                    horizontal
+                    class="form-line"
+                    label="Send Amount"
                     label-for="amount_success">
         <b-form-input id="amount_success"
                       :value="formatter(amount) + ' VSYS'"
@@ -47,6 +61,18 @@
                     label-for="walletAddress_success">
         <b-form-input id="walletAddress_success"
                       v-model="address"
+                      class="addr"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group v-if="txType==='Send Token'"
+                    horizontal
+                    class="form-line"
+                    label="To"
+                    label-for="toAddress_success">
+        <b-form-input id="toAddress_success"
+                      v-model="recipient"
                       class="addr"
                       readonly
                       :plaintext="true">
@@ -97,6 +123,10 @@ export default {
             type: String,
             required: true,
             default: ''
+        },
+        recipient: {
+            type: String,
+            default: ''
         }
     },
     methods: {
@@ -108,6 +138,9 @@ export default {
 </script>
 
 <style scoped>
+.token-succ-icon {
+    text-align: center
+}
 .form-line {
     margin-bottom: 0px;
     border-top: 1px solid #E8E9ED;

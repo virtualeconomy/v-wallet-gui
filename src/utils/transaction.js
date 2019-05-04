@@ -18,7 +18,7 @@ var convert_1 = require("../utils/convert");
 
 var constants = require("../constants");
 var INT_TYPE = constants.INT_TYPE
-var ACCOUNT_TYPE = constants.ACCOUNT_TYPE
+var ACCOUNT_TYPE = constants.ACCOUNT_ADDR_TYPE
 var AMOUNT_TYPE = constants.AMOUNT_TYPE
 var SHORTTEXT_TYPE = constants.SHORTTEXT_TYPE
 // Fields of the original data object
@@ -148,6 +148,15 @@ function transferAmount(amountData) {
     var dataArr = typeArr.concat(byteArr);
     return dataArr
 }
+function transferAccount(account) {
+    var accountArr = base58_1.default.decode(account)
+
+    var typeArr = [ACCOUNT_TYPE]
+    for(let j=0; j<accountArr.length; ++j) {
+        typeArr.push(accountArr[j])
+    }
+    return typeArr
+}
 function transferShortTxt(description) {
     var byteArr = convert_1.default.stringToByteArray(description)
 
@@ -158,14 +167,6 @@ function transferShortTxt(description) {
     var lengthArr = convert_1.default.shortToByteArray(length)
 
     return typeArr.concat(lengthArr.concat(byteArr))
-}
-function transferAccount(account) {
-    var accountArr = base58_1.default.decode(account)
-
-    var typeArr = new Array(1)
-    typeArr[0] = ACCOUNT_TYPE
-
-    return typeArr.concat(accountArr)
 }
 export default {
     prepareForAPI: function(transferData, keyPair, tx_type) {
@@ -190,6 +191,19 @@ export default {
 
         var encodeArr = parametersNum.concat(amountArr)
         return base58_1.default.encode(Uint8Array.from(encodeArr));
+    },
+    prepareSend: function(recipient, amount) {
+        var accountArr = transferAccount(recipient)
+        var amountArr = transferAmount(amount)
+
+        var parametersNum = convert_1.default.shortToByteArray(2)
+
+
+        var encodeArr = parametersNum.concat(accountArr.concat(amountArr))
+        return base58_1.default.encode(Uint8Array.from(encodeArr))
+    },
+    prepareSendAttachment: function(description) {
+        return base58_1.default.encode(convert_1.default.stringToByteArray(description))
     },
     prepareCreate: function(max, unity, tokenDescription) {
         var maxArr = transferAmount(max)
@@ -236,16 +250,6 @@ export default {
         var signature = axlsign_1.default.sign(privateKeyBytes, Uint8Array.from(signBytes), secure_random_1.default.randomUint8Array(64));
         return base58_1.default.encode(signature)
 
-    },
-    prepareSend: function(recipient, amount) {
-        var accountArr = transferAccount(recipient)
-        var amountArr = transferAmount(amount)
-
-        var parametersNum = convert_1.default.shortToByteArray(2)
-
-
-        var encodeArr = parametersNum.concat(accountArr.concat(amountArr))
-        return base58_1.default.encode(Uint8Array.from(encodeArr))
     },
     contractIDToTokenID(contraID) {
         let testde = base58_1.default.decode(contraID)
