@@ -94,8 +94,8 @@
           </b-form-group>
           <div style="margin-top: 10px;">
             <img id="img_read"
-                 @click="changeicon"
-                 style="font-size: 15px;"
+                 @click="changeIcon"
+                 style="font-size: 15px;z-index: 100;"
                  src="../../../assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
           </div>
           <b-form-group style="margin-top: 10px;">
@@ -445,12 +445,12 @@ export default {
         }
     },
     methods: {
-        changeicon() {
+        changeIcon() {
             if (this.support === false) {
-                document.getElementById('img_read').src = imgread1
+                document.getElementById('img_read').src = imgread2
                 this.support = true
             } else {
-                document.getElementById('img_read').src = imgread2
+                document.getElementById('img_read').src = imgread1
                 this.support = false
             }
         },
@@ -484,14 +484,14 @@ export default {
                 this.fee = BigNumber(TOKEN_FEE * VSYS_PRECISION)
                 this.feeScale = 100
                 const dataInfo = {
-                    contract: this.support === true ? CONTRACT : CONTRACT_WITH_SPLIT,
+                    contract: this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT,
                     senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
                     fee: TOKEN_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
                     initData: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment)[0]),
                     description: this.attachment,
-                    signature: transaction.prepareRegContractSignature(this.support === true ? CONTRACT : CONTRACT_WITH_SPLIT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    signature: transaction.prepareRegContractSignature(this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
@@ -554,6 +554,7 @@ export default {
             this.qrErrMsg = void 0
             this.sendError = false
             this.coldSignature = ''
+            this.support = false
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
