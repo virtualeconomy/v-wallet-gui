@@ -158,6 +158,9 @@ exports.default = {
             result.set([randomValue], i);
         }
         return result;
-    }
+    },
+    hashChain(input) {
+    return keccak(blake2b(input));
+}
 };
 //# sourceMappingURL=crypto.js.map

@@ -251,17 +251,23 @@ export default {
         return base58_1.default.encode(signature)
 
     },
-    contractIDToTokenID(contraID) {
-        let testde = base58_1.default.decode(contraID)
-        let tmpa = []
-        for (var j = 0; j < testde.length; j++) {
-            tmpa.push(testde[j])
-        }
-        tmpa.push(0)
-        tmpa.push(0)
-        tmpa.push(0)
-        tmpa.push(0)
-        return base58_1.default.encode(tmpa)
+    contractIDToTokenID(contraId) {
+
+            var conId = base58_1.default.decode(contraId)
+            var firstArr = [132]
+            firstArr[0] = 132
+            var secondArr = []
+            for (var i = 1; i<conId.length-4; i++) {
+                secondArr[i-1] = conId[i]
+            }
+            var thirdArr = convert_1.default.idxToByteArray(0)
+
+            var encodeArr = firstArr.concat(secondArr.concat(thirdArr))
+            var hashArr = crypto_1.default.hashChain(Uint8Array.from(encodeArr))
+            var checkArr = hashArr.slice(0, 4)
+            var tokenArr = encodeArr.concat(checkArr)
+            var string = base58_1.default.encode(tokenArr)
+            return string
     },
     tokenIDToContractID(tokenID) {
         let testde = base58_1.default.decode(tokenID)
