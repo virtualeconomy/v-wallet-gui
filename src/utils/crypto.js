@@ -159,8 +159,8 @@ exports.default = {
         }
         return result;
     },
-    hashChain(input) {
-    return keccak(blake2b(input));
-}
+    hash:function(input) {
+        return hashChain(input);
+    }
 };
 //# sourceMappingURL=crypto.js.map

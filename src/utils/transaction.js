@@ -262,7 +262,7 @@ export default {
             var thirdArr = convert_1.default.idxToByteArray(0)
 
             var encodeArr = firstArr.concat(secondArr.concat(thirdArr))
-            var hashArr = crypto_1.default.hashChain(Uint8Array.from(encodeArr))
+            var hashArr = crypto_1.default.hash(Uint8Array.from(encodeArr))
             var checkArr = hashArr.slice(0, 4)
             var tokenArr = encodeArr.concat(checkArr)
             var tokenString = base58_1.default.encode(tokenArr)
@@ -278,7 +278,7 @@ export default {
         }
         var encodeArr = firstArr.concat(secondArr)
 
-        var hashArr = crypto_1.default.hashChain(Uint8Array.from(encodeArr))
+        var hashArr = crypto_1.default.hash(Uint8Array.from(encodeArr))
         var checkArr = hashArr.slice(0, 4)
         var contractArr = encodeArr.concat(checkArr)
         var contractString = base58_1.default.encode(contractArr)
