@@ -38,7 +38,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token Balance {{ formatter(balances[address]) }} </span>
+              <span class="balance">Token Balance {{ formatter(tokenBalances[address]) }} </span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -95,8 +95,12 @@
               The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isInsufficient(amount, 'hot')">
-              Insufficient funds
+                                     v-else-if="isTokenInsufficient(amount, 'hot')">
+              Insufficient token
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isInsufficient('hot')">
+              Insufficient VSYS balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(amount)">
@@ -197,7 +201,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token Balance {{ formatter(balances[coldAddresses]) }}</span>
+              <span class="balance">Token Balance {{ formatter(tokenBalances[coldAddresses]) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -254,8 +258,12 @@
               The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isInsufficient(coldAmount, 'cold')">
-              Insufficient funds
+                                     v-else-if="isTokenInsufficient(coldAmount, 'cold')">
+              Insufficient token
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isInsufficient('cold')">
+              Insufficient VSYS balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(coldAmount)">
@@ -433,6 +441,12 @@ export default {
         tokenId: {
             type: String,
             default: '',
+            require: true
+        },
+        tokenBalances: {
+            type: Object,
+            default: function() {
+            },
             require: true
         },
         balances: {
@@ -783,7 +797,7 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isTokenInsufficient(amount, type) && !this.isNegative(amount) && !this.isInsufficient(type)
         },
         isWrongFormat(amount) {
             if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
@@ -792,9 +806,13 @@ export default {
                 return false
             }
         },
-        isInsufficient(amount, type) {
-            var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
+        isTokenInsufficient(amount, type) {
+            var balance = type === 'hot' ? this.tokenBalances[this.address] : this.tokenBalances[this.coldAddress]
             return BigNumber(amount).isGreaterThan(BigNumber(balance))
+        },
+        isInsufficient(type) {
+            var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
+            return !BigNumber(balance).isGreaterThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
