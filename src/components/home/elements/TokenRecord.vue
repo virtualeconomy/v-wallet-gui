@@ -378,9 +378,6 @@ export default {
         }
         padding-left: 0px;
     }
-    .auto {
-        background-color: red;
-    }
     .token-balance {
         padding-right: 40px;
     }
