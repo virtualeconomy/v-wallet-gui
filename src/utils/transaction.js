@@ -255,7 +255,6 @@ export default {
 
             var conId = base58_1.default.decode(contraId)
             var firstArr = [132]
-            firstArr[0] = 132
             var secondArr = []
             for (var i = 1; i<conId.length-4; i++) {
                 secondArr[i-1] = conId[i]
@@ -266,15 +265,23 @@ export default {
             var hashArr = crypto_1.default.hashChain(Uint8Array.from(encodeArr))
             var checkArr = hashArr.slice(0, 4)
             var tokenArr = encodeArr.concat(checkArr)
-            var string = base58_1.default.encode(tokenArr)
-            return string
+            var tokenString = base58_1.default.encode(tokenArr)
+            return tokenString
     },
-    tokenIDToContractID(tokenID) {
-        let testde = base58_1.default.decode(tokenID)
-        let tmpa = []
-        for (var j = 0; j < testde.length - 4; j++) {
-            tmpa.push(testde[j])
+    tokenIDToContractID(tokenId) {
+        var tokenArr = base58_1.default.decode(tokenId)
+
+        var firstArr = [6]
+        var secondArr = []
+        for (var i = 1; i < tokenArr.length-8; i++) {
+            secondArr[i-1] = tokenArr[i]
         }
-        return base58_1.default.encode(tmpa)
+        var encodeArr = firstArr.concat(secondArr)
+
+        var hashArr = crypto_1.default.hashChain(Uint8Array.from(encodeArr))
+        var checkArr = hashArr.slice(0, 4)
+        var contractArr = encodeArr.concat(checkArr)
+        var contractString = base58_1.default.encode(contractArr)
+        return contractString
     }
 };
