@@ -15,11 +15,16 @@
         </b-row>
       </b-col>
       <b-col class="record-blank"></b-col>
-      <b-col cols="auto">
+      <b-col class="token-balance"
+             cols="auto">
         <div>
           <span>{{ formatter(balance) }} </span>
         </div>
       </b-col>
+      <button class="btn-sendToken"
+              @click="sendToken">
+        <b>Send</b>
+      </button>
       <b-col class="record-action"
              cols="auto">
         <b-dropdown no-caret
@@ -373,6 +378,15 @@ export default {
         }
         padding-left: 0px;
     }
+    .token-balance {
+        padding-right: 40px;
+    }
+    .btn-sendToken {
+        border-color: #FF8837;
+        color: #FF8837;
+        font-size: 17px;
+        font-weight:lighter;
+    }
     .amount-sent {
         font-size: 17px;
         color: #F5354B;
@@ -416,7 +430,7 @@ export default {
       padding-right: 0px;
     }
     .record-action {
-        padding-left: 0px;
+        padding-left: 20px;
         .more-btn {
             background: none;
             border: none;
