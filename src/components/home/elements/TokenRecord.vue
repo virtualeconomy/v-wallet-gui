@@ -68,6 +68,7 @@
                 @updateBalance="updateBalance">
     </IssueToken>
     <SendToken :token-id="tokenId"
+               :token-balances="tokenBalances"
                :balances="balances"
                :cold-addresses="coldAddresses"
                :addresses="addresses"
@@ -104,14 +105,15 @@ export default {
     components: { TokenInfoModal, SendToken, IssueToken, BurnToken },
     data: function() {
         return {
-            balances: {},
+            tokenBalances: {},
             tokens: {},
             hovered: false,
             cancelTime: 0,
             showCancelDetails: false,
             removeFlag: false,
             issuer: '',
-            balance: BigNumber(0)
+            balance: BigNumber(0),
+            functionIndex: SEND_FUNCIDX
         }
     },
     props: {
@@ -147,6 +149,12 @@ export default {
         tokenId: {
             type: String,
             default: '',
+            require: true
+        },
+        balances: {
+            type: Object,
+            default: function() {
+            },
             require: true
         },
         update: {
@@ -199,11 +207,7 @@ export default {
             } else return ''
         },
         contract() {
-            if (this.tokenId && this.tokenId !== undefined) {
-                let bytes = base58.decode(this.tokenId)
-                bytes = bytes.slice(0, bytes.length - 4)
-                return base58.encode(bytes)
-            }
+            return transaction.tokenIDToContractID(this.tokenId)
         },
         unity() {
             return this.tokens.unity
@@ -247,20 +251,20 @@ export default {
         },
         getTokenBalances() {
             for (const addr in this.addresses) {
-                Vue.set(this.balances, addr, BigNumber(0))
+                Vue.set(this.tokenBalances, addr, BigNumber(0))
                 let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
                 this.$http.get(turl).then(response => {
                     let value = BigNumber(response.body.balance)
-                    Vue.set(this.balances, addr, value)
+                    Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
             }
             for (const addr in this.coldAddresses) {
-                Vue.set(this.balances, addr, BigNumber(0))
+                Vue.set(this.tokenBalances, addr, BigNumber(0))
                 let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
                 this.$http.get(turl).then(response => {
                     let value = BigNumber(response.body.balance)
-                    Vue.set(this.balances, addr, value)
+                    Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
             }

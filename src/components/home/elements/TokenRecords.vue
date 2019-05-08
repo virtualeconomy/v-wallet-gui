@@ -16,6 +16,7 @@
                      :cold-addresses="coldAddresses"
                      :wallet-type="walletType"
                      :update = "update"
+                     :balances="balances"
                      @removeFlag="removeToken"
                      @endSendSignal="endSendSignal"></TokenRecord>
 
@@ -74,6 +75,12 @@ export default {
         addresses: {
             type: Object,
             default: function() {},
+            require: true
+        },
+        balances: {
+            type: Object,
+            default: function() {
+            },
             require: true
         },
         walletType: {

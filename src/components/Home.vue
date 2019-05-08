@@ -102,7 +102,8 @@
                   <TokenRecords :address="selectedAddress"
                                 :addresses="addresses"
                                 :cold-addresses="coldAddresses"
-                                :wallet-type="walletType">
+                                :wallet-type="walletType"
+                                :balances="balance">
                   </TokenRecords>
                 </div>
               </b-tab>
