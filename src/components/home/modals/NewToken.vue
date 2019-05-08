@@ -408,7 +408,7 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(BigNumber(this.amount).isGreaterThan(0) && this.isInsufficient('hot') && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
+            return !(BigNumber(this.amount).isGreaterThan(0) && !this.isInsufficient('hot') && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
         },
         isColdSubmitDisabled() {
             return !(this.coldAddress && this.coldAmount > 0 && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold') && this.coldAddress !== '')
@@ -661,7 +661,7 @@ export default {
         },
         isInsufficient(type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return !BigNumber(balance).isGreaterThan(BigNumber(TOKEN_FEE))
+            return !BigNumber(balance).isGreaterThanOrEqualTo(BigNumber(TOKEN_FEE))
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
