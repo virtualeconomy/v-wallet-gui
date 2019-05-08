@@ -251,24 +251,37 @@ export default {
         return base58_1.default.encode(signature)
 
     },
-    contractIDToTokenID(contraID) {
-        let testde = base58_1.default.decode(contraID)
-        let tmpa = []
-        for (var j = 0; j < testde.length; j++) {
-            tmpa.push(testde[j])
-        }
-        tmpa.push(0)
-        tmpa.push(0)
-        tmpa.push(0)
-        tmpa.push(0)
-        return base58_1.default.encode(tmpa)
+    contractIDToTokenID(contraId) {
+
+            var conId = base58_1.default.decode(contraId)
+            var firstArr = [132]
+            var secondArr = []
+            for (var i = 1; i<conId.length-4; i++) {
+                secondArr[i-1] = conId[i]
+            }
+            var thirdArr = convert_1.default.idxToByteArray(0)
+
+            var encodeArr = firstArr.concat(secondArr.concat(thirdArr))
+            var hashArr = crypto_1.default.hash(Uint8Array.from(encodeArr))
+            var checkArr = hashArr.slice(0, 4)
+            var tokenArr = encodeArr.concat(checkArr)
+            var tokenString = base58_1.default.encode(tokenArr)
+            return tokenString
     },
-    tokenIDToContractID(tokenID) {
-        let testde = base58_1.default.decode(tokenID)
-        let tmpa = []
-        for (var j = 0; j < testde.length - 4; j++) {
-            tmpa.push(testde[j])
+    tokenIDToContractID(tokenId) {
+        var tokenArr = base58_1.default.decode(tokenId)
+
+        var firstArr = [6]
+        var secondArr = []
+        for (var i = 1; i < tokenArr.length-8; i++) {
+            secondArr[i-1] = tokenArr[i]
         }
-        return base58_1.default.encode(tmpa)
+        var encodeArr = firstArr.concat(secondArr)
+
+        var hashArr = crypto_1.default.hash(Uint8Array.from(encodeArr))
+        var checkArr = hashArr.slice(0, 4)
+        var contractArr = encodeArr.concat(checkArr)
+        var contractString = base58_1.default.encode(contractArr)
+        return contractString
     }
 };

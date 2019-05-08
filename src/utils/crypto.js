@@ -158,6 +158,9 @@ exports.default = {
             result.set([randomValue], i);
         }
         return result;
+    },
+    hash:function(input) {
+        return hashChain(input);
     }
 };
 //# sourceMappingURL=crypto.js.map
