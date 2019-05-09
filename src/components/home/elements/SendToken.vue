@@ -92,7 +92,7 @@
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="isWrongFormat(amount)">
-              The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
+              Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isTokenInsufficient(amount, 'hot')">
@@ -255,7 +255,7 @@
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="isWrongFormat(coldAmount)">
-              The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
+              The number in this field is invalid. It may exceed the maximum number of digits after the decimal point.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isTokenInsufficient(coldAmount, 'cold')">
@@ -449,6 +449,12 @@ export default {
             },
             require: true
         },
+        tokenUnity: {
+            type: BigNumber,
+            default: function() {
+            },
+            require: true
+        },
         balances: {
             type: Object,
             default: function() {
@@ -564,8 +570,8 @@ export default {
                     timestamp: this.timeStamp,
                     attachment: transaction.prepareSendAttachment(this.attachment),
                     functionIndex: this.functionIndex,
-                    functionData: transaction.prepareSend(this.recipient, BigNumber(this.amount)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, this.functionIndex, transaction.prepareSend(this.recipient, BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    functionData: transaction.prepareSend(this.recipient, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
+                    signature: transaction.prepareExecContractSignature(this.contractId, this.functionIndex, transaction.prepareSend(this.recipient, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
@@ -800,7 +806,7 @@ export default {
             return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isTokenInsufficient(amount, type) && !this.isNegative(amount) && !this.isInsufficient(type)
         },
         isWrongFormat(amount) {
-            if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
+            if ((BigNumber(amount).multipliedBy(this.tokenUnity).toString().split('.')[1] && BigNumber(amount).multipliedBy(this.tokenUnity).toString().split('.')[1].length > 0) || /[eE]/.test(amount.toString())) {
                 return true
             } else {
                 return false

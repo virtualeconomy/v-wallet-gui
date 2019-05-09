@@ -41,16 +41,36 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Burn Available{{ formatter(balance) }}</span>
+              <span class="balance">Burn Available {{ formatter(tokenBalance) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Burn Amount"
                         label-for="amount-input">
             <b-form-input id="amount-input"
                           class="amount-input"
-                          v-model="amount">
+                          v-model="amount"
+                          aria-describedby="inputLiveFeedback"
+                          :state="isAmountValid('hot')">
             </b-form-input>
-            <b-form-invalid-feedback id="inputLiveFeedback" >Invalid Input.
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-if="isWrongFormat(amount)">
+              Invalid format. The number of digits after the decimal point may be larger than the token precision.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isTokenInsufficient(amount)">
+              Insufficient token
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isInsufficient()">
+              Insufficient VSYS balance
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isNegative(amount)">
+              Negative number is not allowed.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else>
+              Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
@@ -60,6 +80,7 @@
                     class="btn-continue"
                     size="lg"
                     block
+                    :disabled="isSubmitDisabled"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -129,7 +150,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token Balance</span>
+              <span class="balance">Burn Available {{ formatter(tokenBalance) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Issue Amount"
@@ -263,10 +284,16 @@ export default {
         }
     },
     props: {
-        balance: {
+        tokenBalance: {
             type: BigNumber,
             default: function() {
                 return BigNumber(0)
+            },
+            require: true
+        },
+        tokenUnity: {
+            type: BigNumber,
+            default: function() {
             },
             require: true
         },
@@ -280,7 +307,7 @@ export default {
             default: function() {},
             require: true
         },
-        balances: {
+        balance: {
             type: Object,
             default: function() {},
             require: true
@@ -327,10 +354,10 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
+            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot'))
         },
         isColdSubmitDisabled() {
-            return !(this.coldAddress && this.coldAmount > 0) && (this.isValidColdAttachment) && this.isAmountValid('cold') && this.coldAddress !== ''
+            return !(this.coldAmount > 0 && this.isValidIssuer(this.address) && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold'))
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -383,8 +410,8 @@ export default {
                     timestamp: this.timeStamp,
                     attachment: '',
                     functionIndex: BURN_FUNCIDX,
-                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, BURN_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)),
+                    signature: transaction.prepareExecContractSignature(this.contractId, BURN_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
@@ -554,18 +581,20 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isInsufficient() && !this.isNegative(amount) && !this.isTokenInsufficient(amount)
         },
         isWrongFormat(amount) {
-            if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
+            if ((BigNumber(amount).multipliedBy(this.tokenUnity).toString().split('.')[1] && BigNumber(amount).multipliedBy(this.tokenUnity).toString().split('.')[1].length > 0) || /[eE]/.test(amount.toString())) {
                 return true
             } else {
                 return false
             }
         },
-        isInsufficient(amount, type) {
-            var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return BigNumber(amount).isGreaterThan(BigNumber(balance).minus(CONTRACT_EXEC_FEE))
+        isTokenInsufficient(amount) {
+            return BigNumber(amount).isGreaterThan(BigNumber(this.tokenBalance))
+        },
+        isInsufficient() {
+            return !BigNumber(this.balance).isGreaterThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)

@@ -18,7 +18,7 @@
       <b-col class="token-balance"
              cols="auto">
         <div>
-          <span>{{ formatter(balance) }} </span>
+          <span>{{ formatter(tokenBalance) }} </span>
         </div>
       </b-col>
       <button class="btn-sendToken"
@@ -63,8 +63,11 @@
                 :wallet-type="walletType"
                 :addresses="addresses"
                 :cold-addresses="coldAddresses"
-                :balance="balance"
+                :token-balance="tokenBalance"
+                :balance="balances[address]"
                 :total-supply="totalSupply"
+                :issued-tokens="issuedTokens"
+                :token-unity="unity"
                 @updateBalance="updateBalance">
     </IssueToken>
     <SendToken :token-id="tokenId"
@@ -75,6 +78,7 @@
                :selected-address="address"
                :wallet-type="walletType"
                :function-index="functionIndex"
+               :token-unity="unity"
                @endSendSignal="endSendSignal">
     </SendToken>
     <BurnToken :token-id="tokenId"
@@ -83,7 +87,9 @@
                :wallet-type="walletType"
                :addresses="addresses"
                :cold-addresses="coldAddresses"
-               :balance="balance"
+               :token-balance="tokenBalance"
+               :balance="balances[address]"
+               :token-unity="unity"
                @updateBalance="updateBalance"></BurnToken>
   </b-container>
 </template>
@@ -113,7 +119,8 @@ export default {
             showCancelDetails: false,
             removeFlag: false,
             issuer: '',
-            balance: BigNumber(0),
+            tokenBalance: BigNumber(0),
+            unity: BigNumber(1),
             functionIndex: SEND_FUNCIDX
         }
     },
@@ -171,13 +178,8 @@ export default {
     },
     created() {
         this.getTokenInfo()
-        const url = NODE_IP + '/contract/balance/' + this.address + '/' + this.tokenId
-        this.$http.get(url).then(response => {
-            this.balance = BigNumber(response.body.balance)
-        }, respError => {
-        })
+        this.updateBalance()
     },
-
     computed: {
         txAddressShow() {
             if (this.txAddress) {
@@ -199,19 +201,16 @@ export default {
         },
         totalSupply() {
             if (this.tokens) {
-                return BigNumber(this.tokens.max)
+                return BigNumber(this.tokens.max).dividedBy(this.unity)
             } else return ''
         },
         issuedTokens() {
             if (this.tokens) {
-                return this.tokens.total
+                return BigNumber(this.tokens.total).dividedBy(this.unity)
             } else return ''
         },
         contract() {
             return transaction.tokenIDToContractID(this.tokenId)
-        },
-        unity() {
-            return this.tokens.unity
         },
         description() {
             if (this.tokens.description && this.tokens.description !== undefined) {
@@ -244,7 +243,7 @@ export default {
         updateBalance() {
             const url = NODE_IP + '/contract/balance/' + this.address + '/' + this.tokenId
             this.$http.get(url).then(response => {
-                this.balance = BigNumber(response.body.balance)
+                this.tokenBalance = BigNumber(response.body.balance).dividedBy(this.unity)
             }, respError => {
             })
         },
@@ -253,7 +252,7 @@ export default {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
                 let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
                 this.$http.get(turl).then(response => {
-                    let value = BigNumber(response.body.balance)
+                    let value = BigNumber(response.body.balance).dividedBy(this.unity)
                     Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
@@ -262,7 +261,7 @@ export default {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
                 let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
                 this.$http.get(turl).then(response => {
-                    let value = BigNumber(response.body.balance)
+                    let value = BigNumber(response.body.balance).dividedBy(this.unity)
                     Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
@@ -272,6 +271,7 @@ export default {
             const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(tokenUrl).then(response => {
                 this.tokens = response.body
+                this.unity = BigNumber(this.tokens.unity)
             }, respError => {
             })
 
@@ -282,7 +282,6 @@ export default {
                 this.issuer = 'Failed to get issuer'
                 this.registerTime = 'Failed to get time'
             })
-
             var contractId = transaction.tokenIDToContractID(this.tokenId)
             const url2 = NODE_IP + '/contract/content/' + contractId
             this.$http.get(url2).then(response => {
@@ -298,6 +297,7 @@ export default {
             }, respError => {
                 console.log('failed to load tokentype ')
             })
+            this.updateBalance()
         },
         showModal() {
             this.getTokenInfo()
