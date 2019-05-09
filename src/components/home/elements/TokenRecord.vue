@@ -100,6 +100,7 @@ import BurnToken from './BurnToken'
 import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '../../../constants.js'
 import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract.js'
 import Vue from 'vue'
+import browser from '../../../utils/browser'
 export default {
     name: 'TokenRecord',
     components: { TokenInfoModal, SendToken, IssueToken, BurnToken },
@@ -238,9 +239,7 @@ export default {
             this.hovered = false
         },
         formatter(num) {
-            if (this.tokens.unity) {
-                return num.toFixed(Math.log10(this.tokens.unity))
-            } else return num
+            return browser.bigNumberFormatter(num)
         },
         updateBalance() {
             const url = NODE_IP + '/contract/balance/' + this.address + '/' + this.tokenId
