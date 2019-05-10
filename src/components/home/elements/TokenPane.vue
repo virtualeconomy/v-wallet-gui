@@ -43,7 +43,7 @@
               :cold-addresses="coldAddresses"
               :addresses="addresses"
               :selected-address="address"
-              :selected-wallet-type="walletType"
+              :wallet-type="walletType"
               @endLeaseSignal="endLeaseSignal"></NewToken>
   </div>
 </template>
