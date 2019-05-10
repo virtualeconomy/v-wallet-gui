@@ -170,15 +170,22 @@
               disabled
               class="balance-input"
               readonly>
-              <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
-                     width="20"
-                     height="20">
+              <span class="balance-title">Balance
               </span>
               <span class="balance">{{ formatter(balances[coldAddress]) }} VSYS</span>
             </b-btn>
           </b-form-group>
-          <b-form-group label="Amount"
+          <b-form-group label="Description"
+                        label-for="descriptionInput">
+            <b-form-textarea id="descriptionInput"
+                             v-model="coldAttachment"
+                             :rows="2"
+                             :no-resize="true"
+                             placeholder="You can not change the description later"
+                             :state="isValidColdAttachment">
+            </b-form-textarea>
+          </b-form-group>
+          <b-form-group label="Total Supply"
                         label-for="cold-amount-input">
             <b-form-input id="cold-amount-input"
                           class="amount-input"
@@ -193,7 +200,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isInsufficient('cold')">
-              Insufficient funds
+              Insufficient VSYS balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(coldAmount)">
@@ -204,15 +211,28 @@
               Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group label="Description"
-                        label-for="coldDescriptionInput">
-            <b-form-textarea id="coldDescriptionInput"
-                             v-model="coldAttachment"
-                             :rows="3"
-                             :no-resize="true"
-                             :state="isValidColdAttachment">
-            </b-form-textarea>
+          <b-form-group>
+            <span style="font-size: 15px !important;color: #9091A3;">Unity: 10^{{ unity }}</span>
+            <div style="margin-top: 10px;">
+              <span class="unity-number">10<sup>0</sup></span>
+              <button class="bar-minus"
+                      @click="minus">-</button>
+              <b-progress :value="unity"
+                          :max="maxUnity"
+                          variant="warning"
+                          show-value
+                          class="pg-bar"></b-progress>
+              <button class="bar-plus"
+                      @click="plus">+</button>
+              <span class="unity-number-second">10<sup>16</sup></span>
+            </div>
           </b-form-group>
+          <div style="margin-top: 10px;">
+            <img id="img_read_cold"
+                 @click="changeColdIcon"
+                 style="font-size: 15px;z-index: 100;"
+                 src="../../../assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
+          </div>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ Number(coldFee) }} VSYS</label>
           </b-form-group>
@@ -246,7 +266,7 @@
                 class="btn-confirm"
                 variant="warning"
                 size="lg"
-                @click="coldNextPage">Confirm
+                @click=" getQrArray(); coldNextPage()">Confirm
               </b-button>
             </b-col>
           </b-row>
@@ -254,6 +274,8 @@
         <b-container v-if="coldPageId===3"
                      class="text-left">
           <ColdSignature :data-object="dataObject"
+                         :qr-total-page="qrPage"
+                         :qr-array="getArray"
                          v-if="coldPageId===3"
                          @get-signature="getSignature"
                          @next-page="coldNextPage"
@@ -309,7 +331,7 @@ import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import { CONTRACT, CONTRACT_WITH_SPLIT } from '../../../contract'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_TRANSACTION } from '@/constants.js'
+import { NODE_IP, OPC_CONTRACT, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, FEE_SCALE, API_VERSION, PROTOCOL } from '@/constants.js'
 import TokenConfirm from './TokenConfirm'
 import TokenSuccess from './TokenSuccess'
 import ColdSignature from './ColdSignature'
@@ -321,10 +343,12 @@ import base58 from '../../../libs/base58'
 import bus from '../../../assets/bus'
 var initData = {
     opc: '',
+    qrArray: new Array(0),
     support: false,
     recipient: '',
     amount: BigNumber(0),
     attachment: '',
+    qrTotalPage: 1,
     pageId: 1,
     fee: BigNumber(TOKEN_FEE),
     coldRecipient: '',
@@ -420,15 +444,15 @@ export default {
             return {
                 protocol: PROTOCOL,
                 api: this.coldApi(),
-                opc: OPC_TRANSACTION,
-                transactionType: PAYMENT_TX,
-                senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
-                amount: BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).toFixed(0),
+                opc: OPC_CONTRACT,
+                address: this.coldAddress,
                 fee: this.coldFee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
-                recipient: this.coldRecipient,
                 timestamp: Date.now(),
-                attachment: this.coldAttachment
+                contract: this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT,
+                description: this.coldAttachment,
+                contractInit: base58.encode(transaction.prepareCreate(BigNumber(this.coldAmount), BigNumber(Math.pow(10, this.unity)), this.coldAttachment)[0]),
+                contractInitTextual: 'init(max=' + BigNumber(this.coldAmount) + ',unity=' + BigNumber(Math.pow(10, this.unity)) + ',tokenDescription=\'' + this.coldAttachment + '\''
             }
         },
         isValidAttachment() {
@@ -442,15 +466,44 @@ export default {
                 return void 0
             }
             return this.coldAttachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+        },
+        qrPage() {
+            return this.qrTotalPage
+        },
+        getArray() {
+            return this.qrArray
         }
     },
     methods: {
+        getQrArray() {
+            const qrSize = 400
+            const text = JSON.stringify(this.dataObject)
+            var page = Math.ceil(text.length / qrSize)
+            var textArray = Array(page)
+            if (this.dataObject.opc === 'contract') {
+                this.qrTotalPage = page
+                console.log(this.qrTotalPage, text.length)
+                for (var i = 0; i < this.qrTotalPage; i++) {
+                    textArray[i] = text.slice(i * qrSize, (i + 1) * qrSize)
+                }
+            }
+            this.qrArray = textArray
+        },
         changeIcon() {
             if (this.support === false) {
                 document.getElementById('img_read').src = imgread2
                 this.support = true
             } else {
                 document.getElementById('img_read').src = imgread1
+                this.support = false
+            }
+        },
+        changeColdIcon() {
+            if (this.support === false) {
+                document.getElementById('img_read_cold').src = imgread2
+                this.support = true
+            } else {
+                document.getElementById('img_read_cold').src = imgread1
                 this.support = false
             }
         },
@@ -538,6 +591,8 @@ export default {
         resetPage: function() {
             this.opc = ''
             this.unity = 8
+            this.qrTotalPage = 1
+            this.qrArray = new Array(0)
             this.recipient = ''
             this.amount = BigNumber(0)
             this.attachment = ''
