@@ -1,10 +1,12 @@
 <template>
   <div>
     <div v-if="!isScanPage && !isTotalScan">
-      <p>Please use your cold wallet client to scan this QR code. And click continue after your cold wallet client generates a QR code.</p>
+      <p>Scan with cold wallet before continuing</p>
       <div id="address-qrcode">
         <img id="qr-image"
              :src="getBaseQrCodeImg">
+        <br>
+        <span>Current Page: {{ qrPage + 1 }} Total Page: {{ qrTotalPage }}</span>
       </div>
       <b-row>
         <b-col class="col-lef">
