@@ -101,8 +101,7 @@ export default {
         },
         qrTotalPage: {
             type: Number,
-            default: 1,
-            require: true
+            default: 1
         },
         dataObject: {
             type: Object,
@@ -206,7 +205,7 @@ export default {
                     delete data.opc
                     delete data.protocol
                     data.timestamp *= 1e6
-                    if (transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType) && !this.qrError) {
+                    if (!transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType) && !this.qrError) {
                         var _this = this
                         setTimeout(function() {
                             _this.$emit('get-signature', signature)

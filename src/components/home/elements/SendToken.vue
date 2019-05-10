@@ -92,7 +92,7 @@
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="isWrongFormat(amount)">
-              Invalid format. The number of digits after the decimal point may be larger than the token precision.
+              The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isTokenInsufficient(amount, 'hot')">
@@ -121,7 +121,7 @@
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
-            <label class="fee-remark">Transaction Fee </label>
+            <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS </label>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -201,7 +201,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Token Balance {{ formatter(tokenBalances[coldAddresses]) }}</span>
+              <span class="balance">Token Balance {{ formatter(tokenBalances[coldAddress]) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Recipient"
@@ -255,7 +255,7 @@
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="isWrongFormat(coldAmount)">
-              The number in this field is invalid. It may exceed the maximum number of digits after the decimal point.
+              The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isTokenInsufficient(coldAmount, 'cold')">
@@ -284,12 +284,13 @@
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
-            <label class="fee-remark">Transaction Fee </label>
+            <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS </label>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
                     block
                     size="lg"
+                    :disabled="isColdSubmitDisabled"
                     @click="coldNextPage(); addColdRecipientList()">Continue
           </b-button>
         </b-container>
@@ -299,7 +300,7 @@
                         :amount=inputAmount(coldAmount)
                         :fee="coldFee"
                         :attachment="coldAttachment"
-                        :tx-type="'payment'">
+                        :tx-type="'Send Token'">
           </TokenConfirm>
           <b-row>
             <b-col class="col-lef">
@@ -325,6 +326,7 @@
         <b-container v-if="coldPageId===3"
                      class="text-left">
           <ColdSignature :data-object="dataObject"
+                         :qr-total-page="1"
                          v-if="coldPageId===3"
                          @get-signature="getSignature"
                          @next-page="coldNextPage"
@@ -381,7 +383,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION, SEND_FUNCIDX } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION, SEND_FUNCIDX } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import crypto from '@/utils/crypto'
@@ -445,12 +447,6 @@ export default {
         },
         tokenBalances: {
             type: Object,
-            default: function() {
-            },
-            require: true
-        },
-        tokenUnity: {
-            type: BigNumber,
             default: function() {
             },
             require: true
@@ -519,15 +515,17 @@ export default {
             return {
                 protocol: PROTOCOL,
                 api: this.coldApi(),
-                opc: OPC_TRANSACTION,
-                transactionType: PAYMENT_TX,
+                opc: OPC_FUNCTION,
+                //  address: this.coldAddress,
                 senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
-                amount: BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).toFixed(0),
                 fee: this.coldFee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
-                recipient: this.coldRecipient,
                 timestamp: Date.now(),
-                attachment: this.coldAttachment
+                attachment: transaction.prepareSendAttachment(this.coldAttachment),
+                contractId: this.contractId,
+                functionId: this.functionIndex,
+                function: transaction.prepareSend(this.coldRecipient, BigNumber(this.coldAmount)),
+                functionTextual: 'send(recipient=\'' + this.coldRecipient + '\', amount=' + this.coldAmount + ')'
             }
         },
         isValidAttachment() {
@@ -564,18 +562,30 @@ export default {
                 this.feeScale = 100
                 const dataInfo = {
                     contractId: this.contractId,
-                    senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
+                    senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
                     attachment: transaction.prepareSendAttachment(this.attachment),
                     functionIndex: this.functionIndex,
-                    functionData: transaction.prepareSend(this.recipient, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, this.functionIndex, transaction.prepareSend(this.recipient, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    functionData: transaction.prepareSend(this.recipient, BigNumber(this.amount)),
+                    signature: transaction.prepareExecContractSignature(this.contractId, this.functionIndex, transaction.prepareSend(this.recipient, BigNumber(this.amount)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
-                apiSchema = ''
+                console.log('coldSignature', this.coldSignature)
+                const coldDataInfo = {
+                    contractId: this.contractId,
+                    senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
+                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
+                    feeScale: FEE_SCALE,
+                    timestamp: this.timeStamp,
+                    attachment: transaction.prepareSendAttachment(this.attachment),
+                    functionIndex: this.functionIndex,
+                    functionData: transaction.prepareSend(this.recipient, BigNumber(this.amount)),
+                    signature: this.coldSignature
+                }
+                apiSchema = coldDataInfo
             }
             const url = NODE_IP + '/contract/broadcast/execute'
             this.$http.post(url, apiSchema).then(response => {
@@ -806,7 +816,7 @@ export default {
             return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isTokenInsufficient(amount, type) && !this.isNegative(amount) && !this.isInsufficient(type)
         },
         isWrongFormat(amount) {
-            if ((BigNumber(amount).multipliedBy(this.tokenUnity).toString().split('.')[1] && BigNumber(amount).multipliedBy(this.tokenUnity).toString().split('.')[1].length > 0) || /[eE]/.test(amount.toString())) {
+            if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
                 return true
             } else {
                 return false
