@@ -61,7 +61,7 @@
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="isWrongFormat(amount)">
-              The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
+              Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isInsufficient('hot')">
@@ -189,7 +189,7 @@
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="isWrongFormat(coldAmount)">
-              The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
+              Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isInsufficient('cold')">
@@ -488,9 +488,9 @@ export default {
                     fee: TOKEN_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    initData: base58.encode(transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment)[0]),
+                    initData: base58.encode(transaction.prepareCreate(BigNumber(this.amount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.attachment)[0]),
                     description: this.attachment,
-                    signature: transaction.prepareRegContractSignature(this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT, transaction.prepareCreate(BigNumber(this.amount), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    signature: transaction.prepareRegContractSignature(this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT, transaction.prepareCreate(BigNumber(this.amount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
@@ -568,7 +568,7 @@ export default {
                 this.tokens = JSON.parse(this.userInfo.tokens)
             }
             const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
-            console.log('the data' + this.tokenId)
+            console.log('the tokenId is ' + this.tokenId)
             this.$http.get(url).then(response => {
                 Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
                 this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
@@ -653,7 +653,7 @@ export default {
             return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !this.isInsufficient(type)
         },
         isWrongFormat(amount) {
-            if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
+            if ((BigNumber(amount).toString().split('.')[1] && BigNumber(amount).toString().split('.')[1].length > this.unity) || /[eE]/.test(amount.toString())) {
                 return true
             } else {
                 return false
