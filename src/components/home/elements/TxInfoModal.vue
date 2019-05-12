@@ -38,6 +38,18 @@
                src="../../../assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
                width="60px"
                height="60px">
+          <img v-else-if="txIcon==='create contract'"
+               src="../../../assets/imgs/icons/wallet/ic_contract_signup.svg"
+               width="60px"
+               height="60px">
+          <img v-else-if="txIcon==='execution contract success'"
+               src="../../../assets/imgs/icons/wallet/ic_exec_success.svg"
+               width="60px"
+               height="60px">
+          <img v-else-if="txIcon==='execution contract fail'"
+               src="../../../assets/imgs/icons/wallet/ic_exec_fail.svg"
+               width="60px"
+               height="60px">
         </div>
         <div :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
       </div>
@@ -74,6 +86,10 @@
         <label>Block Confirmation</label>
         <span v-if="differenceHeight > 30">{{ differenceHeight }}(Confirmed)</span>
         <span v-else-if="differenceHeight <= 30 && differenceHeight >= 0">{{ differenceHeight }}(Unconfirmed)</span>
+      </div>
+      <div class="tx-status">
+        <label>Status</label>
+        <span>{{ txStatus }}</span>
       </div>
     </div>
   </b-modal>
@@ -137,6 +153,10 @@ export default {
         txBlock: {
             type: Number,
             default: 0
+        },
+        txStatus: {
+            type: String,
+            default: ''
         }
     },
     data: function() {
@@ -185,15 +205,15 @@ export default {
 </script>
 
 <style scoped lang="less">
-     .tx-modal {
-         text-align: center;
-     }
+ .tx-modal {
+     text-align: center;
     .tx-title {
         padding: 24px 0;
         border-bottom: 1px solid #1111;
         .tx-icon {
             margin-bottom: 10px;
         }
+    }
     .tx-address {
         text-align: left;
         border-bottom: 1px solid #E8E9ED;
@@ -236,6 +256,24 @@ export default {
         }
     }
     .tx-block {
+        text-align: left;
+        border-bottom: 1px solid #E8E9ED;
+        height: 48px;
+        padding-top: 15px;
+        span {
+            float:right;
+            font-size: 13px;
+            color: #4F515E;
+            letter-spacing: 0;
+            text-align: right;
+        }
+        label {
+            font-size: 15px;
+            color: #9091A3;
+            letter-spacing: 0;
+        }
+    }
+    .tx-status {
         text-align: left;
         border-bottom: 1px solid #E8E9ED;
         height: 48px;
@@ -324,6 +362,15 @@ export default {
         color: #FFD192;
         letter-spacing: 0;
         text-align: center;
+    }
+    .executioncontractsuccess-amount{
+        font-size: 0px;
+    }
+    .executioncontractfail-amount{
+        font-size: 0px;
+    }
+    .createcontract-amount{
+        font-size: 0px;
     }
     .md-content {
         padding: 40px 24px;

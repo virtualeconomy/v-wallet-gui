@@ -32,8 +32,12 @@
              src="../../../assets/imgs/icons/wallet/ic_contract_signup.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='execution contract'"
-             src="../../../assets/imgs/icons/wallet/ic_contract_implement.svg"
+        <img v-else-if="txIcon==='execution contract success'"
+             src="../../../assets/imgs/icons/wallet/ic_exec_success.svg"
+             width="32px"
+             height="32px">
+        <img v-else-if="txIcon==='execution contract fail'"
+             src="../../../assets/imgs/icons/wallet/ic_exec_fail.svg"
              width="32px"
              height="32px">
       </b-col>
@@ -72,12 +76,12 @@
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span v-else-if="txIcon === 'create contract' || txIcon === 'execution contract'">-</span>
+          <span v-else-if="txIcon === 'create contract' || txIcon === 'execution contract success' || txIcon === 'execution contract fail'">-</span>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ formatter(txAmount) }} VSYS</span>
-          <span v-else-if="txIcon === 'create contract' || txIcon === 'execution contract'">{{ formatter(txFee) }} VSYS</span>
+          <span v-else-if="txIcon === 'create contract' || txIcon === 'execution contract success' || txIcon === 'execution contract fail'">{{ formatter(txFee) }} VSYS</span>
         </div>
         <div class="tx-fee"
-             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'create contract' || txIcon === 'execution contract') && feeFlag">Tx Fee: -
+             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'create contract' || txIcon === 'execution contract success' || txIcon === 'execution contract fail') && feeFlag">Tx Fee: -
           <span> {{ formatter(txFee) }} VSYS </span>
         </div>
       </b-col>
@@ -120,6 +124,7 @@
                  :tx-fee="txFee"
                  :tx-amount="txAmount"
                  :tx-block="txBlock"
+                 :tx-status="txStatus"
                  :tx-attachment="txAttachment"
                  :trans-type="transType"
                  :self-send="selfSend"
@@ -246,7 +251,11 @@ export default {
             } else if (this.txRecord['type'] === CONTRACT_CREATE_TX) {
                 return 'Create Contract'
             } else if (this.txRecord['type'] === CONTRACT_EXEC_TX) {
-                return 'Execution Contract'
+                if (this.txRecord.status === 'Success') {
+                    return 'Execution Contract Success'
+                } else {
+                    return 'Execution Contract Fail'
+                }
             } else {
                 return 'Received'
             }
@@ -337,6 +346,9 @@ export default {
         },
         txBlock() {
             return this.txRecord.height
+        },
+        txStatus() {
+            return this.txRecord.status
         },
         txId() {
             return this.txRecord.id
@@ -494,7 +506,14 @@ export default {
       text-align: right;
       padding-right: 0px;
 }
-    .amount-executioncontract {
+    .amount-executioncontractsuccess {
+      font-size: 17px;
+      color: #F5354B;
+      letter-spacing: 0;
+      text-align: right;
+      padding-right: 0px;
+}
+    .amount-executioncontractfail {
       font-size: 17px;
       color: #F5354B;
       letter-spacing: 0;
