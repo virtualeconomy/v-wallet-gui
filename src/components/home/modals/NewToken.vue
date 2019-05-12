@@ -72,6 +72,10 @@
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isBiggerThanMax(amount)">
+              Too many significant digits for amount. Please reduce unity.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
               Invalid Input.
             </b-form-invalid-feedback>
@@ -205,6 +209,10 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(coldAmount)">
               Negative number is not allowed.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isBiggerThanMax(coldAmount)">
+              Too many significant digits for amount. Please reduce unity.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -705,7 +713,17 @@ export default {
             if (BigNumber(amount).isEqualTo(0) && !this.isInsufficient(type)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !this.isInsufficient(type)
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !this.isInsufficient(type) && !this.isBiggerThanMax(amount)
+        },
+        isBiggerThanMax(amount) {
+            var maxValue = BigNumber(2).exponentiatedBy(63) - 1
+            var unityValue = BigNumber(10).exponentiatedBy(this.unity)
+            var value = BigNumber(amount).multipliedBy(unityValue)
+            if (value.isGreaterThanOrEqualTo(maxValue)) {
+                return true
+            } else {
+                return false
+            }
         },
         isWrongFormat(amount) {
             if ((BigNumber(amount).toString().split('.')[1] && BigNumber(amount).toString().split('.')[1].length > this.unity) || /[eE]/.test(amount.toString())) {
