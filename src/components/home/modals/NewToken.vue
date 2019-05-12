@@ -719,7 +719,7 @@ export default {
             var maxValue = BigNumber(2).exponentiatedBy(63) - 1
             var unityValue = BigNumber(10).exponentiatedBy(this.unity)
             var value = BigNumber(amount).multipliedBy(unityValue)
-            if (value.isGreaterThanOrEqualTo(maxValue)) {
+            if (value.isGreaterThan(maxValue)) {
                 return true
             } else {
                 return false
