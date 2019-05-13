@@ -73,6 +73,7 @@
 
 <script>
 import jrQrcode from 'jr-qrcode'
+import BigNumber from 'bignumber.js'
 import { API_VERSION, PROTOCOL, OPC_SIGNATURE } from '@/constants.js'
 import transaction from '../../../utils/transaction'
 export default {
@@ -90,7 +91,8 @@ export default {
             sgError: false,
             apiError: false,
             protocolError: false,
-            opcError: false
+            opcError: false,
+            contractPublicKey: ''
         }
     },
     props: {
@@ -101,8 +103,7 @@ export default {
         },
         qrTotalPage: {
             type: Number,
-            default: 1,
-            require: true
+            default: 1
         },
         dataObject: {
             type: Object,
@@ -123,7 +124,11 @@ export default {
             }
             var text = ''
             if (this.qrTotalPage === 1) {
-                text = JSON.stringify(this.dataObject).replace(/"amount":"(\d+)"/g, '"amount":$1')
+                let data = JSON.parse(JSON.stringify(this.dataObject))
+                if (data.hasOwnProperty('contractId')) {
+                    delete data.senderPublicKey
+                }
+                text = JSON.stringify(data).replace(/"amount":"(\d+)"/g, '"amount":$1')
             } else {
                 text = this.qrArray[this.qrPage]
             }
@@ -205,8 +210,13 @@ export default {
                     delete data.api
                     delete data.opc
                     delete data.protocol
-                    data.timestamp *= 1e6
-                    if (transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType) && !this.qrError) {
+                    if (data.hasOwnProperty('contractId')) {
+                        data.fee = BigNumber(data.fee)
+                        data.timestamp = BigNumber(data.timestamp *= 1e6)
+                    } else {
+                        data.timestamp *= 1e6
+                    }
+                    if (((!data.hasOwnProperty('contractId') && transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType)) || (data.hasOwnProperty('contractId') && transaction.isValidContractSignature(data, signature, data.senderPublicKey))) && !this.qrError) {
                         var _this = this
                         setTimeout(function() {
                             _this.$emit('get-signature', signature)

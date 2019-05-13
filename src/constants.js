@@ -61,6 +61,7 @@ export const SEND_FUNCIDX = 3
 export const SEND_FUNCIDX_SPLIT = 4
 export const API_VERSION = 3
 export const OPC_TRANSACTION = 'transaction'
+export const OPC_FUNCTION = 'function'
 export const OPC_ACCOUNT = 'account'
 export const OPC_SIGNATURE = 'signature'
 export const OPC_SEED = 'seed'

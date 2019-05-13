@@ -104,7 +104,7 @@ import IssueToken from './IssueToken'
 import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
 import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '../../../constants.js'
-import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract.js'
+import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '../../../contract'
 import Vue from 'vue'
 import browser from '../../../utils/browser'
 export default {
@@ -112,6 +112,8 @@ export default {
     components: { TokenInfoModal, SendToken, IssueToken, BurnToken },
     data: function() {
         return {
+            tokenBalance: BigNumber(0),
+            unity: BigNumber(1),
             tokenBalances: {},
             tokens: {},
             hovered: false,
@@ -119,8 +121,6 @@ export default {
             showCancelDetails: false,
             removeFlag: false,
             issuer: '',
-            tokenBalance: BigNumber(0),
-            unity: BigNumber(1),
             functionIndex: SEND_FUNCIDX
         }
     },
@@ -180,6 +180,7 @@ export default {
         this.getTokenInfo()
         this.updateBalance()
     },
+
     computed: {
         txAddressShow() {
             if (this.txAddress) {
@@ -282,6 +283,7 @@ export default {
                 this.issuer = 'Failed to get issuer'
                 this.registerTime = 'Failed to get time'
             })
+
             var contractId = transaction.tokenIDToContractID(this.tokenId)
             const url2 = NODE_IP + '/contract/content/' + contractId
             this.$http.get(url2).then(response => {
