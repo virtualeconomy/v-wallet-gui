@@ -336,7 +336,7 @@
           <TokenConfirm :address="coldAddress"
                         :amount=inputAmount(coldAmount)
                         :fee="coldFee"
-                        :tx-type="'IssueToken'">
+                        :tx-type="'Send Token'">
           </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-row>
@@ -522,7 +522,7 @@ export default {
                 protocol: PROTOCOL,
                 api: this.coldApi(),
                 opc: OPC_FUNCTION,
-                //  address: this.coldAddress,
+                address: this.coldAddress,
                 senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
                 fee: this.coldFee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
@@ -530,7 +530,7 @@ export default {
                 attachment: transaction.prepareSendAttachment(this.coldAttachment),
                 contractId: this.contractId,
                 functionId: this.functionIndex,
-                function: transaction.prepareSend(this.coldRecipient, BigNumber(this.coldAmount)),
+                function: transaction.prepareSend(this.coldRecipient, BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
                 functionTextual: 'send(recipient=\'' + this.coldRecipient + '\', amount=' + this.coldAmount + ')'
             }
         },
@@ -565,7 +565,6 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                this.feeScale = 100
                 const dataInfo = {
                     contractId: this.contractId,
                     senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
@@ -579,7 +578,6 @@ export default {
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
-                console.log('coldSignature', this.coldSignature)
                 const coldDataInfo = {
                     contractId: this.contractId,
                     senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
@@ -588,7 +586,7 @@ export default {
                     timestamp: this.dataObject.timestamp,
                     attachment: transaction.prepareSendAttachment(this.coldAttachment),
                     functionIndex: this.functionIndex,
-                    functionData: transaction.prepareSend(this.coldRecipient, BigNumber(this.coldAmount)),
+                    functionData: transaction.prepareSend(this.coldRecipient, BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
                     signature: this.coldSignature
                 }
                 apiSchema = coldDataInfo
