@@ -562,7 +562,7 @@ export default {
                 this.feeScale = 100
                 const dataInfo = {
                     contractId: this.contractId,
-                    senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
+                    senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
@@ -580,9 +580,9 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    attachment: transaction.prepareSendAttachment(this.attachment),
+                    attachment: transaction.prepareSendAttachment(this.coldAttachment),
                     functionIndex: this.functionIndex,
-                    functionData: transaction.prepareSend(this.recipient, BigNumber(this.amount)),
+                    functionData: transaction.prepareSend(this.coldRecipient, BigNumber(this.coldAmount)),
                     signature: this.coldSignature
                 }
                 apiSchema = coldDataInfo
