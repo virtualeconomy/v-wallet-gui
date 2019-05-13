@@ -202,7 +202,7 @@ export default {
         },
         totalSupply() {
             if (this.tokens) {
-                return BigNumber(this.tokens.max)
+                return BigNumber(this.tokens.max).dividedBy(this.unity)
             } else return ''
         },
         issuedTokens() {

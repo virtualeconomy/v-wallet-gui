@@ -585,7 +585,7 @@ export default {
                     senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
-                    timestamp: this.timeStamp,
+                    timestamp: this.dataObject.timestamp,
                     attachment: transaction.prepareSendAttachment(this.coldAttachment),
                     functionIndex: this.functionIndex,
                     functionData: transaction.prepareSend(this.coldRecipient, BigNumber(this.coldAmount)),
