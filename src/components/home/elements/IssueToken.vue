@@ -151,11 +151,11 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+                <img src="../../../assets/imgs/icons/wallet/ic_token2.svg"
                      width="20"
                      height="20">
               </span>
-              <span class="balance">{{ formatter(tokenBalance) }}Token Balance</span>
+              <span class="balance">Issue Available{{ formatter(totalSupply - issuedTokens) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Issue Amount"
@@ -177,10 +177,10 @@
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
-          <TokenConfirm :address="coldAddress"
+          <TokenConfirm :address="address"
                         :amount=inputAmount(coldAmount)
                         :fee="coldFee"
-                        :tx-type="'IssueToken'">
+                        :tx-type="'Issue Token'">
           </TokenConfirm>
           <b-row>
             <b-col class="col-lef">
@@ -206,16 +206,17 @@
         <b-container v-if="coldPageId===3"
                      class="text-left">
           <ColdSignature :data-object="dataObject"
+                         :qr-total-page="1"
                          v-if="coldPageId===3"
                          @get-signature="getSignature"
                          @next-page="coldNextPage"
                          @prev-page="coldPrevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
-          <TokenConfirm :address="coldAddress"
+          <TokenConfirm :address="address"
                         :amount=inputAmount(coldAmount)
                         :fee="coldFee"
-                        :tx-type="'IssueToken'">
+                        :tx-type="'Issue Token'">
           </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-row>
@@ -241,10 +242,10 @@
         </b-container>
         <b-container v-show="coldPageId===5">
           <TokenSuccess class="tokenSucced"
-                        :address="coldAddress"
+                        :address="address"
                         :amount=inputAmount(coldAmount)
                         :fee="coldFee"
-                        :tx-type="'IssueToken'">
+                        :tx-type="'Issue Token'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -260,7 +261,7 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, ISSUE_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, ISSUE_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -285,8 +286,7 @@ export default {
             sendError: false,
             coldSignature: '',
             timeStamp: (Date.now() - 1) * 1e6,
-            hasConfirmed: false,
-            contractId: ''
+            hasConfirmed: false
         }
     },
     props: {
@@ -351,6 +351,9 @@ export default {
         }
     },
     computed: {
+        contractId() {
+            return transaction.tokenIDToContractID(this.tokenId)
+        },
         defaultAddress() {
             return Vue.ls.get('address')
         },
@@ -384,13 +387,18 @@ export default {
             return {
                 protocol: PROTOCOL,
                 api: this.coldApi(),
-                opc: OPC_TRANSACTION,
-                transactionType: PAYMENT_TX,
-                senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
-                amount: BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).toFixed(0),
+                opc: OPC_FUNCTION,
+                address: this.address,
+                senderPublicKey: this.coldAddresses[this.address].publicKey,
                 fee: this.coldFee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                attachment: '',
+                contractId: this.contractId,
+                functionId: ISSUE_FUNCIDX,
+                function: transaction.prepareIssueAndBurn(BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
+                functionTextual: 'issue(amount=' + this.coldAmount + ')',
+                functionExplain: ''
             }
         },
         isValidAttachment() {
@@ -405,7 +413,7 @@ export default {
             return BigNumber(num)
         },
         coldApi: function() {
-            if (this.coldAddresses[this.coldAddress].api === 1 && this.coldAmount <= 90000000) {
+            if (this.coldAddresses[this.address].api === 1 && this.coldAmount <= 90000000) {
                 return 1
             } else {
                 return API_VERSION
@@ -421,7 +429,6 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                this.contractId = transaction.tokenIDToContractID(this.tokenId)
                 this.fee = BigNumber(CONTRACT_EXEC_FEE)
                 this.feeScale = 100
                 const dataInfo = {
@@ -437,7 +444,18 @@ export default {
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
-                apiSchema = ''
+                const coldDataInfo = {
+                    contractId: this.contractId,
+                    senderPublicKey: this.coldAddresses[this.address].publicKey,
+                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
+                    feeScale: FEE_SCALE,
+                    timestamp: this.dataObject.timestamp,
+                    attachment: '',
+                    functionIndex: ISSUE_FUNCIDX,
+                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
+                    signature: this.coldSignature
+                }
+                apiSchema = coldDataInfo
             }
             const url = NODE_IP + '/contract/broadcast/execute'
             this.$http.post(url, apiSchema).then(response => {
@@ -451,6 +469,7 @@ export default {
             })
         },
         nextPage: function() {
+            this.hasConfirmed = false
             this.pageId++
         },
         coldNextPage: function() {
