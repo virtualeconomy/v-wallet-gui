@@ -73,6 +73,7 @@
 
 <script>
 import jrQrcode from 'jr-qrcode'
+import crypto from '../../../utils/crypto'
 import BigNumber from 'bignumber.js'
 import { API_VERSION, PROTOCOL, OPC_SIGNATURE } from '@/constants.js'
 import transaction from '../../../utils/transaction'
@@ -130,7 +131,13 @@ export default {
                 }
                 text = JSON.stringify(data).replace(/"amount":"(\d+)"/g, '"amount":$1')
             } else {
-                text = this.qrArray[this.qrPage]
+                let tempData = JSON.parse(JSON.stringify(this.dataObject))
+                if (tempData.opc === 'contract') {
+                    delete tempData.senderPublicKey
+                }
+                let checkSum = crypto.sha256ForCheckSum(JSON.stringify(tempData))
+                text = 'Seg/' + this.qrPage + '/' + this.qrTotalPage + '/' + checkSum + '/'
+                text += this.qrArray[this.qrPage]
             }
             const imgBase64 = jrQrcode.getQrBase64(text, options)
             return imgBase64

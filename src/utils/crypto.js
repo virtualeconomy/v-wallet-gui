@@ -47,6 +47,10 @@ function strengthenPassword(password, rounds) {
     return password;
 }
 exports.default = {
+    sha256ForCheckSum: function (input) {
+        var checkSum = converters_1.default.byteArrayToHexString(sha256(input));
+        return checkSum.slice(0, 8)
+    },
     buildTransactionSignature: function (dataBytes, privateKey) {
         if (!dataBytes || !(dataBytes instanceof Uint8Array)) {
             throw new Error('Missing or invalid data');
