@@ -136,7 +136,7 @@ export default {
                     delete tempData.senderPublicKey
                 }
                 let checkSum = crypto.sha256ForCheckSum(JSON.stringify(tempData))
-                text = 'Seg/' + this.qrPage + '/' + this.qrTotalPage + '/' + checkSum + '/'
+                text = 'Seg/' + (this.qrPage + 1) + '/' + this.qrTotalPage + '/' + checkSum + '/'
                 text += this.qrArray[this.qrPage]
             }
             const imgBase64 = jrQrcode.getQrBase64(text, options)
