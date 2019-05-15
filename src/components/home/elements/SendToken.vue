@@ -336,6 +336,7 @@
           <TokenConfirm :address="coldAddress"
                         :amount=inputAmount(coldAmount)
                         :fee="coldFee"
+                        :recipient="coldRecipient"
                         :tx-type="'Send Token'">
           </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
@@ -531,7 +532,8 @@ export default {
                 contractId: this.contractId,
                 functionId: this.functionIndex,
                 function: transaction.prepareSend(this.coldRecipient, BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
-                functionTextual: 'send(recipient=\'' + this.coldRecipient + '\', amount=' + this.coldAmount + ')'
+                functionTextual: 'send(recipient=\'' + this.coldRecipient + '\', amount=' + this.coldAmount + ')',
+                functionExplain: 'send ' + this.coldAmount + ' token to ' + this.coldRecipient
             }
         },
         isValidAttachment() {

@@ -46,7 +46,7 @@
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
           <b-dropdown-item @click="sendToken">Send Token</b-dropdown-item>
           <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
-          <b-dropdown-item @click="burnToken">Burn Token</b-dropdown-item>
+          <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
