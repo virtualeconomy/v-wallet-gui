@@ -40,14 +40,24 @@
               <span class="balance">{{ formatter(balances[address]) }} VSYS</span>
             </b-btn>
           </b-form-group>
-          <b-form-group label="Description"
+          <b-form-group label="Contract Description"
                         label-for="descriptionInput">
             <b-form-textarea id="descriptionInput"
-                             v-model="attachment"
+                             v-model="contractDescription"
                              :rows="2"
                              :no-resize="true"
                              placeholder="You can not change the description later"
-                             :state="isValidAttachment">
+                             :state="isValidAttachment(contractDescription)">
+            </b-form-textarea>
+          </b-form-group>
+          <b-form-group label="Token Description"
+                        label-for="descriptionInput">
+            <b-form-textarea id="descriptionInput"
+                             v-model="tokenDescription"
+                             :rows="2"
+                             :no-resize="true"
+                             placeholder="You can not change the description later"
+                             :state="isValidAttachment(tokenDescription)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Total Supply"
@@ -100,7 +110,7 @@
             <img id="img_read"
                  @click="changeIcon"
                  style="font-size: 15px;z-index: 100;"
-                 src="../../../assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
+                 src="../../../assets/imgs/icons/signup/ic_check.svg"> Support split/reverse-split token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
           </div>
           <b-form-group style="margin-top: 10px;">
             <label class="fee-remark">Transaction Fee {{ Number(fee) }} VSYS</label>
@@ -179,14 +189,24 @@
               <span class="balance">{{ formatter(balances[coldAddress]) }} VSYS</span>
             </b-btn>
           </b-form-group>
-          <b-form-group label="Description"
+          <b-form-group label="Contract Description"
                         label-for="descriptionInput">
             <b-form-textarea id="descriptionInput"
-                             v-model="coldAttachment"
+                             v-model="coldContractDescription"
                              :rows="2"
                              :no-resize="true"
                              placeholder="You can not change the description later"
-                             :state="isValidColdAttachment">
+                             :state="isValidAttachment(coldContractDescription)">
+            </b-form-textarea>
+          </b-form-group>
+          <b-form-group label="Token Description"
+                        label-for="descriptionInput">
+            <b-form-textarea id="descriptionInput"
+                             v-model="coldTokenDescription"
+                             :rows="2"
+                             :no-resize="true"
+                             placeholder="You can not change the description later"
+                             :state="isValidAttachment(coldTokenDescription)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Total Supply"
@@ -377,7 +397,11 @@ var initData = {
     timeStamp: (Date.now() - 1) * 1e6,
     hasConfirmed: false,
     tokenId: '',
-    tokens: {}
+    tokens: {},
+    contractDescription: '',
+    tokenDescription: '',
+    coldContractDescription: '',
+    coldTokenDescription: ''
 }
 export default {
     name: 'NewToken',
@@ -440,10 +464,10 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(BigNumber(this.amount).isGreaterThan(0) && !this.isInsufficient('hot') && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
+            return !(BigNumber(this.amount).isGreaterThan(0) && !this.isInsufficient('hot') && (this.isValidAttachment(this.contractDescription) || !this.contractDescription) && (this.isValidAttachment(this.tokenDescription) || !this.tokenDescription) && this.isAmountValid('hot') && this.address !== '')
         },
         isColdSubmitDisabled() {
-            return !(this.coldAddress && this.coldAmount > 0 && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold') && this.coldAddress !== '')
+            return !(this.coldAddress && this.coldAmount > 0 && (this.isValidAttachment(this.coldContractDescription) || !this.coldContractDescription) && (this.isValidAttachment(this.coldTokenDescription) || !this.coldTokenDescription) && this.isAmountValid('cold') && this.coldAddress !== '')
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -454,20 +478,16 @@ export default {
                 api: this.coldApi(),
                 opc: OPC_CONTRACT,
                 address: this.coldAddress,
+                senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
                 fee: this.coldFee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
                 timestamp: Date.now(),
                 contract: this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT,
-                description: this.coldAttachment,
-                contractInit: base58.encode(transaction.prepareCreate(BigNumber(this.coldAmount), BigNumber(Math.pow(10, this.unity)), this.coldAttachment)[0]),
-                contractInitTextual: 'init(max=' + BigNumber(this.coldAmount) + ',unity=' + BigNumber(Math.pow(10, this.unity)) + ',tokenDescription=\'' + this.coldAttachment + '\''
+                description: this.coldContractDescription,
+                contractInit: base58.encode(transaction.prepareCreate(BigNumber(this.coldAmount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.coldTokenDescription)[0]),
+                contractInitTextual: 'init(max=' + BigNumber(this.coldAmount) + ',unity=' + BigNumber(Math.pow(10, this.unity)) + ',tokenDescription=\'' + this.coldTokenDescription + '\')',
+                contractInitExplain: 'Create token ' + (this.support === false ? '' : '(support split)' + ' that max supply is ') + BigNumber(this.coldAmount)
             }
-        },
-        isValidAttachment() {
-            if (!this.attachment) {
-                return void 0
-            }
-            return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         isValidColdAttachment() {
             if (!this.coldAttachment) {
@@ -483,12 +503,20 @@ export default {
         }
     },
     methods: {
+        isValidAttachment(attachment) {
+            if (!attachment) {
+                return void 0
+            }
+            return attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+        },
         getQrArray() {
             const qrSize = 400
-            const text = JSON.stringify(this.dataObject)
+            let tempDataObject = JSON.parse(JSON.stringify(this.dataObject))
+            delete tempDataObject.senderPublicKey
+            const text = JSON.stringify(tempDataObject)
             var page = Math.ceil(text.length / qrSize)
             var textArray = Array(page)
-            if (this.dataObject.opc === 'contract') {
+            if (tempDataObject.opc === 'contract') {
                 this.qrTotalPage = page
                 console.log(this.qrTotalPage, text.length)
                 for (var i = 0; i < this.qrTotalPage; i++) {
@@ -549,13 +577,23 @@ export default {
                     fee: TOKEN_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    initData: base58.encode(transaction.prepareCreate(BigNumber(this.amount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.attachment)[0]),
-                    description: this.attachment,
-                    signature: transaction.prepareRegContractSignature(this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT, transaction.prepareCreate(BigNumber(this.amount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.attachment), this.attachment, BigNumber(this.fee * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    initData: base58.encode(transaction.prepareCreate(BigNumber(this.amount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.tokenDescription)[0]),
+                    description: this.contractDescription,
+                    signature: transaction.prepareRegContractSignature(this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT, transaction.prepareCreate(BigNumber(this.amount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.tokenDescription), this.contractDescription, BigNumber(this.fee * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
-                apiSchema = ''
+                const coldDataInfo = {
+                    contract: this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT,
+                    senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
+                    fee: TOKEN_FEE * VSYS_PRECISION,
+                    feeScale: FEE_SCALE,
+                    timestamp: this.dataObject.timestamp,
+                    initData: base58.encode(transaction.prepareCreate(BigNumber(this.coldAmount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.coldTokenDescription)[0]),
+                    description: this.coldContractDescription,
+                    signature: this.coldSignature
+                }
+                apiSchema = coldDataInfo
             }
             const url = NODE_IP + '/contract/broadcast/register'
             this.$http.post(url, apiSchema).then(response => {
@@ -619,6 +657,10 @@ export default {
             this.support = false
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
+            this.contractDescription = ''
+            this.tokenDescription = ''
+            this.coldContractDescription = ''
+            this.coldTokenDescription = ''
         },
         endSend: function() {
             this.$refs.newTokenModal.hide()
