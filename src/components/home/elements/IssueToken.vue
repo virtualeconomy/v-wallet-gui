@@ -398,7 +398,7 @@ export default {
                 functionId: ISSUE_FUNCIDX,
                 function: transaction.prepareIssueAndBurn(BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
                 functionTextual: 'issue(amount=' + this.coldAmount + ')',
-                functionExplain: ''
+                functionExplain: 'Issue ' + this.coldAmount + ' Token'
             }
         },
         isValidAttachment() {

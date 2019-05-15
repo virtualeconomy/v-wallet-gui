@@ -15,6 +15,7 @@
     </button>
     <b-tabs @input="hideQrScan">
       <b-tab title="Hot Wallet"
+             :disabled="walletType === 'coldWallet'"
              :active="walletType==='hotWallet'">
         <b-container
           class="text-left"
@@ -41,10 +42,10 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Burn Available {{ formatter(tokenBalance) }}</span>
+              <span class="balance">Destroy Available {{ formatter(tokenBalance) }}</span>
             </b-btn>
           </b-form-group>
-          <b-form-group label="Burn Amount"
+          <b-form-group label="Destroy Amount"
                         label-for="amount-input">
             <b-form-input id="amount-input"
                           class="amount-input"
@@ -88,7 +89,7 @@
           <TokenConfirm :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Burn Token'">
+                        :tx-type="'Destroy Token'">
           </TokenConfirm>
           <p
             v-show="sendError"
@@ -119,7 +120,7 @@
                         :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Burn Token'">
+                        :tx-type="'Destroy Token'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -129,16 +130,21 @@
         </b-container>
       </b-tab>
       <b-tab title="Cold Wallet"
-             :disabled="!coldPageId"
+             :disabled="!coldPageId || walletType==='hotWallet'"
              :active="walletType==='coldWallet'">
         <b-container v-if="coldPageId===1"
                      class="text-left">
           <b-form-group label="Wallet Address"
                         label-for="wallet-address">
-            <b-form-select id=wallet-address
-                           class="addr-input"
-                           v-model="coldAddress"
-                           :options="options(coldAddresses)"></b-form-select>
+            <b-form-input id=coldAddress-input
+                          class="coldAddress-input"
+                          readonly
+                          v-model="address"
+                          :state="isValidIssuer(address)"
+                          aria-describedby="inputLiveFeedback"></b-form-input>
+            <b-form-invalid-feedback id="inputLiveFeedback">
+              Cannot issue token. You are not issuer of this token.
+            </b-form-invalid-feedback>
             <b-btn
               block
               variant="light"
@@ -150,10 +156,10 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Burn Available {{ formatter(tokenBalance) }}</span>
+              <span class="balance">Destroy Available {{ formatter(tokenBalance) }}</span>
             </b-btn>
           </b-form-group>
-          <b-form-group label="Issue Amount"
+          <b-form-group label="Destroy Amount"
                         label-for="cold-amount-input">
             <b-form-input id="cold-amount-input"
                           class="amount-input"
@@ -172,10 +178,10 @@
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
-          <TokenConfirm :address="coldAddress"
+          <TokenConfirm :address="address"
                         :amount=inputAmount(coldAmount)
                         :fee="coldFee"
-                        :tx-type="'BurnToken'">
+                        :tx-type="'Destroy Token'">
           </TokenConfirm>
           <b-row>
             <b-col class="col-lef">
@@ -201,16 +207,17 @@
         <b-container v-if="coldPageId===3"
                      class="text-left">
           <ColdSignature :data-object="dataObject"
+                         :qr-total-page="1"
                          v-if="coldPageId===3"
                          @get-signature="getSignature"
                          @next-page="coldNextPage"
                          @prev-page="coldPrevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
-          <TokenConfirm :address="coldAddress"
+          <TokenConfirm :address="address"
                         :amount=inputAmount(coldAmount)
                         :fee="coldFee"
-                        :tx-type="'BurnToken'">
+                        :tx-type="'Destroy Token'">
           </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-row>
@@ -236,10 +243,10 @@
         </b-container>
         <b-container v-show="coldPageId===5">
           <TokenSuccess class="tokenSucced"
-                        :address="coldAddress"
+                        :address="address"
                         :amount=inputAmount(coldAmount)
                         :fee="coldFee"
-                        :tx-type="'BurnToken'">
+                        :tx-type="'DestroyToken'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -255,7 +262,7 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, BURN_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
+import { NODE_IP, OPC_FUNCTION, CONTRACT_EXEC_FEE, BURN_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -333,6 +340,9 @@ export default {
         }
     },
     computed: {
+        contractId() {
+            return transaction.tokenIDToContractID(this.tokenId)
+        },
         defaultAddress() {
             return Vue.ls.get('address')
         },
@@ -366,13 +376,18 @@ export default {
             return {
                 protocol: PROTOCOL,
                 api: this.coldApi(),
-                opc: OPC_TRANSACTION,
-                transactionType: PAYMENT_TX,
-                senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
-                amount: BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).toFixed(0),
+                opc: OPC_FUNCTION,
+                address: this.address,
+                senderPublicKey: this.coldAddresses[this.address].publicKey,
                 fee: this.coldFee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                attachment: '',
+                contractId: this.contractId,
+                functionId: BURN_FUNCIDX,
+                function: transaction.prepareIssueAndBurn(BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
+                functionTextual: 'destroy(amount=' + this.coldAmount + ')',
+                functionExplain: 'Destroy ' + this.coldAmount + ' Token'
             }
         },
         isValidAttachment() {
@@ -387,7 +402,7 @@ export default {
             return BigNumber(num)
         },
         coldApi: function() {
-            if (this.coldAddresses[this.coldAddress].api === 1 && this.coldAmount <= 90000000) {
+            if (this.coldAddresses[this.address].api === 1 && this.coldAmount <= 90000000) {
                 return 1
             } else {
                 return API_VERSION
@@ -401,7 +416,6 @@ export default {
                 }
                 this.hasConfirmed = true
                 this.feeScale = 100
-                this.contractId = transaction.tokenIDToContractID(this.tokenId)
                 const dataInfo = {
                     contractId: this.contractId,
                     senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
@@ -415,7 +429,18 @@ export default {
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
-                apiSchema = ''
+                const coldDataInfo = {
+                    contractId: this.contractId,
+                    senderPublicKey: this.coldAddresses[this.address].publicKey,
+                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
+                    feeScale: FEE_SCALE,
+                    timestamp: this.dataObject.timestamp,
+                    attachment: '',
+                    functionIndex: BURN_FUNCIDX,
+                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
+                    signature: this.coldSignature
+                }
+                apiSchema = coldDataInfo
             }
             const url = NODE_IP + '/contract/broadcast/execute'
             this.$http.post(url, apiSchema).then(response => {

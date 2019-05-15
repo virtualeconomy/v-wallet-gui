@@ -1,13 +1,13 @@
 <template>
   <div>
     <div class="token-succ-icon">
-      <img v-if="txType==='Burn Token'"
+      <img v-if="txType==='Destroy Token'"
            src="../../../assets/imgs/icons/operate/ic_burn.svg">
       <img v-else
            src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
     </div>
     <div class="infos">
-      <b-form-group v-if="txType==='Burn Token'"
+      <b-form-group v-if="txType==='Destroy Token'"
                     horizontal
                     class="form-line"
                     label="Burn Amount"

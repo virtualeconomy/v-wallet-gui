@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="infos">
-      <b-form-group v-if="txType==='Burn Token'"
+      <b-form-group v-if="txType==='Destroy Token'"
                     horizontal
                     class="form-line"
                     label="Burn Amount"
