@@ -469,6 +469,7 @@ export default {
             })
         },
         nextPage: function() {
+            this.timeStamp = Date.now() * 1e6
             this.hasConfirmed = false
             this.pageId++
         },

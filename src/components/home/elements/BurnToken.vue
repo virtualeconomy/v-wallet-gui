@@ -455,6 +455,8 @@ export default {
         },
         nextPage: function() {
             this.pageId++
+            this.timeStamp = Date.now() * 1e6
+            this.hasConfirmed = false
         },
         coldNextPage: function() {
             this.sendError = false
