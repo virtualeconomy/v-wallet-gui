@@ -140,7 +140,7 @@ export default {
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
-        if (this.address && Vue.ls.get('pwd') && this.tabActive === 'trans') {
+        if (this.address && Vue.ls.get('pwd') && this.activedTab === 'trans') {
             this.getTxRecords()
         }
     },
@@ -177,14 +177,14 @@ export default {
             type: String,
             default: ''
         },
-        tabActive: {
+        activedTab: {
             type: String,
             default: 'trans'
         }
     },
     watch: {
         address(newAddr, oldAddr) {
-            if (newAddr === '' || this.tabActive !== 'trans') {
+            if (newAddr === '' || this.activedTab !== 'trans') {
                 return
             }
             this.changeShowDisable = false

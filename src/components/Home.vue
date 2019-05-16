@@ -103,7 +103,8 @@
                                 :addresses="addresses"
                                 :cold-addresses="coldAddresses"
                                 :wallet-type="walletType"
-                                :balances="balance">
+                                :balances="balance"
+                                :actived-tab="activedTab">
                   </TokenRecords>
                 </div>
               </b-tab>
@@ -131,7 +132,7 @@
                 </div>
                 <div class="f-records">
                   <Records :address="selectedAddress"
-                           :tab-active="tabActive"></Records>
+                           :actived-tab="activedTab"></Records>
                 </div>
               </b-tab>
               <b-tab>
@@ -161,7 +162,7 @@
                 </div>
                 <div class="f-records">
                   <LeaseRecords :address="selectedAddress"
-                                :tab-active="tabActive"
+                                :actived-tab="activedTab"
                                 :wallet-type="walletType"
                                 :cold-pub-key="coldPubKey"
                                 :address-index="addresses[selectedAddress]"></LeaseRecords>
@@ -205,7 +206,7 @@ export default {
             sortedAddresses: {},
             walletType: '',
             sortFlag: 0,
-            tabActive: 'trans',
+            activedTab: 'trans',
             available: BigNumber(0),
             leasedIn: BigNumber(0),
             leasedOut: BigNumber(0),
@@ -315,9 +316,12 @@ export default {
         },
         tranTabChange(tabIndex) {
             if (tabIndex === 0) {
-                this.tabActive = 'trans'
+                this.activedTab = 'token'
             } else if (tabIndex === 1) {
-                this.tabActive = 'lease'
+                this.activedTab = 'trans'
+                this.getBalance(this.selectedAddress)
+            } else if (tabIndex === 2) {
+                this.activedTab = 'lease'
                 this.getBalance(this.selectedAddress)
             }
         },
