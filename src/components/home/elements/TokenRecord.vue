@@ -165,14 +165,16 @@ export default {
             },
             require: true
         },
-        update: {
-            type: Number,
-            default: 0,
-            require: true
+        activedTab: {
+            type: String,
+            default: 'token'
         }
     },
     watch: {
-        update(newAddr, oldAddr) {
+        address(newAddr, oldAddr) {
+            if (newAddr === '' || this.activedTab !== 'token') {
+                return
+            }
             this.updateBalance()
         }
     },

@@ -15,8 +15,8 @@
                      :addresses="addresses"
                      :cold-addresses="coldAddresses"
                      :wallet-type="walletType"
-                     :update = "update"
                      :balances="balances"
+                     :actived-tab="activedTab"
                      @removeFlag="removeToken"
                      @endSendSignal="endSendSignal"></TokenRecord>
 
@@ -58,8 +58,7 @@ export default {
             tokenRecords: {},
             changeShowDisable: false,
             myHeight: '0',
-            records: {},
-            update: 100
+            records: {}
         }
     },
     props: {
@@ -87,12 +86,20 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        activedTab: {
+            type: String,
+            default: 'token'
         }
     },
     watch: {
         address(newAddr, oldAddr) {
-            this.update += 1
-            this.getTokenRecords()
+            if (newAddr === '' || this.activedTab !== 'token') {
+                return
+            }
+            if (this.address && Vue.ls.get('pwd')) {
+                this.getTokenRecords()
+            }
         }
     },
     computed: {
