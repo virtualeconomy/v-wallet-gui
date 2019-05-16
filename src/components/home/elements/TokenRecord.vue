@@ -176,6 +176,9 @@ export default {
                 return
             }
             this.updateBalance()
+        },
+        activedTab(newTab, oldTab) {
+            this.updateBalance()
         }
     },
     created() {
