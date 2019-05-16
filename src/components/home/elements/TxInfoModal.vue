@@ -69,7 +69,7 @@
            v-if="txIcon === 'sent' || txIcon === 'received'">
         <label>Attachment</label>
         <span>{{ txAttachment }}</span>
-        <span class="tx-attachment-whole"><span>{{ txAttachment }}</span></span>
+        <span class="tx-attachment-whole">{{ txAttachment }}</span>
       </div>
       <div class="tx-id">
         <label>ID</label>
@@ -242,8 +242,6 @@ export default {
             width: 30px;
             height: 22px;
             float: right;
-            position:relative;
-            left:320px;
         }
         span {
             float:right;
@@ -251,9 +249,6 @@ export default {
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
-            position:relative;
-            top:-30px;
-            right:35px;
         }
         label {
             font-size: 15px;
@@ -272,8 +267,6 @@ export default {
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
-            position:relative;
-            top:-30px;
         }
         label {
             font-size: 15px;
@@ -310,8 +303,6 @@ export default {
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
-            position:relative;
-            left:38px;
         }
         label {
             font-size: 15px;
@@ -347,12 +338,12 @@ export default {
             font-size: 13px;
             color: #4F515E;
             letter-spacing: 0;
-            text-align: left;
+            text-align: right;
             overflow: hidden;
             text-overflow: ellipsis;
             width: 300px;
             position: relative;
-            // display: inline-block;
+            display: inline-block;
         }
         label {
             font-size: 15px;
@@ -362,16 +353,15 @@ export default {
     }
     .tx-attachment .tx-attachment-whole{
         visibility: hidden;
-        width: 320px;
         background-color: #DEE2E6;
         color: black;
-        text-align: left;
+        text-align: right;
         border-radius: 6px;
         padding: 0px;
         word-wrap:break-word;
-        position:relative;
-        top:-70px;
-        height: 40px;
+        position:absolute;
+        z-index:1;
+        right:35px;
     }
     .tx-attachment:hover .tx-attachment-whole {
          visibility: visible;
