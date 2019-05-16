@@ -57,7 +57,7 @@
         <label>{{ (txIcon === 'received' || txIcon === 'leased in' || txIcon === 'leased in canceled') ? 'From' : 'To' }}</label>
         <span>{{ displayAddress }}</span>
       </div>
-      <div class="tx-block">
+      <div class="tx-timestamp">
         <label>Timestamp</label>
         <span>{{ new Date(txTime / 1000000).toLocaleString() }}</span>
       </div>
@@ -69,6 +69,7 @@
            v-if="txIcon === 'sent' || txIcon === 'received'">
         <label>Attachment</label>
         <span>{{ txAttachment }}</span>
+        <span class="tx-attachment-whole">{{ txAttachment }}</span>
       </div>
       <div class="tx-id">
         <label>ID</label>
@@ -77,12 +78,12 @@
         <span>{{ displayId }}</span>
       </div>
       <div v-if="txBlock"
-           class="tx-attachment">
+           class="tx-block">
         <label>Block Height</label>
         <span>{{ txBlock }}</span>
       </div>
       <div v-if="heightStatus"
-           class="tx-attachment">
+           class="tx-status">
         <label>Block Confirmation</label>
         <span v-if="differenceHeight > 30">{{ differenceHeight }}(Confirmed)</span>
         <span v-else-if="differenceHeight <= 30 && differenceHeight >= 0">{{ differenceHeight }}(Unconfirmed)</span>
@@ -273,6 +274,24 @@ export default {
             letter-spacing: 0;
         }
     }
+    .tx-timestamp {
+        text-align: left;
+        border-bottom: 1px solid #E8E9ED;
+        height: 48px;
+        padding-top: 15px;
+        span {
+            float:right;
+            font-size: 13px;
+            color: #4F515E;
+            letter-spacing: 0;
+            text-align: right;
+        }
+        label {
+            font-size: 15px;
+            color: #9091A3;
+            letter-spacing: 0;
+        }
+    }
     .tx-status {
         text-align: left;
         border-bottom: 1px solid #E8E9ED;
@@ -320,12 +339,32 @@ export default {
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 300px;
+            position: relative;
+            display: inline-block;
         }
         label {
-          font-size: 15px;
-          color: #9091A3;
-          letter-spacing: 0;
+            font-size: 15px;
+            color: #9091A3;
+            letter-spacing: 0;
         }
+    }
+    .tx-attachment .tx-attachment-whole{
+        visibility: hidden;
+        background-color: #DEE2E6;
+        color: black;
+        text-align: right;
+        border-radius: 6px;
+        padding: 0px;
+        word-wrap:break-word;
+        position:absolute;
+        z-index:1;
+        right:35px;
+    }
+    .tx-attachment:hover .tx-attachment-whole {
+         visibility: visible;
     }
     .sent-amount {
         font-size: 28px;
