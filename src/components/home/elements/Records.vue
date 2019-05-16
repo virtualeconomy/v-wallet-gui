@@ -192,6 +192,15 @@ export default {
             if (this.address && Vue.ls.get('pwd')) {
                 this.getTxRecords()
             }
+        },
+        activedTab(newTab, oldTab) {
+            if (newTab === 'trans') {
+                this.changeShowDisable = false
+                this.showingNum = 10
+                if (this.address && Vue.ls.get('pwd')) {
+                    this.getTxRecords()
+                }
+            }
         }
     },
     computed: {
