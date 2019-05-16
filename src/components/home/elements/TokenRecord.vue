@@ -178,7 +178,9 @@ export default {
             this.updateBalance()
         },
         activedTab(newTab, oldTab) {
-            this.updateBalance()
+            if (newTab === 'token') {
+                this.updateBalance()
+            }
         }
     },
     created() {

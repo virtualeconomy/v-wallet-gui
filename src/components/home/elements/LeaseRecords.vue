@@ -171,6 +171,15 @@ export default {
             if (this.address && Vue.ls.get('pwd')) {
                 this.getLeaseRecords()
             }
+        },
+        activedTab(newTab, oldTab) {
+            if (newTab === 'lease') {
+                this.changeShowDisable = false
+                this.showingNum = 10
+                if (this.address && Vue.ls.get('pwd')) {
+                    this.getLeaseRecords()
+                }
+            }
         }
     },
     methods: {
