@@ -76,9 +76,13 @@
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span v-else-if="txIcon === 'create contract' || txIcon === 'execution contract success' || txIcon === 'execution contract fail'">-</span>
+          <!--
+            <span v-else-if="txIcon === 'create contract' || txIcon === 'execution contract success' || txIcon === 'execution contract fail'">-</span>
+            -->
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ formatter(txAmount) }} VSYS</span>
-          <span v-else-if="txIcon === 'create contract' || txIcon === 'execution contract success' || txIcon === 'execution contract fail'">{{ formatter(txFee) }} VSYS</span>
+          <!--
+            <span v-else-if="txIcon === 'create contract' || txIcon === 'execution contract success' || txIcon === 'execution contract fail'">{{ formatter(txFee) }} VSYS</span>
+            -->
         </div>
         <div class="tx-fee"
              v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'create contract' || txIcon === 'execution contract success' || txIcon === 'execution contract fail') && feeFlag">Tx Fee: -
@@ -304,6 +308,10 @@ export default {
                 return 'Sent'
             } else if (this.txType === 'Received') {
                 return 'Received'
+            } else if (this.txType === 'Execution Contract Success' || this.txType === 'Execution Contract Fail') {
+                return 'Execution Contract'
+            } else if (this.txType === 'Create Contract') {
+                return 'Create Contract'
             }
         },
         txTime() {

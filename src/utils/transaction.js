@@ -237,12 +237,19 @@ export default {
         var bytess = []
         bytess[0] = 8 & (255)
         var contractBytes = convert_1.default.bytesToByteArrayWithSize(base58_1.default.decode(contract))
+        console.log(contractBytes)
         var dataBytes = convert_1.default.bytesToByteArrayWithSize(data[0])
+        console.log(dataBytes)
         var desBytes = convert_1.default.bytesToByteArrayWithSize(convert_1.default.stringToByteArray(description))
+        console.log(desBytes)
         var feeBytes = convert_1.default.bigNumberToByteArray(fee)
+        console.log(feeBytes)
         var feeScaleBytes = convert_1.default.shortToByteArray(feeScale)
+        console.log(feeScaleBytes)
         var timeBytes = convert_1.default.bigNumberToByteArray(time)
+        console.log(timeBytes)
         var signBytes = bytess.concat(contractBytes.concat(dataBytes.concat(desBytes.concat(feeBytes.concat(feeScaleBytes.concat(timeBytes))))))
+        console.log(signBytes)
         var privateKeyBytes = base58_1.default.decode(privateKey);
         var signature = axlsign_1.default.sign(privateKeyBytes, Uint8Array.from(signBytes), secure_random_1.default.randomUint8Array(64));
         return base58_1.default.encode(signature)
