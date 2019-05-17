@@ -15,6 +15,7 @@
     </button>
     <b-tabs @input="hideQrScan">
       <b-tab title="Hot Wallet"
+             :disabled="walletType === 'coldWallet'"
              :active="walletType==='hotWallet'">
         <b-container
           class="text-left"
@@ -129,7 +130,7 @@
         </b-container>
       </b-tab>
       <b-tab title="Cold Wallet"
-             :disabled="!coldPageId"
+             :disabled="!coldPageId || walletType==='hotWallet'"
              :active="walletType==='coldWallet'">
         <b-container v-if="coldPageId===1"
                      class="text-left">

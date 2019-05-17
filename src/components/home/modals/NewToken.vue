@@ -673,7 +673,6 @@ export default {
                 this.tokens = JSON.parse(this.userInfo.tokens)
             }
             const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
-            console.log('the tokenId is ' + this.tokenId)
             this.$http.get(url).then(response => {
                 Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
                 this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
