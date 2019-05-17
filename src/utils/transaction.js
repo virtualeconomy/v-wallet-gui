@@ -180,6 +180,18 @@ export default {
     },
     isValidContractSignature: function(data, signature, publicKey) {
         var bytess = []
+        bytess[0] = 8 & (255)
+        var contractBytes = convert_1.default.bytesToByteArrayWithSize(base58_1.default.decode(data.contract))
+        var dataBytes = convert_1.default.bytesToByteArrayWithSize(base58_1.default.decode(data.contractInit))
+        var desBytes = convert_1.default.bytesToByteArrayWithSize(convert_1.default.stringToByteArray(data.description))
+        var feeBytes = convert_1.default.bigNumberToByteArray(data.fee)
+        var feeScaleBytes = convert_1.default.shortToByteArray(data.feeScale)
+        var timeBytes = convert_1.default.bigNumberToByteArray(data.timestamp)
+        var signBytes = bytess.concat(contractBytes.concat(dataBytes.concat(desBytes.concat(feeBytes.concat(feeScaleBytes.concat(timeBytes))))))
+        return crypto_1.default.isValidTransactionSignature(Uint8Array.from(signBytes), signature, publicKey)
+    },
+    isValidContractExecSignature: function(data, signature, publicKey) {
+        var bytess = []
         bytess[0] = 9 & (255)
         var contractIdBytes = base58_1.default.decode(data.contractId)
         var temBytes = []

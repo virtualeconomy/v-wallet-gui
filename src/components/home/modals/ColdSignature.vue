@@ -217,13 +217,13 @@ export default {
                     delete data.api
                     delete data.opc
                     delete data.protocol
-                    if (data.hasOwnProperty('contractId')) {
+                    if (data.hasOwnProperty('contractId') || data.hasOwnProperty('contract')) {
                         data.fee = BigNumber(data.fee)
                         data.timestamp = BigNumber(data.timestamp *= 1e6)
                     } else {
                         data.timestamp *= 1e6
                     }
-                    if (((!data.hasOwnProperty('contractId') && transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType)) || (data.hasOwnProperty('contractId') && transaction.isValidContractSignature(data, signature, data.senderPublicKey))) && !this.qrError) {
+                    if (((!data.hasOwnProperty('contractId') && transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType)) || (data.hasOwnProperty('contractId') && transaction.isValidContractExecSignature(data, signature, data.senderPublicKey)) || (data.hasOwnProperty('contract') && transaction.isValidContractSignature(data, signature, data.senderPublicKey))) && !this.qrError) {
                         var _this = this
                         setTimeout(function() {
                             _this.$emit('get-signature', signature)

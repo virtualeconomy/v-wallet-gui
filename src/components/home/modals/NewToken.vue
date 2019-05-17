@@ -510,7 +510,7 @@ export default {
             return attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         getQrArray() {
-            const qrSize = 400
+            const qrSize = 300
             let tempDataObject = JSON.parse(JSON.stringify(this.dataObject))
             delete tempDataObject.senderPublicKey
             const text = JSON.stringify(tempDataObject)
