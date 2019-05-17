@@ -275,13 +275,14 @@ export default {
         },
         exportRecords() {
             if (this.response) {
-                for (var i = 0; i < this.response.length; i++) {
-                    if (this.response[i].amount) {
-                        this.response[i].amount = this.response[i].amount.dividedBy(VSYS_PRECISION)
+                var tempResponse = JSON.parse(JSON.stringify(this.response))
+                for (var i = 0; i < tempResponse.length; i++) {
+                    if (tempResponse[i].amount) {
+                        tempResponse[i].amount = this.response[i].amount.dividedBy(VSYS_PRECISION)
                     }
-                    this.response[i].fee = this.response[i].fee / VSYS_PRECISION
+                    tempResponse[i].fee = tempResponse[i].fee / VSYS_PRECISION
                 }
-                this.responseExport = this.response
+                this.responseExport = tempResponse
             }
             return this.responseExport
         }
