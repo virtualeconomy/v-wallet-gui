@@ -85,8 +85,9 @@
             -->
         </div>
         <div class="tx-fee"
-             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'create contract' || txIcon === 'execution contract success' || txIcon === 'execution contract fail') && feeFlag">Tx Fee: -
-          <span> {{ formatter(txFee) }} VSYS </span>
+             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'create contract' || txIcon === 'execution contract success' || txIcon === 'execution contract fail') && feeFlag">
+          <span v-if="(txFee !== 0)"> Tx Fee: - {{ formatter(txFee) }} VSYS </span>
+          <span v-else> Tx Fee: {{ txFee }} VSYS </span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -350,6 +351,12 @@ export default {
             return BigNumber(this.txRecord.amount).dividedBy(VSYS_PRECISION)
         },
         txFee() {
+            var sender = this.txRecord.proofs === undefined ? this.address : crypto.buildRawAddress(base58.decode(this.txRecord.proofs[0].publicKey))
+            if (this.txTitle === 'Execution Contract') {
+                if (this.address !== sender) {
+                    return 0
+                }
+            }
             return BigNumber(this.txRecord.fee).dividedBy(VSYS_PRECISION)
         },
         txBlock() {

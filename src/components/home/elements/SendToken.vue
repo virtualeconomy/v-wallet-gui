@@ -34,7 +34,7 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+                <img src="../../../assets/imgs/icons/wallet/ic_token2.svg"
                      width="20"
                      height="20">
               </span>
@@ -197,7 +197,7 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+                <img src="../../../assets/imgs/icons/wallet/ic_token2.svg"
                      width="20"
                      height="20">
               </span>

@@ -53,9 +53,12 @@
     </b-row>
     <TokenInfoModal :token-id="tokenId"
                     :issuer="issuer"
-                    :total-supply="totalSupply"
-                    :issued-tokens="formatter(issuedTokens)"
-                    :description="description">
+                    :unity="unity"
+                    :maker="maker"
+                    :contract-id="contractId"
+                    :max-supply="maxSupply"
+                    :current-supply="formatter(currentSupply)"
+                    :token-description="tokenDescription">
     </TokenInfoModal>
     <IssueToken :token-id="tokenId"
                 :issuer="issuer"
@@ -65,8 +68,8 @@
                 :cold-addresses="coldAddresses"
                 :token-balance="tokenBalance"
                 :balance="balances[address]"
-                :total-supply="totalSupply"
-                :issued-tokens="issuedTokens"
+                :max-supply="maxSupply"
+                :current-supply="currentSupply"
                 :token-unity="unity"
                 @updateBalance="updateBalance">
     </IssueToken>
@@ -121,7 +124,9 @@ export default {
             showCancelDetails: false,
             removeFlag: false,
             issuer: '',
-            functionIndex: SEND_FUNCIDX
+            maker: '',
+            functionIndex: SEND_FUNCIDX,
+            contractId: ''
         }
     },
     props: {
@@ -207,12 +212,12 @@ export default {
                 return Vue.ls.get('address')
             }
         },
-        totalSupply() {
+        maxSupply() {
             if (this.tokens) {
                 return BigNumber(this.tokens.max).dividedBy(this.unity)
             } else return ''
         },
-        issuedTokens() {
+        currentSupply() {
             if (this.tokens) {
                 return BigNumber(this.tokens.total).dividedBy(this.unity)
             } else return ''
@@ -220,7 +225,7 @@ export default {
         contract() {
             return transaction.tokenIDToContractID(this.tokenId)
         },
-        description() {
+        tokenDescription() {
             if (this.tokens.description && this.tokens.description !== undefined) {
                 let bytes = base58.decode(this.tokens.description)
                 try {
@@ -286,6 +291,8 @@ export default {
             const url = NODE_IP + '/contract/info/' + this.contract
             this.$http.get(url).then(response => {
                 this.issuer = response.body.info[0].data
+                this.maker = response.body.info[1].data
+                this.contractId = response.body.contractId
             }, respError => {
                 this.issuer = 'Failed to get issuer'
                 this.registerTime = 'Failed to get time'
