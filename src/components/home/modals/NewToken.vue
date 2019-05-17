@@ -556,11 +556,7 @@ export default {
             }
         },
         coldApi: function() {
-            if (this.coldAddresses[this.coldAddress].api === 1 && (BigNumber(this.coldAmount).isLessThan(BigNumber(Number.MAX_SAFE_INTEGER).dividedBy(1e8)) || BigNumber(this.coldAmount).multipliedBy(1e8).mod(100).isEqualTo(0))) {
-                return 1
-            } else {
-                return API_VERSION
-            }
+            return API_VERSION
         },
         sendData: function(walletType) {
             let apiSchema
