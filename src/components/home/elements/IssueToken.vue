@@ -414,11 +414,7 @@ export default {
             return BigNumber(num)
         },
         coldApi: function() {
-            if (this.coldAddresses[this.address].api === 1 && this.coldAmount <= 90000000) {
-                return 1
-            } else {
-                return API_VERSION
-            }
+            return API_VERSION
         },
         isValidIssuer: function(addr) {
             return addr === this.issuer

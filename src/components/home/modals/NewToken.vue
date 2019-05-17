@@ -518,7 +518,6 @@ export default {
             var textArray = Array(page)
             if (tempDataObject.opc === 'contract') {
                 this.qrTotalPage = page
-                console.log(this.qrTotalPage, text.length)
                 for (var i = 0; i < this.qrTotalPage; i++) {
                     textArray[i] = text.slice(i * qrSize, (i + 1) * qrSize)
                 }
@@ -557,11 +556,7 @@ export default {
             }
         },
         coldApi: function() {
-            if (this.coldAddresses[this.coldAddress].api === 1 && this.coldAmount <= 90000000) {
-                return 1
-            } else {
-                return API_VERSION
-            }
+            return API_VERSION
         },
         sendData: function(walletType) {
             let apiSchema
