@@ -518,7 +518,6 @@ export default {
             var textArray = Array(page)
             if (tempDataObject.opc === 'contract') {
                 this.qrTotalPage = page
-                console.log(this.qrTotalPage, text.length)
                 for (var i = 0; i < this.qrTotalPage; i++) {
                     textArray[i] = text.slice(i * qrSize, (i + 1) * qrSize)
                 }
@@ -557,7 +556,7 @@ export default {
             }
         },
         coldApi: function() {
-            if (this.coldAddresses[this.coldAddress].api === 1 && this.coldAmount <= 90000000) {
+            if (this.coldAddresses[this.coldAddress].api === 1 && (BigNumber(this.coldAmount).isLessThan(BigNumber(Number.MAX_SAFE_INTEGER).dividedBy(1e8)) || BigNumber(this.coldAmount).multipliedBy(1e8).mod(100).isEqualTo(0))) {
                 return 1
             } else {
                 return API_VERSION
