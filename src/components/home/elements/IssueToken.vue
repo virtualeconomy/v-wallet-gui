@@ -41,7 +41,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Issue Available{{ formatter(totalSupply - issuedTokens) }}</span>
+              <span class="balance">Issue Available{{ formatter(maxSupply - currentSupply) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Issue Amount"
@@ -155,7 +155,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Issue Available{{ formatter(totalSupply - issuedTokens) }}</span>
+              <span class="balance">Issue Available{{ formatter(maxSupply - currentSupply) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Issue Amount"
@@ -318,13 +318,13 @@ export default {
             default: function() {},
             require: true
         },
-        totalSupply: {
+        maxSupply: {
             type: BigNumber,
             default: function() {
             },
             require: true
         },
-        issuedTokens: {
+        currentSupply: {
             type: BigNumber,
             default: function() {
             },
@@ -633,7 +633,7 @@ export default {
             }
         },
         isTokenInsufficient(amount) {
-            return BigNumber(amount).isGreaterThan(BigNumber(this.totalSupply - this.issuedTokens))
+            return BigNumber(amount).isGreaterThan(BigNumber(this.maxSupply - this.currentSupply))
         },
         isInsufficient() {
             return !BigNumber(this.balance).isGreaterThan(BigNumber(CONTRACT_EXEC_FEE))

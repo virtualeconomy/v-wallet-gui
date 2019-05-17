@@ -24,21 +24,33 @@
         <label>TokenId</label>
         <span>{{ tokenId }}</span>
       </div>
+      <div class="tx-address">
+        <label>Contract ID</label>
+        <span>{{ contractId }}</span>
+      </div>
+      <div class="tx-block">
+        <label>Maker</label>
+        <span>{{ maker }}</span>
+      </div>
       <div class="tx-block">
         <label>Issuer</label>
         <span>{{ issuer }}</span>
       </div>
       <div class="tx-attachment">
-        <label>Total Supply</label>
-        <span>{{ formatter(totalSupply) }}</span>
+        <label>Max Supply</label>
+        <span>{{ formatter(maxSupply) }}</span>
       </div>
       <div class="tx-attachment">
-        <label>Issued tokens</label>
-        <span>{{ issuedTokens }}</span>
+        <label>Current Supply</label>
+        <span>{{ currentSupply }}</span>
       </div>
       <div class="tx-attachment">
-        <label>Description</label>
-        <span>{{ description }}</span>
+        <label>Unity</label>
+        <span>{{ formatter(unity) }}</span>
+      </div>
+      <div class="tx-attachment">
+        <label>Token Description</label>
+        <span>{{ tokenDescription }}</span>
       </div>
     </div>
   </b-modal>
@@ -55,22 +67,37 @@ export default {
             default: '',
             require: true
         },
-        totalSupply: {
+        contractId: {
+            type: String,
+            default: '',
+            require: true
+        },
+        maxSupply: {
             type: BigNumber,
             default: '',
             require: true
         },
-        issuedTokens: {
+        currentSupply: {
             type: String,
             default: '',
             require: true
         },
-        description: {
+        tokenDescription: {
             type: String,
+            default: '',
+            require: true
+        },
+        unity: {
+            type: BigNumber,
             default: '',
             require: true
         },
         issuer: {
+            type: String,
+            default: '',
+            require: true
+        },
+        maker: {
             type: String,
             default: '',
             require: true
