@@ -19,15 +19,17 @@
                      :actived-tab="activedTab"
                      @removeFlag="removeToken"
                      @endSendSignal="endSendSignal"></TokenRecord>
+        <div class="add-token"
+             :style="{height:1}">
+          <span style="font-family: Roboto-Regular;font-size: 15px;color: #010102;letter-spacing: 0;text-align: left;">Don't see your tokens?</span>
+          <br>
+          <span style="font-family: Roboto-Regular;font-size: 13px;color: #9091A3;letter-spacing: 0;text-align: right;">Click on <b-button class="add-button"
+                                                                                                                                           v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
+          <AddToken show="false"></AddToken>
+        </div>
       </div>
     </div>
-    <div class="add-token">
-      <span style="font-family: Roboto-Regular;font-size: 15px;color: #010102;letter-spacing: 0;text-align: left;">Don't see your tokens?</span>
-      <br>
-      <span style="font-family: Roboto-Regular;font-size: 13px;color: #9091A3;letter-spacing: 0;text-align: right;">Click on <b-button class="add-button"
-                                                                                                                                       v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
-      <AddToken show="false"></AddToken>
-    </div>
+
   </div>
   <div v-else
        class="records">
@@ -181,7 +183,7 @@ export default {
     position: relative;
     padding-top: 52px;
     top: -52px;
-    height: 250px;
+    height: 500px;
     margin-bottom: 100px;
     z-index: 100;
 }
@@ -232,6 +234,8 @@ export default {
     overflow-x: hidden;
     position: relative;
     left: 25px;
+    top: 10px;
+    margin-bottom: 20px;
     text-align: left;
     z-index: 100;
 }
