@@ -51,7 +51,8 @@
                width="60px"
                height="60px">
         </div>
-        <div :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
+        <div v-if="txIcon!=='create contract'&& txIcon!=='execution contract success'&&txIcon!=='execution contract fail'"
+             :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
       </div>
       <div class="tx-address">
         <label>{{ (txIcon === 'received' || txIcon === 'leased in' || txIcon === 'leased in canceled') ? 'From' : 'To' }}</label>
@@ -73,8 +74,6 @@
       </div>
       <div class="tx-id">
         <label>ID</label>
-        <img src="../../../assets/imgs/icons/wallet/ic_magnifier.svg"
-             @click="txInfo">
         <span>{{ displayId }}</span>
       </div>
       <div v-if="txBlock"
@@ -88,11 +87,41 @@
         <span v-if="differenceHeight > 30">{{ differenceHeight }}(Confirmed)</span>
         <span v-else-if="differenceHeight <= 30 && differenceHeight >= 0">{{ differenceHeight }}(Unconfirmed)</span>
       </div>
-      <div class="tx-status">
+      <div v-if="txStatus === 'Success'"
+           class="tx-success">
+        <label>Status</label>
+        <span>{{ txStatus }}</span>
+      </div>
+      <div v-else
+           class="tx-failed">
         <label>Status</label>
         <span>{{ txStatus }}</span>
       </div>
     </div>
+    <b-row>
+      <b-col class="col-lef">
+        <b-button
+          class="btn-back"
+          block
+          variant="light"
+          size="lg"
+          @click="copyTxId">Copy TX ID
+        </b-button>
+      </b-col>
+      <b-col class="col-lef">
+        <b-button
+          block
+          class="btn-back"
+          variant="light"
+          size="lg"
+          @click="txInfo">View on Explore
+        </b-button>
+      </b-col>
+    </b-row>
+    <textarea class="copy-txid"
+              v-model="modalId"
+              ref="tId"
+              readonly></textarea>
   </b-modal>
 </template>
 
@@ -189,6 +218,7 @@ export default {
             return browser.isMobile()
         },
         txInfo() {
+            console.log(this.modalId)
             if (this.networkType === 'T') {
                 window.open(TX_TEST_EXPLORER + this.modalId)
             } else {
@@ -200,6 +230,10 @@ export default {
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
+        },
+        copyTxId() {
+            this.$refs.tId.select()
+            window.document.execCommand('copy')
         }
     }
 }
@@ -306,10 +340,52 @@ export default {
         }
         label {
             font-size: 15px;
-            color: #9091A3;
+            color: #9091a3;
             letter-spacing: 0;
         }
     }
+   .tx-success {
+       text-align: left;
+       border-bottom: 1px solid #E8E9ED;
+       height: 48px;
+       padding-top: 15px;
+       span {
+            float:right;
+            font-size: 13px;
+            letter-spacing: 0px;
+            text-align: right;
+            background: #DBF6D4;
+            color:#56A142;
+            padding: 5px 12px;
+            height: 26px;
+      }
+      label {
+            font-size: 15px;
+            color: #9091a3;
+            letter-spacing: 0;
+      }
+    }
+ .tx-failed {
+     text-align: left;
+     border-bottom: 1px solid #E8E9ED;
+     height: 48px;
+     padding-top: 15px;
+ span {
+     float:right;
+     font-size: 13px;
+     background: #FFE6E8;
+     color:#F5354B;
+     letter-spacing: 0;
+     text-align: right;
+     padding: 5px 12px;
+     height: 26px;
+ }
+ label {
+     font-size: 15px;
+     color: #9091a3;
+     letter-spacing: 0;
+ }
+ }
     .tx-fee {
         text-align: left;
         border-bottom: 1px solid #E8E9ED;
@@ -366,60 +442,32 @@ export default {
     .tx-attachment:hover .tx-attachment-whole {
          visibility: visible;
     }
-    .sent-amount {
-        font-size: 28px;
-        color: #F5354B;
-        letter-spacing: 0;
-        text-align: center;
-    }
-    .received-amount {
-        font-size: 28px;
-        color: #23A28C;
-        letter-spacing: 0;
-        text-align: center;
-    }
-    .leasedin-amount {
-        font-size: 28px;
-        color: #86BEF7;
-        letter-spacing: 0;
-        text-align: center;
-    }
-    .leasedout-amount {
-        font-size: 28px;
-        color: #73CC5A;
-        letter-spacing: 0;
-        text-align: center;
-    }
-    .leasedoutcanceled-amount {
-        font-size: 28px;
-        color: #FF7A8A;
-        letter-spacing: 0;
-        text-align: center;
-    }
-    .leasedincanceled-amount {
-        font-size: 28px;
-        color: #FFD192;
-        letter-spacing: 0;
-        text-align: center;
-    }
-    .executioncontractsuccess-amount{
-        font-size: 0px;
-    }
-    .executioncontractfail-amount{
-        font-size: 0px;
-    }
-    .createcontract-amount{
-        font-size: 0px;
-    }
     .md-content {
         padding: 40px 24px;
         padding-top: 0;
     }
 }
+ .btn-back {
+     background: #FAFAFA;
+     border: 1px solid #E8E9ED;
+     border-radius: 4px;
+     font-size: 14px;
+     color: #EB7D34;
+     letter-spacing: 0;
+     text-align: center;
+     margin-top: -10px;
+ }
 .btn-close {
     position: absolute;
     right: 0;
     margin-right: 20px;
     margin-top: 4px;
+}
+.Success {
+    color: #73CC5A;
+}
+.copy-txid {
+    position: absolute;
+    opacity: 0;
 }
 </style>
