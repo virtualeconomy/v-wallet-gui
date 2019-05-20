@@ -19,9 +19,15 @@
                      :actived-tab="activedTab"
                      @removeFlag="removeToken"
                      @endSendSignal="endSendSignal"></TokenRecord>
-
       </div>
     </div>
+    <div class="add">
+      <span>Don't see your tokens?</span>
+      <br>
+      <span>click on to add token</span>
+      <button @click="addToken">add token </button>
+    </div>
+    <AddToken show="false"></AddToken>
   </div>
   <div v-else
        class="records">
@@ -138,6 +144,11 @@ export default {
         },
         endSendSignal() {
             this.$emit('updateInfo')
+        },
+        addToken() {
+            console.log('is function')
+            this.$root.$emit('bv::show::modal', 'addTokenModal')
+            console.log('check test')
         }
     }
 }
@@ -153,27 +164,20 @@ export default {
     border: 1px solid #E8E9ED;
     border-radius: 4px;
     margin: 0px 0px;
+    z-index: 100;
 }
 .scroll {
     overflow-y: scroll;
     overflow-x: hidden;
-}
-.monthTtl {
-    height: 44px;
-    text-align: left;
-    vertical-align: middle;
-    border-bottom: 1px solid #EDEDF0;
-    background: #FFF;
-    font-size: 13px;
-    color: #9091A3;
-    letter-spacing: 0;
-    padding: 14px 21px;
+    z-index: 100;
 }
 .inherit-height {
     position: relative;
-    height: inherit;
     padding-top: 52px;
     top: -52px;
+    height: 450px;
+    margin-bottom: 100px;
+    z-index: 100;
 }
 .title-records {
     background: #FAFAFA;
@@ -187,44 +191,26 @@ export default {
     display: flex;
     align-items: Center;
 }
-.btn-export {
-    width: 116px;
-    height: 36px;
-    background-color: #FFF;
-    border-color: #E8E9ED;
-    font-size: 15px;
-    color: #696B8A;
+.add {
+    background: #FAFAFA;
+    padding: 8px 20px;
+    border-bottom: 1px solid #EDEDF0;
+    text-align: left;
+    font-size: 17px;
+    color: #010102;
     letter-spacing: 0;
     align-items: Center;
-    display: flex;
-    justify-content:center;
-    img {
-        margin-right: 8px;
-    }
+    margin-bottom: 0px;
+    z-index: 100
 }
-.pd-select {
-    position: absolute;
-    right: 40px;
-    display: flex;
-    height: 36px;
-    z-index: 100;
-    background-color: #FFF;
-}
-.pd-select:hover, .pd-select:active {
-    background-color: #FAFAFA !important;
-}
-.selection {
-    font-size: 15px;
-    color: #696B8A;
-    letter-spacing: 0;
-}
-.show-position {
-    position: absolute;
-    left: 13px;
+.blink {
+    padding-top: 3px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 .show-fee {
     position: absolute;
-    right:240px;
+    right:380px;
     width: 116px;
     height: 36px;
     border-color: #E8E9ED;
@@ -234,15 +220,5 @@ export default {
     align-items: Center;
     display: flex;
     justify-content:center;
-}
-.show-fee2 {
-    position: absolute;
-    right:7px;
-    width: 15px;
-    height: 30px;
-    display: flex;
-    z-index: 100;
-    cursor:pointer;
-    background-color: #FFF;
 }
 </style>
