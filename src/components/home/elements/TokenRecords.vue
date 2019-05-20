@@ -21,13 +21,6 @@
                      @endSendSignal="endSendSignal"></TokenRecord>
       </div>
     </div>
-    <div class="add">
-      <span>Don't see your tokens?</span>
-      <br>
-      <span>click on to add token</span>
-      <button @click="addToken">add token </button>
-    </div>
-    <AddToken show="false"></AddToken>
   </div>
   <div v-else
        class="records">
@@ -45,13 +38,11 @@
 import Vue from 'vue'
 import browser from '../../../utils/browser'
 import TokenRecord from './TokenRecord'
-import AddToken from '../modals/AddToken'
 import bus from '../../../assets/bus'
 export default {
     name: 'TokenRecords',
     components: {
-        TokenRecord,
-        AddToken
+        TokenRecord
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'

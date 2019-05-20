@@ -52,7 +52,6 @@
           @endSendSignal="endSendSignal"></Send>
     <Receive show="false"
              :address="address"></Receive>
-    <AddToken show="false"></AddToken>
     <NewToken show="false"
               :balances="balances"
               :cold-addresses="coldAddresses"
@@ -64,7 +63,6 @@
 </template>
 
 <script>
-import AddToken from '../modals/AddToken'
 import NewToken from '../modals/NewToken'
 import Receive from '../modals/Receive'
 import Send from '../modals/Send'
@@ -73,7 +71,7 @@ import BigNumber from 'bignumber.js'
 export default {
     name: 'TokenPane',
     components: {
-        AddToken, NewToken, Receive, Send
+        NewToken, Receive, Send
     },
     data() {
         return {
