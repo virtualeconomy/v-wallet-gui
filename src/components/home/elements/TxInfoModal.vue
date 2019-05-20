@@ -231,7 +231,6 @@ export default {
             return browser.bigNumberFormatter(num)
         },
         copyTxId() {
-            console.log(this.modalId)
             this.$refs.tId.select()
             window.document.execCommand('copy')
         }
