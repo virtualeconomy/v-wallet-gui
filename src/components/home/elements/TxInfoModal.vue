@@ -51,7 +51,8 @@
                width="60px"
                height="60px">
         </div>
-        <div :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
+        <div v-if="txIcon!=='create contract'&& txIcon!=='execution contract success'&&txIcon!=='execution contract fail'"
+             :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
       </div>
       <div class="tx-address">
         <label>{{ (txIcon === 'received' || txIcon === 'leased in' || txIcon === 'leased in canceled') ? 'From' : 'To' }}</label>
@@ -113,7 +114,7 @@
           class="btn-back"
           variant="light"
           size="lg"
-          @click="txInfo">view on Explore
+          @click="txInfo">View on Explore
         </b-button>
       </b-col>
     </b-row>
@@ -351,10 +352,10 @@ export default {
        span {
             float:right;
             font-size: 13px;
-            color: #333333;
-            background:#73CC5A;
+            color: #4F515E;
             letter-spacing: 0;
             text-align: right;
+            padding: auto;
       }
       label {
             font-size: 15px;
@@ -374,6 +375,7 @@ export default {
      color: #333333;
      letter-spacing: 0;
      text-align: right;
+     padding: auto;
  }
  label {
      font-size: 15px;
