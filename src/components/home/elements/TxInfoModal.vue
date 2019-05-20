@@ -352,10 +352,12 @@ export default {
        span {
             float:right;
             font-size: 13px;
-            color: #4F515E;
-            letter-spacing: 0;
+            letter-spacing: 0px;
             text-align: right;
-            padding: auto;
+            background: #DBF6D4;
+            color:#56A142;
+            padding: 5px 12px;
+            height: 26px;
       }
       label {
             font-size: 15px;
@@ -371,11 +373,12 @@ export default {
  span {
      float:right;
      font-size: 13px;
-     background: #E03146;
-     color: #333333;
+     background: #FFE6E8;
+     color:#F5354B;
      letter-spacing: 0;
      text-align: right;
-     padding: auto;
+     padding: 5px 12px;
+     height: 26px;
  }
  label {
      font-size: 15px;
