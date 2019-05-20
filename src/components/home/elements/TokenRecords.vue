@@ -19,8 +19,14 @@
                      :actived-tab="activedTab"
                      @removeFlag="removeToken"
                      @endSendSignal="endSendSignal"></TokenRecord>
-
       </div>
+    </div>
+    <div class="add-token">
+      <span style="font-family: Roboto-Regular;font-size: 15px;color: #010102;letter-spacing: 0;text-align: left;">Don't see your tokens?</span>
+      <br>
+      <span style="font-family: Roboto-Regular;font-size: 13px;color: #9091A3;letter-spacing: 0;text-align: right;">Click on <b-button class="add-button"
+                                                                                                                                       v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
+      <AddToken show="false"></AddToken>
     </div>
   </div>
   <div v-else
@@ -31,6 +37,13 @@
     <div class="empty">
       There are no token in watch list.
     </div>
+    <div class="add-token">
+      <span style="font-family: Roboto-Regular;font-size: 15px;color: #010102;letter-spacing: 0;text-align: left;">Don't see your tokens?</span>
+      <br>
+      <span style="font-family: Roboto-Regular;font-size: 13px;color: #9091A3;letter-spacing: 0;text-align: right;">Click on <b-button class="add-button"
+                                                                                                                                       v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
+      <AddToken show="false"></AddToken>
+    </div>
   </div>
 </template>
 
@@ -39,13 +52,12 @@
 import Vue from 'vue'
 import browser from '../../../utils/browser'
 import TokenRecord from './TokenRecord'
-import AddToken from '../modals/AddToken'
 import bus from '../../../assets/bus'
+import AddToken from '../modals/AddToken'
 export default {
     name: 'TokenRecords',
     components: {
-        TokenRecord,
-        AddToken
+        TokenRecord, AddToken
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
@@ -138,6 +150,11 @@ export default {
         },
         endSendSignal() {
             this.$emit('updateInfo')
+        },
+        addToken() {
+            console.log('is function')
+            this.$root.$emit('bv::show::modal', 'addTokenModal')
+            console.log('check test')
         }
     }
 }
@@ -153,27 +170,20 @@ export default {
     border: 1px solid #E8E9ED;
     border-radius: 4px;
     margin: 0px 0px;
+    z-index: 100;
 }
 .scroll {
     overflow-y: scroll;
     overflow-x: hidden;
-}
-.monthTtl {
-    height: 44px;
-    text-align: left;
-    vertical-align: middle;
-    border-bottom: 1px solid #EDEDF0;
-    background: #FFF;
-    font-size: 13px;
-    color: #9091A3;
-    letter-spacing: 0;
-    padding: 14px 21px;
+    z-index: 100;
 }
 .inherit-height {
     position: relative;
-    height: inherit;
     padding-top: 52px;
     top: -52px;
+    height: 250px;
+    margin-bottom: 100px;
+    z-index: 100;
 }
 .title-records {
     background: #FAFAFA;
@@ -187,44 +197,26 @@ export default {
     display: flex;
     align-items: Center;
 }
-.btn-export {
-    width: 116px;
-    height: 36px;
-    background-color: #FFF;
-    border-color: #E8E9ED;
-    font-size: 15px;
-    color: #696B8A;
+.add {
+    background: #FAFAFA;
+    padding: 8px 20px;
+    border-bottom: 1px solid #EDEDF0;
+    text-align: left;
+    font-size: 17px;
+    color: #010102;
     letter-spacing: 0;
     align-items: Center;
-    display: flex;
-    justify-content:center;
-    img {
-        margin-right: 8px;
-    }
+    margin-bottom: 0px;
+    z-index: 100
 }
-.pd-select {
-    position: absolute;
-    right: 40px;
-    display: flex;
-    height: 36px;
-    z-index: 100;
-    background-color: #FFF;
-}
-.pd-select:hover, .pd-select:active {
-    background-color: #FAFAFA !important;
-}
-.selection {
-    font-size: 15px;
-    color: #696B8A;
-    letter-spacing: 0;
-}
-.show-position {
-    position: absolute;
-    left: 13px;
+.blink {
+    padding-top: 3px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 .show-fee {
     position: absolute;
-    right:240px;
+    right:380px;
     width: 116px;
     height: 36px;
     border-color: #E8E9ED;
@@ -235,14 +227,26 @@ export default {
     display: flex;
     justify-content:center;
 }
-.show-fee2 {
-    position: absolute;
-    right:7px;
-    width: 15px;
-    height: 30px;
-    display: flex;
+.add-token {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: relative;
+    left: 25px;
+    text-align: left;
     z-index: 100;
-    cursor:pointer;
-    background-color: #FFF;
+}
+.add-button {
+    background-color: transparent;
+    opacity: 1;
+    border: none;
+    outline: none;
+    font-family: Roboto-Bold;
+    font-size: 13px;
+    color: #FF8837;
+    letter-spacing: 0;
+    text-align: right;
+    line-height: 15px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 </style>

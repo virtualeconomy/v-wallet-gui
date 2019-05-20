@@ -108,7 +108,7 @@
                   </TokenRecords>
                 </div>
               </b-tab>
-              <b-tab active>
+              <b-tab>
                 <template slot="title">
                   <div>
                     <img
@@ -120,16 +120,6 @@
                     <span class="tab-title">Transaction</span>
                   </div>
                 </template>
-                <div class="trans-pane">
-                  <trans-pane :balance="balance[selectedAddress]"
-                              :address="selectedAddress"
-                              :wallet-type="walletType"
-                              :balances="balance"
-                              :cold-addresses="coldAddresses"
-                              :total="total"
-                              :addresses="addresses"
-                              @updateInfo="updateInfo"></trans-pane>
-                </div>
                 <div class="f-records">
                   <Records :address="selectedAddress"
                            :actived-tab="activedTab"></Records>
@@ -178,7 +168,7 @@
 
 <script>
 import NavBar from './home/elements/NavBar'
-import TransPane from './home/elements/TransPane'
+// import TransPane from './home/elements/TransPane'
 import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
@@ -205,7 +195,7 @@ export default {
             sortedAddresses: {},
             walletType: '',
             sortFlag: 0,
-            activedTab: 'trans',
+            activedTab: 'token',
             available: BigNumber(0),
             leasedIn: BigNumber(0),
             leasedOut: BigNumber(0),
@@ -438,7 +428,7 @@ export default {
 
     components: {
         ImportColdWallet,
-        TransPane,
+        // TransPane,
         NavBar,
         Asset,
         Records,
@@ -497,6 +487,7 @@ export default {
     margin-left: auto;
     margin-right: auto;
     color: @vsysColor;
+    z-index: 1000;
 }
 .pointer {
     cursor: pointer;
@@ -543,5 +534,12 @@ export default {
 .sort-image {
     left: 0px;
     margin-left: 15px;
+}
+.input {
+    margin-top: -100px;
+    top: 100px;
+}
+.test {
+    z-index: 100;
 }
 </style>
