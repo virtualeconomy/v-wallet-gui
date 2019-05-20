@@ -21,6 +21,13 @@
                      @endSendSignal="endSendSignal"></TokenRecord>
       </div>
     </div>
+    <div class="add-token">
+      <span style="font-family: Roboto-Regular;font-size: 15px;color: #010102;letter-spacing: 0;text-align: left;">Don't see your tokens?</span>
+      <br>
+      <span style="font-family: Roboto-Regular;font-size: 13px;color: #9091A3;letter-spacing: 0;text-align: right;">Click on <b-button class="add-button"
+                                                                                                                                       v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
+      <AddToken show="false"></AddToken>
+    </div>
   </div>
   <div v-else
        class="records">
@@ -29,6 +36,13 @@
     </div>
     <div class="empty">
       There are no token in watch list.
+    </div>
+    <div class="add-token">
+      <span style="font-family: Roboto-Regular;font-size: 15px;color: #010102;letter-spacing: 0;text-align: left;">Don't see your tokens?</span>
+      <br>
+      <span style="font-family: Roboto-Regular;font-size: 13px;color: #9091A3;letter-spacing: 0;text-align: right;">Click on <b-button class="add-button"
+                                                                                                                                       v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
+      <AddToken show="false"></AddToken>
     </div>
   </div>
 </template>
@@ -39,10 +53,11 @@ import Vue from 'vue'
 import browser from '../../../utils/browser'
 import TokenRecord from './TokenRecord'
 import bus from '../../../assets/bus'
+import AddToken from '../modals/AddToken'
 export default {
     name: 'TokenRecords',
     components: {
-        TokenRecord
+        TokenRecord, AddToken
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
@@ -166,7 +181,7 @@ export default {
     position: relative;
     padding-top: 52px;
     top: -52px;
-    height: 450px;
+    height: 250px;
     margin-bottom: 100px;
     z-index: 100;
 }
@@ -211,5 +226,27 @@ export default {
     align-items: Center;
     display: flex;
     justify-content:center;
+}
+.add-token {
+    overflow-y: scroll;
+    overflow-x: hidden;
+    position: relative;
+    left: 25px;
+    text-align: left;
+    z-index: 100;
+}
+.add-button {
+    background-color: transparent;
+    opacity: 1;
+    border: none;
+    outline: none;
+    font-family: Roboto-Bold;
+    font-size: 13px;
+    color: #FF8837;
+    letter-spacing: 0;
+    text-align: right;
+    line-height: 15px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 </style>

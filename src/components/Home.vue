@@ -107,13 +107,6 @@
                                 :actived-tab="activedTab">
                   </TokenRecords>
                 </div>
-                <div class="add-token">
-                  <span style="font-family: Roboto-Regular;font-size: 15px;color: #010102;letter-spacing: 0;text-align: left;">Don't see your tokens?</span>
-                  <br>
-                  <span style="font-family: Roboto-Regular;font-size: 13px;color: #9091A3;letter-spacing: 0;text-align: right;">Click on <b-button class="add-button"
-                                                                                                                                                   v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
-                  <AddToken show="false"></AddToken>
-                </div>
               </b-tab>
               <b-tab>
                 <template slot="title">
@@ -545,26 +538,6 @@ export default {
 .input {
     margin-top: -100px;
     top: 100px;
-}
-.add-token {
-    position: relative;
-    left: 25px;
-    top: 10px;
-    text-align: left;
-}
-.add-button {
-    background-color: transparent;
-    opacity: 1;
-    border: none;
-    outline: none;
-    font-family: Roboto-Bold;
-    font-size: 13px;
-    color: #FF8837;
-    letter-spacing: 0;
-    text-align: right;
-    line-height: 15px;
-    padding-left: 2px;
-    padding-right: 2px;
 }
 .test {
     z-index: 100;
