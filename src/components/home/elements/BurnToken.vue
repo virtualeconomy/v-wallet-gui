@@ -281,7 +281,6 @@ export default {
             fee: BigNumber(CONTRACT_EXEC_FEE),
             coldPageId: 5,
             coldFee: BigNumber(CONTRACT_EXEC_FEE),
-            // address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
             coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
             scanShow: false,
             sendError: false,
@@ -386,7 +385,6 @@ export default {
                 contractId: this.contractId,
                 functionId: BURN_FUNCIDX,
                 function: transaction.prepareIssueAndBurn(BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
-                functionTextual: 'destroy(amount=' + this.coldAmount + ')',
                 functionExplain: 'Destroy ' + this.coldAmount + ' Token'
             }
         },

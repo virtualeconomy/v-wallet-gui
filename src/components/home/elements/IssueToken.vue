@@ -398,7 +398,6 @@ export default {
                 contractId: this.contractId,
                 functionId: ISSUE_FUNCIDX,
                 function: transaction.prepareIssueAndBurn(BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
-                functionTextual: 'issue(amount=' + this.coldAmount + ')',
                 functionExplain: 'Issue ' + this.coldAmount + ' Token'
             }
         },
