@@ -60,7 +60,7 @@
                              :state="isValidAttachment(tokenDescription)">
             </b-form-textarea>
           </b-form-group>
-          <b-form-group label="Total Supply"
+          <b-form-group label="Max Supply"
                         label-for="amount-input">
             <b-form-input id="amount-input"
                           class="amount-input"
@@ -209,7 +209,7 @@
                              :state="isValidAttachment(coldTokenDescription)">
             </b-form-textarea>
           </b-form-group>
-          <b-form-group label="Total Supply"
+          <b-form-group label="Max Supply"
                         label-for="cold-amount-input">
             <b-form-input id="cold-amount-input"
                           class="amount-input"

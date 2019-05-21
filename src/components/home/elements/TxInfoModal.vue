@@ -114,7 +114,7 @@
           class="btn-back"
           variant="light"
           size="lg"
-          @click="txInfo">View on Explore
+          @click="txInfo">View on Explorer
         </b-button>
       </b-col>
     </b-row>

@@ -304,7 +304,7 @@ export default {
             } else if (this.txType === 'Received') {
                 return 'Received'
             } else if (this.txType === 'Execution Contract Success' || this.txType === 'Execution Contract Fail') {
-                return 'Execution Contract'
+                return 'Execute Contract Function'
             } else if (this.txType === 'Create Contract') {
                 return 'Create Contract'
             }
