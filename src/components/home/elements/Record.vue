@@ -28,8 +28,12 @@
              src="../../../assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='register contract'"
+        <img v-else-if="txIcon==='register contract' && txStatus === 'Success'"
              src="../../../assets/imgs/icons/wallet/ic_contract_signup.svg"
+             width="32px"
+             height="32px">
+        <img v-else-if="txIcon==='register contract' && txStatus !== 'Success'"
+             src="../../../assets/imgs/icons/wallet/ic_exec_fail.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='execution contract success'"
