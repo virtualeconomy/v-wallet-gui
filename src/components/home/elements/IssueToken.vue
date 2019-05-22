@@ -433,7 +433,6 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    attachment: '',
                     functionIndex: ISSUE_FUNCIDX,
                     functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)),
                     signature: transaction.prepareExecContractSignature(this.contractId, ISSUE_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
@@ -446,7 +445,6 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.dataObject.timestamp,
-                    attachment: '',
                     functionIndex: ISSUE_FUNCIDX,
                     functionData: transaction.prepareIssueAndBurn(BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
                     signature: this.coldSignature
