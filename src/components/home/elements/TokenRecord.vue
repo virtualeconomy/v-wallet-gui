@@ -332,7 +332,7 @@ export default {
             this.$root.$emit('bv::show::modal', 'burnTokenModal_' + this.tokenId)
         },
         removeToken() {
-            var isRemove = confirm('Are you sure to remove this token ?')
+            var isRemove = confirm('Are you sure to remove this token?')
             if (isRemove) {
                 var user = JSON.parse(window.localStorage.getItem(this.seedaddress))
                 var arr = JSON.parse(user.tokens)

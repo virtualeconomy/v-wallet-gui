@@ -22,7 +22,7 @@
       <b-form-group v-else-if="txType==='Register New Token'"
                     horizontal
                     class="form-line"
-                    label="Total Supply"
+                    label="Max Supply"
                     label-for="amount_success">
         <b-form-input id="amount_success"
                       :value="formatter(amount) + ' VSYS'"

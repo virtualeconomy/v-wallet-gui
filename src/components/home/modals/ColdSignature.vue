@@ -92,8 +92,7 @@ export default {
             sgError: false,
             apiError: false,
             protocolError: false,
-            opcError: false,
-            contractPublicKey: ''
+            opcError: false
         }
     },
     props: {
