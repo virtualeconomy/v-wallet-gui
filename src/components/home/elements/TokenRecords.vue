@@ -21,10 +21,10 @@
                      @endSendSignal="endSendSignal"></TokenRecord>
         <div class="add-token"
              :style="{height:1}">
-          <span style="font-family: Roboto-Regular;font-size: 15px;color: #010102;letter-spacing: 0;text-align: left;">Don't see your tokens?</span>
+          <span class="add-token-input-first">Don't see your tokens?</span>
           <br>
-          <span style="font-family: Roboto-Regular;font-size: 13px;color: #9091A3;letter-spacing: 0;text-align: right;">Click on <b-button class="add-button"
-                                                                                                                                           v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
+          <span class="add-token-input-second">Click on <b-button class="add-button"
+                                                                  v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
           <AddToken show="false"></AddToken>
         </div>
       </div>
@@ -40,10 +40,10 @@
       There are no token in watch list.
     </div>
     <div class="add-token">
-      <span style="font-family: Roboto-Regular;font-size: 15px;color: #010102;letter-spacing: 0;text-align: left;">Don't see your tokens?</span>
+      <span class="add-token-input-first">Don't see your tokens?</span>
       <br>
-      <span style="font-family: Roboto-Regular;font-size: 13px;color: #9091A3;letter-spacing: 0;text-align: right;">Click on <b-button class="add-button"
-                                                                                                                                       v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
+      <span class="add-token-input-second">Click on <b-button class="add-button"
+                                                              v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
       <AddToken show="false"></AddToken>
     </div>
   </div>
@@ -237,7 +237,6 @@ export default {
     top: 10px;
     margin-bottom: 20px;
     text-align: left;
-    z-index: 100;
 }
 .add-button {
     background-color: transparent;
@@ -253,4 +252,21 @@ export default {
     padding-left: 2px;
     padding-right: 2px;
 }
+.add-token-input-first
+{
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    color: #010102;
+    letter-spacing: 0;
+    text-align: left;
+}
+.add-token-input-second
+{
+    font-family: Roboto-Regular;
+    font-size: 13px;
+    color: #9091A3;
+    letter-spacing: 0;
+    text-align: right;
+}
+
 </style>
