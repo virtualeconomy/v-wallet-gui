@@ -405,6 +405,7 @@ export default {
         color: #FF8837;
         font-size: 17px;
         font-weight:lighter;
+        background:#fafafa;
     }
     .amount-sent {
         font-size: 17px;
