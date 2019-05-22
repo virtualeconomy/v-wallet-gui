@@ -64,13 +64,13 @@ export default {
         }
     },
     computed: {
-        seedaddress() {
+        seedAddress() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
             }
         },
         userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.seedaddress))
+            return JSON.parse(window.localStorage.getItem(this.seedAddress))
         },
         isAddable() {
             return !this.tokenId.length > 0
@@ -87,12 +87,12 @@ export default {
         },
         setUsrLocalStorage(fieldname, value) {
             Vue.set(this.userInfo, fieldname, value)
-            window.localStorage.setItem(this.seedaddress, JSON.stringify(this.userInfo))
+            window.localStorage.setItem(this.seedAddress, JSON.stringify(this.userInfo))
         },
         addModal() {
             this.init = true
             this.tokens = {}
-            var tmpUserInfo = JSON.parse(window.localStorage.getItem(this.seedaddress))
+            var tmpUserInfo = JSON.parse(window.localStorage.getItem(this.seedAddress))
             if (tmpUserInfo && tmpUserInfo.tokens) {
                 this.tokens = JSON.parse(tmpUserInfo.tokens)
             }
@@ -101,7 +101,7 @@ export default {
                 this.responseErr = false
                 Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
                 this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
-                var usInfo = JSON.parse(window.localStorage.getItem(this.seedaddress))
+                var usInfo = JSON.parse(window.localStorage.getItem(this.seedAddress))
                 console.log(usInfo.tokens)
                 this.sendFlag = true
                 bus.$emit('sendFlag', this.sendFlag)

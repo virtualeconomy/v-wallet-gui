@@ -402,7 +402,7 @@ var initData = {
     paused: false,
     sendError: false,
     coldSignature: '',
-    timeStamp: (Date.now() - 1) * 1e6,
+    timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     coldRecipientAddressList: {},
     hotRecipientAddressList: {}

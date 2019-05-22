@@ -394,7 +394,7 @@ var initData = {
     sendError: false,
     coldSignature: '',
     maxUnity: 16,
-    timeStamp: (Date.now() - 1) * 1e6,
+    timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     tokenId: '',
     tokens: {},
@@ -486,7 +486,7 @@ export default {
                 description: this.coldContractDescription,
                 contractInit: base58.encode(transaction.prepareCreate(BigNumber(this.coldAmount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.coldTokenDescription)[0]),
                 contractInitTextual: 'init(max=' + BigNumber(this.coldAmount) + ',unity=' + BigNumber(Math.pow(10, this.unity)) + ',tokenDescription=\'' + this.coldTokenDescription + '\')',
-                contractInitExplain: 'Create token ' + (this.support === false ? '' : '(support split)') + ' that max supply is ' + BigNumber(this.coldAmount)
+                contractInitExplain: 'Create token ' + (this.support === false ? '' : '(support split)') + ' with max supply ' + BigNumber(this.coldAmount)
             }
         },
         isValidColdAttachment() {

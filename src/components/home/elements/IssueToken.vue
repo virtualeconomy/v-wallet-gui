@@ -58,8 +58,8 @@
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isTokenInsufficient(amount)">
-              Insufficient token
+                                     v-else-if="beyondMaxSupply(amount)">
+              The issued token can not larger than max supply.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isInsufficient()">
@@ -286,7 +286,7 @@ export default {
             scanShow: false,
             sendError: false,
             coldSignature: '',
-            timeStamp: (Date.now() - 1) * 1e6,
+            timeStamp: Date.now() * 1e6,
             hasConfirmed: false
         }
     },
@@ -626,7 +626,7 @@ export default {
                 return false
             }
         },
-        isTokenInsufficient(amount) {
+        beyondMaxSupply(amount) {
             return BigNumber(amount).isGreaterThan(BigNumber(this.maxSupply - this.currentSupply))
         },
         isInsufficient() {
