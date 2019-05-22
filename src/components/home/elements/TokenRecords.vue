@@ -183,7 +183,7 @@ export default {
     position: relative;
     padding-top: 52px;
     top: -52px;
-    height: 500px;
+    height: 900px;
     margin-bottom: 100px;
     z-index: 100;
 }
