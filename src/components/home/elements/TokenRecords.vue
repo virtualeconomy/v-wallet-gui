@@ -268,5 +268,4 @@ export default {
     letter-spacing: 0;
     text-align: right;
 }
-
 </style>
