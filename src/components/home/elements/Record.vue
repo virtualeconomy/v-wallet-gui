@@ -28,7 +28,7 @@
              src="../../../assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='create contract'"
+        <img v-else-if="txIcon==='register contract'"
              src="../../../assets/imgs/icons/wallet/ic_contract_signup.svg"
              width="32px"
              height="32px">
@@ -79,7 +79,7 @@
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ formatter(txAmount) }} VSYS</span>
         </div>
         <div class="tx-fee"
-             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'create contract' || txIcon === 'execution contract success' || txIcon === 'execution contract fail') && feeFlag">
+             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'register contract' || txIcon === 'execution contract success' || txIcon === 'execution contract fail') && feeFlag">
           <span v-if="(txFee !== 0)"> Tx Fee: - {{ formatter(txFee) }} VSYS </span>
           <span v-else> Tx Fee: {{ txFee }} VSYS </span>
         </div>
@@ -248,7 +248,7 @@ export default {
                     return 'Leased Out Canceled'
                 }
             } else if (this.txRecord['type'] === CONTRACT_CREATE_TX) {
-                return 'Create Contract'
+                return 'Register Contract'
             } else if (this.txRecord['type'] === CONTRACT_EXEC_TX) {
                 if (this.txRecord.status === 'Success') {
                     return 'Execution Contract Success'
@@ -305,8 +305,8 @@ export default {
                 return 'Received'
             } else if (this.txType === 'Execution Contract Success' || this.txType === 'Execution Contract Fail') {
                 return 'Execute Contract Function'
-            } else if (this.txType === 'Create Contract') {
-                return 'Create Contract'
+            } else if (this.txType === 'Register Contract') {
+                return 'Register Contract'
             }
         },
         txTime() {

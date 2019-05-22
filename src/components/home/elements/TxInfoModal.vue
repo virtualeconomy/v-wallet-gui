@@ -38,7 +38,7 @@
                src="../../../assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
                width="60px"
                height="60px">
-          <img v-else-if="txIcon==='create contract'"
+          <img v-else-if="txIcon==='register contract'"
                src="../../../assets/imgs/icons/wallet/ic_contract_signup.svg"
                width="60px"
                height="60px">
@@ -51,7 +51,7 @@
                width="60px"
                height="60px">
         </div>
-        <div v-if="txIcon!=='create contract'&& txIcon!=='execution contract success'&&txIcon!=='execution contract fail'"
+        <div v-if="txIcon!=='register contract'&& txIcon!=='execution contract success'&&txIcon!=='execution contract fail'"
              :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
       </div>
       <div class="tx-address">
