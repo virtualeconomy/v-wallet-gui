@@ -309,6 +309,7 @@ export default {
     height: 44px;
     text-align: left;
     vertical-align: middle;
+    border-bottom: 1px solid #EDEDF0;
     background: #FFF;
     font-size: 13px;
     color: #9091A3;
