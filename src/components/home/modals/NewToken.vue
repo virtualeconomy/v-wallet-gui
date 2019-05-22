@@ -752,7 +752,7 @@ export default {
             return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !this.isInsufficient(type) && !this.isBiggerThanMax(amount)
         },
         isBiggerThanMax(amount) {
-            var maxValue = BigNumber(2).exponentiatedBy(63) - 1
+            var maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
             var unityValue = BigNumber(10).exponentiatedBy(this.unity)
             var value = BigNumber(amount).multipliedBy(unityValue)
             if (value.isGreaterThan(maxValue)) {
