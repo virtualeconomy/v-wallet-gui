@@ -139,7 +139,7 @@ export default {
         JsonExcel
     },
     created() {
-        this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
+        this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 100) + 'px'
         if (this.address && Vue.ls.get('pwd') && this.activedTab === 'trans') {
             this.getTxRecords()
         }
@@ -298,12 +298,14 @@ export default {
 .records {
     background: #FFFFFF;
     border: 1px solid #E8E9ED;
+    height: 900px;
     border-radius: 4px;
     margin: 0px 0px;
 }
 .scroll {
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
+    height: 900px;
 }
 .monthTtl {
     height: 44px;
@@ -319,6 +321,7 @@ export default {
 .inherit-height {
     position: relative;
     padding-top: 52px;
+    height: inherit;
     top:-52px;
     margin-bottom: -52px;
 }
