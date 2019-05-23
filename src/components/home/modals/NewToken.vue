@@ -489,12 +489,6 @@ export default {
                 contractInitExplain: 'Create token ' + (this.support === false ? '' : '(support split)') + ' with max supply ' + BigNumber(this.coldAmount)
             }
         },
-        isValidColdAttachment() {
-            if (!this.coldAttachment) {
-                return void 0
-            }
-            return this.coldAttachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
-        },
         qrPage() {
             return this.qrTotalPage
         },
@@ -642,7 +636,6 @@ export default {
             this.coldAmount = BigNumber(0)
             this.coldAttachment = ''
             this.coldPageId = 1
-            this.coldAddress = ''
             this.scanShow = false
             this.qrInit = false
             this.paused = false
