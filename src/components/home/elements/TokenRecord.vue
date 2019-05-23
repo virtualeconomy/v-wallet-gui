@@ -269,14 +269,14 @@ export default {
         },
         getTokenInfo() {
             var contractId = transaction.tokenIDToContractID(this.tokenId)
-            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + contractId
+            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(tokenUrl).then(response => {
                 this.tokens = response.body
                 this.unity = BigNumber(this.tokens.unity)
             }, respError => {
             })
 
-            const url = NODE_IP + '/contract/info/' + this.contract
+            const url = NODE_IP + '/contract/info/' + contractId
             this.$http.get(url).then(response => {
                 this.issuer = response.body.info[0].data
                 this.maker = response.body.info[1].data
@@ -306,7 +306,6 @@ export default {
             this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
         },
         sendToken() {
-            this.getTokenBalances()
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId)
         },
@@ -315,6 +314,7 @@ export default {
             this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)
         },
         burnToken() {
+            this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'burnTokenModal_' + this.tokenId)
         },
         removeToken() {
