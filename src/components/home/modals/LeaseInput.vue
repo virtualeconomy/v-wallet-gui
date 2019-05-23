@@ -202,7 +202,7 @@ export default {
     },
     computed: {
         isSubmitDisabled() {
-            return !(this.recipient && BigNumber(this.amount) > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid(this.walletType))
+            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient(this.recipient) && this.isAmountValid(this.walletType))
         },
         isSameWithSender() {
             var thisAddr = this.walletType === 'hot' ? this.address : this.coldAddress

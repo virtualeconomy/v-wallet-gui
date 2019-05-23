@@ -163,11 +163,11 @@
                         label-for="cold-amount-input">
             <b-form-input id="cold-amount-input"
                           class="amount-input"
-                          v-model="coldAmount">
+                          v-model="amount">
             </b-form-input>
           </b-form-group>
           <b-form-group>
-            <label class="fee-remark">Transaction Fee {{ formatter(coldFee) }} VSYS</label>
+            <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -179,8 +179,8 @@
         </b-container>
         <b-container v-if="coldPageId===2">
           <TokenConfirm :address="address"
-                        :amount=inputAmount(coldAmount)
-                        :fee="coldFee"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
                         :tx-type="'Destroy Token'">
           </TokenConfirm>
           <b-row>
@@ -215,8 +215,8 @@
         </b-container>
         <b-container v-show="coldPageId===4">
           <TokenConfirm :address="address"
-                        :amount=inputAmount(coldAmount)
-                        :fee="coldFee"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
                         :tx-type="'Destroy Token'">
           </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
@@ -244,8 +244,8 @@
         <b-container v-show="coldPageId===5">
           <TokenSuccess class="tokenSucced"
                         :address="address"
-                        :amount=inputAmount(coldAmount)
-                        :fee="coldFee"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
                         :tx-type="'DestroyToken'">
           </TokenSuccess>
           <b-button variant="warning"
@@ -275,13 +275,10 @@ export default {
     data: function() {
         return {
             amount: BigNumber(0),
-            coldAmount: BigNumber(0),
             attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
             coldPageId: 5,
-            coldFee: BigNumber(CONTRACT_EXEC_FEE),
-            coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
             scanShow: false,
             sendError: false,
             coldSignature: '',
@@ -306,7 +303,7 @@ export default {
         coldAddresses: {
             type: Object,
             default: function() {},
-            require: true
+            require: true// Can not be removed ,cause this is an inherited property may be used somewhere
         },
         addresses: {
             type: Object,
@@ -366,7 +363,7 @@ export default {
             return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot'))
         },
         isColdSubmitDisabled() {
-            return !(this.coldAmount > 0 && this.isValidIssuer(this.address) && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold'))
+            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold'))
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -378,14 +375,14 @@ export default {
                 opc: OPC_FUNCTION,
                 address: this.address,
                 senderPublicKey: this.coldAddresses[this.address].publicKey,
-                fee: this.coldFee * VSYS_PRECISION,
+                fee: this.fee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
                 timestamp: Date.now(),
                 attachment: '',
                 contractId: this.contractId,
                 functionId: BURN_FUNCIDX,
-                function: transaction.prepareIssueAndBurn(BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
-                functionExplain: 'Destroy ' + this.coldAmount + ' Token'
+                function: transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)),
+                functionExplain: 'Destroy ' + this.amount + ' Token'
             }
         },
         isValidAttachment() {
@@ -429,7 +426,7 @@ export default {
                     feeScale: FEE_SCALE,
                     timestamp: this.dataObject.timestamp,
                     functionIndex: BURN_FUNCIDX,
-                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
+                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)),
                     signature: this.coldSignature
                 }
                 apiSchema = coldDataInfo
@@ -473,16 +470,13 @@ export default {
         resetPage: function() {
             this.amount = BigNumber(0)
             this.pageId = 1
-            this.coldAmount = BigNumber(0)
             this.coldPageId = 1
-            this.coldAddress = ''
             this.scanShow = false
             this.qrInit = false
             this.paused = false
             this.qrErrMsg = void 0
             this.sendError = false
             this.coldSignature = ''
-            this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         endSend: function() {
             for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
@@ -596,7 +590,7 @@ export default {
             this.scanShow = false
         },
         isAmountValid(type) {
-            var amount = type === 'hot' ? this.amount : this.coldAmount
+            var amount = this.amount
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
@@ -613,7 +607,7 @@ export default {
             return BigNumber(amount).isGreaterThan(BigNumber(this.tokenBalance))
         },
         isInsufficient() {
-            return !BigNumber(this.balance).isGreaterThan(BigNumber(CONTRACT_EXEC_FEE))
+            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
