@@ -46,16 +46,16 @@
                src="../../../assets/imgs/icons/wallet/ic_exec_fail.svg"
                width="60px"
                height="60px">
-          <img v-else-if="txIcon==='execution contract success'"
+          <img v-else-if="txIcon==='execute contract function' && txStatus === 'Success'"
                src="../../../assets/imgs/icons/wallet/ic_exec_success.svg"
                width="60px"
                height="60px">
-          <img v-else-if="txIcon==='execution contract fail'"
+          <img v-else-if="txIcon==='execute contract function' && txStatus !== 'Success'"
                src="../../../assets/imgs/icons/wallet/ic_exec_fail.svg"
                width="60px"
                height="60px">
         </div>
-        <div v-if="txIcon!=='register contract'&& txIcon!=='execution contract success'&&txIcon!=='execution contract fail'"
+        <div v-if="txIcon!=='register contract'&& txIcon!=='execute contract function'"
              :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
       </div>
       <div class="tx-address">
