@@ -112,10 +112,7 @@ export default {
             })
         },
         isValidToken() {
-            if (!this.init || this.tokenId.length === 0 || this.responseErr === false) {
-                return void 0
-            }
-            return !this.responseErr
+            return this.init && this.tokenId.length > 0 && !this.responseErr
         }
     }
 
