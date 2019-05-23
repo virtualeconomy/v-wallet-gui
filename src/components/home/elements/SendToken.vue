@@ -800,11 +800,10 @@ export default {
             }
         },
         hideQrScan(tabIndex) {
+            this.resetPage()
             if (tabIndex === 0) {
-                this.resetPage()
                 this.pageId = 1
             } else {
-                this.resetPage()
                 this.coldPageId = 1
             }
             this.scanShow = false

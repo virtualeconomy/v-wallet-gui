@@ -194,16 +194,6 @@ export default {
     },
 
     computed: {
-        txAddressShow() {
-            if (this.txAddress) {
-                const addrChars = this.txAddress.split('')
-                addrChars.splice(6, 23, '******')
-                return addrChars.join('')
-            }
-        },
-        txAmount() {
-            return 100
-        },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.seedaddress))
         },
@@ -221,9 +211,6 @@ export default {
             if (this.tokens) {
                 return BigNumber(this.tokens.total).dividedBy(this.unity)
             } else return ''
-        },
-        contract() {
-            return transaction.tokenIDToContractID(this.tokenId)
         },
         tokenDescription() {
             if (this.tokens.description && this.tokens.description !== undefined) {
@@ -281,7 +268,8 @@ export default {
             }
         },
         getTokenInfo() {
-            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
+            var contractId = transaction.tokenIDToContractID(this.tokenId)
+            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + contractId
             this.$http.get(tokenUrl).then(response => {
                 this.tokens = response.body
                 this.unity = BigNumber(this.tokens.unity)
@@ -295,10 +283,8 @@ export default {
                 this.contractId = response.body.contractId
             }, respError => {
                 this.issuer = 'Failed to get issuer'
-                this.registerTime = 'Failed to get time'
             })
 
-            var contractId = transaction.tokenIDToContractID(this.tokenId)
             const url2 = NODE_IP + '/contract/content/' + contractId
             this.$http.get(url2).then(response => {
                 var tokentype = response.body.textual.descriptors
