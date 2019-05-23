@@ -467,7 +467,7 @@ export default {
             return !(BigNumber(this.amount).isGreaterThan(0) && !this.isInsufficient('hot') && (this.isValidAttachment(this.contractDescription) || !this.contractDescription) && (this.isValidAttachment(this.tokenDescription) || !this.tokenDescription) && this.isAmountValid('hot') && this.address !== '')
         },
         isColdSubmitDisabled() {
-            return !(this.coldAddress && this.coldAmount > 0 && (this.isValidAttachment(this.coldContractDescription) || !this.coldContractDescription) && (this.isValidAttachment(this.coldTokenDescription) || !this.coldTokenDescription) && this.isAmountValid('cold') && this.coldAddress !== '')
+            return !(BigNumber(this.coldAmount).isGreaterThan(0) && (this.isValidAttachment(this.coldContractDescription) || !this.coldContractDescription) && (this.isValidAttachment(this.coldTokenDescription) || !this.coldTokenDescription) && this.isAmountValid('cold') && this.coldAddress !== '')
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -770,7 +770,7 @@ export default {
         },
         isInsufficient(type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return !BigNumber(balance).isGreaterThanOrEqualTo(BigNumber(TOKEN_FEE))
+            return BigNumber(balance).isLessThan(BigNumber(TOKEN_FEE))
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
