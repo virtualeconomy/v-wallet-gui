@@ -17,6 +17,7 @@
         <b-form-select class="setting-input"
                        :options="langOptions"
                        v-model="selectedLang"
+                       :disabed="true"
                        size="sm">
         </b-form-select>
       </div>
