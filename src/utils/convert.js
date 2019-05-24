@@ -53,27 +53,8 @@ exports.default = {
         }
         return bytes;
     },
-    amountToByteArray: function (input) {
-        if (typeof input !== 'number') {
-            throw new Error('Numeric input is expected');
-        }
-        var bytes = new Array(7);
-        for (var k = 7; k >= 0; k--) {
-            bytes[k] = input & (16);
-            input = input / 16;
-        }
-        return bytes;
-    },
     idxToByteArray: function (input) {
-        if (typeof input !== 'number') {
-            throw new Error('Numeric input is expected');
-        }
-        var bytes = new Array(4);
-        for (var k = 3; k >= 0; k--) {
-            bytes[k] = input & (255);
-            input = input / 256;
-        }
-        return bytes;
+        return converters_1.default.int32ToBytes(input, true);
     },
     bigNumberToByteArray: function (input) {
         if (!(input instanceof bignumber_1.default)) {

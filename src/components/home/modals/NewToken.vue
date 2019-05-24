@@ -440,7 +440,7 @@ export default {
         defaultAddress() {
             return Vue.ls.get('address')
         },
-        seedaddress() {
+        seedAddress() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
             }
@@ -668,7 +668,7 @@ export default {
         },
         setUsrLocalStorage(fieldname, value) {
             Vue.set(this.userInfo, fieldname, value)
-            window.localStorage.setItem(this.seedaddress, JSON.stringify(this.userInfo))
+            window.localStorage.setItem(this.seedAddress, JSON.stringify(this.userInfo))
         },
         scanChange: function(evt) {
             if (!this.qrInit) {
@@ -739,7 +739,7 @@ export default {
             if (BigNumber(amount).isEqualTo(0) && !this.isInsufficient(type)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !this.isInsufficient(type) && !this.isBiggerThanMax(amount)
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !this.isBiggerThanMax(amount)
         },
         isBiggerThanMax(amount) {
             var maxValue = BigNumber(2).exponentiatedBy(63).minus(1)

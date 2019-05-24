@@ -372,9 +372,6 @@ export default {
         wordList() {
             return this.seedPhrase.split(' ')
         },
-        isSubmitDisabled(type) {
-            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && this.isValidAttachment && this.isAmountValid(type))
-        },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
@@ -411,6 +408,9 @@ export default {
         },
         isValidIssuer: function(addr) {
             return addr === this.issuer
+        },
+        isSubmitDisabled(type) {
+            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid(type))
         },
         sendData: function(walletType) {
             let apiSchema

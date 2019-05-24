@@ -134,13 +134,6 @@ function castToAPISchema(data, tx_type) {
     __assign(apiSchema, { recipient : transformRecipient() })
     return apiSchema
 }
-function transferInt(tokenIdx) {
-    var byteArr = convert_1.default.idxToByteArray(tokenIdx)
-
-    var newBytes = []
-    newBytes[0] = INT_TYPE
-    return newBytes.concat(byteArr)
-}
 function transferAmount(amountData) {
     var byteArr = convert_1.default.bigNumberToByteArray(amountData)
     var typeArr = new Array(1);

@@ -73,7 +73,7 @@ export default {
             return JSON.parse(window.localStorage.getItem(this.seedAddress))
         },
         isAddable() {
-            return !this.tokenId.length > 0
+            return this.tokenId.length <= 0
         }
     },
 
