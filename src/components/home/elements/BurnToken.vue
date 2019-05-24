@@ -594,7 +594,7 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isInsufficient() && !this.isNegative(amount) && !this.isTokenInsufficient(amount)
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !this.isTokenInsufficient(amount)
         },
         isWrongFormat(amount) {
             if ((BigNumber(amount).multipliedBy(this.tokenUnity).toString().split('.')[1] && BigNumber(amount).multipliedBy(this.tokenUnity).toString().split('.')[1].length > 0) || /[eE]/.test(amount.toString())) {
