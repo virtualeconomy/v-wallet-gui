@@ -423,7 +423,7 @@ export default {
                 }
                 this.hasConfirmed = true
                 this.fee = BigNumber(CONTRACT_EXEC_FEE)
-                this.feeScale = 100
+                this.feeScale = FEE_SCALE
                 const dataInfo = {
                     contractId: this.contractId,
                     senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,

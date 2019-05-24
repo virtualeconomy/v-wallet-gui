@@ -304,14 +304,13 @@ export default {
             }, oldTimeout * 60 * 1000)
         },
         tranTabChange(tabIndex) {
+            this.getBalance(this.selectedAddress)
             if (tabIndex === 0) {
                 this.activedTab = 'token'
             } else if (tabIndex === 1) {
                 this.activedTab = 'trans'
-                this.getBalance(this.selectedAddress)
             } else if (tabIndex === 2) {
                 this.activedTab = 'lease'
-                this.getBalance(this.selectedAddress)
             }
         },
         resetSessionClearTimeout() {
