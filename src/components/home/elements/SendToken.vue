@@ -449,6 +449,7 @@ export default {
         tokenBalances: {
             type: Object,
             default: function() {
+                return BigNumber(0)
             },
             require: true
         },

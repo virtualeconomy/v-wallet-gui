@@ -81,7 +81,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled"
+                    :disabled="isSubmitDisabled('hot')"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -173,7 +173,7 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isColdSubmitDisabled"
+                    :disabled="isSubmitDisabled('cold')"
                     @click="coldNextPage">Continue
           </b-button>
         </b-container>
@@ -359,12 +359,6 @@ export default {
         wordList() {
             return this.seedPhrase.split(' ')
         },
-        isSubmitDisabled() {
-            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot'))
-        },
-        isColdSubmitDisabled() {
-            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold'))
-        },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
@@ -398,6 +392,9 @@ export default {
         },
         coldApi: function() {
             return API_VERSION
+        },
+        isSubmitDisabled(type) {
+            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid(type))
         },
         sendData: function(walletType) {
             let apiSchema
@@ -594,7 +591,7 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isInsufficient() && !this.isNegative(amount) && !this.isTokenInsufficient(amount)
+            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !this.isTokenInsufficient(amount)
         },
         isWrongFormat(amount) {
             if ((BigNumber(amount).multipliedBy(this.tokenUnity).toString().split('.')[1] && BigNumber(amount).multipliedBy(this.tokenUnity).toString().split('.')[1].length > 0) || /[eE]/.test(amount.toString())) {
