@@ -75,7 +75,7 @@
 import jrQrcode from 'jr-qrcode'
 import crypto from '../../../utils/crypto'
 import BigNumber from 'bignumber.js'
-import { API_VERSION, PROTOCOL, OPC_SIGNATURE, OPC_FUNCTION, OPC_CONTRACT } from '@/constants.js'
+import { API_VERSION, PROTOCOL, OPC_SIGNATURE, OPC_FUNCTION, OPC_CONTRACT, OPC_TRANSACTION } from '@/constants.js'
 import transaction from '../../../utils/transaction'
 export default {
     name: 'ColdSignature',
@@ -223,7 +223,7 @@ export default {
                     } else {
                         data.timestamp *= 1e6
                     }
-                    if ((((dataOpc !== OPC_FUNCTION) && transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType)) ||
+                    if ((((dataOpc === OPC_TRANSACTION) && transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType)) ||
                         ((dataOpc === OPC_FUNCTION) && transaction.isValidContractExecSignature(data, signature, data.senderPublicKey)) ||
                         ((dataOpc === OPC_CONTRACT) && transaction.isValidContractSignature(data, signature, data.senderPublicKey))) && !this.qrError) {
                         var _this = this
