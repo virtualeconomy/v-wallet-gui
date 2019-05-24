@@ -406,7 +406,7 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                this.feeScale = 100
+                this.feeScale = FEE_SCALE
                 const dataInfo = {
                     contractId: this.contractId,
                     senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,

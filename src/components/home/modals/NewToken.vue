@@ -381,7 +381,6 @@ var initData = {
     fee: BigNumber(TOKEN_FEE),
     coldRecipient: '',
     coldAmount: BigNumber(0),
-    coldAttachment: '',
     coldPageId: 1,
     coldFee: BigNumber(TOKEN_FEE),
     address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
@@ -559,7 +558,7 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                this.feeScale = 100
+                this.feeScale = FEE_SCALE
                 const dataInfo = {
                     contract: this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT,
                     senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
@@ -630,11 +629,9 @@ export default {
             this.qrArray = new Array(0)
             this.recipient = ''
             this.amount = BigNumber(0)
-            this.attachment = ''
             this.pageId = 1
             this.coldRecipient = ''
             this.coldAmount = BigNumber(0)
-            this.coldAttachment = ''
             this.coldPageId = 1
             this.scanShow = false
             this.qrInit = false
