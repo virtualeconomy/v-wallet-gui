@@ -143,11 +143,8 @@ function transferAmount(amountData) {
 }
 function transferAccount(account) {
     var accountArr = base58_1.default.decode(account)
-
     var typeArr = [ACCOUNT_TYPE]
-    for(let j=0; j<accountArr.length; ++j) {
-        typeArr.push(accountArr[j])
-    }
+    typeArr = typeArr.concat(Array.from(accountArr))
     return typeArr
 }
 function transferShortTxt(description) {
