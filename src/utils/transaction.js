@@ -187,10 +187,7 @@ export default {
         var bytess = []
         bytess[0] = 9 & (255)
         var contractIdBytes = base58_1.default.decode(data.contractId)
-        var temBytes = []
-        for (var len = 0 ; len < contractIdBytes.length; ++len) {
-            temBytes [len] = contractIdBytes[len]
-        }
+        var temBytes = Array.from(contractIdBytes)
         var funIdxBytes = convert_1.default.shortToByteArray(data.functionId)
         var databyte = base58_1.default.decode(data.function)
         var dataBytes = convert_1.default.bytesToByteArrayWithSize(databyte)
@@ -242,19 +239,12 @@ export default {
         var bytess = []
         bytess[0] = 8 & (255)
         var contractBytes = convert_1.default.bytesToByteArrayWithSize(base58_1.default.decode(contract))
-        console.log(contractBytes)
         var dataBytes = convert_1.default.bytesToByteArrayWithSize(data[0])
-        console.log(dataBytes)
         var desBytes = convert_1.default.bytesToByteArrayWithSize(convert_1.default.stringToByteArray(description))
-        console.log(desBytes)
         var feeBytes = convert_1.default.bigNumberToByteArray(fee)
-        console.log(feeBytes)
         var feeScaleBytes = convert_1.default.shortToByteArray(feeScale)
-        console.log(feeScaleBytes)
         var timeBytes = convert_1.default.bigNumberToByteArray(time)
-        console.log(timeBytes)
         var signBytes = bytess.concat(contractBytes.concat(dataBytes.concat(desBytes.concat(feeBytes.concat(feeScaleBytes.concat(timeBytes))))))
-        console.log(signBytes)
         var privateKeyBytes = base58_1.default.decode(privateKey);
         var signature = axlsign_1.default.sign(privateKeyBytes, Uint8Array.from(signBytes), secure_random_1.default.randomUint8Array(64));
         return base58_1.default.encode(signature)
@@ -264,10 +254,7 @@ export default {
         var bytess = []
         bytess[0] = 9 & (255)
         var contractIdBytes = base58_1.default.decode(contractId)
-        var temBytes = []
-        for (var len = 0 ; len < contractIdBytes.length; ++len) {
-            temBytes [len] = contractIdBytes[len]
-        }
+        var temBytes = Array.from(contractIdBytes)
         var funIdxBytes = convert_1.default.shortToByteArray(funIdx)
         var databyte = base58_1.default.decode(data)
         var dataBytes = convert_1.default.bytesToByteArrayWithSize(databyte)
@@ -285,12 +272,8 @@ export default {
 
             var conId = base58_1.default.decode(contraId)
             var firstArr = [132]
-            var secondArr = []
-            for (var i = 1; i<conId.length-4; i++) {
-                secondArr[i-1] = conId[i]
-            }
+            var secondArr = Array.from(conId.slice(1,conId.length-4))
             var thirdArr = convert_1.default.idxToByteArray(0)
-
             var encodeArr = firstArr.concat(secondArr.concat(thirdArr))
             var hashArr = crypto_1.default.hash(Uint8Array.from(encodeArr))
             var checkArr = hashArr.slice(0, 4)
@@ -300,14 +283,9 @@ export default {
     },
     tokenIDToContractID(tokenId) {
         var tokenArr = base58_1.default.decode(tokenId)
-
         var firstArr = [6]
-        var secondArr = []
-        for (var i = 1; i < tokenArr.length-8; i++) {
-            secondArr[i-1] = tokenArr[i]
-        }
+        var secondArr = Array.from(tokenArr.slice(1,tokenArr.length-8))
         var encodeArr = firstArr.concat(secondArr)
-
         var hashArr = crypto_1.default.hash(Uint8Array.from(encodeArr))
         var checkArr = hashArr.slice(0, 4)
         var contractArr = encodeArr.concat(checkArr)
