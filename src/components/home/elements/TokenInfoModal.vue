@@ -136,7 +136,7 @@ export default {
         padding-top: 15px;
         span {
             float:right;
-            font-size: 15px;
+            font-size: 13px;
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
@@ -154,7 +154,7 @@ export default {
         padding-top: 15px;
         span {
             float:right;
-            font-size: 15px;
+            font-size: 13px;
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
@@ -172,7 +172,7 @@ export default {
         padding-top: 15px;
         span {
             float:right;
-            font-size: 15px;
+            font-size: 13px;
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
@@ -190,7 +190,7 @@ export default {
         padding-top: 15px;
         span {
             float:right;
-            font-size: 15px;
+            font-size: 13px;
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
@@ -208,7 +208,7 @@ export default {
         padding-top: 15px;
         span {
             float:right;
-            font-size: 15px;
+            font-size: 13px;
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
