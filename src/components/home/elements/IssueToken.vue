@@ -42,7 +42,7 @@
                      width="20"
                      height="20">
               </span>
-              <span class="balance">Issue Available{{ formatter(maxSupply - currentSupply) }}</span>
+              <span class="balance">Issue Available {{ formatter(maxSupply - currentSupply) }}</span>
             </b-btn>
           </b-form-group>
           <b-form-group label="Issue Amount"

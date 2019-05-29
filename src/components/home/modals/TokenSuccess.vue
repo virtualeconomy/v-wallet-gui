@@ -25,7 +25,7 @@
                     label="Max Supply"
                     label-for="amount_success">
         <b-form-input id="amount_success"
-                      :value="formatter(amount) + ' VSYS'"
+                      :value="formatter(amount)"
                       class="amount"
                       readonly
                       :plaintext="true">
@@ -37,7 +37,7 @@
                     label="Send Amount"
                     label-for="amount_success">
         <b-form-input id="amount_success"
-                      :value="formatter(amount) + ' VSYS'"
+                      :value="formatter(amount)"
                       class="amount"
                       readonly
                       :plaintext="true">
