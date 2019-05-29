@@ -99,11 +99,11 @@
               Insufficient funds
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNumFormatValid(amount) === 'negative'">
+                                     v-else-if="isNegative(amount)">
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNumFormatValid(amount) === 'format'">
+                                     v-else-if="!isNumFormatValid(amount)">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -261,11 +261,11 @@
               Insufficient funds
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNumFormatValid(coldAmount) === 'negative'">
+                                     v-else-if="isNegative(coldAmount)">
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNumFormatValid(coldAmount) === 'format'">
+                                     v-else-if="!isNumFormatValid(coldAmount)">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -777,7 +777,10 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) === 'valid' && !this.isInsufficient(amount, type)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
+        },
+        isNegative(amount) {
+            return BigNumber(amount).isLessThan(0)
         },
         isNumFormatValid(amount) {
             return common.isNumFormatValid(amount)

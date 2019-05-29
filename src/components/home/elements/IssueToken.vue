@@ -66,11 +66,11 @@
               Insufficient VSYS balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNumFormatValid(amount) === 'negative'">
+                                     v-else-if="isNegative(amount)">
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNumFormatValid(amount) === 'format'">
+                                     v-else-if="!isNumFormatValid(amount)">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -613,10 +613,13 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) === 'valid' && !this.isInsufficient() && !this.isExceededMaxSupply(amount)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isInsufficient() && !this.isExceededMaxSupply(amount) && !this.isNegative(amount)
         },
         isNumFormatValid(amount) {
             return common.isNumFormatValid(amount)
+        },
+        isNegative(amount) {
+            return BigNumber(amount).isLessThan(0)
         },
         checkPrecision(amount) {
             return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)

@@ -78,7 +78,7 @@
               Insufficient VSYS balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNumFormatValid(amount) === 'negative'">
+                                     v-else-if="isNegative(amount)">
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -86,7 +86,7 @@
               Too many significant digits for amount. Please reduce unity.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNumFormatValid(amount) === 'format'">
+                                     v-else-if="!isNumFormatValid(amount)">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -231,11 +231,11 @@
               Insufficient VSYS balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNumFormatValid(coldAmount) === 'negative'">
+                                     v-else-if="isNegative(coldAmount)">
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNumFormatValid(coldAmount) === 'format'">
+                                     v-else-if="!isNumFormatValid(coldAmount)">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -748,7 +748,10 @@ export default {
             if (BigNumber(amount).isEqualTo(0) && !this.isInsufficient(type)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) === 'valid' && !this.isBiggerThanMax(amount)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isBiggerThanMax(amount) && !this.isNegative(amount)
+        },
+        isNegative(amount) {
+            return BigNumber(amount).isLessThan(0)
         },
         isBiggerThanMax(amount) {
             var maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
