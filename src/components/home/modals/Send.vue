@@ -502,13 +502,13 @@ export default {
             if (!this.attachment) {
                 return void 0
             }
-            return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+            return browser.getLength(this.attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         isValidColdAttachment() {
             if (!this.coldAttachment) {
                 return void 0
             }
-            return this.coldAttachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+            return browser.getLength(this.coldAttachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         }
     },
     methods: {

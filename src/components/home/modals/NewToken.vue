@@ -500,7 +500,7 @@ export default {
             if (!attachment) {
                 return void 0
             }
-            return attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+            return browser.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         getQrArray() {
             const qrSize = 300
