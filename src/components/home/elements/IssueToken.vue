@@ -54,7 +54,7 @@
                           :state="isAmountValid('hot')">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="isWrongFormat(amount)">
+                                     v-if="isWrongFormat(amount) && !isExceededMaxSupply(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
