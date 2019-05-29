@@ -369,6 +369,7 @@ import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
 import base58 from '../../../libs/base58'
 import bus from '../../../assets/bus'
+import common from '../../../utils/common'
 var initData = {
     opc: '',
     qrArray: new Array(0),
@@ -500,7 +501,7 @@ export default {
             if (!attachment) {
                 return void 0
             }
-            return browser.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+            return common.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         getQrArray() {
             const qrSize = 300

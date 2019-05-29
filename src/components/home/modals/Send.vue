@@ -380,6 +380,7 @@ import Success from './Success'
 import crypto from '@/utils/crypto'
 import ColdSignature from './ColdSignature'
 import browser from '../../../utils/browser'
+import common from '../../../utils/common'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 var initData = {
@@ -502,13 +503,13 @@ export default {
             if (!this.attachment) {
                 return void 0
             }
-            return browser.getLength(this.attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+            return common.getLength(this.attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         isValidColdAttachment() {
             if (!this.coldAttachment) {
                 return void 0
             }
-            return browser.getLength(this.coldAttachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+            return common.getLength(this.coldAttachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         }
     },
     methods: {
