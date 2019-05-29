@@ -176,7 +176,7 @@ export default {
             return common.checkPrecision(amount, 8)
         },
         isValid(amount, invoice) {
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) === 'valid' && invoice.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && invoice.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         copyAddr() {
             this.$refs.addrToCopy.select()
