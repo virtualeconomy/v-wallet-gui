@@ -70,7 +70,7 @@
                           onfocus="this.select()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="isWrongFormat(amount)">
+                                     v-if="!checkPrecision(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -78,12 +78,16 @@
               Insufficient VSYS balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
+                                     v-else-if="isNumFormatValid(amount) === 'negative'">
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isBiggerThanMax(amount)">
               Too many significant digits for amount. Please reduce unity.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isNumFormatValid(amount) === 'format'">
+              Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -219,7 +223,7 @@
                           onfocus="this.select()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="isWrongFormat(coldAmount)">
+                                     v-if="!checkPrecision(coldAmount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -227,8 +231,12 @@
               Insufficient VSYS balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(coldAmount)">
+                                     v-else-if="isNumFormatValid(coldAmount) === 'negative'">
               Negative number is not allowed.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isNumFormatValid(coldAmount) === 'format'">
+              Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isBiggerThanMax(coldAmount)">
@@ -740,7 +748,7 @@ export default {
             if (BigNumber(amount).isEqualTo(0) && !this.isInsufficient(type)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !this.isBiggerThanMax(amount)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) === 'valid' && !this.isBiggerThanMax(amount)
         },
         isBiggerThanMax(amount) {
             var maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
@@ -752,19 +760,15 @@ export default {
                 return false
             }
         },
-        isWrongFormat(amount) {
-            if ((BigNumber(amount).toString().split('.')[1] && BigNumber(amount).toString().split('.')[1].length > this.unity) || /[eE]/.test(amount.toString())) {
-                return true
-            } else {
-                return false
-            }
+        isNumFormatValid(amount) {
+            return common.isNumFormatValid(amount)
+        },
+        checkPrecision(amount) {
+            return common.checkPrecision(amount, this.unity)
         },
         isInsufficient(type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
             return BigNumber(balance).isLessThan(BigNumber(TOKEN_FEE))
-        },
-        isNegative(amount) {
-            return BigNumber(amount).isLessThan(0)
         },
         options(addrs) {
             return Object.keys(addrs).reduce((options, addr) => {
