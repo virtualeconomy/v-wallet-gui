@@ -54,7 +54,7 @@
                           :state="isAmountValid('hot')">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="isWrongFormat(amount) && !isTokenInsufficient(amount)">
+                                     v-if="!checkPrecision(amount) && !isTokenInsufficient(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -68,6 +68,10 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(amount)">
               Negative number is not allowed.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="!isNumFormatValid(amount)">
+              Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -267,6 +271,7 @@ import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '../../../utils/browser'
+import common from '../../../utils/common'
 import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
 export default {
@@ -591,23 +596,22 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !this.isTokenInsufficient(amount)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount) && !this.isInsufficient() && !this.isNegative(amount)
         },
-        isWrongFormat(amount) {
-            if ((BigNumber(amount).multipliedBy(this.tokenUnity).toString().split('.')[1] && BigNumber(amount).multipliedBy(this.tokenUnity).toString().split('.')[1].length > 0) || /[eE]/.test(amount.toString())) {
-                return true
-            } else {
-                return false
-            }
+        isNegative(amount) {
+            return BigNumber(amount).isLessThan(0)
+        },
+        isNumFormatValid(amount) {
+            return common.isNumFormatValid(amount)
+        },
+        checkPrecision(amount) {
+            return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
         },
         isTokenInsufficient(amount) {
             return BigNumber(amount).isGreaterThan(BigNumber(this.tokenBalance))
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
-        },
-        isNegative(amount) {
-            return BigNumber(amount).isLessThan(0)
         },
         options(addrs) {
             return Object.keys(addrs).reduce((options, addr) => {

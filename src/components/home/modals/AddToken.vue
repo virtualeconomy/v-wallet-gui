@@ -101,8 +101,6 @@ export default {
                 this.responseErr = false
                 Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
                 this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
-                var usInfo = JSON.parse(window.localStorage.getItem(this.seedAddress))
-                console.log(usInfo.tokens)
                 this.sendFlag = true
                 bus.$emit('sendFlag', this.sendFlag)
                 this.sendFlag = false
@@ -112,7 +110,10 @@ export default {
             })
         },
         isValidToken() {
-            return this.init && this.tokenId.length > 0 && !this.responseErr
+            if (!this.init || this.tokenId.length === 0 || this.responseErr === false) {
+                return void 0
+            }
+            return !this.responseErr
         }
     }
 
