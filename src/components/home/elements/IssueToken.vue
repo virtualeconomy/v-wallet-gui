@@ -62,12 +62,8 @@
               The total supply can not larger than max supply.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isInsufficient()">
-              Insufficient VSYS balance
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(amount)">
-              Negative number is not allowed.
+              Negative number is not allowed
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="!isNumFormatValid(amount)">
@@ -80,6 +76,8 @@
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
+            <span v-if="isInsufficient()"
+                  class="vsys-check">Insufficient VSYS balance</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -167,11 +165,35 @@
                         label-for="cold-amount-input">
             <b-form-input id="cold-amount-input"
                           class="amount-input"
-                          v-model="amount">
+                          v-model="amount"
+                          aria-describedby="inputLiveFeedback"
+                          :state="isAmountValid('cold')">
             </b-form-input>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
+              Invalid format. The number of digits after the decimal point may be larger than the token precision.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isExceededMaxSupply(amount)">
+              The total supply can not larger than max supply.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isNegative(amount)">
+              Negative number is not allowed
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="!isNumFormatValid(amount)">
+              Invalid format.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else>
+              Invalid Input.
+            </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
+            <span v-if="isInsufficient()"
+                  class="vsys-check">Insufficient VSYS balance</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -415,7 +437,7 @@ export default {
             return addr === this.issuer
         },
         isSubmitDisabled(type) {
-            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid(type))
+            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid(type) && !this.isInsufficient())
         },
         sendData: function(walletType) {
             let apiSchema
@@ -613,7 +635,7 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isInsufficient() && !this.isExceededMaxSupply(amount) && !this.isNegative(amount)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededMaxSupply(amount) && !this.isNegative(amount)
         },
         isNumFormatValid(amount) {
             return common.isNumFormatValid(amount)
@@ -749,5 +771,11 @@ export default {
 }
 .tokenSucced {
     text-align: center;
+}
+.vsys-check {
+    display: block;
+    margin-top: -10px;
+    font-size: 80%;
+    color: #dc3545;
 }
 </style>
