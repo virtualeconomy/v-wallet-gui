@@ -1,7 +1,7 @@
 <template>
   <div class="row justify-content-between height-full">
     <div class="col-auto align-self-center text-left tran-head">
-      <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+      <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
            class="money-icon"
            width="30"
            height="30">
@@ -13,7 +13,7 @@
       </p>
     </div>
     <div class="col-auto align-self-center text-left">
-      <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+      <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
            width="16"
            height="16">
       <span class="sub-title">
@@ -24,7 +24,7 @@
       </p>
     </div>
     <div class="col-auto align-self-center text-left">
-      <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+      <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
            width="16"
            height="16">
       <span class="sub-title">
@@ -35,7 +35,7 @@
       </p>
     </div>
     <div class="col-auto align-self-center text-left">
-      <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+      <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
            width="16"
            height="16">
       <span class="sub-title">
@@ -58,7 +58,7 @@
       <b-button variant="dark"
                 id="leaseHelp"
                 class="btn-help">
-        <img src="../../../assets/imgs/icons/wallet/ic_help.svg">
+        <img src="@/assets/imgs/icons/wallet/ic_help.svg">
       </b-button>
     </div>
     <b-popover target="leaseHelp"
@@ -72,7 +72,7 @@
         <div class="description-split"></div>
         <div>
           <div class="quick-icon">
-            <img src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
+            <img src="@/assets/imgs/icons/wallet/ic_leasing_cancel.svg"
                  width="40"
                  height="40">
           </div>
@@ -95,7 +95,7 @@
 
 <script>
 import Lease from '../modals/Lease'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 
 export default {

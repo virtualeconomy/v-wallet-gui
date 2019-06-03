@@ -24,6 +24,12 @@
       </p>
     </div>
     <div class="col align-self-center text-right">
+      <b-button variant="white"
+                class="btn-creat"
+                v-b-modal.newTokenModal>
+        <img v-if="!isMobile"
+             class="icon-btn"
+             src="@/assets/imgs/icons/wallet/ic_new_token_yellow.svg"><b>Create Token</b></b-button>
       <b-button variant="dark"
                 class="btn-send"
                 v-b-modal.sendModal>
@@ -46,19 +52,26 @@
           @endSendSignal="endSendSignal"></Send>
     <Receive show="false"
              :address="address"></Receive>
+    <NewToken show="false"
+              :balances="balances"
+              :cold-addresses="coldAddresses"
+              :addresses="addresses"
+              :selected-address="address"
+              :wallet-type="walletType"
+              @endLeaseSignal="endLeaseSignal"></NewToken>
   </div>
 </template>
 
 <script>
+import NewToken from '../modals/NewToken'
 import Receive from '../modals/Receive'
 import Send from '../modals/Send'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 export default {
-    name: 'TransPane',
+    name: 'TokenPane',
     components: {
-        Receive,
-        Send
+        NewToken, Receive, Send
     },
     data() {
         return {
@@ -92,8 +105,7 @@ export default {
         },
         balances: {
             type: Object,
-            default: function() {
-            },
+            default: function() {},
             require: true
         },
         total: {
@@ -113,6 +125,9 @@ export default {
         formatter(num) {
             return browser.bigNumberFormatter(num)
         },
+        endLeaseSignal() {
+            this.$emit('updateInfo')
+        },
         endSendSignal() {
             this.$emit('updateInfo')
         }
@@ -130,13 +145,6 @@ export default {
     font-size: 200%;
     line-height: 120%;
 }
-.btn-send {
-    background-color: @sendColor;
-    color: white;
-    border: 1px solid @sendColor;
-    width: 124px;
-    height: 42px;
-}
 .btn-send:active, .btn-send:hover{
     background-color: #E03146 !important;
     border: 1px solid #E03146 !important;
@@ -146,7 +154,7 @@ export default {
     background-color: @receiveColor;
     color: white;
     border: 1px solid @receiveColor;
-    width: 124px;
+    width: 150px;
     height: 42px;
 }
 .btn-receive:active, .btn-receive:hover {
@@ -162,5 +170,19 @@ export default {
 }
 .icon-btn {
     margin-right: 10px;
+}
+.btn-creat {
+    border-color: #FF8837;
+    color: #FF8837;
+    margin-right: 15px;
+    font-size: 17px;
+    font-weight:lighter;
+}
+.btn-send {
+    background-color: @sendColor;
+    color: white;
+    border: 1px solid @sendColor;
+    width: 124px;
+    height: 42px;
 }
 </style>

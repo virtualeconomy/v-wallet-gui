@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="18px" height="18px" viewBox="0 0 18 18" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_check_selected</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Export" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(-71.000000, -217.000000)" id="ic_check_selected">
+            <g transform="translate(71.000000, 217.000000)">
+                <rect id="Bg" stroke="#FF8737" fill="#FF8737" x="0.5" y="0.5" width="17" height="17" rx="2"></rect>
+                <polygon id="Check" fill="#FFFFFF" points="6.81353042 11.2177374 3.96873223 8.37293917 3 9.33484935 6.81353042 13.1483798 15 4.96191018 14.0380898 4"></polygon>
+            </g>
+        </g>
+    </g>
+</svg>

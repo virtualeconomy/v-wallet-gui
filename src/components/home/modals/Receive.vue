@@ -9,7 +9,7 @@
     <button
       class="close btn-close"
       @click="closeModal">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <b-container
       fluid
@@ -35,7 +35,7 @@
           v-b-popover.click.topright="'Copied!'"
           @click="copyAddr"
           variant="link">
-          <img src="../../../assets/imgs/icons/operate/ic_copy.svg">
+          <img src="@/assets/imgs/icons/operate/ic_copy.svg">
         </b-btn>
       </b-form-group>
       <b-form-group label="Amount"
@@ -49,12 +49,16 @@
                       min="0">
         </b-form-input>
         <b-form-invalid-feedback id="inputLiveFeedback"
-                                 v-if="isWrongFormat(amount)">
+                                 v-if="!checkPrecision(amount)">
           The number in this field is invalid. The minimum unit of amount is 0.00000001.
         </b-form-invalid-feedback>
         <b-form-invalid-feedback id="inputLiveFeedback"
                                  v-else-if="isNegative(amount)">
           Negative number is not allowed.
+        </b-form-invalid-feedback>
+        <b-form-invalid-feedback id="inputLiveFeedback"
+                                 v-else-if="!isNumFormatValid(amount)">
+          Invalid format.
         </b-form-invalid-feedback>
         <b-form-invalid-feedback id="inputLiveFeedback"
                                  v-else>
@@ -89,6 +93,7 @@
 import jrQrcode from 'jr-qrcode'
 import { API_VERSION, PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION, TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants.js'
 import BigNumber from 'bignumber.js'
+import common from '@/utils/common'
 export default {
     name: 'Receive',
     props: {
@@ -159,16 +164,19 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && !/[eE]/.test(amount.toString())
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isNegative(amount)
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
         },
-        isWrongFormat(amount) {
-            return (amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8)
+        isNumFormatValid(amount) {
+            return common.isNumFormatValid(amount)
+        },
+        checkPrecision(amount) {
+            return common.checkPrecision(amount, 8)
         },
         isValid(amount, invoice) {
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isNegative(amount) && invoice.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && invoice.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         copyAddr() {
             this.$refs.addrToCopy.select()

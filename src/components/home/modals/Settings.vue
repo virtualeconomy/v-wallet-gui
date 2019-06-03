@@ -9,7 +9,7 @@
     <button
       class="close btn-close"
       @click="closeModal">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <div class="div-set">
       <div class="lang-setting div-t">

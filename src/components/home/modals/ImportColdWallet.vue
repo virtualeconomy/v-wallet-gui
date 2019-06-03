@@ -16,7 +16,7 @@
       :disabled="qrInit"
       class="close btn-close"
       @click="closeModal">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <b-container fluid
                  class="c-import">
@@ -55,7 +55,7 @@
                class="qrcode-waiting"
                height="100"
                width="100"
-               src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+               src="@/assets/imgs/icons/wallet/ic_wait.svg">
         </qrcode-reader>
         <b-btn class="scan-again-btn"
                variant="warning"

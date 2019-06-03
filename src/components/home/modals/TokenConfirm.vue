@@ -1,16 +1,49 @@
 <template>
   <div>
-    <img v-if="txType==='transfer'"
-         src="@/assets/imgs/icons/operate/ic_sent_big.svg">
-    <img v-else-if="txType==='lease'"
-         src="@/assets/imgs/icons/operate/ic_leasing_big.svg">
     <div class="infos">
-      <b-form-group horizontal
+      <b-form-group v-if="txType==='Destroy Token'"
+                    horizontal
                     class="form-line"
-                    label="Amount"
+                    label="Burn Amount"
                     label-for="amount_confirm">
         <b-form-input id="amount_confirm"
-                      :value="formatter(amount) + ' VSYS'"
+                      :value="formatter(amount)"
+                      class="amount"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group v-else-if="txType==='Register New Token'"
+                    horizontal
+                    class="form-line"
+                    label="Total Supply"
+                    label-for="amount_confirm">
+        <b-form-input id="amount_confirm"
+                      :value="formatter(amount)"
+                      class="amount"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group v-else-if="txType==='Send Token'"
+                    horizontal
+                    class="form-line"
+                    label="Send Amount"
+                    label-for="amount_confirm">
+        <b-form-input id="amount_confirm"
+                      :value="formatter(amount)"
+                      class="amount"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group v-else
+                    horizontal
+                    class="form-line"
+                    label="Issue Amount"
+                    label-for="amount_confirm">
+        <b-form-input id="amount_confirm"
+                      :value="formatter(amount)"
                       class="amount"
                       readonly
                       :plaintext="true">
@@ -38,26 +71,14 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group v-if="txType==='Send Token'"
+                    horizontal
                     class="form-line"
                     label="To"
-                    label-for="recipientAddress_confirm">
-        <b-form-input id="recipientAddress_confirm"
+                    label-for="toAddress_confirm">
+        <b-form-input id="toAddress_confirm"
                       v-model="recipient"
                       class="addr"
-                      margin-left="0px"
-                      readonly
-                      :plaintext="true">
-        </b-form-input>
-      </b-form-group>
-      <b-form-group horizontal
-                    class="form-line"
-                    label="Description"
-                    label-for="attachment_confirm"
-                    v-if="txType==='transfer'">
-        <b-form-input id="attachment_confirm"
-                      v-model="attachment"
-                      class="des"
                       readonly
                       :plaintext="true">
         </b-form-input>
@@ -67,7 +88,7 @@
                     label="Fee"
                     label-for="fee_confirm">
         <b-form-input id="fee_confirm"
-                      :value="formatter(fee) + ' VSYS'"
+                      :value="Number(fee) + ' VSYS'"
                       class="fee"
                       readonly
                       :plaintext="true">
@@ -80,16 +101,11 @@
 <script>
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE } from '@/constants'
+import { TOKEN_FEE } from '@/constants'
 export default {
-    name: 'Confirm',
+    name: 'TokenConfirm',
     props: {
         address: {
-            type: String,
-            require: true,
-            default: ''
-        },
-        recipient: {
             type: String,
             require: true,
             default: ''
@@ -105,16 +121,16 @@ export default {
             type: BigNumber,
             require: true,
             default: function() {
-                return BigNumber(TX_FEE)
+                return BigNumber(TOKEN_FEE)
             }
-        },
-        attachment: {
-            type: String,
-            default: ''
         },
         txType: {
             type: String,
             require: true,
+            default: ''
+        },
+        recipient: {
+            type: String,
             default: ''
         }
     },
@@ -139,7 +155,7 @@ export default {
     overflow-x: visible;
 }
 .infos {
-    width: 439px;
+    width: 409px;
     margin-top: 30px;
     border-bottom: 1px solid #E8E9ED;
     margin-bottom: 40px;

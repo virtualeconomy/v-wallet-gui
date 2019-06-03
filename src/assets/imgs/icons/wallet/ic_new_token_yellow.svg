@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_new_token_yellow</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Export" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(-57.000000, -41.000000)" id="ic_new_token_yellow">
+            <g transform="translate(57.000000, 41.000000)">
+                <rect id="Guide" fill-opacity="0" fill="#FFFFFF" x="0" y="0" width="16" height="16"></rect>
+                <path d="M8.00210394,2.78323584 L3.58814587,13.2162276 L7.73366619,10.5781693 C7.8974494,10.4739436 8.10675848,10.4739436 8.27054169,10.5781693 L12.416062,13.2162276 L8.00210394,2.78323584 Z M8.00210394,11.5926548 L2.77054169,14.9218307 C2.35661909,15.185236 1.85045265,14.7570308 2.04162031,14.30518 L7.54162031,1.30518 C7.71377314,0.898273332 8.29043474,0.898273332 8.46258757,1.30518 L13.9625876,14.30518 C14.1537552,14.7570308 13.6475888,15.185236 13.2336662,14.9218307 L8.00210394,11.5926548 Z" id="ic_new_token" fill="#FF8837" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>

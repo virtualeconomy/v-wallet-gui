@@ -24,7 +24,7 @@
               type="button"
               :disabled="!avatarCanChange||registering"
               @click="changeAvatar()">
-              <img src="../../../assets/imgs/icons/signup/ico_refresh.svg"> Change one {{ timeLeftToChangeStr }}
+              <img src="@/assets/imgs/icons/signup/ico_refresh.svg"> Change one {{ timeLeftToChangeStr }}
             </button>
           </div>
         </div>
@@ -80,7 +80,7 @@
           <img
             v-if="password && !isPassErrors"
             class="check-right"
-            src="../../../assets/imgs/icons/signup/ic_check_green.svg">
+            src="@/assets/imgs/icons/signup/ic_check_green.svg">
           <small
             id="emailHelp"
             class="form-text text-muted text-right">
@@ -103,7 +103,7 @@
           <img
             id="img_read"
             @click="changeicon"
-            src="../../../assets/imgs/icons/signup/ic_select_border.svg">
+            src="@/assets/imgs/icons/signup/ic_select_border.svg">
           I have read and agree to the <a class='vsys-color'
                                           href="#"
                                           target="_blank"

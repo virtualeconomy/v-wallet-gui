@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="16px" height="16px" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 52.5 (67469) - http://www.bohemiancoding.com/sketch -->
+    <title>ic_new_token</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Export" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g transform="translate(-438.000000, -114.000000)" fill="#FFFFFF" fill-rule="nonzero" id="ic_new_token">
+            <g transform="translate(440.000000, 115.000000)">
+                <path d="M6.00210394,1.78323584 L1.58814587,12.2162276 L5.73366619,9.57816926 C5.8974494,9.47394358 6.10675848,9.47394358 6.27054169,9.57816926 L10.416062,12.2162276 L6.00210394,1.78323584 Z M6.00210394,10.5926548 L0.770541686,13.9218307 C0.356619093,14.185236 -0.149547349,13.7570308 0.0416203145,13.30518 L5.54162031,0.305180005 C5.71377314,-0.101726668 6.29043474,-0.101726668 6.46258757,0.305180005 L11.9625876,13.30518 C12.1537552,13.7570308 11.6475888,14.185236 11.2336662,13.9218307 L6.00210394,10.5926548 Z"></path>
+            </g>
+        </g>
+    </g>
+</svg>

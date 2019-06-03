@@ -21,7 +21,7 @@
         class="balance-input"
         readonly>
         <span class="balance-title">
-          <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+          <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
                width="20"
                height="20">
         </span>
@@ -58,7 +58,7 @@
         <option v-for="addr in coldRecipientAddressList.keys()"
                 :key="addr">{{ addr }}</option>
       </datalist>
-      <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
+      <img src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
            v-b-tooltip.hover
            class="qr-code"
            @click="scanChange"
@@ -81,7 +81,7 @@
                  class="qrcode-waiting center"
                  height="70"
                  width="70"
-                 src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
           </qrcode-reader>
         </div>
         <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
@@ -97,7 +97,7 @@
                     onfocus="this.select()">
       </b-form-input>
       <b-form-invalid-feedback id="inputLiveFeedback"
-                               v-if="isWrongFormat(amount)">
+                               v-if="!checkPrecision(amount)">
         The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
       </b-form-invalid-feedback>
       <b-form-invalid-feedback id="inputLiveFeedback"
@@ -107,6 +107,10 @@
       <b-form-invalid-feedback id="inputLiveFeedback"
                                v-else-if="isNegative(amount)">
         Negative number is not allowed.
+      </b-form-invalid-feedback>
+      <b-form-invalid-feedback id="inputLiveFeedback"
+                               v-else-if="!isNumFormatValid(amount)">
+        Invalid format.
       </b-form-invalid-feedback>
       <b-form-invalid-feedback id="inputLiveFeedback"
                                v-else>
@@ -129,9 +133,10 @@
 <script>
 import { TX_FEE, VSYS_PRECISION, PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/constants'
 import crypto from '@/utils/crypto'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
+import common from '@/utils/common'
 
 export default {
     name: 'LeaseInput',
@@ -202,7 +207,7 @@ export default {
     },
     computed: {
         isSubmitDisabled() {
-            return !(this.recipient && BigNumber(this.amount) > 0 && this.isValidRecipient(this.recipient) && this.isAmountValid(this.walletType))
+            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient(this.recipient) && this.isAmountValid(this.walletType))
         },
         isSameWithSender() {
             var thisAddr = this.walletType === 'hot' ? this.address : this.coldAddress
@@ -292,21 +297,20 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return !BigNumber(amount).isNaN() && !this.isWrongFormat(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
         },
-        isWrongFormat(amount) {
-            if ((amount.toString().split('.')[1] && amount.toString().split('.')[1].length > 8) || /[eE]/.test(amount.toString())) {
-                return true
-            } else {
-                return false
-            }
+        isNegative(amount) {
+            return BigNumber(amount).isLessThan(0)
+        },
+        isNumFormatValid(amount) {
+            return common.isNumFormatValid(amount)
+        },
+        checkPrecision(amount) {
+            return common.checkPrecision(amount, 8)
         },
         isInsufficient(amount, type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
             return BigNumber(amount).isGreaterThan(BigNumber(balance).minus(TX_FEE))
-        },
-        isNegative(amount) {
-            return BigNumber(amount).isLessThan(0)
         },
         nextPage() {
             if (this.walletType === 'hot') {

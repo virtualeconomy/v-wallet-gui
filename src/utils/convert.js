@@ -53,6 +53,9 @@ exports.default = {
         }
         return bytes;
     },
+    idxToByteArray: function (input) {
+        return converters_1.default.int32ToBytes(input, true);
+    },
     bigNumberToByteArray: function (input) {
         if (!(input instanceof bignumber_1.default)) {
             throw new Error('BigNumber input is expected');

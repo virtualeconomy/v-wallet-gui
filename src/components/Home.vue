@@ -82,6 +82,37 @@
                   <div>
                     <img
                       class="img-active"
+                      src="../assets/imgs/icons/wallet/ic_polygon_solid.svg">
+                    <img
+                      class="img-nonactive"
+                      src="../assets/imgs/icons/wallet/ic_polygon_line.svg">
+                    <span class="tab-title">Asset</span>
+                  </div>
+                </template>
+                <div class="token-pane">
+                  <TokenPane :balance="balance[selectedAddress]"
+                             :address="selectedAddress"
+                             :wallet-type="walletType"
+                             :balances="balance"
+                             :cold-addresses="coldAddresses"
+                             :total="total"
+                             :addresses="addresses"></TokenPane>
+                </div>
+                <div class="f-records">
+                  <TokenRecords :address="selectedAddress"
+                                :addresses="addresses"
+                                :cold-addresses="coldAddresses"
+                                :wallet-type="walletType"
+                                :balances="balance"
+                                :actived-tab="activedTab">
+                  </TokenRecords>
+                </div>
+              </b-tab>
+              <b-tab>
+                <template slot="title">
+                  <div>
+                    <img
+                      class="img-active"
                       src="../assets/imgs/icons/wallet/ic_transaction_solid.svg">
                     <img
                       class="img-nonactive"
@@ -89,19 +120,9 @@
                     <span class="tab-title">Transaction</span>
                   </div>
                 </template>
-                <div class="trans-pane">
-                  <trans-pane :balance="balance[selectedAddress]"
-                              :address="selectedAddress"
-                              :wallet-type="walletType"
-                              :balances="balance"
-                              :cold-addresses="coldAddresses"
-                              :total="total"
-                              :addresses="addresses"
-                              @updateInfo="updateInfo"></trans-pane>
-                </div>
                 <div class="f-records">
                   <Records :address="selectedAddress"
-                           :tab-active="tabActive"></Records>
+                           :actived-tab="activedTab"></Records>
                 </div>
               </b-tab>
               <b-tab>
@@ -131,7 +152,7 @@
                 </div>
                 <div class="f-records">
                   <LeaseRecords :address="selectedAddress"
-                                :tab-active="tabActive"
+                                :actived-tab="activedTab"
                                 :wallet-type="walletType"
                                 :cold-pub-key="coldPubKey"
                                 :address-index="addresses[selectedAddress]"></LeaseRecords>
@@ -147,7 +168,7 @@
 
 <script>
 import NavBar from './home/elements/NavBar'
-import TransPane from './home/elements/TransPane'
+// import TransPane from './home/elements/TransPane'
 import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
@@ -156,6 +177,9 @@ import seedLib from '@/libs/seed.js'
 import Records from './home/elements/Records'
 import LeasePane from './home/elements/LeasePane'
 import LeaseRecords from './home/elements/LeaseRecords'
+import TokenPane from './home/elements/TokenPane'
+import TokenRecords from './home/elements/TokenRecords'
+import AddToken from './home/modals/AddToken'
 import BigNumber from 'bignumber.js'
 import JSONBigNumber from 'json-bignumber'
 
@@ -171,7 +195,7 @@ export default {
             sortedAddresses: {},
             walletType: '',
             sortFlag: 0,
-            tabActive: 'trans',
+            activedTab: 'token',
             available: BigNumber(0),
             leasedIn: BigNumber(0),
             leasedOut: BigNumber(0),
@@ -280,11 +304,13 @@ export default {
             }, oldTimeout * 60 * 1000)
         },
         tranTabChange(tabIndex) {
+            this.getBalance(this.selectedAddress)
             if (tabIndex === 0) {
-                this.tabActive = 'trans'
+                this.activedTab = 'token'
             } else if (tabIndex === 1) {
-                this.tabActive = 'lease'
-                this.getBalance(this.selectedAddress)
+                this.activedTab = 'trans'
+            } else if (tabIndex === 2) {
+                this.activedTab = 'lease'
             }
         },
         resetSessionClearTimeout() {
@@ -401,12 +427,15 @@ export default {
 
     components: {
         ImportColdWallet,
-        TransPane,
+        // TransPane,
         NavBar,
         Asset,
         Records,
         LeaseRecords,
-        LeasePane
+        LeasePane,
+        TokenPane,
+        TokenRecords,
+        AddToken
     }
 }
 </script>
@@ -418,7 +447,7 @@ export default {
     height: 100%;
     min-width: 1000px;
 }
-.trans-pane, .lease-pane {
+.trans-pane, .lease-pane, .token-pane {
     height:@trxDivH;
     width: 100%;
 }
@@ -457,6 +486,7 @@ export default {
     margin-left: auto;
     margin-right: auto;
     color: @vsysColor;
+    z-index: 1000;
 }
 .pointer {
     cursor: pointer;
@@ -503,5 +533,12 @@ export default {
 .sort-image {
     left: 0px;
     margin-left: 15px;
+}
+.input {
+    margin-top: -100px;
+    top: 100px;
+}
+.test {
+    z-index: 100;
 }
 </style>

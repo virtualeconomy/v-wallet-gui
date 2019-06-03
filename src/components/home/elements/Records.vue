@@ -23,15 +23,15 @@
           <div style="display:inline-block; margin-right: 10px;">
             <img
               v-if="!changeShowDisable"
-              src="../../../assets/imgs/icons/wallet/ic_filter.svg">
+              src="@/assets/imgs/icons/wallet/ic_filter.svg">
             <img
               height="16"
               width="16"
               v-if="changeShowDisable"
-              src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+              src="@/assets/imgs/icons/wallet/ic_wait.svg">
             <span class="m-1">Latest {{ showingNum }} Records </span>
           </div>
-          <img src="../../../assets/imgs/icons/signup/ic_arrow_down.svg">
+          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
         </template>
         <b-dropdown-item
           class="selection"
@@ -48,7 +48,7 @@
         <b-btn
           class="btn-export"
           :disabled="changeShowDisable"
-          variant="light"><img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
+          variant="light"><img src="@/assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
       </json-excel>
     </div>
     <div class="inherit-height">
@@ -86,14 +86,14 @@
         <template slot="button-content">
           <div style="display:inline-block; margin-right: 10px;">
             <img v-if="!changeShowDisable"
-                 src="../../../assets/imgs/icons/wallet/ic_filter.svg">
+                 src="@/assets/imgs/icons/wallet/ic_filter.svg">
             <img height="16"
                  width="16"
                  v-if="changeShowDisable"
-                 src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
             <span class="m-1">Latest {{ showingNum }} Records </span>
           </div>
-          <img src="../../../assets/imgs/icons/signup/ic_arrow_down.svg">
+          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
         </template>
         <b-dropdown-item class="selection"
                          v-for="num in showNums"
@@ -107,14 +107,14 @@
                   :name="'txs_' + address + '.' + downloadFileType">
         <b-btn class="btn-export"
                :disabled="changeShowDisable"
-               variant="light"><img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
+               variant="light"><img src="@/assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
       </json-excel>
     </div>
     <img
       height="50"
       width="50"
       v-if="changeShowDisable"
-      src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+      src="@/assets/imgs/icons/wallet/ic_wait.svg">
     <div
       v-if="!changeShowDisable"
       class="empty">
@@ -124,11 +124,11 @@
 </template>
 
 <script>
-import { NODE_IP, VSYS_PRECISION } from '../../../constants'
+import { NODE_IP, VSYS_PRECISION } from '@/constants'
 import Record from './Record'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import base58 from '@/libs/base58'
 import crypto from '@/utils/crypto'
 import JSONBigNumber from 'json-bignumber'
@@ -139,8 +139,8 @@ export default {
         JsonExcel
     },
     created() {
-        this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
-        if (this.address && Vue.ls.get('pwd') && this.tabActive === 'trans') {
+        this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 100) + 'px'
+        if (this.address && Vue.ls.get('pwd') && this.activedTab === 'trans') {
             this.getTxRecords()
         }
     },
@@ -177,20 +177,29 @@ export default {
             type: String,
             default: ''
         },
-        tabActive: {
+        activedTab: {
             type: String,
             default: 'trans'
         }
     },
     watch: {
         address(newAddr, oldAddr) {
-            if (newAddr === '' || this.tabActive !== 'trans') {
+            if (newAddr === '' || this.activedTab !== 'trans') {
                 return
             }
             this.changeShowDisable = false
             this.showingNum = 10
             if (this.address && Vue.ls.get('pwd')) {
                 this.getTxRecords()
+            }
+        },
+        activedTab(newTab, oldTab) {
+            if (newTab === 'trans') {
+                this.changeShowDisable = false
+                this.showingNum = 10
+                if (this.address && Vue.ls.get('pwd')) {
+                    this.getTxRecords()
+                }
             }
         }
     },
@@ -266,13 +275,14 @@ export default {
         },
         exportRecords() {
             if (this.response) {
-                for (var i = 0; i < this.response.length; i++) {
-                    if (this.response[i].amount) {
-                        this.response[i].amount = this.response[i].amount.dividedBy(VSYS_PRECISION)
+                var tempResponse = JSON.parse(JSON.stringify(this.response))
+                for (var i = 0; i < tempResponse.length; i++) {
+                    if (tempResponse[i].amount) {
+                        tempResponse[i].amount = this.response[i].amount.dividedBy(VSYS_PRECISION)
                     }
-                    this.response[i].fee = this.response[i].fee / VSYS_PRECISION
+                    tempResponse[i].fee = tempResponse[i].fee / VSYS_PRECISION
                 }
-                this.responseExport = this.response
+                this.responseExport = tempResponse
             }
             return this.responseExport
         }
@@ -288,12 +298,14 @@ export default {
 .records {
     background: #FFFFFF;
     border: 1px solid #E8E9ED;
+    height: 900px;
     border-radius: 4px;
     margin: 0px 0px;
 }
 .scroll {
-    overflow-y: auto;
+    overflow-y: scroll;
     overflow-x: hidden;
+    height: 900px;
 }
 .monthTtl {
     height: 44px;
@@ -309,7 +321,9 @@ export default {
 .inherit-height {
     position: relative;
     padding-top: 52px;
-    top: -52px;
+    height: inherit;
+    top:-52px;
+    margin-bottom: -52px;
 }
 .title-records {
     background: #FAFAFA;

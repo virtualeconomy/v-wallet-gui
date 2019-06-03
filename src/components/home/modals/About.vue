@@ -9,18 +9,18 @@
     <button
       class="close btn-close"
       @click="closeModal">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <div class="about-container">
       <div class="image-illustration">
-        <img src="../../../assets/imgs/icons/wallet/ic_illustration_wallet.svg">
+        <img src="@/assets/imgs/icons/wallet/ic_illustration_wallet.svg">
       </div>
       <div class="about-vsyswallet">About V Wallet
       </div>
       <div class="version">Version {{ vnumber }}
       </div>
       <div class="about_text">
-        V Wallet is a reference implementation of cross-platform browser wallet for the V Systems blockchain network. It features basic hot wallet mode and cold wallet interaction/monitoring mode. It implements V Systems wallet format specification 1.0 and V Systems wallet QR code API 2.0.
+        V Wallet is a reference implementation of cross-platform browser wallet for the V Systems blockchain network. It features basic hot wallet mode and cold wallet interaction/monitoring mode. It implements V Systems wallet format specification 1.0 and V Systems wallet QR code API 3.0.
       </div>
       <div class="right-reserved">@2018-2019 V SYSTEMS LIMITED All rights reserved
       </div>

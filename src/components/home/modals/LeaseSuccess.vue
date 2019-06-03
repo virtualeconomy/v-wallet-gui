@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
+    <img src="@/assets/imgs/icons/operate/ic_success_circle.svg">
     <div>
       <p class="p-tips">Your transaction is on the way!</p>
       <p class="p-info">You have leased {{ formatter(amount) }} VSYS</p>
@@ -12,8 +12,8 @@
 </template>
 <script>
 import TxInfoModal from '../elements/TxInfoModal'
-import { TX_FEE } from '../../../constants'
-import browser from '../../../utils/browser'
+import { TX_FEE } from '@/constants'
+import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 export default {
     name: 'LeaseSuccess',

@@ -5,27 +5,43 @@
       <b-col class="record-icon"
              cols="auto">
         <img v-if="txIcon==='sent'"
-             src="../../../assets/imgs/icons/wallet/ic_sent.svg"
+             src="@/assets/imgs/icons/wallet/ic_sent.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='received'"
-             src="../../../assets/imgs/icons/wallet/ic_received.svg"
+             src="@/assets/imgs/icons/wallet/ic_received.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='leased in'"
-             src="../../../assets/imgs/icons/wallet/ic_leasing_reverse.svg"
+             src="@/assets/imgs/icons/wallet/ic_leasing_reverse.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='leased out'"
-             src="../../../assets/imgs/icons/wallet/ic_leasing.svg"
+             src="@/assets/imgs/icons/wallet/ic_leasing.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='leased out canceled'"
-             src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
+             src="@/assets/imgs/icons/wallet/ic_leasing_cancel.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='leased in canceled'"
-             src="../../../assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
+             src="@/assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
+             width="32px"
+             height="32px">
+        <img v-else-if="txIcon==='register contract' && txStatus === 'Success'"
+             src="@/assets/imgs/icons/wallet/ic_contract_signup.svg"
+             width="32px"
+             height="32px">
+        <img v-else-if="txIcon==='register contract' && txStatus !== 'Success'"
+             src="@/assets/imgs/icons/wallet/ic_exec_fail.svg"
+             width="32px"
+             height="32px">
+        <img v-else-if="txIcon==='execute contract function' && txStatus === 'Success'"
+             src="@/assets/imgs/icons/wallet/ic_exec_success.svg"
+             width="32px"
+             height="32px">
+        <img v-else-if="txIcon==='execute contract function' && txStatus !== 'Success'"
+             src="@/assets/imgs/icons/wallet/ic_exec_fail.svg"
              width="32px"
              height="32px">
       </b-col>
@@ -64,11 +80,12 @@
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span>{{ formatter(txAmount) }} VSYS</span>
+          <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ formatter(txAmount) }} VSYS</span>
         </div>
         <div class="tx-fee"
-             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out') && feeFlag">Tx Fee: -
-          <span> {{ formatter(txFee) }} VSYS </span>
+             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'register contract' || txIcon === 'execute contract function') && feeFlag">
+          <span v-if="(txFee !== 0)"> Tx Fee: - {{ formatter(txFee) }} VSYS </span>
+          <span v-else> Tx Fee: {{ txFee }} VSYS </span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -83,10 +100,10 @@
               @mouseout="unhoverIco">
               <img
                 v-if="hovered"
-                src="../../../assets/imgs/icons/wallet/ic_more_hover.svg">
+                src="@/assets/imgs/icons/wallet/ic_more_hover.svg">
               <img
                 v-if="!hovered"
-                src="../../../assets/imgs/icons/wallet/ic_more.svg">
+                src="@/assets/imgs/icons/wallet/ic_more.svg">
             </div>
           </template>
           <b-dropdown-item @click="showModal">TX info</b-dropdown-item>
@@ -110,6 +127,7 @@
                  :tx-fee="txFee"
                  :tx-amount="txAmount"
                  :tx-block="txBlock"
+                 :tx-status="txStatus"
                  :tx-attachment="txAttachment"
                  :trans-type="transType"
                  :self-send="selfSend"
@@ -143,11 +161,10 @@
 import TxInfoModal from './TxInfoModal'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
-import { VSYS_PRECISION } from '@/constants'
 import crypto from '@/utils/crypto'
 import CancelLease from '../modals/CancelLease'
-import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '../../../constants'
-import browser from '../../../utils/browser'
+import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '@/constants'
+import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 
 export default {
@@ -233,6 +250,10 @@ export default {
                 } else {
                     return 'Leased Out Canceled'
                 }
+            } else if (this.txRecord['type'] === CONTRACT_CREATE_TX) {
+                return 'Register Contract'
+            } else if (this.txRecord['type'] === CONTRACT_EXEC_TX) {
+                return 'Execute Contract Function'
             } else {
                 return 'Received'
             }
@@ -281,6 +302,10 @@ export default {
                 return 'Sent'
             } else if (this.txType === 'Received') {
                 return 'Received'
+            } else if (this.txType === 'Execute Contract Function') {
+                return 'Execute Contract Function'
+            } else if (this.txType === 'Register Contract') {
+                return 'Register Contract'
             }
         },
         txTime() {
@@ -319,10 +344,19 @@ export default {
             return BigNumber(this.txRecord.amount).dividedBy(VSYS_PRECISION)
         },
         txFee() {
+            var sender = this.txRecord.proofs === undefined ? this.address : crypto.buildRawAddress(base58.decode(this.txRecord.proofs[0].publicKey))
+            if (this.txTitle === 'Execute Contract Function') {
+                if (this.address !== sender) {
+                    return BigNumber(0)
+                }
+            }
             return BigNumber(this.txRecord.fee).dividedBy(VSYS_PRECISION)
         },
         txBlock() {
             return this.txRecord.height
+        },
+        txStatus() {
+            return this.txRecord.status
         },
         txId() {
             return this.txRecord.id
@@ -473,6 +507,27 @@ export default {
       text-align: right;
       padding-right: 0px;
     }
+    .amount-createcontract {
+      font-size: 17px;
+      color: #F5354B;
+      letter-spacing: 0;
+      text-align: right;
+      padding-right: 0px;
+}
+    .amount-executecontractfunction {
+      font-size: 17px;
+      color: #F5354B;
+      letter-spacing: 0;
+      text-align: right;
+      padding-right: 0px;
+}
+    .amount-registercontract {
+      font-size: 17px;
+      color: #F5354B;
+      letter-spacing: 0;
+      text-align: right;
+      padding-right: 0px;
+}
     .record-action {
         padding-left: 0px;
         .more-btn {
