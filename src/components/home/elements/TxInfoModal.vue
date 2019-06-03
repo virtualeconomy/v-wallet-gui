@@ -423,6 +423,7 @@ export default {
             width: 300px;
             position: relative;
             display: inline-block;
+            white-space:nowrap;
         }
         label {
             font-size: 15px;
@@ -437,6 +438,7 @@ export default {
         text-align: right;
         border-radius: 6px;
         padding: 0px;
+        white-space: pre-wrap;
         word-wrap:break-word;
         position:absolute;
         z-index:1;
