@@ -823,7 +823,7 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && this.isTokenInsufficient(amount, type) && !this.isInsufficient(type) && !this.isNegative(amount)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount, type) && !this.isInsufficient(type) && !this.isNegative(amount)
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
