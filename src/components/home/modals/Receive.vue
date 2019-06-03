@@ -9,7 +9,7 @@
     <button
       class="close btn-close"
       @click="closeModal">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <b-container
       fluid
@@ -35,7 +35,7 @@
           v-b-popover.click.topright="'Copied!'"
           @click="copyAddr"
           variant="link">
-          <img src="../../../assets/imgs/icons/operate/ic_copy.svg">
+          <img src="@/assets/imgs/icons/operate/ic_copy.svg">
         </b-btn>
       </b-form-group>
       <b-form-group label="Amount"
@@ -93,7 +93,7 @@
 import jrQrcode from 'jr-qrcode'
 import { API_VERSION, PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION, TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants.js'
 import BigNumber from 'bignumber.js'
-import common from '../../../utils/common'
+import common from '@/utils/common'
 export default {
     name: 'Receive',
     props: {

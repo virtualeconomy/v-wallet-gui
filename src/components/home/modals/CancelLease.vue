@@ -9,13 +9,13 @@
     <button
       class="close btn-close"
       @click="closeModal">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <b-container v-if="page==='confirm'">
       <div class="md-content">
         <div class="cl-title">
           <div class="cl-icon">
-            <img src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
+            <img src="@/assets/imgs/icons/wallet/ic_leasing_cancel.svg"
                  width="60px"
                  height="60px">
           </div>
@@ -70,14 +70,14 @@
 
 <script>
 import Confirm from './Confirm'
-import { CANCEL_LEASE_TX, VSYS_PRECISION, NODE_IP, TX_FEE, FEE_SCALE, PROTOCOL, OPC_TRANSACTION } from '../../../constants'
+import { CANCEL_LEASE_TX, VSYS_PRECISION, NODE_IP, TX_FEE, FEE_SCALE, PROTOCOL, OPC_TRANSACTION } from '@/constants'
 import transaction from '@/utils/transaction'
 import ColdSignature from './ColdSignature'
 import CancelSuccess from './CancelSuccess'
 import TxInfoModal from '../elements/TxInfoModal'
 import seedLib from '@/libs/seed'
 import Vue from 'vue'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 export default {
     name: 'CancelLease',

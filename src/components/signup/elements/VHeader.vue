@@ -2,7 +2,7 @@
   <div class="logo">
     <img
       class="brand-logo"
-      src="../../../assets/imgs/icons/signup/vsys_logo.svg">
+      src="@/assets/imgs/icons/signup/vsys_logo.svg">
   </div>
 </template>
 

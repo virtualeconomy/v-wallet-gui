@@ -8,7 +8,7 @@
       <b-navbar-brand>
         <img
           class="brand-logo"
-          src="../../../assets/imgs/icons/wallet/vsys_logo_small.svg">
+          src="@/assets/imgs/icons/wallet/vsys_logo_small.svg">
         <div v-if="networkType === 'T'"
              style="display: inline-block">
           <p style="color: red;font-size: 15px;">(Testnet)</p>
@@ -73,7 +73,7 @@
 import Settings from '../modals/Settings'
 import Account from '../modals/Account'
 import About from '../modals/About'
-import {NETWORK_BYTE, NODE_IP} from '../../../constants.js'
+import {NETWORK_BYTE, NODE_IP} from '@/constants.js'
 import Vue from 'vue'
 import jdenticon from '@/libs/jdenticon-2.1.0'
 

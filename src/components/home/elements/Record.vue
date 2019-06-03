@@ -5,43 +5,43 @@
       <b-col class="record-icon"
              cols="auto">
         <img v-if="txIcon==='sent'"
-             src="../../../assets/imgs/icons/wallet/ic_sent.svg"
+             src="@/assets/imgs/icons/wallet/ic_sent.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='received'"
-             src="../../../assets/imgs/icons/wallet/ic_received.svg"
+             src="@/assets/imgs/icons/wallet/ic_received.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='leased in'"
-             src="../../../assets/imgs/icons/wallet/ic_leasing_reverse.svg"
+             src="@/assets/imgs/icons/wallet/ic_leasing_reverse.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='leased out'"
-             src="../../../assets/imgs/icons/wallet/ic_leasing.svg"
+             src="@/assets/imgs/icons/wallet/ic_leasing.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='leased out canceled'"
-             src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
+             src="@/assets/imgs/icons/wallet/ic_leasing_cancel.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='leased in canceled'"
-             src="../../../assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
+             src="@/assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='register contract' && txStatus === 'Success'"
-             src="../../../assets/imgs/icons/wallet/ic_contract_signup.svg"
+             src="@/assets/imgs/icons/wallet/ic_contract_signup.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='register contract' && txStatus !== 'Success'"
-             src="../../../assets/imgs/icons/wallet/ic_exec_fail.svg"
+             src="@/assets/imgs/icons/wallet/ic_exec_fail.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='execute contract function' && txStatus === 'Success'"
-             src="../../../assets/imgs/icons/wallet/ic_exec_success.svg"
+             src="@/assets/imgs/icons/wallet/ic_exec_success.svg"
              width="32px"
              height="32px">
         <img v-else-if="txIcon==='execute contract function' && txStatus !== 'Success'"
-             src="../../../assets/imgs/icons/wallet/ic_exec_fail.svg"
+             src="@/assets/imgs/icons/wallet/ic_exec_fail.svg"
              width="32px"
              height="32px">
       </b-col>
@@ -100,10 +100,10 @@
               @mouseout="unhoverIco">
               <img
                 v-if="hovered"
-                src="../../../assets/imgs/icons/wallet/ic_more_hover.svg">
+                src="@/assets/imgs/icons/wallet/ic_more_hover.svg">
               <img
                 v-if="!hovered"
-                src="../../../assets/imgs/icons/wallet/ic_more.svg">
+                src="@/assets/imgs/icons/wallet/ic_more.svg">
             </div>
           </template>
           <b-dropdown-item @click="showModal">TX info</b-dropdown-item>
@@ -161,11 +161,10 @@
 import TxInfoModal from './TxInfoModal'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
-import { VSYS_PRECISION } from '@/constants'
 import crypto from '@/utils/crypto'
 import CancelLease from '../modals/CancelLease'
-import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '../../../constants'
-import browser from '../../../utils/browser'
+import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '@/constants'
+import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 
 export default {

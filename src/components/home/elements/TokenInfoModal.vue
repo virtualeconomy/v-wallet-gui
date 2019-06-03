@@ -10,11 +10,11 @@
       <button
         class="close btn-close"
         @click="closeModal">
-        <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+        <img src="@/assets/imgs/icons/operate/ic_close.svg">
       </button>
       <div class="tx-title">
         <div class="tx-icon">
-          <img src="../../../assets/imgs/icons/operate/ic_token2.svg"
+          <img src="@/assets/imgs/icons/operate/ic_token2.svg"
                width="60px"
                height="60px">
         </div>
@@ -58,7 +58,7 @@
 
 <script>
 import BigNumber from 'bignumber.js'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 export default {
     name: 'TokenInfoModal',
     props: {

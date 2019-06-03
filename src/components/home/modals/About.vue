@@ -9,11 +9,11 @@
     <button
       class="close btn-close"
       @click="closeModal">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <div class="about-container">
       <div class="image-illustration">
-        <img src="../../../assets/imgs/icons/wallet/ic_illustration_wallet.svg">
+        <img src="@/assets/imgs/icons/wallet/ic_illustration_wallet.svg">
       </div>
       <div class="about-vsyswallet">About V Wallet
       </div>

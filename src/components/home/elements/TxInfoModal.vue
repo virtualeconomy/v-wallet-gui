@@ -10,48 +10,48 @@
       <button
         class="close btn-close"
         @click="closeModal">
-        <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+        <img src="@/assets/imgs/icons/operate/ic_close.svg">
       </button>
       <div class="tx-title">
         <div class="tx-icon">
           <img v-if="txIcon==='sent'"
-               src="../../../assets/imgs/icons/wallet/ic_sent.svg"
+               src="@/assets/imgs/icons/wallet/ic_sent.svg"
                width="60px"
                height="60px">
           <img v-else-if="txIcon==='received'"
-               src="../../../assets/imgs/icons/wallet/ic_received.svg"
+               src="@/assets/imgs/icons/wallet/ic_received.svg"
                width="60px"
                height="60px">
           <img v-else-if="txIcon==='leased in'"
-               src="../../../assets/imgs/icons/wallet/ic_leasing_reverse.svg"
+               src="@/assets/imgs/icons/wallet/ic_leasing_reverse.svg"
                width="60px"
                height="60px">
           <img v-else-if="txIcon==='leased out'"
-               src="../../../assets/imgs/icons/wallet/ic_leasing.svg"
+               src="@/assets/imgs/icons/wallet/ic_leasing.svg"
                width="60px"
                height="60px">
           <img v-else-if="txIcon==='leased out canceled'"
-               src="../../../assets/imgs/icons/wallet/ic_leasing_cancel.svg"
+               src="@/assets/imgs/icons/wallet/ic_leasing_cancel.svg"
                width="60px"
                height="60px">
           <img v-else-if="txIcon==='leased in canceled'"
-               src="../../../assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
+               src="@/assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
                width="60px"
                height="60px">
           <img v-else-if="txIcon==='register contract' && txStatus === 'Success'"
-               src="../../../assets/imgs/icons/wallet/ic_contract_signup.svg"
+               src="@/assets/imgs/icons/wallet/ic_contract_signup.svg"
                width="60px"
                height="60px">
           <img v-else-if="txIcon==='register contract' && txStatus !== 'Success'"
-               src="../../../assets/imgs/icons/wallet/ic_exec_fail.svg"
+               src="@/assets/imgs/icons/wallet/ic_exec_fail.svg"
                width="60px"
                height="60px">
           <img v-else-if="txIcon==='execute contract function' && txStatus === 'Success'"
-               src="../../../assets/imgs/icons/wallet/ic_exec_success.svg"
+               src="@/assets/imgs/icons/wallet/ic_exec_success.svg"
                width="60px"
                height="60px">
           <img v-else-if="txIcon==='execute contract function' && txStatus !== 'Success'"
-               src="../../../assets/imgs/icons/wallet/ic_exec_fail.svg"
+               src="@/assets/imgs/icons/wallet/ic_exec_fail.svg"
                width="60px"
                height="60px">
         </div>
@@ -130,9 +130,9 @@
 </template>
 
 <script>
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE, TX_TEST_EXPLORER, NETWORK_BYTE, TX_EXPLORER } from '../../../constants'
+import { TX_FEE, TX_TEST_EXPLORER, NETWORK_BYTE, TX_EXPLORER } from '@/constants'
 export default {
     name: 'TxInfoModal',
     props: {
@@ -222,7 +222,6 @@ export default {
             return browser.isMobile()
         },
         txInfo() {
-            console.log(this.modalId)
             if (this.networkType === 'T') {
                 window.open(TX_TEST_EXPLORER + this.modalId)
             } else {

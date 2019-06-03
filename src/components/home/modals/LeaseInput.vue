@@ -21,7 +21,7 @@
         class="balance-input"
         readonly>
         <span class="balance-title">
-          <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+          <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
                width="20"
                height="20">
         </span>
@@ -58,7 +58,7 @@
         <option v-for="addr in coldRecipientAddressList.keys()"
                 :key="addr">{{ addr }}</option>
       </datalist>
-      <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
+      <img src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
            v-b-tooltip.hover
            class="qr-code"
            @click="scanChange"
@@ -81,7 +81,7 @@
                  class="qrcode-waiting center"
                  height="70"
                  width="70"
-                 src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
           </qrcode-reader>
         </div>
         <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
@@ -133,10 +133,10 @@
 <script>
 import { TX_FEE, VSYS_PRECISION, PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/constants'
 import crypto from '@/utils/crypto'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
-import common from '../../../utils/common'
+import common from '@/utils/common'
 
 export default {
     name: 'LeaseInput',

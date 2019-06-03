@@ -11,7 +11,7 @@
       <button
         class="close btn-close"
         @click="closeModal">
-        <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+        <img src="@/assets/imgs/icons/operate/ic_close.svg">
       </button>
       <b-tabs>
         <b-tab title="Hot Wallet"

@@ -2,9 +2,9 @@
   <div>
     <div class="token-succ-icon">
       <img v-if="txType==='Destroy Token'"
-           src="../../../assets/imgs/icons/operate/ic_burn.svg">
+           src="@/assets/imgs/icons/operate/ic_burn.svg">
       <img v-else
-           src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
+           src="@/assets/imgs/icons/operate/ic_success_circle.svg">
     </div>
     <div class="infos">
       <b-form-group v-if="txType==='Destroy Token'"
@@ -94,9 +94,9 @@
 </template>
 
 <script>
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { TOKEN_FEE } from '../../../constants'
+import { TOKEN_FEE } from '@/constants'
 export default {
     name: 'TokenSuccess',
     props: {

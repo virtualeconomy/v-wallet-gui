@@ -4,7 +4,7 @@
     <b-row align-v="center">
       <b-col class="record-icon"
              cols="auto">
-        <img src="../../../assets/imgs/icons/wallet/ic_token2.svg"
+        <img src="@/assets/imgs/icons/wallet/ic_token2.svg"
              width="32px"
              height="32px">
       </b-col>
@@ -37,10 +37,10 @@
               @mouseout="unhoverIco">
               <img
                 v-if="hovered"
-                src="../../../assets/imgs/icons/wallet/ic_more_hover.svg">
+                src="@/assets/imgs/icons/wallet/ic_more_hover.svg">
               <img
                 v-if="!hovered"
-                src="../../../assets/imgs/icons/wallet/ic_more.svg">
+                src="@/assets/imgs/icons/wallet/ic_more.svg">
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
@@ -106,10 +106,10 @@ import SendToken from './SendToken'
 import IssueToken from './IssueToken'
 import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
-import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '../../../constants.js'
-import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '../../../contract'
+import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/constants.js'
+import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
 import Vue from 'vue'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 export default {
     name: 'TokenRecord',
     components: { TokenInfoModal, SendToken, IssueToken, BurnToken },
@@ -306,6 +306,7 @@ export default {
             this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
         },
         sendToken() {
+            this.getTokenBalances()
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId)
         },

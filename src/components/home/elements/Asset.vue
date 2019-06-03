@@ -7,11 +7,11 @@
         <p class="mb-0 asset-title">Wallet Address</p>
       </div>
       <div class="card-text">
-        <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+        <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
              class="money-icon unselected-icon"
              width="16"
              height="16">
-        <img src="../../../assets/imgs/icons/wallet/Symbol_White.svg"
+        <img src="@/assets/imgs/icons/wallet/Symbol_White.svg"
              class="money-icon selected-icon"
              width="16"
              height="16">
@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 export default {
     name: 'Asset',

@@ -10,7 +10,7 @@
            @hidden="closeModal">
     <button class="close btn-close"
             @click="closeModal">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <b-tabs>
       <b-tab title="Add Token">
@@ -45,8 +45,8 @@
 
 <script>
 import Vue from 'vue'
-import { NODE_IP } from '../../../constants.js'
-import bus from '../../../assets/bus'
+import { NODE_IP } from '@/constants.js'
+import bus from '@/assets/bus'
 export default {
     name: 'AddToken',
     data() {

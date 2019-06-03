@@ -13,7 +13,7 @@
       :disabled="qrInit"
       class="close btn-close"
       @click="endSend">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <b-tabs @input="hideQrScan">
       <b-tab title="Hot Wallet"
@@ -114,7 +114,7 @@
             <img id="img_read"
                  @click="changeIcon"
                  style="font-size: 15px;z-index: 100;"
-                 src="../../../assets/imgs/icons/signup/ic_check.svg"> Support split/reverse-split token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
+                 src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/reverse-split token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
           </div>
           <b-form-group style="margin-top: 10px;">
             <label class="fee-remark">Transaction Fee {{ Number(fee) }} VSYS</label>
@@ -267,7 +267,7 @@
             <img id="img_read_cold"
                  @click="changeColdIcon"
                  style="font-size: 15px;z-index: 100;"
-                 src="../../../assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
+                 src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
           </div>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ Number(coldFee) }} VSYS</label>
@@ -365,19 +365,19 @@
 <script>
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
-import { CONTRACT, CONTRACT_WITH_SPLIT } from '../../../contract'
+import { CONTRACT, CONTRACT_WITH_SPLIT } from '@/contract'
 import seedLib from '@/libs/seed.js'
 import { NODE_IP, OPC_CONTRACT, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, FEE_SCALE, API_VERSION, PROTOCOL } from '@/constants.js'
 import TokenConfirm from './TokenConfirm'
 import TokenSuccess from './TokenSuccess'
 import ColdSignature from './ColdSignature'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
-import base58 from '../../../libs/base58'
-import bus from '../../../assets/bus'
-import common from '../../../utils/common'
+import base58 from '@/libs/base58'
+import bus from '@/assets/bus'
+import common from '@/utils/common'
 var initData = {
     opc: '',
     qrArray: new Array(0),

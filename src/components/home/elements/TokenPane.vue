@@ -1,7 +1,7 @@
 <template>
   <div class="row justify-content-between height-full">
     <div class="col-auto align-self-center text-left tran-head">
-      <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+      <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
            class="money-icon"
            width="30"
            height="30">
@@ -13,7 +13,7 @@
       </p>
     </div>
     <div class="col-auto align-self-center text-left">
-      <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+      <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
            width="16"
            height="16">
       <span class="sub-title">
@@ -29,19 +29,19 @@
                 v-b-modal.newTokenModal>
         <img v-if="!isMobile"
              class="icon-btn"
-             src="../../../assets/imgs/icons/wallet/ic_new_token_yellow.svg"><b>Create Token</b></b-button>
+             src="@/assets/imgs/icons/wallet/ic_new_token_yellow.svg"><b>Create Token</b></b-button>
       <b-button variant="dark"
                 class="btn-send"
                 v-b-modal.sendModal>
         <img v-if="!isMobile"
              class="icon-btn"
-             src="../../../assets/imgs/icons/wallet/ic_send.svg"><b>Send</b></b-button>
+             src="@/assets/imgs/icons/wallet/ic_send.svg"><b>Send</b></b-button>
       <b-button variant="dark"
                 class="btn-receive"
                 v-b-modal.receiveModal>
         <img v-if="!isMobile"
              class="icon-btn"
-             src="../../../assets/imgs/icons/wallet/ic_receive.svg"><b> {{ !isMobile ? 'Receive':'Recv' }} </b></b-button>
+             src="@/assets/imgs/icons/wallet/ic_receive.svg"><b> {{ !isMobile ? 'Receive':'Recv' }} </b></b-button>
     </div>
     <Send show="false"
           :balances="balances"
@@ -66,7 +66,7 @@
 import NewToken from '../modals/NewToken'
 import Receive from '../modals/Receive'
 import Send from '../modals/Send'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 export default {
     name: 'TokenPane',

@@ -52,9 +52,9 @@
 <script>
 
 import Vue from 'vue'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import TokenRecord from './TokenRecord'
-import bus from '../../../assets/bus'
+import bus from '@/assets/bus'
 import AddToken from '../modals/AddToken'
 export default {
     name: 'TokenRecords',

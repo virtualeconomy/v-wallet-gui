@@ -11,7 +11,7 @@
     <button
       class="close btn-close"
       @click="endSend">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <b-tabs @input="hideQrScan">
       <b-tab title="Hot Wallet"
@@ -38,7 +38,7 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/ic_token2.svg"
+                <img src="@/assets/imgs/icons/wallet/ic_token2.svg"
                      width="20"
                      height="20">
               </span>
@@ -154,7 +154,7 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+                <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
                      width="20"
                      height="20">
               </span>
@@ -292,8 +292,8 @@ import { NODE_IP, OPC_FUNCTION, CONTRACT_EXEC_FEE, BURN_FUNCIDX, TRANSFER_ATTACH
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
-import browser from '../../../utils/browser'
-import common from '../../../utils/common'
+import browser from '@/utils/browser'
+import common from '@/utils/common'
 import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
 export default {

@@ -12,7 +12,7 @@
       :disabled="qrInit"
       class="close btn-close"
       @click="endSend">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <b-tabs @input="hideQrScan">
       <b-tab title="Hot Wallet"
@@ -34,7 +34,7 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+                <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
                      width="20"
                      height="20">
               </span>
@@ -56,7 +56,7 @@
               <option v-for="addr in hotRecipientAddressList.keys()"
                       :key="addr">{{ addr }}</option>
             </datalist>
-            <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
+            <img src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
                  class="qr-code"
                  @click="scanChange"
@@ -75,7 +75,7 @@
                        class="qrcode-waiting center"
                        height="70"
                        width="70"
-                       src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+                       src="@/assets/imgs/icons/wallet/ic_wait.svg">
                 </qrcode-reader>
               </div>
               <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
@@ -196,7 +196,7 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/Symbol_Yellow.svg"
+                <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
                      width="20"
                      height="20">
               </span>
@@ -218,7 +218,7 @@
               <option v-for="addr in coldRecipientAddressList.keys()"
                       :key="addr">{{ addr }}</option>
             </datalist>
-            <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
+            <img src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
                  class="qr-code"
                  title="scan qr-code"
@@ -237,7 +237,7 @@
                        class="qrcode-waiting center"
                        height="70"
                        width="70"
-                       src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+                       src="@/assets/imgs/icons/wallet/ic_wait.svg">
                 </qrcode-reader>
               </div>
               <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
@@ -387,8 +387,8 @@ import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
 import ColdSignature from './ColdSignature'
-import browser from '../../../utils/browser'
-import common from '../../../utils/common'
+import browser from '@/utils/browser'
+import common from '@/utils/common'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 var initData = {

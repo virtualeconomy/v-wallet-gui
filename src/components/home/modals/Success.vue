@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img src="../../../assets/imgs/icons/operate/ic_success_circle.svg">
+    <img src="@/assets/imgs/icons/operate/ic_success_circle.svg">
     <div class="infos">
       <b-form-group horizontal
                     class="form-line"
@@ -62,9 +62,9 @@
 </template>
 
 <script>
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE } from '../../../constants'
+import { TX_FEE } from '@/constants'
 export default {
     name: 'Confirm',
     props: {

@@ -23,15 +23,15 @@
           <div style="display:inline-block; margin-right: 10px;">
             <img
               v-if="!changeShowDisable"
-              src="../../../assets/imgs/icons/wallet/ic_filter.svg">
+              src="@/assets/imgs/icons/wallet/ic_filter.svg">
             <img
               height="16"
               width="16"
               v-if="changeShowDisable"
-              src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+              src="@/assets/imgs/icons/wallet/ic_wait.svg">
             <span class="m-1">Latest {{ showingNum }} Records </span>
           </div>
-          <img src="../../../assets/imgs/icons/signup/ic_arrow_down.svg">
+          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
         </template>
         <b-dropdown-item
           class="selection"
@@ -48,7 +48,7 @@
         <b-btn
           class="btn-export"
           :disabled="changeShowDisable"
-          variant="light"><img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
+          variant="light"><img src="@/assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
       </json-excel>
     </div>
     <div class="inherit-height">
@@ -86,14 +86,14 @@
         <template slot="button-content">
           <div style="display:inline-block; margin-right: 10px;">
             <img v-if="!changeShowDisable"
-                 src="../../../assets/imgs/icons/wallet/ic_filter.svg">
+                 src="@/assets/imgs/icons/wallet/ic_filter.svg">
             <img height="16"
                  width="16"
                  v-if="changeShowDisable"
-                 src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
             <span class="m-1">Latest {{ showingNum }} Records </span>
           </div>
-          <img src="../../../assets/imgs/icons/signup/ic_arrow_down.svg">
+          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
         </template>
         <b-dropdown-item class="selection"
                          v-for="num in showNums"
@@ -107,14 +107,14 @@
                   :name="'txs_' + address + '.' + downloadFileType">
         <b-btn class="btn-export"
                :disabled="changeShowDisable"
-               variant="light"><img src="../../../assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
+               variant="light"><img src="@/assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
       </json-excel>
     </div>
     <img
       height="50"
       width="50"
       v-if="changeShowDisable"
-      src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+      src="@/assets/imgs/icons/wallet/ic_wait.svg">
     <div
       v-if="!changeShowDisable"
       class="empty">
@@ -124,11 +124,11 @@
 </template>
 
 <script>
-import { NODE_IP, VSYS_PRECISION } from '../../../constants'
+import { NODE_IP, VSYS_PRECISION } from '@/constants'
 import Record from './Record'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import base58 from '@/libs/base58'
 import crypto from '@/utils/crypto'
 import JSONBigNumber from 'json-bignumber'

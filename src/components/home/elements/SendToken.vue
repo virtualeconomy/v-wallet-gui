@@ -12,7 +12,7 @@
       :disabled="qrInit"
       class="close btn-close"
       @click="endSend">
-      <img src="../../../assets/imgs/icons/operate/ic_close.svg">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <b-tabs @input="hideQrScan">
       <b-tab title="Hot Wallet"
@@ -34,7 +34,7 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/ic_token2.svg"
+                <img src="@/assets/imgs/icons/wallet/ic_token2.svg"
                      width="20"
                      height="20">
               </span>
@@ -56,7 +56,7 @@
               <option v-for="addr in hotRecipientAddressList.keys()"
                       :key="addr">{{ addr }}</option>
             </datalist>
-            <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
+            <img src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
                  class="qr-code"
                  @click="scanChange"
@@ -75,7 +75,7 @@
                        class="qrcode-waiting center"
                        height="70"
                        width="70"
-                       src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+                       src="@/assets/imgs/icons/wallet/ic_wait.svg">
                 </qrcode-reader>
               </div>
               <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
@@ -201,7 +201,7 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="../../../assets/imgs/icons/wallet/ic_token2.svg"
+                <img src="@/assets/imgs/icons/wallet/ic_token2.svg"
                      width="20"
                      height="20">
               </span>
@@ -223,7 +223,7 @@
               <option v-for="addr in coldRecipientAddressList.keys()"
                       :key="addr"> {{ addr }}</option>
             </datalist>
-            <img src="../../../assets/imgs/icons/operate/ic_qr_code_line.svg"
+            <img src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
                  class="qr-code"
                  title="scan qr-code"
@@ -242,7 +242,7 @@
                        class="qrcode-waiting center"
                        height="70"
                        width="70"
-                       src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+                       src="@/assets/imgs/icons/wallet/ic_wait.svg">
                 </qrcode-reader>
               </div>
               <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
@@ -397,10 +397,10 @@ import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import crypto from '@/utils/crypto'
 import ColdSignature from '../modals/ColdSignature'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
-import common from '../../../utils/common'
+import common from '@/utils/common'
 var initData = {
     opc: '',
     recipient: '',
@@ -823,7 +823,7 @@ export default {
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount, type) && !this.isInsufficient(type) && !this.isNegative(amount)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && this.isTokenInsufficient(amount, type) && !this.isInsufficient(type) && !this.isNegative(amount)
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)

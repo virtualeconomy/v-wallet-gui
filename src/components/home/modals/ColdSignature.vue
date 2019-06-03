@@ -40,7 +40,7 @@
                class="qrcode-waiting center"
                height="80"
                width="80"
-               src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+               src="@/assets/imgs/icons/wallet/ic_wait.svg">
         </qrcode-reader>
       </div>
       <div class="flink"
@@ -73,10 +73,10 @@
 
 <script>
 import jrQrcode from 'jr-qrcode'
-import crypto from '../../../utils/crypto'
+import crypto from '@/utils/crypto'
 import BigNumber from 'bignumber.js'
 import { API_VERSION, PROTOCOL, OPC_SIGNATURE, OPC_FUNCTION, OPC_CONTRACT, OPC_TRANSACTION } from '@/constants.js'
-import transaction from '../../../utils/transaction'
+import transaction from '@/utils/transaction'
 export default {
     name: 'ColdSignature',
     data: function() {

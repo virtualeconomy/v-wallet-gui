@@ -1,9 +1,9 @@
 <template>
   <div>
     <img v-if="txType==='transfer'"
-         src="../../../assets/imgs/icons/operate/ic_sent_big.svg">
+         src="@/assets/imgs/icons/operate/ic_sent_big.svg">
     <img v-else-if="txType==='lease'"
-         src="../../../assets/imgs/icons/operate/ic_leasing_big.svg">
+         src="@/assets/imgs/icons/operate/ic_leasing_big.svg">
     <div class="infos">
       <b-form-group horizontal
                     class="form-line"
@@ -78,9 +78,9 @@
 </template>
 
 <script>
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE } from '../../../constants'
+import { TX_FEE } from '@/constants'
 export default {
     name: 'Confirm',
     props: {

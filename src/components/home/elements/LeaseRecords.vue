@@ -19,14 +19,14 @@
         <template slot="button-content">
           <div style="display: inline-block; margin-right: 10px">
             <img v-if="!changeShowDisable"
-                 src="../../../assets/imgs/icons/wallet/ic_filter.svg">
+                 src="@/assets/imgs/icons/wallet/ic_filter.svg">
             <img v-if="changeShowDisable"
                  width="16"
                  height="16"
-                 src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
             <span class="m-1">Latest {{ showingNum }} Records </span>
           </div>
-          <img src="../../../assets/imgs/icons/signup/ic_arrow_down.svg">
+          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
         </template>
         <b-dropdown-item class="selection"
                          @click="changeShowNum(num)"
@@ -65,14 +65,14 @@
         <template slot="button-content">
           <div style="display: inline-block; margin-right: 10px">
             <img v-if="!changeShowDisable"
-                 src="../../../assets/imgs/icons/wallet/ic_filter.svg">
+                 src="@/assets/imgs/icons/wallet/ic_filter.svg">
             <img v-if="changeShowDisable"
                  width="16"
                  height="16"
-                 src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
             <span class="m-1">Latest {{ showingNum }} Records </span>
           </div>
-          <img src="../../../assets/imgs/icons/signup/ic_arrow_down.svg">
+          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
         </template>
         <b-dropdown-item class="selection"
                          @click="changeShowNum(num)"
@@ -84,7 +84,7 @@
     <img height="50"
          width="50"
          v-if="changeShowDisable"
-         src="../../../assets/imgs/icons/wallet/ic_wait.svg">
+         src="@/assets/imgs/icons/wallet/ic_wait.svg">
     <div v-if="!changeShowDisable"
          class="empty">
       There are no transaction records.
@@ -94,10 +94,10 @@
 
 <script>
 
-import {NODE_IP, LEASE_TX, CANCEL_LEASE_TX} from '../../../constants'
+import {NODE_IP, LEASE_TX, CANCEL_LEASE_TX} from '@/constants'
 import Vue from 'vue'
 import Record from './Record'
-import browser from '../../../utils/browser'
+import browser from '@/utils/browser'
 import JSONBigNumber from 'json-bignumber'
 export default {
     name: 'LeaseRecords',
