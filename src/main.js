@@ -11,6 +11,7 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Storage from 'vue-ls'
 import jdenticon from '@/libs/jdenticon-2.1.0'
 import jrQrcode from 'jr-qrcode'
+import store from './store'
 
 const options = {
     namespace: 'vuejs__',
@@ -30,6 +31,7 @@ Vue.use(jrQrcode)
 /* eslint-disable no-new */
 new Vue({
     el: '#app',
+    store,
     router,
     components: {App},
     template: '<App/>'

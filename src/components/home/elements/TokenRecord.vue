@@ -44,7 +44,8 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
-          <b-dropdown-item @click="sendToken">Send Token</b-dropdown-item>
+          <b-dropdown-item v-if="enableStatus"
+                           @click="sendToken">Send Token</b-dropdown-item>
           <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
@@ -194,6 +195,9 @@ export default {
     },
 
     computed: {
+        enableStatus() {
+            return this.$store.state.enableStatus
+        },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.seedaddress))
         },

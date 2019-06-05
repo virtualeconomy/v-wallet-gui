@@ -36,6 +36,13 @@
                @click="showHeight">
         <label class="label-st">Show Current Block Height</label>
       </div>
+      <div class="timeout-setting div-t">
+        <input class="enable-function"
+               type="checkbox"
+               v-model="curEnableStatus"
+               @click="enableFunction">
+        <label class="label-st">Enable Advanced Function</label>
+      </div>
     </div>
     <b-row class="btn-bottom">
       <b-col class="col-lef">
@@ -83,6 +90,7 @@ export default {
     data() {
         return {
             heightStatus: this.getHeightStatus(),
+            curEnableStatus: this.$store.state.enableStatus,
             selectedLang: 'en',
             langOptions: [
                 {
@@ -138,6 +146,21 @@ export default {
             }
             return oldHeightStatus
         },
+        enableFunction: function() {
+            if (!this.curEnableStatus) this.curEnableStatus = true
+            else this.curEnableStatus = false
+        },
+        changeEnableStatus: function() {
+            window.localStorage.setItem('enableStatus', this.$store.state.enableStatus)
+        },
+        getEnableStatus: function() {
+            let oldEnableStatus = false
+            try {
+                oldEnableStatus = JSON.parse(window.localStorage.getItem('enableStatus'))
+            } catch (e) {
+            }
+            return oldEnableStatus
+        },
         getSelectedSession() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT
             try {
@@ -153,11 +176,14 @@ export default {
             this.$emit('passParamToParent', this.heightStatus)
         },
         confirm() {
+            this.$store.commit('changeEnableStatus', this.curEnableStatus)
+            this.changeEnableStatus()
             this.changeHeightStatus()
             this.changeSession()
             this.$refs.settingModal.hide()
         },
         resetSession() {
+            this.curEnableStatus = this.getEnableStatus()
             this.heightStatus = this.getHeightStatus()
             this.selectedSession = this.getSelectedSession()
         }
@@ -220,6 +246,11 @@ export default {
     letter-spacing: 0;
 }
 .show-height {
+    z-index: 100;
+    cursor:pointer;
+    background-color: #FFF;
+}
+.enable-function {
     z-index: 100;
     cursor:pointer;
     background-color: #FFF;
