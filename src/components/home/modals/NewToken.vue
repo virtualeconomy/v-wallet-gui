@@ -110,11 +110,14 @@
               <span class="unity-number-second">10<sup>16</sup></span>
             </div>
           </b-form-group>
-          <div style="margin-top: 10px;">
-            <img id="img_read"
-                 @click="changeIcon"
-                 style="font-size: 15px;z-index: 100;"
-                 src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/reverse-split token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
+          <div v-if="enableStatus"
+               style="margin-top: 10px;">
+            <span>
+              <img id="img_read"
+                   @click="changeIcon"
+                   style="font-size: 15px;z-index: 100;"
+                   src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/reverse-split token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
+            </span>
           </div>
           <b-form-group style="margin-top: 10px;">
             <label class="fee-remark">Transaction Fee {{ Number(fee) }} VSYS</label>
@@ -263,11 +266,14 @@
               <span class="unity-number-second">10<sup>16</sup></span>
             </div>
           </b-form-group>
-          <div style="margin-top: 10px;">
-            <img id="img_read_cold"
-                 @click="changeColdIcon"
-                 style="font-size: 15px;z-index: 100;"
-                 src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
+          <div v-if="enableStatus"
+               style="margin-top: 10px;">
+            <span>
+              <img id="img_read_cold"
+                   @click="changeColdIcon"
+                   style="font-size: 15px;z-index: 100;"
+                   src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
+            </span>
           </div>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ Number(coldFee) }} VSYS</label>
@@ -446,6 +452,9 @@ export default {
         return initData
     },
     computed: {
+        enableStatus() {
+            return this.$store.state.enableStatus
+        },
         defaultAddress() {
             return Vue.ls.get('address')
         },

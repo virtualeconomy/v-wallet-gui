@@ -44,10 +44,11 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
+          <b-dropdown-item v-if="enableStatus"
+                           @click="supersede">Supersede</b-dropdown-item>
           <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
-          <b-dropdown-item @click="supersede">Supersede</b-dropdown-item>
         </b-dropdown>
       </b-col>
     </b-row>
@@ -205,6 +206,9 @@ export default {
     },
 
     computed: {
+        enableStatus() {
+            return this.$store.state.enableStatus
+        },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.seedaddress))
         },
