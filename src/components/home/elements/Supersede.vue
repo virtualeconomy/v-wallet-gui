@@ -383,7 +383,7 @@ export default {
                 contractId: this.contractId,
                 functionId: SUPERSEDE_FUNCIDX,
                 function: transaction.prepareSupersede(this.newIssuer),
-                functionExplain: 'New Issuer ' + this.newIssuer
+                functionExplain: 'Set issuer to ' + this.newIssuer
             }
         }
     },
