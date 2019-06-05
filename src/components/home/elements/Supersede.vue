@@ -132,7 +132,7 @@
           <b-form-group label="Wallet Address"
                         label-for="wallet-address">
             <b-form-input id=coldAddress-input
-                          class="coldAddress-input"
+                          class="address-input"
                           readonly
                           v-model="address"
                           :state="isValidMaker(address)"
@@ -648,7 +648,6 @@ export default {
     border: 1px solid #E8E9ED;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    border-bottom: none;
     background-color: #FFF;
     font-size: 15px;
     color: #181B3A;
