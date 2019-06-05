@@ -45,7 +45,7 @@
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
           <b-dropdown-item v-if="enableStatus"
-                           @click="sendToken">Send Token</b-dropdown-item>
+                           @click="supersede">Supersede</b-dropdown-item>
           <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
@@ -74,6 +74,16 @@
                 :token-unity="unity"
                 @updateBalance="updateBalance">
     </IssueToken>
+    <Supersede :token-id="tokenId"
+               :maker="maker"
+               :address="address"
+               :wallet-type="walletType"
+               :addresses="addresses"
+               :cold-addresses="coldAddresses"
+               :token-balance="tokenBalance"
+               :balance="balances[address]"
+               @updateBalance="updateBalance">
+    </Supersede>
     <SendToken :token-id="tokenId"
                :token-balances="tokenBalances"
                :balances="balances"
@@ -107,13 +117,14 @@ import SendToken from './SendToken'
 import IssueToken from './IssueToken'
 import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
+import Supersede from './Supersede'
 import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/constants.js'
 import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, IssueToken, BurnToken },
+    components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede },
     data: function() {
         return {
             tokenBalance: BigNumber(0),
@@ -313,6 +324,10 @@ export default {
             this.getTokenBalances()
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId)
+        },
+        supersede() {
+            this.getTokenInfo()
+            this.$root.$emit('bv::show::modal', 'supersedeModal_' + this.tokenId)
         },
         issueToken() {
             this.getTokenInfo()

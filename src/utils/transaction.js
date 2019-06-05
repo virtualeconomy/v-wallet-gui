@@ -209,10 +209,15 @@ export default {
         var encodeArr = parametersNum.concat(amountArr)
         return base58_1.default.encode(Uint8Array.from(encodeArr));
     },
+    prepareSupersede: function(newIssuer) {
+        var accountArr = transferAccount(newIssuer)
+        var parametersNum = convert_1.default.shortToByteArray(1)
+        var encodeArr = parametersNum.concat(accountArr)
+        return base58_1.default.encode(Uint8Array.from(encodeArr));
+    },
     prepareSend: function(recipient, amount) {
         var accountArr = transferAccount(recipient)
         var amountArr = transferAmount(amount)
-
         var parametersNum = convert_1.default.shortToByteArray(2)
 
 
