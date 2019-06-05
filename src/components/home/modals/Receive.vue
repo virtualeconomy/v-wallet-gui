@@ -90,7 +90,7 @@
 
 <script>
 import jrQrcode from 'jr-qrcode'
-import { API_VERSION, PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION, TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants.js'
+import { PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION, TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants.js'
 import BigNumber from 'bignumber.js'
 import common from '@/utils/common'
 export default {
@@ -111,7 +111,7 @@ export default {
         receivedObject() {
             return {
                 protocol: PROTOCOL,
-                api: API_VERSION,
+                api: this.api,
                 opc: OPC_ACCOUNT,
                 address: this.address,
                 amount: this.transferAmount,
@@ -147,6 +147,13 @@ export default {
         transferAmount() {
             if (this.amount) {
                 return BigNumber(this.amount).multipliedBy(VSYS_PRECISION)
+            }
+        },
+        api() {
+            if (common.getLength(this.invoice) > TRANSFER_ATTACHMENT_BYTE_LIMIT || this.invoice === '') {
+                return 1
+            } else {
+                return 2
             }
         }
     },
