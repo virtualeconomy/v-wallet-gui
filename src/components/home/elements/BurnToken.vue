@@ -139,7 +139,7 @@
           <b-form-group label="Wallet Address"
                         label-for="wallet-address">
             <b-form-input id=coldAddress-input
-                          class="coldAddress-input"
+                          class="address-input"
                           readonly
                           v-model="address"
                           :state="isValidIssuer(address)"

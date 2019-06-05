@@ -1,11 +1,11 @@
 <template>
-  <b-modal :id="'issueTokenModal_' + tokenId"
+  <b-modal :id="'supersedeModal_' + tokenId"
            centered
            lazy
-           title="IssueToken"
+           title="Supersede"
            hide-footer
            hide-header
-           ref="issueTokenModal"
+           ref="supersedeModal"
            :busy="true"
            @hidden="resetPage">
     <button
@@ -15,64 +15,57 @@
     </button>
     <b-tabs @input="hideQrScan">
       <b-tab title="Hot Wallet"
-             :disabled="walletType === 'coldWallet'"
+             :disabled="!pageId || walletType==='coldWallet'"
              :active="walletType==='hotWallet'">
         <b-container
           class="text-left"
           v-if="pageId===1">
-          <b-form-group label="Wallet Address"
+          <b-form-group label="Maker Wallet Address"
                         label-for="address-input">
             <b-form-input id=address-input
                           class="address-input"
                           readonly
                           v-model="address"
-                          :state="isValidIssuer(address)"
+                          :state="isValidMaker(address)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Cannot issue token. You are not issuer of this token.
+              Cannot supersede token. You are not maker of this token.
             </b-form-invalid-feedback>
-            <b-btn
-              block
-              variant="light"
-              disabled
-              class="balance-input"
-              readonly>
-              <span class="balance-title">
-                <img src="@/assets/imgs/icons/wallet/ic_token2.svg"
-                     width="20"
-                     height="20">
-              </span>
-              <span class="balance">Issue Available {{ formatter(maxSupply - currentSupply) }}</span>
-            </b-btn>
           </b-form-group>
-          <b-form-group label="Issue Amount"
+          <b-form-group label="New Issuer"
                         label-for="amount-input">
-            <b-form-input id="amount-input"
-                          class="amount-input"
-                          v-model="amount"
+            <b-form-input id="recipient-input"
+                          class="recipient-input"
+                          type="text"
+                          v-model="newIssuer"
+                          :state="isValidIssuer(newIssuer)"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('hot')">
+                          placeholder="Paste or scan an address.">
             </b-form-input>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
-              Invalid format. The number of digits after the decimal point may be larger than the token precision.
+            <img src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
+                 v-b-tooltip.hover
+                 class="qr-code"
+                 @click="scanChange"
+                 title="scan qr-code">
+            <b-form-invalid-feedback id="inputLiveFeedback">
+              Invalid Address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupply(amount)">
-              The total supply can not larger than max supply.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
-              Negative number is not allowed
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isNumFormatValid(amount)">
-              Invalid format.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else>
-              Invalid Input.
-            </b-form-invalid-feedback>
+            <div v-if="scanShow">
+              <div class="qr-info">Please confirm your browser's camera is available.</div>
+              <div class="qr-window">
+                <qrcode-reader @init="onInit"
+                               @decode="onDecode"
+                               :track="repaintLocation"
+                               :paused="paused">
+                  <img v-if="qrInit"
+                       class="qrcode-waiting center"
+                       height="70"
+                       width="70"
+                       src="@/assets/imgs/icons/wallet/ic_wait.svg">
+                </qrcode-reader>
+              </div>
+              <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
+            </div>
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
@@ -83,15 +76,15 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled('hot')"
+                    :disabled="isSubmitDisabled()"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
           <TokenConfirm :address="address"
-                        :amount=inputAmount(amount)
+                        :new-issuer="newIssuer"
                         :fee="fee"
-                        :tx-type="'Issue Token'">
+                        :tx-type="'Supersede'">
           </TokenConfirm>
           <p
             v-show="sendError"
@@ -120,9 +113,9 @@
         <b-container v-if="pageId===3">
           <TokenSuccess class="tokenSucced"
                         :address="address"
-                        :amount=inputAmount(amount)
+                        :new-issuer="newIssuer"
                         :fee="fee"
-                        :tx-type="'IssueToken'">
+                        :tx-type="'Supersede'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -142,72 +135,60 @@
                           class="address-input"
                           readonly
                           v-model="address"
-                          :state="isValidIssuer(address)"
+                          :state="isValidMaker(address)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Cannot issue token. You are not issuer of this token.
+              Cannot supersede token. You are not maker of this token.
             </b-form-invalid-feedback>
-            <b-btn
-              block
-              variant="light"
-              disabled
-              class="balance-input"
-              readonly>
-              <span class="balance-title">
-                <img src="@/assets/imgs/icons/wallet/ic_token2.svg"
-                     width="20"
-                     height="20">
-              </span>
-              <span class="balance">Issue Available{{ formatter(maxSupply - currentSupply) }}</span>
-            </b-btn>
           </b-form-group>
-          <b-form-group label="Issue Amount"
+          <b-form-group label="New Issuer"
                         label-for="cold-amount-input">
-            <b-form-input id="cold-amount-input"
-                          class="amount-input"
-                          v-model="amount"
+            <b-form-input id="cold-recipient-input"
+                          class="recipient-input"
+                          type="text"
+                          v-model="newIssuer"
+                          :state="isValidIssuer(newIssuer)"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('cold')">
+                          placeholder="Paste or scan an address.">
             </b-form-input>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
-              Invalid format. The number of digits after the decimal point may be larger than the token precision.
+            <img src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
+                 v-b-tooltip.hover
+                 class="qr-code"
+                 @click="scanChange"
+                 title="scan qr-code">
+            <b-form-invalid-feedback id="inputLiveFeedback">
+              Invalid Address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupply(amount)">
-              The total supply can not larger than max supply.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
-              Negative number is not allowed
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isNumFormatValid(amount)">
-              Invalid format.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else>
-              Invalid Input.
-            </b-form-invalid-feedback>
-          </b-form-group>
-          <b-form-group>
-            <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
-            <span v-if="isInsufficient()"
-                  class="vsys-check">Insufficient VSYS balance</span>
+            <div v-if="scanShow">
+              <div class="qr-info">Please confirm your browser's camera is available.</div>
+              <div class="qr-window">
+                <qrcode-reader @init="onInit"
+                               @decode="onDecode"
+                               :track="repaintLocation"
+                               :paused="paused">
+                  <img v-if="qrInit"
+                       class="qrcode-waiting center"
+                       height="70"
+                       width="70"
+                       src="@/assets/imgs/icons/wallet/ic_wait.svg">
+                </qrcode-reader>
+              </div>
+              <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
+            </div>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isSubmitDisabled('cold')"
+                    :disabled="isSubmitDisabled()"
                     @click="coldNextPage">Continue
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
           <TokenConfirm :address="address"
-                        :amount=inputAmount(amount)
+                        :new-issuer="newIssuer"
                         :fee="fee"
-                        :tx-type="'Issue Token'">
+                        :tx-type="'Supersede'">
           </TokenConfirm>
           <b-row>
             <b-col class="col-lef">
@@ -241,9 +222,9 @@
         </b-container>
         <b-container v-show="coldPageId===4">
           <TokenConfirm :address="address"
-                        :amount=inputAmount(amount)
+                        :new-issuer="newIssuer"
                         :fee="fee"
-                        :tx-type="'Issue Token'">
+                        :tx-type="'Supersede'">
           </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-row>
@@ -270,9 +251,9 @@
         <b-container v-show="coldPageId===5">
           <TokenSuccess class="tokenSucced"
                         :address="address"
-                        :amount=inputAmount(amount)
+                        :new-issuer="newIssuer"
                         :fee="fee"
-                        :tx-type="'Issue Token'">
+                        :tx-type="'Supersede'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -286,9 +267,10 @@
 </template>
 
 <script>
+import crypto from '@/utils/crypto'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, ISSUE_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, SUPERSEDE_FUNCIDX, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -301,12 +283,15 @@ export default {
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     data: function() {
         return {
-            amount: BigNumber(0),
+            newIssuer: '',
             attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
             coldPageId: 5,
             scanShow: false,
+            qrInit: false,
+            qrErrMsg: void 0,
+            paused: false,
             sendError: false,
             coldSignature: '',
             timeStamp: Date.now() * 1e6,
@@ -327,12 +312,6 @@ export default {
             },
             require: true
         },
-        tokenUnity: {
-            type: BigNumber,
-            default: function() {
-            },
-            require: true
-        },
         coldAddresses: {
             type: Object,
             default: function() {},
@@ -341,18 +320,6 @@ export default {
         addresses: {
             type: Object,
             default: function() {},
-            require: true
-        },
-        maxSupply: {
-            type: BigNumber,
-            default: function() {
-            },
-            require: true
-        },
-        currentSupply: {
-            type: BigNumber,
-            default: function() {
-            },
             require: true
         },
         walletType: {
@@ -365,7 +332,7 @@ export default {
             default: '',
             require: true
         },
-        issuer: {
+        maker: {
             type: String,
             default: '',
             require: true
@@ -414,30 +381,36 @@ export default {
                 timestamp: Date.now(),
                 attachment: '',
                 contractId: this.contractId,
-                functionId: ISSUE_FUNCIDX,
-                function: transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                functionExplain: 'Issue ' + this.amount + ' Token'
+                functionId: SUPERSEDE_FUNCIDX,
+                function: transaction.prepareSupersede(this.newIssuer),
+                functionExplain: 'Set issuer to ' + this.newIssuer
             }
-        },
-        isValidAttachment() {
-            if (!this.attachment) {
-                return void 0
-            }
-            return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         }
     },
     methods: {
+        isValidIssuer: function(issuer) {
+            if (!issuer) {
+                return void 0
+            }
+            let isValid = false
+            try {
+                isValid = crypto.isValidAddress(issuer)
+            } catch (e) {
+                console.log(e)
+            }
+            return isValid
+        },
         inputAmount(num) {
             return BigNumber(num)
         },
         coldApi: function() {
             return API_VERSION
         },
-        isValidIssuer: function(addr) {
-            return addr === this.issuer
+        isValidMaker: function(addr) {
+            return addr === this.maker
         },
-        isSubmitDisabled(type) {
-            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid(type) && !this.isInsufficient())
+        isSubmitDisabled() {
+            return !(this.isValidMaker(this.address) && this.isValidIssuer(this.newIssuer) && !this.isInsufficient())
         },
         sendData: function(walletType) {
             let apiSchema
@@ -454,9 +427,9 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    functionIndex: ISSUE_FUNCIDX,
-                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, ISSUE_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    functionIndex: SUPERSEDE_FUNCIDX,
+                    functionData: transaction.prepareSupersede(this.newIssuer),
+                    signature: transaction.prepareExecContractSignature(this.contractId, SUPERSEDE_FUNCIDX, transaction.prepareSupersede(this.newIssuer), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
@@ -466,7 +439,7 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.dataObject.timestamp,
-                    functionIndex: ISSUE_FUNCIDX,
+                    functionIndex: SUPERSEDE_FUNCIDX,
                     functionData: this.dataObject.function,
                     signature: this.coldSignature
                 }
@@ -523,7 +496,7 @@ export default {
             for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 setTimeout(this.sendBalanceChange, delayTime)
             }
-            this.$refs.issueTokenModal.hide()
+            this.$refs.supersedeModal.hide()
         },
         sendBalanceChange: function() {
             this.$emit('updateBalance', 'update')
@@ -562,36 +535,30 @@ export default {
             this.paused = true
             try {
                 var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
-                this.recipient = jsonObj.address
+                this.newIssuer = jsonObj.address
                 var opc = jsonObj.opc
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
-                if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                }
-                if (jsonObj.hasOwnProperty('invoice')) {
-                    this.attachment = jsonObj.invoice
-                }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
                     this.qrErrMsg = 'Invalid QR code protocol.'
-                } else if (api !== API_VERSION) {
+                } else if (api > API_VERSION) {
                     this.paused = false
                     this.qrErrMsg = 'API version mismatch.'
                 } else if (opc !== OPC_ACCOUNT) {
                     this.paused = false
                     this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidIssuer(this.recipient) || this.recipient === '') {
+                } else if (!this.isValidIssuer(this.newIssuer) || this.newIssuer === '') {
                     this.paused = false
-                    this.qrErrMsg = 'Invalid address of recipient.'
+                    this.qrErrMsg = 'Invalid address of new issuer.'
                 } else {
                     this.qrErrMsg = void 0
                 }
             } catch (e) {
                 if (this.isValidIssuer(decodeString)) {
-                    this.recipient = decodeString
+                    this.newIssuer = decodeString
                 } else {
-                    this.recipient = 'please scan QR code of recipient'
+                    this.newIssuer = 'please scan QR code of new issuer'
                     this.paused = false
                 }
             }
@@ -671,7 +638,7 @@ export default {
     cursor: pointer;
     position: absolute;
     margin-top: -37px;
-    margin-left: 380px;
+    margin-left: 350px;
 }
 .qr-info {
     text-align: left;
@@ -681,7 +648,6 @@ export default {
     border: 1px solid #E8E9ED;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
-    border-bottom: none;
     background-color: #FFF;
     font-size: 15px;
     color: #181B3A;

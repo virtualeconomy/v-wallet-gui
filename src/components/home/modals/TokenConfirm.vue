@@ -37,6 +37,18 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
+      <b-form-group v-else-if="txType==='Supersede'"
+                    horizontal
+                    class="form-line"
+                    label="New Issuer"
+                    label-for="amount_confirm">
+        <b-form-input id="amount_confirm"
+                      :value="newIssuer"
+                      class="des"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
       <b-form-group v-else
                     horizontal
                     class="form-line"
@@ -105,6 +117,11 @@ import { TOKEN_FEE } from '@/constants'
 export default {
     name: 'TokenConfirm',
     props: {
+        newIssuer: {
+            type: String,
+            require: true,
+            default: ''
+        },
         address: {
             type: String,
             require: true,
