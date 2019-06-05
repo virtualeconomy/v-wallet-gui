@@ -76,8 +76,7 @@
         </b-form-textarea>
       </b-form-group>
       <div id="address-qrcode">
-        <img v-if="isValid(amount,invoice)"
-             :src="getQrCodeImg">
+        <img :src="getQrCodeImg">
       </div>
       <b-button variant="warning"
                 class="btn-o"
@@ -110,30 +109,20 @@ export default {
     },
     computed: {
         receivedObject() {
-            if (this.invoice === '') {
-                return {
-                    protocol: PROTOCOL,
-                    api: 1,
-                    opc: OPC_ACCOUNT,
-                    address: this.address,
-                    amount: this.transferAmount
-                }
-            } else {
-                return {
-                    protocol: PROTOCOL,
-                    api: API_VERSION,
-                    opc: OPC_ACCOUNT,
-                    address: this.address,
-                    amount: this.transferAmount,
-                    invoice: this.invoice
-                }
+            return {
+                protocol: PROTOCOL,
+                api: API_VERSION,
+                opc: OPC_ACCOUNT,
+                address: this.address,
+                amount: this.transferAmount,
+                invoice: this.invoice
             }
         },
         isValidInvoice() {
             if (!this.invoice) {
                 return void 0
             }
-            return this.invoice.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+            return common.getLength(this.invoice) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         getQrCodeImg() {
             const options = {
@@ -144,6 +133,12 @@ export default {
                 reverse: false,
                 background: '#ffffff',
                 foreground: '#000000'
+            }
+            if (common.getLength(this.invoice) > TRANSFER_ATTACHMENT_BYTE_LIMIT || this.invoice === '') {
+                delete this.receivedObject.invoice
+            }
+            if (!this.isAmountValid(this.amount)) {
+                delete this.receivedObject.amount
             }
             const text = JSON.stringify(this.receivedObject).replace(/"amount":"(\d+)"/g, '"amount":$1') // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
             const imgBase64 = jrQrcode.getQrBase64(text, options)
@@ -174,9 +169,6 @@ export default {
         },
         checkPrecision(amount) {
             return common.checkPrecision(amount, 8)
-        },
-        isValid(amount, invoice) {
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && invoice.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         copyAddr() {
             this.$refs.addrToCopy.select()
