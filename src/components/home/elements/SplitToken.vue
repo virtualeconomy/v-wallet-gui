@@ -69,6 +69,8 @@
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
             <span v-if="isInsufficient()"
                   class="vsys-check">Insufficient VSYS balance</span>
+            <span v-if="!isSplit"
+                  class="vsys-check">This token cannot be split</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -177,6 +179,8 @@
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
             <span v-if="isInsufficient()"
                   class="vsys-check">Insufficient VSYS balance</span>
+            <span v-if="!isSplit"
+                  class="vsys-check">This token cannot be split</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -309,6 +313,10 @@ export default {
             },
             require: true
         },
+        isSplit: {
+            type: Boolean,
+            default: false
+        },
         tokenUnity: {
             type: BigNumber,
             default: function() {
@@ -404,7 +412,7 @@ export default {
             return addr === this.maker
         },
         isSubmitDisabled() {
-            return !(this.isValidMaker(this.address) && this.isValidUnity() && !this.isInsufficient())
+            return !(this.isValidMaker(this.address) && this.isValidUnity() && !this.isInsufficient() && this.isSplit)
         },
         isBiggerThanMax() {
             var maxValue = BigNumber(2).exponentiatedBy(63).minus(1)

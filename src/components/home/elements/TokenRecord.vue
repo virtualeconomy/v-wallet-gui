@@ -96,6 +96,7 @@
                 :balance="balances[address]"
                 :token-unity="unity"
                 :max-supply="maxSupply"
+                :is-split="isSplit"
                 @updateBalance="updateBalance">
     </SplitToken>
     <SendToken :token-id="tokenId"
@@ -142,6 +143,7 @@ export default {
     components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede, SplitToken },
     data: function() {
         return {
+            isSplit: false,
             tokenBalance: BigNumber(0),
             unity: BigNumber(1),
             tokenBalances: {},
@@ -321,9 +323,12 @@ export default {
                 this.functionIndex = -9
                 if (tokentype === CONTRACT_DESCRIPTOR) {
                     this.functionIndex = SEND_FUNCIDX
+                    this.isSplit = false
                 } else if (tokentype === CONTRACT_WITH_SPLIT_DESCRIPTOR) {
                     this.functionIndex = SEND_FUNCIDX_SPLIT
+                    this.isSplit = true
                 } else {
+                    this.isSplit = false
                     this.functionIndex = -999
                 }
             }, respError => {
