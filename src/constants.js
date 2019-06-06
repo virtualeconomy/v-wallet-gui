@@ -58,6 +58,7 @@ export const CONTRACT_EXEC_FEE = 0.3
 export const ISSUE_FUNCIDX = 1
 export const BURN_FUNCIDX = 2
 export const SUPERSEDE_FUNCIDX = 0
+export const SPLIT_FUNCIDX = 3
 export const SEND_FUNCIDX = 3
 export const SEND_FUNCIDX_SPLIT = 4
 export const API_VERSION = 3

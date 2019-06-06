@@ -49,6 +49,18 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
+      <b-form-group v-else-if="txType==='Split Token'"
+                    horizontal
+                    class="form-line"
+                    label="New Unity"
+                    label-for="amount_confirm">
+        <b-form-input id="amount_confirm"
+                      :value="formatter(newUnity)"
+                      class="amount"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
       <b-form-group v-else
                     horizontal
                     class="form-line"
@@ -128,6 +140,13 @@ export default {
             default: ''
         },
         amount: {
+            type: BigNumber,
+            require: true,
+            default: function() {
+                return BigNumber(0)
+            }
+        },
+        newUnity: {
             type: BigNumber,
             require: true,
             default: function() {

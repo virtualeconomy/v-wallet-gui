@@ -48,6 +48,8 @@
                            @click="supersede">Supersede</b-dropdown-item>
           <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
+          <b-dropdown-item v-if="enableStatus"
+                           @click="splitToken">Split Token</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
@@ -84,6 +86,19 @@
                :balance="balances[address]"
                @updateBalance="updateBalance">
     </Supersede>
+    <SplitToken :token-id="tokenId"
+                :maker="maker"
+                :address="address"
+                :wallet-type="walletType"
+                :addresses="addresses"
+                :cold-addresses="coldAddresses"
+                :token-balance="tokenBalance"
+                :balance="balances[address]"
+                :token-unity="unity"
+                :max-supply="maxSupply"
+                :is-split="isSplit"
+                @updateBalance="updateBalance">
+    </SplitToken>
     <SendToken :token-id="tokenId"
                :token-balances="tokenBalances"
                :balances="balances"
@@ -118,15 +133,17 @@ import IssueToken from './IssueToken'
 import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
 import Supersede from './Supersede'
+import SplitToken from './SplitToken'
 import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/constants.js'
 import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede },
+    components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede, SplitToken },
     data: function() {
         return {
+            isSplit: false,
             tokenBalance: BigNumber(0),
             unity: BigNumber(1),
             tokenBalances: {},
@@ -306,9 +323,12 @@ export default {
                 this.functionIndex = -9
                 if (tokentype === CONTRACT_DESCRIPTOR) {
                     this.functionIndex = SEND_FUNCIDX
+                    this.isSplit = false
                 } else if (tokentype === CONTRACT_WITH_SPLIT_DESCRIPTOR) {
                     this.functionIndex = SEND_FUNCIDX_SPLIT
+                    this.isSplit = true
                 } else {
+                    this.isSplit = false
                     this.functionIndex = -999
                 }
             }, respError => {
@@ -328,6 +348,10 @@ export default {
         supersede() {
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'supersedeModal_' + this.tokenId)
+        },
+        splitToken() {
+            this.getTokenInfo()
+            this.$root.$emit('bv::show::modal', 'splitTokenModal_' + this.tokenId)
         },
         issueToken() {
             this.getTokenInfo()
