@@ -70,7 +70,7 @@
             <span v-if="isInsufficient()"
                   class="vsys-check">Insufficient VSYS balance</span>
             <span v-if="!isSplit"
-                  class="vsys-check">This token cannot be split</span>
+                  class="vsys-check">Cannot change unity. This token does not support split function.</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
@@ -180,7 +180,7 @@
             <span v-if="isInsufficient()"
                   class="vsys-check">Insufficient VSYS balance</span>
             <span v-if="!isSplit"
-                  class="vsys-check">This token cannot be split</span>
+                  class="vsys-check">Cannot change unity. This token does not support split function.</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
