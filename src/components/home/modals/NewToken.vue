@@ -46,7 +46,7 @@
                              v-model="contractDescription"
                              :rows="2"
                              :no-resize="true"
-                             placeholder="You can not change the description later"
+                             placeholder="Max 140 characters. When you have done, this content can not be revised"
                              :state="isValidAttachment(contractDescription)">
             </b-form-textarea>
           </b-form-group>
@@ -56,7 +56,7 @@
                              v-model="tokenDescription"
                              :rows="2"
                              :no-resize="true"
-                             placeholder="You can not change the description later"
+                             placeholder="Max 140 characters. When you have done, this content can not be revised"
                              :state="isValidAttachment(tokenDescription)">
             </b-form-textarea>
           </b-form-group>
@@ -83,7 +83,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isBiggerThanMax(amount)">
-              Too many significant digits for amount. Please reduce unity.
+              Please reduce Unity scale.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="!isNumFormatValid(amount)">
@@ -116,7 +116,7 @@
               <img id="img_read"
                    @click="changeIcon"
                    style="font-size: 15px;z-index: 100;"
-                   src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/reverse-split token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
+                   src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/reverse-split token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after created)</span>
             </span>
           </div>
           <b-form-group style="margin-top: 10px;">
@@ -202,7 +202,7 @@
                              v-model="coldContractDescription"
                              :rows="2"
                              :no-resize="true"
-                             placeholder="You can not change the description later"
+                             placeholder="Max 140 characters. When you have done, this content can not be revised"
                              :state="isValidAttachment(coldContractDescription)">
             </b-form-textarea>
           </b-form-group>
@@ -212,7 +212,7 @@
                              v-model="coldTokenDescription"
                              :rows="2"
                              :no-resize="true"
-                             placeholder="You can not change the description later"
+                             placeholder="Max 140 characters. When you have done, this content can not be revised"
                              :state="isValidAttachment(coldTokenDescription)">
             </b-form-textarea>
           </b-form-group>
@@ -243,7 +243,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isBiggerThanMax(coldAmount)">
-              Too many significant digits for amount. Please reduce unity.
+              Please reduce Unity scale.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -272,7 +272,7 @@
               <img id="img_read_cold"
                    @click="changeColdIcon"
                    style="font-size: 15px;z-index: 100;"
-                   src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after create)</span>
+                   src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after created)</span>
             </span>
           </div>
           <b-form-group>
