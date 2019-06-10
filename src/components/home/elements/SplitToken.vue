@@ -50,7 +50,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isBiggerThanMax()">
-              Too many significant digits for amount. Please reduce unity.
+              Please reduce Unity scale.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="!isNumFormatValid(this.newUnity)">
@@ -160,7 +160,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isBiggerThanMax()">
-              Too many significant digits for amount. Please reduce unity.
+              Please reduce Unity scale.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="!isNumFormatValid(this.newUnity)">
