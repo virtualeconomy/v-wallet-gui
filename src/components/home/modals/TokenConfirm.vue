@@ -1,6 +1,18 @@
 <template>
   <div>
     <div class="infos">
+      <b-form-group v-if="txType==='Deposit Token to Contract'"
+                    horizontal
+                    class="form-line"
+                    label="Contract ID"
+                    label-for="amount_confirm">
+        <b-form-input id="amount_confirm"
+                      :value="contractId"
+                      class="addr"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
       <b-form-group v-if="txType==='Destroy Token'"
                     horizontal
                     class="form-line"
@@ -61,10 +73,22 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group v-else
+      <b-form-group v-else-if="txType==='Issue Token'"
                     horizontal
                     class="form-line"
                     label="Issue Amount"
+                    label-for="amount_confirm">
+        <b-form-input id="amount_confirm"
+                      :value="formatter(amount)"
+                      class="amount"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group v-else-if="txType==='Deposit Token to Contract'"
+                    horizontal
+                    class="form-line"
+                    label="Amount"
                     label-for="amount_confirm">
         <b-form-input id="amount_confirm"
                       :value="formatter(amount)"
@@ -131,7 +155,6 @@ export default {
     props: {
         newIssuer: {
             type: String,
-            require: true,
             default: ''
         },
         address: {
@@ -148,7 +171,6 @@ export default {
         },
         newUnity: {
             type: BigNumber,
-            require: true,
             default: function() {
                 return BigNumber(0)
             }
@@ -166,6 +188,10 @@ export default {
             default: ''
         },
         recipient: {
+            type: String,
+            default: ''
+        },
+        contractId: {
             type: String,
             default: ''
         }
