@@ -50,6 +50,10 @@
           <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="enableStatus"
                            @click="splitToken">Split Token</b-dropdown-item>
+          <b-dropdown-item v-if="enableStatus"
+                           @click="depositToken">Deposit to Contract </b-dropdown-item>
+          <b-dropdown-item v-if="enableStatus"
+                           @click="splitToken">Withdraw from Contract</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
@@ -76,6 +80,19 @@
                 :token-unity="unity"
                 @updateBalance="updateBalance">
     </IssueToken>
+    <DepositToken :token-id="tokenId"
+                  :issuer="issuer"
+                  :address="address"
+                  :wallet-type="walletType"
+                  :addresses="addresses"
+                  :cold-addresses="coldAddresses"
+                  :token-balance="tokenBalance"
+                  :balance="balances[address]"
+                  :max-supply="maxSupply"
+                  :current-supply="currentSupply"
+                  :token-unity="unity"
+                  @updateBalance="updateBalance">
+    </DepositToken>
     <Supersede :token-id="tokenId"
                :maker="maker"
                :address="address"
@@ -134,13 +151,14 @@ import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
 import Supersede from './Supersede'
 import SplitToken from './SplitToken'
+import DepositToken from './DepositToken'
 import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/constants.js'
 import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede, SplitToken },
+    components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede, SplitToken, DepositToken },
     data: function() {
         return {
             isSplit: false,
@@ -360,6 +378,10 @@ export default {
         burnToken() {
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'burnTokenModal_' + this.tokenId)
+        },
+        depositToken() {
+            this.getTokenInfo()
+            this.$root.$emit('bv::show::modal', 'depositTokenModal_' + this.tokenId)
         },
         removeToken() {
             var isRemove = confirm('Are you sure to remove this token?')
