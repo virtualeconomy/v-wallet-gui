@@ -11,7 +11,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 };
 export const WALLET_VERSION = '0.2.0'
 export const INITIAL_SESSION_TIMEOUT = 5
-export const NETWORK_BYTE = 'T'.charCodeAt(0);
+export const NETWORK_BYTE = 'M'.charCodeAt(0);
 export const INITIAL_NONCE = 0;
 export const ADDRESS_VERSION = 5;
 export const PAYMENT_TX = 2;
@@ -46,7 +46,7 @@ export const DEFAULT_BASIC_CONFIG = {
     timeDiff: 0
 };
 
-export const NODE_IP = 'http://3.19.103.180:29928'
+export const NODE_IP = '/api'
 export const ADDRESS_LENGTH = 35;
 export const TX_TEST_EXPLORER = 'https://testexplorer.v.systems/transactions/'
 export const TX_EXPLORER = 'https://explorer.v.systems/transactions/'
@@ -70,5 +70,6 @@ export const OPC_ACCOUNT = 'account'
 export const OPC_SIGNATURE = 'signature'
 export const OPC_SEED = 'seed'
 export const OPC_CONTRACT = 'contract'
+export const SHOW_UNSUPPORTED_FUNCTION = false
 
 

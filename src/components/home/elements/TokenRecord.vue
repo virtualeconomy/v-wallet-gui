@@ -50,9 +50,9 @@
           <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="enableStatus"
                            @click="splitToken">Split Token</b-dropdown-item>
-          <b-dropdown-item v-if="enableStatus"
+          <b-dropdown-item v-if="enableStatus && showUnsupportedFunction !== false"
                            @click="depositToken">Deposit to Contract </b-dropdown-item>
-          <b-dropdown-item v-if="enableStatus"
+          <b-dropdown-item v-if="enableStatus && showUnsupportedFunction !== false"
                            @click="splitToken">Withdraw from Contract</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
         </b-dropdown>
@@ -152,7 +152,7 @@ import BurnToken from './BurnToken'
 import Supersede from './Supersede'
 import SplitToken from './SplitToken'
 import DepositToken from './DepositToken'
-import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/constants.js'
+import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT, SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
 import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
 import Vue from 'vue'
 import browser from '@/utils/browser'
@@ -173,7 +173,8 @@ export default {
             issuer: '',
             maker: '',
             functionIndex: SEND_FUNCIDX,
-            contractId: ''
+            contractId: '',
+            showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION
         }
     },
     props: {

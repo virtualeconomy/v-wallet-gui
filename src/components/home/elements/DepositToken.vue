@@ -40,14 +40,13 @@
                           aria-describedby="inputLiveFeedback"
                           :state="isAmountValid('hot')">
             </b-form-input>
-            <!--
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isExceededMaxSupply(amount)">
-              The total supply can not larger than max supply.
+              Deposited token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(amount)">
@@ -61,7 +60,6 @@
                                      v-else>
               Invalid Input.
             </b-form-invalid-feedback>
-            -->
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
@@ -153,7 +151,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isExceededMaxSupply(amount)">
-              The total supply can not larger than max supply.
+              Deposited token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(amount)">
@@ -629,7 +627,7 @@ export default {
             return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
         },
         isExceededMaxSupply(amount) {
-            return BigNumber(amount).isGreaterThan(BigNumber(this.maxSupply - this.currentSupply))
+            return BigNumber(amount).isGreaterThan(this.tokenBalance)
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
