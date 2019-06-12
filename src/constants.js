@@ -21,6 +21,7 @@ export const CONTRACT_EXEC_TX =9;
 export const CANCEL_LEASE_TX = 4;
 export const INT_TYPE = 4;
 export const ACCOUNT_ADDR_TYPE = 2;
+export const CONTRACT_TYPE = 6;
 export const SHORTTEXT_TYPE = 5;
 export const AMOUNT_TYPE = 3;
 export const TRANSFER_TX = 12;
@@ -59,6 +60,7 @@ export const ISSUE_FUNCIDX = 1
 export const BURN_FUNCIDX = 2
 export const SUPERSEDE_FUNCIDX = 0
 export const SPLIT_FUNCIDX = 3
+export const DEPOSIT_FUNCIDX = 5
 export const SEND_FUNCIDX = 3
 export const SEND_FUNCIDX_SPLIT = 4
 export const API_VERSION = 3
@@ -68,5 +70,6 @@ export const OPC_ACCOUNT = 'account'
 export const OPC_SIGNATURE = 'signature'
 export const OPC_SEED = 'seed'
 export const OPC_CONTRACT = 'contract'
+export const SHOW_UNSUPPORTED_FUNCTION = false
 
 
