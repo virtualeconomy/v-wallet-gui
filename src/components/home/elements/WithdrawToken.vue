@@ -453,7 +453,6 @@ export default {
             }
             const url = NODE_IP + '/contract/broadcast/execute'
             this.$http.post(url, apiSchema).then(response => {
-                console.log(response)
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
