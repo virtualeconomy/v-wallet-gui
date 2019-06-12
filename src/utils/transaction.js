@@ -249,6 +249,15 @@ export default {
         var encodeArr = parametersNum.concat(contractArr.concat(addrArr.concat(amountArr)))
         return base58_1.default.encode(Uint8Array.from(encodeArr))
     },
+    prepareDeposit: function(addr, contractId, amount) {
+      var addrArr = transferAccount(addr)
+      var contractArr = transferContract(contractId)
+      var amountArr = transferAmount(amount)
+      var parametersNum = convert_1.default.shortToByteArray(3)
+
+      var encodeArr = parametersNum.concat(addrArr.concat(contractArr.concat(amountArr)))
+      return base58_1.default.encode(Uint8Array.from(encodeArr))
+    },
     prepareCreate: function(max, unity, tokenDescription) {
         var maxArr = transferAmount(max)
         var unityArr = transferAmount(unity)
