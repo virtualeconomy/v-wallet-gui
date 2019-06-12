@@ -7,6 +7,18 @@
            src="@/assets/imgs/icons/operate/ic_success_circle.svg">
     </div>
     <div class="infos">
+      <b-form-group v-if="txType==='Withdraw Token from Contract'"
+                    horizontal
+                    class="form-line"
+                    label="Contract ID"
+                    label-for="contract_success">
+        <b-form-input id="contract_success"
+                      :value="contractId"
+                      class="addr"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
       <b-form-group v-if="txType==='Destroy Token'"
                     horizontal
                     class="form-line"
@@ -67,12 +79,24 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group v-else
+      <b-form-group v-else-if="txType==='Issue Token'"
                     horizontal
                     class="form-line"
                     label="Issue Amount"
                     label-for="amount_success">
         <b-form-input id="amount_success"
+                      :value="formatter(amount)"
+                      class="amount"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
+      <b-form-group v-else-if="txType==='Withdraw Token from Contract'"
+                    horizontal
+                    class="form-line"
+                    label="Amount"
+                    label-for="amount_success">
+        <b-form-input id="amount_confirm"
                       :value="formatter(amount)"
                       class="amount"
                       readonly
@@ -126,7 +150,6 @@ export default {
     props: {
         newIssuer: {
             type: String,
-            required: true,
             default: ''
         },
         address: {
@@ -143,7 +166,6 @@ export default {
         },
         newUnity: {
             type: BigNumber,
-            required: true,
             default: function() {
                 return BigNumber(0)
             }
@@ -161,6 +183,10 @@ export default {
             default: ''
         },
         recipient: {
+            type: String,
+            default: ''
+        },
+        contractId: {
             type: String,
             default: ''
         }

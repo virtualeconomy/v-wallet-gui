@@ -50,6 +50,8 @@
           <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="enableStatus"
                            @click="splitToken">Split Token</b-dropdown-item>
+          <b-dropdown-item v-if="enableStatus"
+                           @click="withdrawToken">Withdraw from Contract</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
@@ -76,6 +78,19 @@
                 :token-unity="unity"
                 @updateBalance="updateBalance">
     </IssueToken>
+    <WithdrawToken :token-id="tokenId"
+                   :issuer="issuer"
+                   :address="address"
+                   :wallet-type="walletType"
+                   :addresses="addresses"
+                   :cold-addresses="coldAddresses"
+                   :token-balance="tokenBalance"
+                   :balance="balances[address]"
+                   :max-supply="maxSupply"
+                   :current-supply="currentSupply"
+                   :token-unity="unity"
+                   @updateBalance="updateBalance">
+    </WithdrawToken>
     <Supersede :token-id="tokenId"
                :maker="maker"
                :address="address"
@@ -130,17 +145,18 @@ import converters from '@/libs/converters'
 import TokenInfoModal from './TokenInfoModal'
 import SendToken from './SendToken'
 import IssueToken from './IssueToken'
+import WithdrawToken from './WithdrawToken'
 import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
 import Supersede from './Supersede'
 import SplitToken from './SplitToken'
-import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/constants.js'
+import {NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT} from '@/constants.js'
 import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede, SplitToken },
+    components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede, WithdrawToken, SplitToken },
     data: function() {
         return {
             isSplit: false,
@@ -356,6 +372,10 @@ export default {
         issueToken() {
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)
+        },
+        withdrawToken() {
+            this.getTokenInfo()
+            this.$root.$emit('bv::show::modal', 'withdrawTokenModal_' + this.tokenId)
         },
         burnToken() {
             this.getTokenInfo()
