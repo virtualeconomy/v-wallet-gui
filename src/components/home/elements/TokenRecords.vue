@@ -154,9 +154,7 @@ export default {
             this.$emit('updateInfo')
         },
         addToken() {
-            console.log('is function')
             this.$root.$emit('bv::show::modal', 'addTokenModal')
-            console.log('check test')
         }
     }
 }

@@ -669,13 +669,15 @@ export default {
             this.$store.commit('changeEventPool', eventPool)
         },
         sendToAdd: function() {
-            if (this.userInfo && this.userInfo.tokens) {
-                this.tokens = JSON.parse(this.userInfo.tokens)
+            var userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            var tokens = {}
+            if (userInfo && userInfo.tokens) {
+                tokens = JSON.parse(userInfo.tokens)
             }
             const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(url).then(response => {
-                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
-                this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
+                Vue.set(tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
+                this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
                 let sendFlag = true
                 bus.$emit('sendFlag', sendFlag)
             }, respError => {
