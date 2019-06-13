@@ -50,11 +50,8 @@
           <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="enableStatus"
                            @click="splitToken">Split Token</b-dropdown-item>
-          <!--
           <b-dropdown-item v-if="enableStatus && showUnsupportedFunction !== false"
-          -->
-
-          <b-dropdown-item @click="depositToken">Deposit to Contract </b-dropdown-item>
+                           @click="depositToken">Deposit to Contract </b-dropdown-item>
           <b-dropdown-item v-if="enableStatus && showUnsupportedFunction !== false"
                            @click="splitToken">Withdraw from Contract</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
