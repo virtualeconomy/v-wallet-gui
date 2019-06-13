@@ -410,7 +410,6 @@ var initData = {
     tokenDescription: '',
     coldContractDescription: '',
     coldTokenDescription: '',
-    stopParaArr: [],
     eventPool: {}
 }
 export default {
@@ -660,12 +659,13 @@ export default {
         },
         endSend: function() {
             this.$refs.newTokenModal.hide()
+            var stopParaArr = []
             for (let delayTime = 6000; delayTime < 150100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 var stopPara = setTimeout(this.sendToAdd, delayTime)
-                this.stopParaArr.push(stopPara)
+                stopParaArr.push(stopPara)
             }
             var tmp = {}
-            Vue.set(tmp, 'newToken', this.stopParaArr)
+            Vue.set(tmp, 'newToken', stopParaArr)
             tmp['removeToken'] = false
             Vue.set(this.eventPool, this.tokenId, JSON.parse(JSON.stringify(tmp)))
             this.$store.commit('changeEventPool', this.eventPool)
