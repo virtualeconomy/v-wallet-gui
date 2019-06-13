@@ -409,8 +409,7 @@ var initData = {
     contractDescription: '',
     tokenDescription: '',
     coldContractDescription: '',
-    coldTokenDescription: '',
-    eventPool: {}
+    coldTokenDescription: ''
 }
 export default {
     name: 'NewToken',
@@ -665,8 +664,9 @@ export default {
                 stopParaArr.push(stopPara)
             }
             var tmp = {'newToken': stopParaArr, 'removeToken': false}
-            Vue.set(this.eventPool, this.tokenId, tmp)
-            this.$store.commit('changeEventPool', this.eventPool)
+            var eventPool = this.$store.state.eventPool
+            Vue.set(eventPool, this.tokenId, tmp)
+            this.$store.commit('changeEventPool', eventPool)
         },
         sendToAdd: function() {
             if (this.userInfo && this.userInfo.tokens) {
