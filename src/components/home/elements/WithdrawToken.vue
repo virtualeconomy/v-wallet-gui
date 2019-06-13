@@ -267,7 +267,7 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION, WITHDRAW_FUNCIDX } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -393,7 +393,7 @@ export default {
                 timestamp: Date.now(),
                 attachment: '',
                 contractId: this.contractId,
-                functionId: WITHDRAW_FUNCIDX,
+                functionId: this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX,
                 function: transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
                 functionExplain: 'Withdraw ' + this.amount + ' token from ' + this.contractId
             }

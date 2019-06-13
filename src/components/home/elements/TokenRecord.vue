@@ -51,11 +51,9 @@
           <b-dropdown-item v-if="enableStatus"
                            @click="splitToken">Split Token</b-dropdown-item>
           <b-dropdown-item v-if="enableStatus && showUnsupportedFunction"
-                           @click="withdrawToken">Withdraw from Contract</b-dropdown-item>
-          <b-dropdown-item v-if="enableStatus && showUnsupportedFunction"
                            @click="depositToken">Deposit to Contract </b-dropdown-item>
           <b-dropdown-item v-if="enableStatus && showUnsupportedFunction"
-                           @click="splitToken">Withdraw from Contract</b-dropdown-item>
+                           @click="withdrawToken">Withdraw from Contract</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
@@ -93,6 +91,7 @@
                    :max-supply="maxSupply"
                    :current-supply="currentSupply"
                    :token-unity="unity"
+                   :is-split="isSplit"
                    @updateBalance="updateBalance">
     </WithdrawToken>
     <DepositToken :token-id="tokenId"

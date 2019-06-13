@@ -46,7 +46,7 @@ export const DEFAULT_BASIC_CONFIG = {
     timeDiff: 0
 };
 
-export const NODE_IP = 'api'
+export const NODE_IP = '/api'
 export const ADDRESS_LENGTH = 35;
 export const TX_TEST_EXPLORER = 'https://testexplorer.v.systems/transactions/'
 export const TX_EXPLORER = 'https://explorer.v.systems/transactions/'
@@ -61,6 +61,7 @@ export const BURN_FUNCIDX = 2
 export const SUPERSEDE_FUNCIDX = 0
 export const SPLIT_FUNCIDX = 3
 export const WITHDRAW_FUNCIDX = 6
+export const WITHDRAW_FUNCIDX_SPLIT = 7
 export const DEPOSIT_FUNCIDX = 5
 export const SEND_FUNCIDX = 3
 export const SEND_FUNCIDX_SPLIT = 4
