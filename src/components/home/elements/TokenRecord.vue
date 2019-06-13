@@ -322,8 +322,6 @@ export default {
         removeToken() {
             var isRemove = confirm('Are you sure to remove this token?')
             if (isRemove) {
-                // var status = JSON.parse(this.userInfo.eventPool)
-                // Vue.set('eventPools', this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
                 var user = JSON.parse(window.localStorage.getItem(this.seedaddress))
                 var arr = JSON.parse(user.tokens)
                 Vue.delete(arr, this.tokenId)
@@ -333,19 +331,16 @@ export default {
                 this.removeFlag = false
                 if (this.$store.state.eventPool) {
                     this.eventPool = this.$store.state.eventPool
-                    for (var index in this.eventPool) {
-                        if (index === this.tokenId) {
-                            var stopArr = this.eventPool[index].newToken
-                            for (var i in stopArr) {
-                                clearTimeout(stopArr[i])
-                            }
-                            this.eventPool[index].removeToken = true
-                            this.$store.commit('changeEventPool', this.eventPool)
+                    if (this.eventPool[this.tokenId].newToken) {
+                        var stopArr = this.eventPool[this.tokenId].newToken
+                        for (var i in stopArr) {
+                            clearTimeout(stopArr[i])
                         }
                     }
+                    this.eventPool[this.tokenId].removeToken = true
+                    this.$store.commit('changeEventPool', this.eventPool)
                 }
             }
-            this.updateBalance()
         },
         endSendSignal() {
             this.$emit('endSendSignal')
