@@ -664,10 +664,8 @@ export default {
                 var stopPara = setTimeout(this.sendToAdd, delayTime)
                 stopParaArr.push(stopPara)
             }
-            var tmp = {}
-            Vue.set(tmp, 'newToken', stopParaArr)
-            tmp['removeToken'] = false
-            Vue.set(this.eventPool, this.tokenId, JSON.parse(JSON.stringify(tmp)))
+            var tmp = {'newToken': stopParaArr, 'removeToken': false}
+            Vue.set(this.eventPool, this.tokenId, tmp)
             this.$store.commit('changeEventPool', this.eventPool)
         },
         sendToAdd: function() {
