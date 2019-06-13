@@ -447,13 +447,6 @@ export default {
     data: function() {
         return initData
     },
-    /* watch: {
-        eventFlag() {
-            for (var i in this.stopParaArr) {
-                clearTimeout(this.stopParaArr[i])
-            }
-        }
-    }, */
     computed: {
         defaultAddress() {
             return Vue.ls.get('address')
@@ -463,17 +456,6 @@ export default {
                 return Vue.ls.get('address')
             }
         },
-        /* eventFlag() {
-            if (this.$store.state.eventPool) {
-                var event = this.$store.state.eventPool
-                for (var index in event) {
-                    if (index === this.tokenId) {
-                        return event[index].removeToken
-                    }
-                }
-            }
-            return false
-        }, */
         defaultColdAddress() {
             if (this.noColdAddress) return ''
             return Object.keys(this.coldAddresses)[0]
