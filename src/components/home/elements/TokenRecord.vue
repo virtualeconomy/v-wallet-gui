@@ -126,7 +126,8 @@ export default {
             issuer: '',
             maker: '',
             functionIndex: SEND_FUNCIDX,
-            contractId: ''
+            contractId: '',
+            eventPool: {}
         }
     },
     props: {
@@ -321,6 +322,8 @@ export default {
         removeToken() {
             var isRemove = confirm('Are you sure to remove this token?')
             if (isRemove) {
+                // var status = JSON.parse(this.userInfo.eventPool)
+                // Vue.set('eventPools', this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
                 var user = JSON.parse(window.localStorage.getItem(this.seedaddress))
                 var arr = JSON.parse(user.tokens)
                 Vue.delete(arr, this.tokenId)
@@ -328,6 +331,15 @@ export default {
                 this.removeFlag = true
                 this.$emit('removeFlag', this.removeFlag)
                 this.removeFlag = false
+                if (this.$store.state.eventPool) {
+                    this.eventPool = this.$store.state.eventPool
+                    for (var index in this.eventPool) {
+                        if (index === this.tokenId) {
+                            this.eventPool[index].removeToken = true
+                            this.$store.commit('changeEventPool', this.eventPool)
+                        }
+                    }
+                }
             }
         },
         endSendSignal() {

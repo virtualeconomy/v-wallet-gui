@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 import BootstrapVue from 'bootstrap-vue'
 import VueResource from 'vue-resource'
+import store from './storge'
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
@@ -31,6 +32,7 @@ Vue.use(jrQrcode)
 new Vue({
     el: '#app',
     router,
+    store,
     components: {App},
     template: '<App/>'
 })

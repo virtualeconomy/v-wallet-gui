@@ -409,7 +409,10 @@ var initData = {
     contractDescription: '',
     tokenDescription: '',
     coldContractDescription: '',
-    coldTokenDescription: ''
+    coldTokenDescription: '',
+    stopPara: 0,
+    stopParaArr: [],
+    eventPool: {}
 }
 export default {
     name: 'NewToken',
@@ -445,6 +448,13 @@ export default {
     data: function() {
         return initData
     },
+    watch: {
+        eventFlag() {
+            for (var i in this.stopParaArr) {
+                clearTimeout(this.stopParaArr[i])
+            }
+        }
+    },
     computed: {
         defaultAddress() {
             return Vue.ls.get('address')
@@ -453,6 +463,17 @@ export default {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
             }
+        },
+        eventFlag() {
+            if (this.$store.state.eventPool) {
+                var event = this.$store.state.eventPool
+                for (var index in event) {
+                    if (index === this.tokenId) {
+                        return event[index].removeToken
+                    }
+                }
+            }
+            return false
         },
         defaultColdAddress() {
             if (this.noColdAddress) return ''
@@ -658,9 +679,15 @@ export default {
         },
         endSend: function() {
             this.$refs.newTokenModal.hide()
-            for (let delayTime = 6000; delayTime < 150100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                setTimeout(this.sendToAdd, delayTime)
+            for (let delayTime = 6000; delayTime < 180100; delayTime *= 2) { //  Refresh interval will be 6s, 30s, 150s
+                this.stopPara = setTimeout(this.sendToAdd, delayTime)
+                this.stopParaArr.push(this.stopPara)
             }
+            var tmp = {}
+            Vue.set(tmp, 'newToken', this.stopParaArr)
+            tmp['removeToken'] = false
+            Vue.set(this.eventPool, this.tokenId, JSON.parse(JSON.stringify(tmp)))
+            this.$store.commit('changeEventPool', this.eventPool)
         },
         sendToAdd: function() {
             if (this.userInfo && this.userInfo.tokens) {
