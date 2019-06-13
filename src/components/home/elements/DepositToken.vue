@@ -267,7 +267,7 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION, DEPOSIT_FUNCIDX } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -352,6 +352,10 @@ export default {
         address: {
             type: String,
             default: ''
+        },
+        isSplit: {
+            type: Boolean,
+            default: false
         }
     },
     computed: {
@@ -393,7 +397,7 @@ export default {
                 timestamp: Date.now(),
                 attachment: '',
                 contractId: this.contractId,
-                functionId: DEPOSIT_FUNCIDX,
+                functionId: this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX,
                 function: transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
                 functionExplain: 'Deposit ' + this.amount + ' token to ' + this.contractId
             }
@@ -433,9 +437,9 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    functionIndex: DEPOSIT_FUNCIDX,
+                    functionIndex: this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX,
                     functionData: transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, DEPOSIT_FUNCIDX, transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    signature: transaction.prepareExecContractSignature(this.contractId, this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX, transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
@@ -445,7 +449,7 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.dataObject.timestamp,
-                    functionIndex: DEPOSIT_FUNCIDX,
+                    functionIndex: this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX,
                     functionData: this.dataObject.function,
                     signature: this.coldSignature
                 }

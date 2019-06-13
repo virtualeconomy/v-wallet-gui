@@ -50,8 +50,11 @@
           <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="enableStatus"
                            @click="splitToken">Split Token</b-dropdown-item>
+          <!--
           <b-dropdown-item v-if="enableStatus && showUnsupportedFunction !== false"
-                           @click="depositToken">Deposit to Contract </b-dropdown-item>
+          -->
+
+          <b-dropdown-item @click="depositToken">Deposit to Contract </b-dropdown-item>
           <b-dropdown-item v-if="enableStatus && showUnsupportedFunction !== false"
                            @click="splitToken">Withdraw from Contract</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
@@ -91,6 +94,7 @@
                   :max-supply="maxSupply"
                   :current-supply="currentSupply"
                   :token-unity="unity"
+                  :is-split="isSplit"
                   @updateBalance="updateBalance">
     </DepositToken>
     <Supersede :token-id="tokenId"
