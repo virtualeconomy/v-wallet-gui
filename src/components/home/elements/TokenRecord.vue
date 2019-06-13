@@ -126,7 +126,8 @@ export default {
             issuer: '',
             maker: '',
             functionIndex: SEND_FUNCIDX,
-            contractId: ''
+            contractId: '',
+            eventPool: {}
         }
     },
     props: {
@@ -328,6 +329,19 @@ export default {
                 this.removeFlag = true
                 this.$emit('removeFlag', this.removeFlag)
                 this.removeFlag = false
+                if (this.$store.state.eventPool) {
+                    this.eventPool = this.$store.state.eventPool
+                    if (this.eventPool[this.tokenId] && this.eventPool[this.tokenId].newToken) {
+                        var stopArr = this.eventPool[this.tokenId].newToken
+                        for (var i in stopArr) {
+                            clearTimeout(stopArr[i])
+                        }
+                    }
+                    if (this.eventPool[this.tokenId] && this.eventPool[this.tokenId].removeToken) {
+                        this.eventPool[this.tokenId].removeToken = true
+                    }
+                    this.$store.commit('changeEventPool', this.eventPool)
+                }
             }
         },
         endSendSignal() {
