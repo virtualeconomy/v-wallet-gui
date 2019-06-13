@@ -331,13 +331,15 @@ export default {
                 this.removeFlag = false
                 if (this.$store.state.eventPool) {
                     this.eventPool = this.$store.state.eventPool
-                    if (this.eventPool[this.tokenId].newToken) {
+                    if (this.eventPool[this.tokenId] && this.eventPool[this.tokenId].newToken) {
                         var stopArr = this.eventPool[this.tokenId].newToken
                         for (var i in stopArr) {
                             clearTimeout(stopArr[i])
                         }
                     }
-                    this.eventPool[this.tokenId].removeToken = true
+                    if (this.eventPool[this.tokenId] && this.eventPool[this.tokenId].removeToken) {
+                        this.eventPool[this.tokenId].removeToken = true
+                    }
                     this.$store.commit('changeEventPool', this.eventPool)
                 }
             }
