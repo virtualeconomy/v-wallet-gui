@@ -335,12 +335,17 @@ export default {
                     this.eventPool = this.$store.state.eventPool
                     for (var index in this.eventPool) {
                         if (index === this.tokenId) {
+                            var stopArr = this.eventPool[index].newToken
+                            for (var i in stopArr) {
+                                clearTimeout(stopArr[i])
+                            }
                             this.eventPool[index].removeToken = true
                             this.$store.commit('changeEventPool', this.eventPool)
                         }
                     }
                 }
             }
+            this.updateBalance()
         },
         endSendSignal() {
             this.$emit('endSendSignal')

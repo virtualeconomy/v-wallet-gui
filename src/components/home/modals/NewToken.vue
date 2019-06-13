@@ -410,7 +410,6 @@ var initData = {
     tokenDescription: '',
     coldContractDescription: '',
     coldTokenDescription: '',
-    stopPara: 0,
     stopParaArr: [],
     eventPool: {}
 }
@@ -448,13 +447,13 @@ export default {
     data: function() {
         return initData
     },
-    watch: {
+    /* watch: {
         eventFlag() {
             for (var i in this.stopParaArr) {
                 clearTimeout(this.stopParaArr[i])
             }
         }
-    },
+    }, */
     computed: {
         defaultAddress() {
             return Vue.ls.get('address')
@@ -464,7 +463,7 @@ export default {
                 return Vue.ls.get('address')
             }
         },
-        eventFlag() {
+        /* eventFlag() {
             if (this.$store.state.eventPool) {
                 var event = this.$store.state.eventPool
                 for (var index in event) {
@@ -474,7 +473,7 @@ export default {
                 }
             }
             return false
-        },
+        }, */
         defaultColdAddress() {
             if (this.noColdAddress) return ''
             return Object.keys(this.coldAddresses)[0]
@@ -680,8 +679,8 @@ export default {
         endSend: function() {
             this.$refs.newTokenModal.hide()
             for (let delayTime = 6000; delayTime < 150100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                this.stopPara = setTimeout(this.sendToAdd, delayTime)
-                this.stopParaArr.push(this.stopPara)
+                var stopPara = setTimeout(this.sendToAdd, delayTime)
+                this.stopParaArr.push(stopPara)
             }
             var tmp = {}
             Vue.set(tmp, 'newToken', this.stopParaArr)
