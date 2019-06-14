@@ -459,6 +459,7 @@ export default {
             this.paused = false
             this.sendError = false
             this.coldSignature = ''
+            this.contractId = ''
         },
         endSend: function() {
             for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
