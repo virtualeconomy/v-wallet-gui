@@ -24,7 +24,6 @@
                         label-for="contract-input">
             <b-form-input id=contract-input
                           class="contract-input"
-                          readonly
                           v-model="contractId"
                           :state="isValidContractId(contractId)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
@@ -290,7 +289,7 @@ export default {
             timeStamp: Date.now() * 1e6,
             hasConfirmed: false,
             attachment: '',
-            contractId: this.contract()
+            contractId: ''
         }
     },
     props: {
@@ -380,9 +379,6 @@ export default {
         },
         coldApi: function() {
             return API_VERSION
-        },
-        contract: function() {
-            return transaction.tokenIDToContractID(this.tokenId)
         },
         isSubmitDisabled() {
             return !(!this.isInsufficient() && this.isAmountValid() && this.isValidContractId(this.contractId))
