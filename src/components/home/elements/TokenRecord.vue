@@ -81,7 +81,6 @@
                 @updateBalance="updateBalance">
     </IssueToken>
     <WithdrawToken :token-id="tokenId"
-                   :issuer="issuer"
                    :address="address"
                    :maker="maker"
                    :wallet-type="walletType"
@@ -89,8 +88,6 @@
                    :cold-addresses="coldAddresses"
                    :token-balance="tokenBalance"
                    :balance="balances[address]"
-                   :max-supply="maxSupply"
-                   :current-supply="currentSupply"
                    :token-unity="unity"
                    :is-split="isSplit"
                    @updateBalance="updateBalance">
