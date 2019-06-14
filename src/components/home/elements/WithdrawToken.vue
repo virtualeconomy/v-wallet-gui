@@ -219,7 +219,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :contract-id="contractId"
-                        :tx-type="'Wuthdraw Token from Contract'">
+                        :tx-type="'Withdraw Token from Contract'">
           </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-row>
@@ -462,6 +462,7 @@ export default {
             this.coldPageId = 1
             this.sendError = false
             this.coldSignature = ''
+            this.contractId = ''
         },
         endSend: function() {
             for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
