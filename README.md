@@ -59,3 +59,37 @@ $ npm run dev
   proxy_pass http://wallet.v.systems:9922 
 ```
 to a particular address
+
+### Deploy using [zappa](https://github.com/Miserlou/Zappa)
+
+#### Installation
+
+
+```
+npm run build
+cd app
+pipenv shell
+pipenv install zappa flask
+```
+
+#### Deployment
+
+Amazon AWS deployment requires awscli.
+
+```
+zappa init
+```
+
+Add `certificate_arn` and `domain` settings to `zappa_settings.json`. To deploy the web service:
+
+```
+zappa deploy
+zappa certify dev
+```
+
+To terminate the web service:
+
+```
+zappa undeploy
+```
+
