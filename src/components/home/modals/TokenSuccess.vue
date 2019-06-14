@@ -96,7 +96,7 @@
                     class="form-line"
                     label="Amount"
                     label-for="amount_success">
-        <b-form-input id="amount_confirm"
+        <b-form-input id="amount_success"
                       :value="formatter(amount)"
                       class="amount"
                       readonly

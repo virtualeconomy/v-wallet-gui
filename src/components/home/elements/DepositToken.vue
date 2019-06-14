@@ -38,14 +38,14 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('hot')">
+                          :state="isAmountValid()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
+                                     v-if="!checkPrecision(amount) && !isExceededBalance(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupply(amount)">
+                                     v-else-if="isExceededBalance(amount)">
               Deposited token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -70,7 +70,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled('hot')"
+                    :disabled="isSubmitDisabled()"
                     @click="nextPage">Deposit
           </b-button>
         </b-container>
@@ -127,7 +127,7 @@
                      class="text-left">
           <b-form-group label="Contract ID"
                         label-for="contract-input">
-            <b-form-input id=contract-input
+            <b-form-input id=coldContract-input
                           class="contract-input"
                           readonly
                           v-model="contractId"
@@ -143,14 +143,14 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('cold')">
+                          :state="isAmountValid()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
+                                     v-if="!checkPrecision(amount) && !isExceededBalance(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupply(amount)">
+                                     v-else-if="isExceededBalance(amount)">
               Deposited token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -175,7 +175,7 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isSubmitDisabled('cold')"
+                    :disabled="isSubmitDisabled()"
                     @click="coldNextPage">Deposit
           </b-button>
         </b-container>
@@ -267,7 +267,7 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -281,15 +281,15 @@ export default {
     data: function() {
         return {
             amount: BigNumber(0),
-            attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
-            coldPageId: 5,
-            scanShow: false,
+            coldPageId: 1,
             sendError: false,
             coldSignature: '',
             timeStamp: Date.now() * 1e6,
-            hasConfirmed: false
+            hasConfirmed: false,
+            attachment: '',
+            contractId: this.contract()
         }
     },
     props: {
@@ -342,15 +342,8 @@ export default {
         }
     },
     computed: {
-        contractId() {
-            return transaction.tokenIDToContractID(this.tokenId)
-        },
         defaultAddress() {
             return Vue.ls.get('address')
-        },
-        defaultColdAddress() {
-            if (this.noColdAddress) return ''
-            return Object.keys(this.coldAddresses)[0]
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
@@ -361,12 +354,6 @@ export default {
         },
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
-        },
-        wordList() {
-            return this.seedPhrase.split(' ')
-        },
-        noColdAddress() {
-            return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         dataObject() {
             return {
@@ -384,12 +371,6 @@ export default {
                 function: transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
                 functionExplain: 'Deposit ' + this.amount + ' token to ' + this.contractId
             }
-        },
-        isValidAttachment() {
-            if (!this.attachment) {
-                return void 0
-            }
-            return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         }
     },
     methods: {
@@ -399,8 +380,11 @@ export default {
         coldApi: function() {
             return API_VERSION
         },
-        isSubmitDisabled(type) {
-            return !(BigNumber(this.amount).isGreaterThan(0))
+        contract: function() {
+            return transaction.tokenIDToContractID(this.tokenId)
+        },
+        isSubmitDisabled() {
+            return !(this.isValidContractId(this.contractId) && this.isAmountValid())
         },
         sendData: function(walletType) {
             let apiSchema
@@ -476,10 +460,7 @@ export default {
             this.amount = BigNumber(0)
             this.pageId = 1
             this.coldPageId = 1
-            this.scanShow = false
-            this.qrInit = false
             this.paused = false
-            this.qrErrMsg = void 0
             this.sendError = false
             this.coldSignature = ''
         },
@@ -492,58 +473,17 @@ export default {
         sendBalanceChange: function() {
             this.$emit('updateBalance', 'update')
         },
-        async onInit(promise) {
-            try {
-                this.qrInit = true
-                await promise
-            } catch (error) {
-                if (error.name === 'NotAllowedError') {
-                    throw Error('user denied camera access permission')
-                } else if (error.name === 'NotFoundError') {
-                    throw Error('no suitable camera device installed')
-                } else if (error.name === 'NotSupportedError') {
-                    throw Error('page is not served over HTTPS (or localhost)')
-                } else if (error.name === 'NotReadableError') {
-                    throw Error('maybe camera is already in use')
-                } else if (error.name === 'OverconstarinedError') {
-                    throw Error('pass constraints do not match any camera')
-                } else {
-                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
-                }
-            } finally {
-                this.qrInit = false
-            }
-        },
         getSignature: function(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
         },
-        repaintLocation(location, ctx) {
-            if (location !== null) {
-                const {
-                    topLeftCorner,
-                    topRightCorner,
-                    bottomLeftCorner,
-                    bottomRightCorner
-                } = location
-                ctx.strokeStyle = 'orange' // instead of red
-                ctx.beginPath()
-                ctx.moveTo(topLeftCorner.x, topLeftCorner.y)
-                ctx.lineTo(bottomLeftCorner.x, bottomLeftCorner.y)
-                ctx.lineTo(bottomRightCorner.x, bottomRightCorner.y)
-                ctx.lineTo(topRightCorner.x, topRightCorner.y)
-                ctx.lineTo(topLeftCorner.x, topLeftCorner.y)
-                ctx.closePath()
-                ctx.stroke()
-            }
-        },
-        isAmountValid(type) {
+        isAmountValid() {
             var amount = this.amount
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededMaxSupply(amount) && !this.isNegative(amount)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededBalance(amount) && !this.isNegative(amount)
         },
         isNumFormatValid(amount) {
             return common.isNumFormatValid(amount)
@@ -554,7 +494,7 @@ export default {
         checkPrecision(amount) {
             return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
         },
-        isExceededMaxSupply(amount) {
+        isExceededBalance(amount) {
             return BigNumber(amount).isGreaterThan(this.tokenBalance)
         },
         isInsufficient() {
