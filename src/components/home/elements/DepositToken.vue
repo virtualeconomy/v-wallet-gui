@@ -26,6 +26,7 @@
                           class="contract-input"
                           readonly
                           v-model="contractId"
+                          :state="isValidContractId(contractId)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid Contract ID
@@ -120,7 +121,7 @@
         </b-container>
       </b-tab>
       <b-tab title="Cold Wallet"
-             :disabled="walletType==='hotWallet'"
+             :disabled="!coldPageId || walletType==='hotWallet'"
              :active="walletType==='coldWallet'">
         <b-container v-if="coldPageId===1"
                      class="text-left">
@@ -130,6 +131,7 @@
                           class="contract-input"
                           readonly
                           v-model="contractId"
+                          :state="isValidContractId(contractId)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid Contract ID
@@ -272,6 +274,7 @@ import ColdSignature from '../modals/ColdSignature'
 import browser from '@/utils/browser'
 import common from '@/utils/common'
 import BigNumber from 'bignumber.js'
+import base58 from '@/libs/base58'
 import transaction from '@/utils/transaction'
 export default {
     name: 'DepositToken',
@@ -382,7 +385,7 @@ export default {
             return transaction.tokenIDToContractID(this.tokenId)
         },
         isSubmitDisabled() {
-            return !(!this.isInsufficient() && this.isAmountValid())
+            return !(!this.isInsufficient() && this.isAmountValid() && this.isValidContractId(this.contractId))
         },
         sendData: function(walletType) {
             let apiSchema
@@ -419,7 +422,6 @@ export default {
             }
             const url = NODE_IP + '/contract/broadcast/execute'
             this.$http.post(url, apiSchema).then(response => {
-                console.log(response)
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
@@ -497,6 +499,18 @@ export default {
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
+        },
+        isValidContractId(contractId) {
+            var contractArr = base58.decode(contractId)
+            if (contractArr) {
+                if (contractArr.length === 26 && contractArr[0] === 6) {
+                    return true
+                } else {
+                    return false
+                }
+            } else {
+                return false
+            }
         },
         getKeypair: function(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
