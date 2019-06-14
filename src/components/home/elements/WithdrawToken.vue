@@ -16,7 +16,7 @@
     <b-tabs>
       <b-tab title="Hot Wallet"
              :disabled="walletType === 'coldWallet'"
-             :active="walletType==='hotWallet'">
+             :active="walletType === 'hotWallet'">
         <b-container
           class="text-left"
           v-if="pageId===1">
@@ -24,7 +24,6 @@
                         label-for="contract-input">
             <b-form-input id=contract-input
                           class="contract-input"
-                          readonly
                           v-model="contractId"
                           :state="isValidContractId(contractId)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
@@ -41,11 +40,11 @@
                           :state="isAmountValid()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
+                                     v-if="!checkPrecision(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupply(amount)">
+                                     v-else-if="!isEnoughContractBanlance(amount)">
               Withdrawed token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -121,15 +120,14 @@
         </b-container>
       </b-tab>
       <b-tab title="Cold Wallet"
-             :disabled="!coldPageId || walletType==='hotWallet'"
-             :active="walletType==='coldWallet'">
+             :disabled="walletType === 'hotWallet'"
+             :active="walletType === 'coldWallet'">
         <b-container v-if="coldPageId===1"
                      class="text-left">
           <b-form-group label="Contract ID"
                         label-for="contract-input">
-            <b-form-input id=contract-input
+            <b-form-input id=coldContract-input
                           class="contract-input"
-                          readonly
                           v-model="contractId"
                           :state="isValidContractId(contractId)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
@@ -146,11 +144,11 @@
                           :state="isAmountValid()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
+                                     v-if="!checkPrecision(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupply(amount)">
+                                     v-else-if="!isEnoughContractBanlance(amount)">
               Withdrawed token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -267,13 +265,14 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '@/utils/browser'
 import common from '@/utils/common'
 import BigNumber from 'bignumber.js'
+import base58 from '@/libs/base58'
 import transaction from '@/utils/transaction'
 export default {
     name: 'WithdrawToken',
@@ -284,12 +283,12 @@ export default {
             attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
-            coldPageId: 5,
-            scanShow: false,
+            coldPageId: 1,
             sendError: false,
             coldSignature: '',
             timeStamp: Date.now() * 1e6,
-            hasConfirmed: false
+            hasConfirmed: false,
+            contractId: ''
         }
     },
     props: {
@@ -347,15 +346,8 @@ export default {
         }
     },
     computed: {
-        contractId() {
-            return transaction.tokenIDToContractID(this.tokenId)
-        },
         defaultAddress() {
             return Vue.ls.get('address')
-        },
-        defaultColdAddress() {
-            if (this.noColdAddress) return ''
-            return Object.keys(this.coldAddresses)[0]
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
@@ -366,12 +358,6 @@ export default {
         },
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
-        },
-        wordList() {
-            return this.seedPhrase.split(' ')
-        },
-        noColdAddress() {
-            return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         dataObject() {
             return {
@@ -389,12 +375,6 @@ export default {
                 function: transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
                 functionExplain: 'Withdraw ' + this.amount + ' token from ' + this.contractId
             }
-        },
-        isValidAttachment() {
-            if (!this.attachment) {
-                return void 0
-            }
-            return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         }
     },
     methods: {
@@ -405,7 +385,7 @@ export default {
             return API_VERSION
         },
         isSubmitDisabled() {
-            return !(BigNumber(this.amount).isGreaterThan(0))
+            return !(!this.isInsufficient() && this.isAmountValid() && this.isValidContractId(this.contractId))
         },
         sendData: function(walletType) {
             let apiSchema
@@ -480,10 +460,6 @@ export default {
             this.amount = BigNumber(0)
             this.pageId = 1
             this.coldPageId = 1
-            this.scanShow = false
-            this.qrInit = false
-            this.paused = false
-            this.qrErrMsg = void 0
             this.sendError = false
             this.coldSignature = ''
         },
@@ -496,58 +472,17 @@ export default {
         sendBalanceChange: function() {
             this.$emit('updateBalance', 'update')
         },
-        async onInit(promise) {
-            try {
-                this.qrInit = true
-                await promise
-            } catch (error) {
-                if (error.name === 'NotAllowedError') {
-                    throw Error('user denied camera access permission')
-                } else if (error.name === 'NotFoundError') {
-                    throw Error('no suitable camera device installed')
-                } else if (error.name === 'NotSupportedError') {
-                    throw Error('page is not served over HTTPS (or localhost)')
-                } else if (error.name === 'NotReadableError') {
-                    throw Error('maybe camera is already in use')
-                } else if (error.name === 'OverconstarinedError') {
-                    throw Error('pass constraints do not match any camera')
-                } else {
-                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
-                }
-            } finally {
-                this.qrInit = false
-            }
-        },
         getSignature: function(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
-        },
-        repaintLocation(location, ctx) {
-            if (location !== null) {
-                const {
-                    topLeftCorner,
-                    topRightCorner,
-                    bottomLeftCorner,
-                    bottomRightCorner
-                } = location
-                ctx.strokeStyle = 'orange' // instead of red
-                ctx.beginPath()
-                ctx.moveTo(topLeftCorner.x, topLeftCorner.y)
-                ctx.lineTo(bottomLeftCorner.x, bottomLeftCorner.y)
-                ctx.lineTo(bottomRightCorner.x, bottomRightCorner.y)
-                ctx.lineTo(topRightCorner.x, topRightCorner.y)
-                ctx.lineTo(topLeftCorner.x, topLeftCorner.y)
-                ctx.closePath()
-                ctx.stroke()
-            }
         },
         isAmountValid() {
             var amount = this.amount
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededMaxSupply(amount) && !this.isNegative(amount)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && this.isEnoughContractBanlance(amount) && !this.isNegative(amount)
         },
         isNumFormatValid(amount) {
             return common.isNumFormatValid(amount)
@@ -558,15 +493,15 @@ export default {
         checkPrecision(amount) {
             return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
         },
-        isExceededMaxSupply(amount) {
-            return BigNumber(amount).isGreaterThan(this.tokenBalance)
+        isEnoughContractBanlance(amount) {
+            return true
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         isValidContractId(contractId) {
-            var contractIdCmp = transaction.tokenIDToContractID(this.tokenId)
-            return contractId === contractIdCmp
+            var contractArr = base58.decode(contractId)
+            return contractArr && contractArr.length === 26 && contractArr[0] === 6
         },
         getKeypair: function(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
