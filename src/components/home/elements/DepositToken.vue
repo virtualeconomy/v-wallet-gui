@@ -15,7 +15,7 @@
     </button>
     <b-tabs>
       <b-tab title="Hot Wallet"
-             :disabled="walletType === 'coldWallet'"
+             :disabled="walletType==='coldWallet'"
              :active="walletType==='hotWallet'">
         <b-container
           class="text-left"
@@ -26,7 +26,6 @@
                           class="contract-input"
                           readonly
                           v-model="contractId"
-                          :state="isValidContractId(contractId)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid Contract ID
@@ -121,7 +120,7 @@
         </b-container>
       </b-tab>
       <b-tab title="Cold Wallet"
-             :disabled="!coldPageId || walletType==='hotWallet'"
+             :disabled="walletType==='hotWallet'"
              :active="walletType==='coldWallet'">
         <b-container v-if="coldPageId===1"
                      class="text-left">
@@ -131,7 +130,6 @@
                           class="contract-input"
                           readonly
                           v-model="contractId"
-                          :state="isValidContractId(contractId)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid Contract ID
@@ -384,7 +382,7 @@ export default {
             return transaction.tokenIDToContractID(this.tokenId)
         },
         isSubmitDisabled() {
-            return !(this.isValidContractId(this.contractId) && this.isAmountValid())
+            return !(!this.isInsufficient() && this.isAmountValid())
         },
         sendData: function(walletType) {
             let apiSchema
@@ -499,10 +497,6 @@ export default {
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
-        },
-        isValidContractId(contractId) {
-            var contractIdCmp = transaction.tokenIDToContractID(this.tokenId)
-            return contractId === contractIdCmp
         },
         getKeypair: function(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
