@@ -502,15 +502,7 @@ export default {
         },
         isValidContractId(contractId) {
             var contractArr = base58.decode(contractId)
-            if (contractArr) {
-                if (contractArr.length === 26 && contractArr[0] === 6) {
-                    return true
-                } else {
-                    return false
-                }
-            } else {
-                return false
-            }
+            return contractArr && contractArr.length === 26 && contractArr[0] === 6
         },
         getKeypair: function(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
