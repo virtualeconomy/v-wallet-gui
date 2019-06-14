@@ -83,6 +83,7 @@
     <WithdrawToken :token-id="tokenId"
                    :issuer="issuer"
                    :address="address"
+                   :maker="maker"
                    :wallet-type="walletType"
                    :addresses="addresses"
                    :cold-addresses="coldAddresses"

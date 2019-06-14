@@ -13,7 +13,7 @@
       @click="endSend">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
-    <b-tabs @input="hideQrScan">
+    <b-tabs>
       <b-tab title="Hot Wallet"
              :disabled="walletType === 'coldWallet'"
              :active="walletType==='hotWallet'">
@@ -38,7 +38,7 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('hot')">
+                          :state="isAmountValid()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
@@ -70,7 +70,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled('hot')"
+                    :disabled="isSubmitDisabled()"
                     @click="nextPage">Withdraw
           </b-button>
         </b-container>
@@ -143,7 +143,7 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('cold')">
+                          :state="isAmountValid()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
@@ -175,7 +175,7 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isSubmitDisabled('cold')"
+                    :disabled="isSubmitDisabled()"
                     @click="coldNextPage">Withdraw
           </b-button>
         </b-container>
@@ -267,7 +267,7 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -276,7 +276,7 @@ import common from '@/utils/common'
 import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
 export default {
-    name: 'IssueToken',
+    name: 'WithdrawToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     data: function() {
         return {
@@ -322,29 +322,12 @@ export default {
             default: function() {},
             require: true
         },
-        maxSupply: {
-            type: BigNumber,
-            default: function() {
-            },
-            require: true
-        },
-        currentSupply: {
-            type: BigNumber,
-            default: function() {
-            },
-            require: true
-        },
         walletType: {
             type: String,
             default: 'hotWallet',
             require: true
         },
         tokenId: {
-            type: String,
-            default: '',
-            require: true
-        },
-        issuer: {
             type: String,
             default: '',
             require: true
@@ -356,6 +339,11 @@ export default {
         isSplit: {
             type: Boolean,
             default: false
+        },
+        maker: {
+            type: String,
+            default: '',
+            require: true
         }
     },
     computed: {
@@ -416,10 +404,7 @@ export default {
         coldApi: function() {
             return API_VERSION
         },
-        isValidIssuer: function(addr) {
-            return addr === this.issuer
-        },
-        isSubmitDisabled(type) {
+        isSubmitDisabled() {
             return !(BigNumber(this.amount).isGreaterThan(0))
         },
         sendData: function(walletType) {
@@ -511,14 +496,6 @@ export default {
         sendBalanceChange: function() {
             this.$emit('updateBalance', 'update')
         },
-        scanChange: function(evt) {
-            if (!this.qrInit) {
-                this.scanShow = !this.scanShow
-            }
-            if (this.scanShow) {
-                this.paused = false
-            }
-        },
         async onInit(promise) {
             try {
                 this.qrInit = true
@@ -539,44 +516,6 @@ export default {
                 }
             } finally {
                 this.qrInit = false
-            }
-        },
-        onDecode: function(decodeString) {
-            this.paused = true
-            try {
-                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
-                this.recipient = jsonObj.address
-                var opc = jsonObj.opc
-                var api = jsonObj.api
-                var protocol = jsonObj.protocol
-                if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                }
-                if (jsonObj.hasOwnProperty('invoice')) {
-                    this.attachment = jsonObj.invoice
-                }
-                if (protocol !== PROTOCOL) {
-                    this.paused = false
-                    this.qrErrMsg = 'Invalid QR code protocol.'
-                } else if (api !== API_VERSION) {
-                    this.paused = false
-                    this.qrErrMsg = 'API version mismatch.'
-                } else if (opc !== OPC_ACCOUNT) {
-                    this.paused = false
-                    this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidIssuer(this.recipient) || this.recipient === '') {
-                    this.paused = false
-                    this.qrErrMsg = 'Invalid address of recipient.'
-                } else {
-                    this.qrErrMsg = void 0
-                }
-            } catch (e) {
-                if (this.isValidIssuer(decodeString)) {
-                    this.recipient = decodeString
-                } else {
-                    this.recipient = 'please scan QR code of recipient'
-                    this.paused = false
-                }
             }
         },
         getSignature: function(signature) {
@@ -603,17 +542,7 @@ export default {
                 ctx.stroke()
             }
         },
-        hideQrScan(tabIndex) {
-            if (tabIndex === 0) {
-                this.resetPage()
-                this.pageId = 1
-            } else {
-                this.resetPage()
-                this.coldPageId = 1
-            }
-            this.scanShow = false
-        },
-        isAmountValid(type) {
+        isAmountValid() {
             var amount = this.amount
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0

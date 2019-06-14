@@ -13,7 +13,7 @@
       @click="endSend">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
-    <b-tabs @input="hideQrScan">
+    <b-tabs>
       <b-tab title="Hot Wallet"
              :disabled="!pageId || walletType==='coldWallet'"
              :active="walletType==='hotWallet'">
@@ -284,7 +284,7 @@ import common from '@/utils/common'
 import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
 export default {
-    name: 'IssueToken',
+    name: 'SplitToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     data: function() {
         return {
