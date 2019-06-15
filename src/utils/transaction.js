@@ -240,6 +240,15 @@ export default {
     prepareSendAttachment: function(description) {
         return base58_1.default.encode(convert_1.default.stringToByteArray(description))
     },
+    prepareWithdraw: function(contractId, addr, amount) {
+        var contractArr = transferContract(contractId)
+        var addrArr = transferAccount(addr)
+        var amountArr = transferAmount(amount)
+        var parametersNum = convert_1.default.shortToByteArray(3)
+
+        var encodeArr = parametersNum.concat(contractArr.concat(addrArr.concat(amountArr)))
+        return base58_1.default.encode(Uint8Array.from(encodeArr))
+    },
     prepareDeposit: function(addr, contractId, amount) {
       var addrArr = transferAccount(addr)
       var contractArr = transferContract(contractId)

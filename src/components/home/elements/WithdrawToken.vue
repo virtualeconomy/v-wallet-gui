@@ -1,11 +1,11 @@
 <template>
-  <b-modal :id="'splitTokenModal_' + tokenId"
+  <b-modal :id="'withdrawTokenModal_' + tokenId"
            centered
            lazy
-           title="SplitToken"
+           title="WithdrawToken"
            hide-footer
            hide-header
-           ref="splitTokenModal"
+           ref="withdrawTokenModal"
            :busy="true"
            @hidden="resetPage">
     <button
@@ -15,76 +15,70 @@
     </button>
     <b-tabs>
       <b-tab title="Hot Wallet"
-             :disabled="!pageId || walletType==='coldWallet'"
-             :active="walletType==='hotWallet'">
+             :disabled="walletType === 'coldWallet'"
+             :active="walletType === 'hotWallet'">
         <b-container
           class="text-left"
           v-if="pageId===1">
-          <b-form-group label="Maker Wallet Address"
-                        label-for="address-input">
-            <b-form-input id=address-input
-                          class="address-input"
-                          readonly
-                          v-model="address"
-                          :state="isValidMaker(address)"
+          <b-form-group label="Contract ID"
+                        label-for="contract-input">
+            <b-form-input id=contract-input
+                          class="contract-input"
+                          v-model="contractId"
+                          :state="isValidContractId(contractId)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Cannot split token. You are not maker of this token.
+              Invalid Contract ID
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group>
-            <div class="unity">Current Unity {{ tokenUnity.toString() }}</div>
-          </b-form-group>
-          <b-form-group label="New Unity"
+          <b-form-group label="Amount"
                         label-for="amount-input">
-            <b-form-input id="recipient-input"
-                          class="recipient-input"
-                          type="text"
-                          v-model="newUnity"
-                          :state="isValidUnity()"
-                          aria-describedby="inputLiveFeedback">
+            <b-form-input id="amount-input"
+                          class="amount-input"
+                          v-model="amount"
+                          aria-describedby="inputLiveFeedback"
+                          :state="isAmountValid()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="isNegative(this.newUnity)">
-              Negative number is not allowed.
+                                     v-if="!checkPrecision(amount)">
+              Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isBiggerThanMax()">
-              Please reduce Unity scale.
+                                     v-else-if="!isEnoughContractBanlance(amount)">
+              Withdrawed token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isNumFormatValid(this.newUnity)">
+                                     v-else-if="isNegative(amount)">
+              Negative number is not allowed
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="!isNumFormatValid(amount)">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isInteger()">
-              Integer number is allowed.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
-              Invalid Unity.
+              Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
             <span v-if="isInsufficient()"
                   class="vsys-check">Insufficient VSYS balance</span>
-            <span v-if="!isSplit"
-                  class="vsys-check">Cannot change unity. This token does not support split function.</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
                     size="lg"
                     block
                     :disabled="isSubmitDisabled()"
-                    @click="nextPage">Change
+                    @click="nextPage">Withdraw
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
           <TokenConfirm :address="address"
-                        :new-unity="newUnity"
+                        :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Split Token'">
+                        :contract-id="contractId"
+                        :tx-type="'Withdraw Token from Contract'">
           </TokenConfirm>
           <p
             v-show="sendError"
@@ -113,9 +107,10 @@
         <b-container v-if="pageId===3">
           <TokenSuccess class="tokenSucced"
                         :address="address"
-                        :new-unity="newUnity"
+                        :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Split Token'">
+                        :contract-id="contractId"
+                        :tx-type="'Withdraw Token from Contract'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -125,76 +120,69 @@
         </b-container>
       </b-tab>
       <b-tab title="Cold Wallet"
-             :disabled="!coldPageId || walletType==='hotWallet'"
-             :active="walletType==='coldWallet'">
+             :disabled="walletType === 'hotWallet'"
+             :active="walletType === 'coldWallet'">
         <b-container v-if="coldPageId===1"
                      class="text-left">
-          <b-form-group label="Wallet Address"
-                        label-for="wallet-address">
-            <b-form-input id=coldAddress-input
-                          class="address-input"
-                          readonly
-                          v-model="address"
-                          :state="isValidMaker(address)"
+          <b-form-group label="Contract ID"
+                        label-for="contract-input">
+            <b-form-input id=coldContract-input
+                          class="contract-input"
+                          v-model="contractId"
+                          :state="isValidContractId(contractId)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Cannot split token. You are not maker of this token.
+              Invalid Contract ID
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group>
-            <div class="unity">Current Unity {{ tokenUnity.toString() }}</div>
-          </b-form-group>
-          <b-form-group label="New Issuer"
+          <b-form-group label="Amount"
                         label-for="cold-amount-input">
-            <b-form-input id="cold-recipient-input"
-                          class="recipient-input"
-                          type="text"
-                          v-model="newUnity"
-                          :state="isValidUnity()"
+            <b-form-input id="cold-amount-input"
+                          class="amount-input"
+                          v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          placeholder="Paste or scan an address.">
+                          :state="isAmountValid()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="isNegative(this.newUnity)">
-              Negative number is not allowed.
+                                     v-if="!checkPrecision(amount)">
+              Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isBiggerThanMax()">
-              Please reduce Unity scale.
+                                     v-else-if="!isEnoughContractBanlance(amount)">
+              Withdrawed token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isNumFormatValid(this.newUnity)">
+                                     v-else-if="isNegative(amount)">
+              Negative number is not allowed
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="!isNumFormatValid(amount)">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isInteger()">
-              Integer number is allowed.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
-              Invalid Unity.
+              Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
             <span v-if="isInsufficient()"
                   class="vsys-check">Insufficient VSYS balance</span>
-            <span v-if="!isSplit"
-                  class="vsys-check">Cannot change unity. This token does not support split function.</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
                     block
                     size="lg"
                     :disabled="isSubmitDisabled()"
-                    @click="coldNextPage">Continue
+                    @click="coldNextPage">Withdraw
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
           <TokenConfirm :address="address"
-                        :new-unity="newUnity"
+                        :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Split Token'">
+                        :contract-id="contractId"
+                        :tx-type="'Withdraw Token from Contract'">
           </TokenConfirm>
           <b-row>
             <b-col class="col-lef">
@@ -228,9 +216,10 @@
         </b-container>
         <b-container v-show="coldPageId===4">
           <TokenConfirm :address="address"
-                        :new-unity="newUnity"
+                        :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Split Token'">
+                        :contract-id="contractId"
+                        :tx-type="'Withdraw Token from Contract'">
           </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed!</p>
           <b-row>
@@ -257,9 +246,10 @@
         <b-container v-show="coldPageId===5">
           <TokenSuccess class="tokenSucced"
                         :address="address"
-                        :new-unity="newUnity"
+                        :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Split Token'">
+                        :contract-id="contractId"
+                        :tx-type="'Withdraw Token from Contract'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -275,28 +265,30 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, SPLIT_FUNCIDX, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '@/utils/browser'
 import common from '@/utils/common'
 import BigNumber from 'bignumber.js'
+import base58 from '@/libs/base58'
 import transaction from '@/utils/transaction'
 export default {
-    name: 'SplitToken',
+    name: 'WithdrawToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     data: function() {
         return {
-            newUnity: BigNumber(0),
+            amount: BigNumber(0),
             attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
-            coldPageId: 5,
+            coldPageId: 1,
             sendError: false,
             coldSignature: '',
             timeStamp: Date.now() * 1e6,
-            hasConfirmed: false
+            hasConfirmed: false,
+            contractId: ''
         }
     },
     props: {
@@ -313,10 +305,6 @@ export default {
             },
             require: true
         },
-        isSplit: {
-            type: Boolean,
-            default: false
-        },
         tokenUnity: {
             type: BigNumber,
             default: function() {
@@ -327,12 +315,6 @@ export default {
             type: Object,
             default: function() {},
             require: true// Can not be removed ,cause this is an inherited property may be used somewhere
-        },
-        maxSupply: {
-            type: BigNumber,
-            default: function() {
-            },
-            require: true
         },
         addresses: {
             type: Object,
@@ -349,26 +331,23 @@ export default {
             default: '',
             require: true
         },
+        address: {
+            type: String,
+            default: ''
+        },
+        isSplit: {
+            type: Boolean,
+            default: false
+        },
         maker: {
             type: String,
             default: '',
             require: true
-        },
-        address: {
-            type: String,
-            default: ''
         }
     },
     computed: {
-        contractId() {
-            return transaction.tokenIDToContractID(this.tokenId)
-        },
         defaultAddress() {
             return Vue.ls.get('address')
-        },
-        defaultColdAddress() {
-            if (this.noColdAddress) return ''
-            return Object.keys(this.coldAddresses)[0]
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
@@ -380,58 +359,33 @@ export default {
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
-        wordList() {
-            return this.seedPhrase.split(' ')
-        },
-        noColdAddress() {
-            return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
-        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
                 api: this.coldApi(),
                 opc: OPC_FUNCTION,
                 address: this.address,
-                senderPublicKey: this.coldAddresses[this.address].publicKey,
+                // senderPublicKey: this.coldAddresses[this.address].publicKey,
                 fee: this.fee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
                 timestamp: Date.now(),
                 attachment: '',
                 contractId: this.contractId,
-                functionId: SPLIT_FUNCIDX,
-                function: transaction.prepareSplit(BigNumber(this.newUnity)),
-                functionExplain: 'Set token unity to ' + this.newUnity
+                functionId: this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX,
+                function: transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
+                functionExplain: 'Withdraw ' + this.amount + ' token from ' + this.contractId
             }
         }
     },
     methods: {
+        inputAmount(num) {
+            return BigNumber(num)
+        },
         coldApi: function() {
             return API_VERSION
         },
-        isValidMaker: function(addr) {
-            return addr === this.maker
-        },
         isSubmitDisabled() {
-            return !(this.isValidMaker(this.address) && this.isValidUnity() && !this.isInsufficient() && this.isSplit)
-        },
-        isBiggerThanMax() {
-            var maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
-            var unityValue = BigNumber(this.newUnity)
-            var value = BigNumber(this.maxSupply).multipliedBy(unityValue)
-            if (value.isGreaterThan(maxValue) || unityValue.isGreaterThan(BigNumber(10).exponentiatedBy(16))) {
-                return true
-            } else {
-                return false
-            }
-        },
-        isInteger() {
-            return BigNumber(this.newUnity).isInteger()
-        },
-        isValidUnity() {
-            if (BigNumber(this.newUnity).isEqualTo(0) && !this.isInsufficient()) {
-                return void 0
-            }
-            return this.isNumFormatValid(this.newUnity) && !this.isBiggerThanMax() && !this.isNegative(this.newUnity) && this.isInteger()
+            return !(!this.isInsufficient() && this.isAmountValid() && this.isValidContractId(this.contractId))
         },
         sendData: function(walletType) {
             let apiSchema
@@ -448,19 +402,19 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    functionIndex: SPLIT_FUNCIDX,
-                    functionData: transaction.prepareSplit(BigNumber(this.newUnity)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, SPLIT_FUNCIDX, transaction.prepareSplit(BigNumber(this.newUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    functionIndex: this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX,
+                    functionData: transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
+                    signature: transaction.prepareExecContractSignature(this.contractId, this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX, transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
                 const coldDataInfo = {
                     contractId: this.contractId,
-                    senderPublicKey: this.coldAddresses[this.address].publicKey,
+                    // senderPublicKey: this.coldAddresses[this.address].publicKey,
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.dataObject.timestamp,
-                    functionIndex: SPLIT_FUNCIDX,
+                    functionIndex: this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX,
                     functionData: this.dataObject.function,
                     signature: this.coldSignature
                 }
@@ -503,17 +457,18 @@ export default {
             }
         },
         resetPage: function() {
-            this.newUnity = BigNumber(0)
+            this.amount = BigNumber(0)
             this.pageId = 1
             this.coldPageId = 1
             this.sendError = false
             this.coldSignature = ''
+            this.contractId = ''
         },
         endSend: function() {
             for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 setTimeout(this.sendBalanceChange, delayTime)
             }
-            this.$refs.splitTokenModal.hide()
+            this.$refs.withdrawTokenModal.hide()
         },
         sendBalanceChange: function() {
             this.$emit('updateBalance', 'update')
@@ -523,14 +478,31 @@ export default {
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
         },
+        isAmountValid() {
+            var amount = this.amount
+            if (BigNumber(amount).isEqualTo(0)) {
+                return void 0
+            }
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && this.isEnoughContractBanlance(amount) && !this.isNegative(amount)
+        },
         isNumFormatValid(amount) {
             return common.isNumFormatValid(amount)
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
         },
+        checkPrecision(amount) {
+            return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
+        },
+        isEnoughContractBanlance(amount) {
+            return true
+        },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
+        },
+        isValidContractId(contractId) {
+            var contractArr = base58.decode(contractId)
+            return contractArr && contractArr.length === 26 && contractArr[0] === 6
         },
         getKeypair: function(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
@@ -551,13 +523,13 @@ export default {
     cursor: pointer;
     position: absolute;
     margin-top: -37px;
-    margin-left: 350px;
+    margin-left: 380px;
 }
 .qr-info {
     text-align: left;
     color: #9091a3;
 }
-.address-input {
+.contract-input {
     border: 1px solid #E8E9ED;
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
@@ -656,11 +628,5 @@ export default {
     margin-top: -10px;
     font-size: 80%;
     color: #dc3545;
-}
-.unity {
-    font-size: 15px;
-    color: #9091A3;
-    letter-spacing: 0;
-    text-align: left;
 }
 </style>

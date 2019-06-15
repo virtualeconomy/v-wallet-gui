@@ -50,10 +50,10 @@
           <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="enableStatus"
                            @click="splitToken">Split Token</b-dropdown-item>
-          <b-dropdown-item v-if="enableStatus && showUnsupportedFunction !== false"
+          <b-dropdown-item v-if="enableStatus && showUnsupportedFunction"
                            @click="depositToken">Deposit to Contract </b-dropdown-item>
-          <b-dropdown-item v-if="enableStatus && showUnsupportedFunction !== false"
-                           @click="splitToken">Withdraw from Contract</b-dropdown-item>
+          <b-dropdown-item v-if="enableStatus "
+                           @click="withdrawToken">Withdraw from Contract</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
@@ -80,6 +80,18 @@
                 :token-unity="unity"
                 @updateBalance="updateBalance">
     </IssueToken>
+    <WithdrawToken :token-id="tokenId"
+                   :address="address"
+                   :maker="maker"
+                   :wallet-type="walletType"
+                   :addresses="addresses"
+                   :cold-addresses="coldAddresses"
+                   :token-balance="tokenBalance"
+                   :balance="balances[address]"
+                   :token-unity="unity"
+                   :is-split="isSplit"
+                   @updateBalance="updateBalance">
+    </WithdrawToken>
     <DepositToken :token-id="tokenId"
                   :address="address"
                   :wallet-type="walletType"
@@ -145,6 +157,7 @@ import converters from '@/libs/converters'
 import TokenInfoModal from './TokenInfoModal'
 import SendToken from './SendToken'
 import IssueToken from './IssueToken'
+import WithdrawToken from './WithdrawToken'
 import BigNumber from 'bignumber.js'
 import BurnToken from './BurnToken'
 import Supersede from './Supersede'
@@ -156,7 +169,7 @@ import Vue from 'vue'
 import browser from '@/utils/browser'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede, SplitToken, DepositToken },
+    components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede, SplitToken, WithdrawToken, DepositToken },
     data: function() {
         return {
             isSplit: false,
@@ -373,6 +386,10 @@ export default {
         issueToken() {
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)
+        },
+        withdrawToken() {
+            this.getTokenInfo()
+            this.$root.$emit('bv::show::modal', 'withdrawTokenModal_' + this.tokenId)
         },
         burnToken() {
             this.getTokenInfo()

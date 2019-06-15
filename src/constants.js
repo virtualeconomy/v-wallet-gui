@@ -60,6 +60,8 @@ export const ISSUE_FUNCIDX = 1
 export const BURN_FUNCIDX = 2
 export const SUPERSEDE_FUNCIDX = 0
 export const SPLIT_FUNCIDX = 3
+export const WITHDRAW_FUNCIDX = 6
+export const WITHDRAW_FUNCIDX_SPLIT = 7
 export const DEPOSIT_FUNCIDX = 5
 export const DEPOSIT_FUNCIDX_SPLIT = 6
 export const SEND_FUNCIDX = 3
@@ -72,5 +74,4 @@ export const OPC_SIGNATURE = 'signature'
 export const OPC_SEED = 'seed'
 export const OPC_CONTRACT = 'contract'
 export const SHOW_UNSUPPORTED_FUNCTION = false
-
 

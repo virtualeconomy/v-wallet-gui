@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="infos">
-      <b-form-group v-if="txType==='Deposit Token to Contract'"
+      <b-form-group v-if="txType==='Withdraw Token from Contract' || txType==='Deposit Token to Contract'"
                     horizontal
                     class="form-line"
                     label="Contract ID"
@@ -85,7 +85,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group v-else-if="txType==='Deposit Token to Contract'"
+      <b-form-group v-else-if="txType==='Withdraw Token from Contract' || txType==='Deposit Token to Contract'"
                     horizontal
                     class="form-line"
                     label="Amount"
@@ -159,7 +159,6 @@ export default {
         },
         address: {
             type: String,
-            require: true,
             default: ''
         },
         amount: {
