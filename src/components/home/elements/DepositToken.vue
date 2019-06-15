@@ -13,9 +13,9 @@
       @click="endSend">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
-    <b-tabs @input="hideQrScan">
+    <b-tabs>
       <b-tab title="Hot Wallet"
-             :disabled="walletType === 'coldWallet'"
+             :disabled="walletType==='coldWallet'"
              :active="walletType==='hotWallet'">
         <b-container
           class="text-left"
@@ -24,7 +24,6 @@
                         label-for="contract-input">
             <b-form-input id=contract-input
                           class="contract-input"
-                          readonly
                           v-model="contractId"
                           :state="isValidContractId(contractId)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
@@ -38,14 +37,14 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('hot')">
+                          :state="isAmountValid()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
+                                     v-if="!checkPrecision(amount) && !isExceededBalance(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupply(amount)">
+                                     v-else-if="isExceededBalance(amount)">
               Deposited token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -70,7 +69,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled('hot')"
+                    :disabled="isSubmitDisabled()"
                     @click="nextPage">Deposit
           </b-button>
         </b-container>
@@ -127,7 +126,7 @@
                      class="text-left">
           <b-form-group label="Contract ID"
                         label-for="contract-input">
-            <b-form-input id=contract-input
+            <b-form-input id=coldContract-input
                           class="contract-input"
                           readonly
                           v-model="contractId"
@@ -143,14 +142,14 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('cold')">
+                          :state="isAmountValid()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
+                                     v-if="!checkPrecision(amount) && !isExceededBalance(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupply(amount)">
+                                     v-else-if="isExceededBalance(amount)">
               Deposited token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -175,7 +174,7 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isSubmitDisabled('cold')"
+                    :disabled="isSubmitDisabled()"
                     @click="coldNextPage">Deposit
           </b-button>
         </b-container>
@@ -267,29 +266,30 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION, DEPOSIT_FUNCIDX } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '@/utils/browser'
 import common from '@/utils/common'
 import BigNumber from 'bignumber.js'
+import base58 from '@/libs/base58'
 import transaction from '@/utils/transaction'
 export default {
-    name: 'IssueToken',
+    name: 'DepositToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     data: function() {
         return {
             amount: BigNumber(0),
-            attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
-            coldPageId: 5,
-            scanShow: false,
+            coldPageId: 1,
             sendError: false,
             coldSignature: '',
             timeStamp: Date.now() * 1e6,
-            hasConfirmed: false
+            hasConfirmed: false,
+            attachment: '',
+            contractId: ''
         }
     },
     props: {
@@ -322,18 +322,6 @@ export default {
             default: function() {},
             require: true
         },
-        maxSupply: {
-            type: BigNumber,
-            default: function() {
-            },
-            require: true
-        },
-        currentSupply: {
-            type: BigNumber,
-            default: function() {
-            },
-            require: true
-        },
         walletType: {
             type: String,
             default: 'hotWallet',
@@ -344,26 +332,18 @@ export default {
             default: '',
             require: true
         },
-        issuer: {
-            type: String,
-            default: '',
-            require: true
-        },
         address: {
             type: String,
             default: ''
+        },
+        isSplit: {
+            type: Boolean,
+            default: false
         }
     },
     computed: {
-        contractId() {
-            return transaction.tokenIDToContractID(this.tokenId)
-        },
         defaultAddress() {
             return Vue.ls.get('address')
-        },
-        defaultColdAddress() {
-            if (this.noColdAddress) return ''
-            return Object.keys(this.coldAddresses)[0]
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
@@ -374,12 +354,6 @@ export default {
         },
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
-        },
-        wordList() {
-            return this.seedPhrase.split(' ')
-        },
-        noColdAddress() {
-            return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         dataObject() {
             return {
@@ -393,16 +367,10 @@ export default {
                 timestamp: Date.now(),
                 attachment: '',
                 contractId: this.contractId,
-                functionId: DEPOSIT_FUNCIDX,
+                functionId: this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX,
                 function: transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
                 functionExplain: 'Deposit ' + this.amount + ' token to ' + this.contractId
             }
-        },
-        isValidAttachment() {
-            if (!this.attachment) {
-                return void 0
-            }
-            return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         }
     },
     methods: {
@@ -412,11 +380,8 @@ export default {
         coldApi: function() {
             return API_VERSION
         },
-        isValidIssuer: function(addr) {
-            return addr === this.issuer
-        },
-        isSubmitDisabled(type) {
-            return !(BigNumber(this.amount).isGreaterThan(0))
+        isSubmitDisabled() {
+            return !(!this.isInsufficient() && this.isAmountValid() && this.isValidContractId(this.contractId))
         },
         sendData: function(walletType) {
             let apiSchema
@@ -433,9 +398,9 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    functionIndex: DEPOSIT_FUNCIDX,
+                    functionIndex: this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX,
                     functionData: transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, DEPOSIT_FUNCIDX, transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    signature: transaction.prepareExecContractSignature(this.contractId, this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX, transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
@@ -445,7 +410,7 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.dataObject.timestamp,
-                    functionIndex: DEPOSIT_FUNCIDX,
+                    functionIndex: this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX,
                     functionData: this.dataObject.function,
                     signature: this.coldSignature
                 }
@@ -453,7 +418,6 @@ export default {
             }
             const url = NODE_IP + '/contract/broadcast/execute'
             this.$http.post(url, apiSchema).then(response => {
-                console.log(response)
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
@@ -492,12 +456,10 @@ export default {
             this.amount = BigNumber(0)
             this.pageId = 1
             this.coldPageId = 1
-            this.scanShow = false
-            this.qrInit = false
             this.paused = false
-            this.qrErrMsg = void 0
             this.sendError = false
             this.coldSignature = ''
+            this.contractId = ''
         },
         endSend: function() {
             for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
@@ -508,114 +470,17 @@ export default {
         sendBalanceChange: function() {
             this.$emit('updateBalance', 'update')
         },
-        scanChange: function(evt) {
-            if (!this.qrInit) {
-                this.scanShow = !this.scanShow
-            }
-            if (this.scanShow) {
-                this.paused = false
-            }
-        },
-        async onInit(promise) {
-            try {
-                this.qrInit = true
-                await promise
-            } catch (error) {
-                if (error.name === 'NotAllowedError') {
-                    throw Error('user denied camera access permission')
-                } else if (error.name === 'NotFoundError') {
-                    throw Error('no suitable camera device installed')
-                } else if (error.name === 'NotSupportedError') {
-                    throw Error('page is not served over HTTPS (or localhost)')
-                } else if (error.name === 'NotReadableError') {
-                    throw Error('maybe camera is already in use')
-                } else if (error.name === 'OverconstarinedError') {
-                    throw Error('pass constraints do not match any camera')
-                } else {
-                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
-                }
-            } finally {
-                this.qrInit = false
-            }
-        },
-        onDecode: function(decodeString) {
-            this.paused = true
-            try {
-                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
-                this.recipient = jsonObj.address
-                var opc = jsonObj.opc
-                var api = jsonObj.api
-                var protocol = jsonObj.protocol
-                if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                }
-                if (jsonObj.hasOwnProperty('invoice')) {
-                    this.attachment = jsonObj.invoice
-                }
-                if (protocol !== PROTOCOL) {
-                    this.paused = false
-                    this.qrErrMsg = 'Invalid QR code protocol.'
-                } else if (api !== API_VERSION) {
-                    this.paused = false
-                    this.qrErrMsg = 'API version mismatch.'
-                } else if (opc !== OPC_ACCOUNT) {
-                    this.paused = false
-                    this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidIssuer(this.recipient) || this.recipient === '') {
-                    this.paused = false
-                    this.qrErrMsg = 'Invalid address of recipient.'
-                } else {
-                    this.qrErrMsg = void 0
-                }
-            } catch (e) {
-                if (this.isValidIssuer(decodeString)) {
-                    this.recipient = decodeString
-                } else {
-                    this.recipient = 'please scan QR code of recipient'
-                    this.paused = false
-                }
-            }
-        },
         getSignature: function(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
         },
-        repaintLocation(location, ctx) {
-            if (location !== null) {
-                const {
-                    topLeftCorner,
-                    topRightCorner,
-                    bottomLeftCorner,
-                    bottomRightCorner
-                } = location
-                ctx.strokeStyle = 'orange' // instead of red
-                ctx.beginPath()
-                ctx.moveTo(topLeftCorner.x, topLeftCorner.y)
-                ctx.lineTo(bottomLeftCorner.x, bottomLeftCorner.y)
-                ctx.lineTo(bottomRightCorner.x, bottomRightCorner.y)
-                ctx.lineTo(topRightCorner.x, topRightCorner.y)
-                ctx.lineTo(topLeftCorner.x, topLeftCorner.y)
-                ctx.closePath()
-                ctx.stroke()
-            }
-        },
-        hideQrScan(tabIndex) {
-            if (tabIndex === 0) {
-                this.resetPage()
-                this.pageId = 1
-            } else {
-                this.resetPage()
-                this.coldPageId = 1
-            }
-            this.scanShow = false
-        },
-        isAmountValid(type) {
+        isAmountValid() {
             var amount = this.amount
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededMaxSupply(amount) && !this.isNegative(amount)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededBalance(amount) && !this.isNegative(amount)
         },
         isNumFormatValid(amount) {
             return common.isNumFormatValid(amount)
@@ -626,15 +491,15 @@ export default {
         checkPrecision(amount) {
             return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
         },
-        isExceededMaxSupply(amount) {
+        isExceededBalance(amount) {
             return BigNumber(amount).isGreaterThan(this.tokenBalance)
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         isValidContractId(contractId) {
-            var contractIdCmp = transaction.tokenIDToContractID(this.tokenId)
-            return contractId === contractIdCmp
+            var contractArr = base58.decode(contractId)
+            return contractArr && contractArr.length === 26 && contractArr[0] === 6
         },
         getKeypair: function(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

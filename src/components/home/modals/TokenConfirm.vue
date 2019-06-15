@@ -5,8 +5,8 @@
                     horizontal
                     class="form-line"
                     label="Contract ID"
-                    label-for="amount_confirm">
-        <b-form-input id="amount_confirm"
+                    label-for="contract_confirm">
+        <b-form-input id="contract_confirm"
                       :value="contractId"
                       class="addr"
                       readonly

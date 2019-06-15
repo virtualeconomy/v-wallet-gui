@@ -81,16 +81,14 @@
                 @updateBalance="updateBalance">
     </IssueToken>
     <DepositToken :token-id="tokenId"
-                  :issuer="issuer"
                   :address="address"
                   :wallet-type="walletType"
                   :addresses="addresses"
                   :cold-addresses="coldAddresses"
                   :token-balance="tokenBalance"
                   :balance="balances[address]"
-                  :max-supply="maxSupply"
-                  :current-supply="currentSupply"
                   :token-unity="unity"
+                  :is-split="isSplit"
                   @updateBalance="updateBalance">
     </DepositToken>
     <Supersede :token-id="tokenId"
