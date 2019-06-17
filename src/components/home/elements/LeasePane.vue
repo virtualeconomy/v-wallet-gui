@@ -55,34 +55,7 @@
                 v-b-modal.leaseModal>
         <b>Start Leasing</b>
       </b-button>
-      <b-button variant="dark"
-                id="leaseHelp"
-                class="btn-help">
-        <img src="@/assets/imgs/icons/wallet/ic_help.svg">
-      </b-button>
     </div>
-    <b-popover target="leaseHelp"
-               placement="bottom"
-               title="Quick note"
-               triggers="click blur">
-      <div class="quick-note">
-        <div>
-          <span>You can only transfer or trade VSYSs that aren’t leased. The leased amount cannot be transferred or traded by you or anyone else.</span>
-        </div>
-        <div class="description-split"></div>
-        <div>
-          <div class="quick-icon">
-            <img src="@/assets/imgs/icons/wallet/ic_leasing_cancel.svg"
-                 width="40"
-                 height="40">
-          </div>
-          <span>You can cancel a leasing transaction as soon as it appears in the blockchain which usually occurs in a minute or less.</span>
-        </div>
-        <div class="description-split"></div>
-        <div><a href="http://vsysrate.com"
-                target="_blank" >List of nodes</a><span> You can lease your coins to supernode to get lease rewards</span></div>
-      </div>
-    </b-popover>
     <Lease show="false"
            :balances="balance"
            :cold-addresses="coldAddresses"
@@ -190,6 +163,7 @@ export default {
     border-right: 1px solid #EDEDED;
 }
 .btn-leasing {
+    margin-bottom: 6px;
     background: #FF8737;
     border-radius: 4px;
     border: 1px solid #FF8737;
@@ -205,6 +179,8 @@ export default {
     border: 1px solid #EB7D34 !important;
 }
 .btn-list{
+    margin-top: 6px;
+    margin-bottom: 6px;
     background: #FFFFFF;
     border-radius: 4px;
     border: 1px solid #E8E9ED;
@@ -219,6 +195,7 @@ export default {
     border: 1px solid #EB7D34 !important;
 }
 .btn-help {
+    margin-bottom: 6px;
     background: #FAFAFA;
     border: 1px solid #E8E9ED;
     border-radius: 4px;
