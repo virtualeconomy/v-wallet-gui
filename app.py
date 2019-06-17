@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # Web Pages
 
-SITE_NAME = "http://wallet.v.systems:9922"
+NODE_API_URL = "http://wallet.v.systems:9922"
 
 @app.route("/")
 def index():
