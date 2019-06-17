@@ -8,7 +8,7 @@
       <div class="scroll"
            :style="{height: myHeight}">
         <TokenRecord v-for="(record,tokenId) in tokenRecords"
-                     :key="record.index"
+                     :key="tokenId"
                      :token-id="tokenId"
                      :token-record="record"
                      :address="address"
@@ -154,9 +154,7 @@ export default {
             this.$emit('updateInfo')
         },
         addToken() {
-            console.log('is function')
             this.$root.$emit('bv::show::modal', 'addTokenModal')
-            console.log('check test')
         }
     }
 }

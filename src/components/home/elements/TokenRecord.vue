@@ -409,6 +409,19 @@ export default {
                 this.removeFlag = true
                 this.$emit('removeFlag', this.removeFlag)
                 this.removeFlag = false
+                if (this.$store.state.eventPool) {
+                    var eventPool = this.$store.state.eventPool
+                    if (eventPool[this.tokenId] && eventPool[this.tokenId].newToken) {
+                        var stopArr = eventPool[this.tokenId].newToken
+                        for (var i in stopArr) {
+                            clearTimeout(stopArr[i])
+                        }
+                    }
+                    if (eventPool[this.tokenId] && eventPool[this.tokenId].removeToken) {
+                        eventPool[this.tokenId].removeToken = true
+                    }
+                    this.$store.commit('changeEventPool', eventPool)
+                }
             }
         },
         endSendSignal() {
