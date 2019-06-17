@@ -52,7 +52,7 @@
                            @click="splitToken">Split Token</b-dropdown-item>
           <b-dropdown-item v-if="enableStatus && showUnsupportedFunction"
                            @click="depositToken">Deposit to Contract </b-dropdown-item>
-          <b-dropdown-item v-if="enableStatus "
+          <b-dropdown-item v-if="enableStatus && showUnsupportedFunction"
                            @click="withdrawToken">Withdraw from Contract</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
         </b-dropdown>
