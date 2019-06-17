@@ -12,7 +12,6 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 import Storage from 'vue-ls'
 import jdenticon from '@/libs/jdenticon-2.1.0'
 import jrQrcode from 'jr-qrcode'
-import store from './store'
 
 const options = {
     namespace: 'vuejs__',
@@ -34,7 +33,6 @@ new Vue({
     el: '#app',
     store,
     router,
-    store,
     components: {App},
     template: '<App/>'
 })
