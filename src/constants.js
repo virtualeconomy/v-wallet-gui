@@ -9,7 +9,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
     }
     return t;
 };
-export const WALLET_VERSION = '0.2.0'
+export const WALLET_VERSION = '0.2.1'
 export const INITIAL_SESSION_TIMEOUT = 5
 export const NETWORK_BYTE = 'M'.charCodeAt(0);
 export const INITIAL_NONCE = 0;
