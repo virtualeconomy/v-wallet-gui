@@ -608,6 +608,9 @@ export default {
                 }
             }, response => {
                 this.errorMessage = response.body.message
+                if (this.errorMessage === undefined) {
+                    this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
+                }
                 this.sendError = true
             })
             this.$emit('endSendSignal')
