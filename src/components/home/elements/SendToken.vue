@@ -832,7 +832,7 @@ export default {
             return common.isNumFormatValid(amount)
         },
         checkPrecision(amount) {
-            return common.checkPrecision(amount, this.unity)
+            return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
         },
         isTokenInsufficient(amount, type) {
             var balance = type === 'hot' ? this.tokenBalances[this.address] : this.tokenBalances[this.coldAddress]
