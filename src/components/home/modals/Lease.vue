@@ -34,7 +34,7 @@
                      :fee="fee"></Confirm>
             <p v-show="sendError"
                class="text-danger">
-              <small>Sorry, transaction send failed!</small>
+              <small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small>
             </p>
             <b-row>
               <b-col class="col-lef">
@@ -115,7 +115,7 @@
                      :fee="fee"></Confirm>
             <p v-show="sendError"
                class="text-danger">
-              <small>Sorry, transaction send failed!</small>
+              <small>Sorry, transaction send failed ! Failed reason: {{ errorMessage }}</small>
             </p>
             <b-row>
               <b-col class="col-lef">
@@ -189,7 +189,8 @@ export default {
             txAmount: BigNumber(0),
             timestamp: 0,
             hasConfirmed: false,
-            isRaisingLease: 'true'
+            isRaisingLease: 'true',
+            errorMessage: ''
         }
     },
     props: {
@@ -337,6 +338,7 @@ export default {
                     this.coldPageId++
                 }
             }, response => {
+                this.errorMessage = response.body.message
                 this.sendError = true
             })
             this.$emit('endLeaseSignal')

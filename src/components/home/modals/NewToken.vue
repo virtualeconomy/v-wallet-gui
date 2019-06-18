@@ -138,7 +138,7 @@
           </TokenConfirm>
           <p
             v-show="sendError"
-            class="text-danger"><small>Sorry, transaction send failed!</small></p>
+            class="text-danger"><small>Sorry, transaction send failed! {{ errorMessage }}</small></p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -329,7 +329,7 @@
                         :fee="coldFee"
                         :tx-type="'Register New Token'">
           </TokenConfirm>
-          <p v-show="sendError">Sorry, transaction send failed!</p>
+          <p v-show="sendError">Sorry, transaction send failed! {{ errorMessage }}</p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -385,6 +385,7 @@ import base58 from '@/libs/base58'
 import bus from '@/assets/bus'
 import common from '@/utils/common'
 var initData = {
+    errorMessage: '',
     opc: '',
     qrArray: new Array(0),
     support: false,
@@ -610,6 +611,7 @@ export default {
                 }
                 this.tokenId = transaction.contractIDToTokenID(response.body.contractId)
             }, response => {
+                this.errorMessage = response.body.message
                 this.sendError = true
             })
             this.$emit('endSendSignal')

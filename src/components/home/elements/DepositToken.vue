@@ -82,7 +82,7 @@
           </TokenConfirm>
           <p
             v-show="sendError"
-            class="text-danger"><small>Sorry, transaction send failed!</small></p>
+            class="text-danger"><small>Sorry, transaction send failed! {{ errorMessage }}</small></p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -222,7 +222,7 @@
                         :contract-id="contractId"
                         :tx-type="'Deposit Token to Contract'">
           </TokenConfirm>
-          <p v-show="sendError">Sorry, transaction send failed!</p>
+          <p v-show="sendError">Sorry, transaction send failed! {{ errorMessage }}</p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -280,6 +280,7 @@ export default {
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     data: function() {
         return {
+            errorMessage: '',
             amount: BigNumber(0),
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
@@ -424,6 +425,7 @@ export default {
                     this.coldPageId++
                 }
             }, response => {
+                this.errorMessage = response.body.message
                 this.sendError = true
             })
         },
