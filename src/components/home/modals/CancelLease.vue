@@ -32,7 +32,7 @@
       </div>
       <p v-show="sendError"
          class="text-danger">
-        <small>Sorry, transaction send failed!</small>
+        <small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small>
       </p>
       <b-row>
         <b-col class="col-lef">
@@ -84,6 +84,7 @@ export default {
     components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm },
     data: function() {
         return {
+            errorMessage: '',
             page: 'confirm',
             timestamp: 0,
             coldSignature: '',
@@ -221,6 +222,10 @@ export default {
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 this.page = 'success'
             }, response => {
+                this.errorMessage = response.body.message
+                if (this.errorMessage === undefined) {
+                    this.errorMessage = 'Unknown.Please check network connection!'
+                }
                 this.sendError = true
             })
         },

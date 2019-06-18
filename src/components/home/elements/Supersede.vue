@@ -88,7 +88,7 @@
           </TokenConfirm>
           <p
             v-show="sendError"
-            class="text-danger"><small>Sorry, transaction send failed!</small></p>
+            class="text-danger"><small>Sorry, transaction send failed! {{ errorMessage }}</small></p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -226,7 +226,7 @@
                         :fee="fee"
                         :tx-type="'Supersede'">
           </TokenConfirm>
-          <p v-show="sendError">Sorry, transaction send failed!</p>
+          <p v-show="sendError">Sorry, transaction send failed! {{ errorMessage }}</p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -283,6 +283,7 @@ export default {
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     data: function() {
         return {
+            errorMessage: '',
             newIssuer: '',
             attachment: '',
             pageId: 1,
@@ -453,6 +454,10 @@ export default {
                     this.coldPageId++
                 }
             }, response => {
+                this.errorMessage = response.body.message
+                if (this.errorMessage === undefined) {
+                    this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
+                }
                 this.sendError = true
             })
         },

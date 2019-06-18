@@ -141,7 +141,7 @@
           </Confirm>
           <p
             v-show="sendError"
-            class="text-danger"><small>Sorry, transaction send failed!</small></p>
+            class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -338,7 +338,7 @@
                    :attachment="coldAttachment"
                    :tx-type="'Payment'">
           </Confirm>
-          <p v-show="sendError">Sorry, transaction send failed!</p>
+          <p v-show="sendError">Sorry, transaction send failed! Failed reason: {{ errorMessage }}</p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -392,6 +392,7 @@ import common from '@/utils/common'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 var initData = {
+    errorMessage: '',
     opc: '',
     recipient: '',
     amount: BigNumber(0),
@@ -559,6 +560,10 @@ export default {
                     this.coldPageId++
                 }
             }, response => {
+                this.errorMessage = response.body.message
+                if (this.errorMessage === undefined) {
+                    this.errorMessage = 'Unknown.Please check network connection!'
+                }
                 this.sendError = true
             })
             this.$emit('endSendSignal')
