@@ -139,7 +139,7 @@ export default {
         JsonExcel
     },
     created() {
-        this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 100) + 'px'
+        this.myHeight = (this.isMobile() ? window.innerHeight + 180 : window.innerHeight - 180) + 'px'
         if (this.address && Vue.ls.get('pwd') && this.activedTab === 'trans') {
             this.getTxRecords()
         }
