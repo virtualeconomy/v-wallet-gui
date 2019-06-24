@@ -668,10 +668,18 @@ export default {
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
-                    var amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    if (this.walletType === 'hotWallet') {
+                        this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    } else {
+                        this.coldAmount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    }
                 }
                 if (jsonObj.hasOwnProperty('invoice')) {
-                    var attachment = jsonObj.invoice
+                    if (this.walletType === 'hotWallet') {
+                        this.attachment = jsonObj.invoice
+                    } else {
+                        this.coldAttachment = jsonObj.invoice
+                    }
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
@@ -682,7 +690,7 @@ export default {
                 } else if (opc !== OPC_ACCOUNT) {
                     this.paused = false
                     this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
+                } else if (!this.isValidRecipient(recipient) || recipient === '') {
                     this.paused = false
                     this.qrErrMsg = 'Invalid address of recipient.'
                 } else {
@@ -690,12 +698,8 @@ export default {
                 }
                 if (this.walletType === 'hotWallet') {
                     this.recipient = recipient
-                    this.amount = amount
-                    this.attachment = attachment
                 } else {
                     this.coldRecipient = recipient
-                    this.coldAmount = amount
-                    this.coldAttachment = attachment
                 }
             } catch (e) {
                 if (this.isValidRecipient(decodeString)) {
