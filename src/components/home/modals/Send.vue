@@ -87,7 +87,7 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('hot')"
+                          :state="isAmountValid('hotWallet')"
                           onfocus="this.select()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -95,7 +95,7 @@
               The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isInsufficient(amount, 'hot')">
+                                     v-else-if="isInsufficient(amount, 'hotWallet')">
               Insufficient funds
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -117,7 +117,7 @@
                              v-model="attachment"
                              :rows="3"
                              :no-resize="true"
-                             :state="isValidAttachment">
+                             :state="isValidAttachment(attachment)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
@@ -127,8 +127,8 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled"
-                    @click="nextPage(); addHotRecipientList();">Continue
+                    :disabled="isSubmitDisabled('hotWallet')"
+                    @click="nextPage(); addRecipientList('hotWallet');">Continue
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
@@ -230,7 +230,7 @@
               <div class="qr-info">Please confirm your browser's camera is available.</div>
               <div class="qr-window">
                 <qrcode-reader @init="onInit"
-                               @decode="onColdDecode"
+                               @decode="onDecode"
                                :track="repaintLocation"
                                :paused="paused">
                   <img v-if="qrInit"
@@ -249,7 +249,7 @@
                           class="amount-input"
                           v-model="coldAmount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('cold')"
+                          :state="isAmountValid('coldWallet')"
                           onfocus="this.select()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -257,7 +257,7 @@
               The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isInsufficient(coldAmount, 'cold')">
+                                     v-else-if="isInsufficient(coldAmount, 'coldWallet')">
               Insufficient funds
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -279,7 +279,7 @@
                              v-model="coldAttachment"
                              :rows="3"
                              :no-resize="true"
-                             :state="isValidColdAttachment">
+                             :state="isValidAttachment(coldAttachment)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
@@ -289,8 +289,8 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isColdSubmitDisabled"
-                    @click="coldNextPage(); addColdRecipientList()">Continue
+                    :disabled="isSubmitDisabled('coldWallet')"
+                    @click="nextPage(); addRecipientList('coldWallet')">Continue
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
@@ -308,7 +308,7 @@
                 block
                 variant="light"
                 size="lg"
-                @click="coldPrevPage">Back
+                @click="prevPage">Back
               </b-button>
             </b-col>
             <b-col class="col-rit">
@@ -317,7 +317,7 @@
                 class="btn-confirm"
                 variant="warning"
                 size="lg"
-                @click="coldNextPage">Confirm
+                @click="nextPage">Confirm
               </b-button>
             </b-col>
           </b-row>
@@ -327,8 +327,8 @@
           <ColdSignature :data-object="dataObject"
                          v-if="coldPageId===3"
                          @get-signature="getSignature"
-                         @next-page="coldNextPage"
-                         @prev-page="coldPrevPage"></ColdSignature>
+                         @next-page="nextPage"
+                         @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
           <Confirm :address="coldAddress"
@@ -346,7 +346,7 @@
                 block
                 variant="light"
                 size="lg"
-                @click="coldPrevPage">Back
+                @click="prevPage">Back
               </b-button>
             </b-col>
             <b-col class="col-rit">
@@ -484,12 +484,6 @@ export default {
         wordList() {
             return this.seedPhrase.split(' ')
         },
-        isSubmitDisabled() {
-            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient(this.recipient) && (this.isValidAttachment || !this.attachment) && this.isAmountValid('hot') && this.address !== '')
-        },
-        isColdSubmitDisabled() {
-            return !(this.coldRecipient && BigNumber(this.coldAmount).isGreaterThan(0) && this.isValidRecipient(this.coldRecipient) && (this.isValidColdAttachment || !this.coldAttachment) && this.isAmountValid('cold') && this.coldAddress !== '')
-        },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
@@ -507,21 +501,21 @@ export default {
                 timestamp: Date.now(),
                 attachment: this.coldAttachment
             }
-        },
-        isValidAttachment() {
-            if (!this.attachment) {
-                return void 0
-            }
-            return common.getLength(this.attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
-        },
-        isValidColdAttachment() {
-            if (!this.coldAttachment) {
-                return void 0
-            }
-            return common.getLength(this.coldAttachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         }
     },
     methods: {
+        isSubmitDisabled(type) {
+            var amount = type === 'hotWallet' ? this.amount : this.coldAmount
+            var recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
+            var attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
+            return !(recipient && BigNumber(amount).isGreaterThan(0) && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && this.address !== '')
+        },
+        isValidAttachment(attachment) {
+            if (!attachment) {
+                return void 0
+            }
+            return common.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+        },
         inputAmount(num) {
             return BigNumber(num)
         },
@@ -570,36 +564,34 @@ export default {
         },
         nextPage: function() {
             this.sendError = false
-            this.timeStamp = Date.now() * 1e6
             this.hasConfirmed = false
-            this.pageId++
+            if (this.walletType === 'hotWallet') {
+                this.pageId++
+                this.timeStamp = Date.now() * 1e6
+            } else {
+                this.coldPageId++
+            }
         },
-        addColdRecipientList: function() {
-            this.coldRecipientAddressList.set(this.coldRecipient, '0')
-            window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
-        },
-        addHotRecipientList: function() {
-            this.hotRecipientAddressList.set(this.recipient, '0')
-            window.localStorage.setItem('Hot ' + this.defaultAddress + ' sendRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
-        },
-        coldNextPage: function() {
-            this.sendError = false
-            this.coldPageId++
+        addRecipientList: function(walletType) {
+            if (walletType === 'hotWallet') {
+                this.hotRecipientAddressList.set(this.recipient, '0')
+                window.localStorage.setItem('Hot ' + this.defaultAddress + ' sendRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
+            } else {
+                this.coldRecipientAddressList.set(this.coldRecipient, '0')
+                window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
+            }
         },
         prevPage: function() {
             this.sendError = false
-            if (this.pageId === 1) {
+            var pageId = this.walletType === 'hotWallet' ? this.pageId : this.coldPageId
+            if (pageId === 1) {
                 this.$refs.sendModal.hide()
             } else {
-                this.pageId--
-            }
-        },
-        coldPrevPage: function() {
-            this.sendError = false
-            if (this.coldPageId === 1) {
-                this.$refs.sendModal.hide()
-            } else {
-                this.coldPageId--
+                if (this.walletType === 'hotWallet') {
+                    this.pageId--
+                } else {
+                    this.coldPageId--
+                }
             }
         },
         resetPage: function() {
@@ -671,15 +663,23 @@ export default {
             this.paused = true
             try {
                 var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
-                this.recipient = jsonObj.address
+                var recipient = jsonObj.address
                 var opc = jsonObj.opc
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    if (this.walletType === 'hotWallet') {
+                        this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    } else {
+                        this.coldAmount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    }
                 }
                 if (jsonObj.hasOwnProperty('invoice')) {
-                    this.attachment = jsonObj.invoice
+                    if (this.walletType === 'hotWallet') {
+                        this.attachment = jsonObj.invoice
+                    } else {
+                        this.coldAttachment = jsonObj.invoice
+                    }
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
@@ -690,56 +690,28 @@ export default {
                 } else if (opc !== OPC_ACCOUNT) {
                     this.paused = false
                     this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
+                } else if (!this.isValidRecipient(recipient) || recipient === '') {
                     this.paused = false
                     this.qrErrMsg = 'Invalid address of recipient.'
                 } else {
                     this.qrErrMsg = void 0
                 }
-            } catch (e) {
-                if (this.isValidRecipient(decodeString)) {
-                    this.recipient = decodeString
+                if (this.walletType === 'hotWallet') {
+                    this.recipient = recipient
                 } else {
-                    this.recipient = 'please scan QR code of recipient'
-                    this.paused = false
-                }
-            }
-        },
-        onColdDecode: function(decodeString) {
-            this.paused = true
-            try {
-                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
-                this.coldRecipient = jsonObj.address
-                var opc = jsonObj.opc
-                var api = jsonObj.api
-                var protocol = jsonObj.protocol
-                if (jsonObj.hasOwnProperty('invoice')) {
-                    this.coldAttachment = jsonObj.invoice
-                }
-                if (jsonObj.hasOwnProperty('amount')) {
-                    this.coldAmount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                }
-                if (protocol !== PROTOCOL) {
-                    this.paused = false
-                    this.qrErrMsg = 'Invalid QR code protocol.'
-                } else if (api > API_VERSION) {
-                    this.paused = false
-                    this.qrErrMsg = 'API version mismatch.'
-                } else if (opc !== OPC_ACCOUNT) {
-                    this.paused = false
-                    this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidRecipient(this.coldRecipient) || this.coldRecipient === '') {
-                    this.paused = false
-                    this.qrErrMsg = 'Invalid address of recipient.'
-                } else {
-                    this.qrErrMsg = void 0
+                    this.coldRecipient = recipient
                 }
             } catch (e) {
                 if (this.isValidRecipient(decodeString)) {
-                    this.coldRecipient = decodeString
+                    recipient = decodeString
                 } else {
-                    this.coldRecipient = 'please scan QR code of recipient'
+                    recipient = 'please scan QR code of recipient'
                     this.paused = false
+                }
+                if (this.walletType === 'hotWallet') {
+                    this.recipient = recipient
+                } else {
+                    this.coldRecipient = recipient
                 }
             }
         },
@@ -771,14 +743,16 @@ export default {
             if (tabIndex === 0) {
                 this.resetPage()
                 this.pageId = 1
+                this.walletType = 'hotWallet'
             } else {
                 this.resetPage()
                 this.coldPageId = 1
+                this.walletType = 'coldWallet'
             }
             this.scanShow = false
         },
         isAmountValid(type) {
-            var amount = type === 'hot' ? this.amount : this.coldAmount
+            var amount = type === 'hotWallet' ? this.amount : this.coldAmount
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
@@ -794,7 +768,7 @@ export default {
             return common.checkPrecision(amount, 8)
         },
         isInsufficient(amount, type) {
-            var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
+            var balance = type === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
             return BigNumber(amount).isGreaterThan(BigNumber(balance).minus(TX_FEE))
         },
         options(addrs) {
