@@ -20,48 +20,17 @@
     </button>
     <b-container fluid
                  class="c-import">
-      <b-form-group label="Cold Wallet Address"
-                    label-for="coldAddress">
-        <b-form-input id="coldAddress"
-                      type="text"
-                      v-model="coldAddress"
-                      :state="isValidAddress"
-                      aria-describedby="inputLiveHelp inputLiveFeedback"
-                      placeholder="Please input cold wallet address.">
-        </b-form-input>
-        <b-form-invalid-feedback id="inputLiveFeedback">
-          Invalid cold wallet address. <span v-if="addressExisted">The address has existed.</span>
-        </b-form-invalid-feedback>
-      </b-form-group>
-      <b-form-group label="Cold Wallet Public Key"
-                    label-for="coldPubKey">
-        <b-form-input id="coldPubKey"
-                      type="text"
-                      v-model="coldPubKey"
-                      :state="isValidPubKey"
-                      aria-describedby="inputLiveHelp inputLiveFeedback"
-                      placeholder="Please input public key of cold wallet.">
-        </b-form-input>
-        <b-form-invalid-feedback id="inputLiveFeedback">
-          Invalid cold wallet public key.
-        </b-form-invalid-feedback>
-      </b-form-group>
-      <p class="qrInfo">Tips: Please confirm if your browser's camera is available.</p>
-      <div class="scan-pane">
-        <qrcode-reader @init="onInit"
-                       @decode="onDecode"
-                       :paused="paused">
-          <img v-if="qrInit"
-               class="qrcode-waiting"
-               height="100"
-               width="100"
-               src="@/assets/imgs/icons/wallet/ic_wait.svg">
-        </qrcode-reader>
-        <b-btn class="scan-again-btn"
-               variant="warning"
-               @click="scanAgain"
-               centered>Scan again</b-btn>
-      </div>
+      <p class="monitor">Select Monitor Method</p>
+      <p class="information">You can select three method to monitor cold wallet.</p>
+      <button id="appWallet"
+              @click="select('appWallet')"
+              class="selected">    Mobile Wallet App</button>
+      <button id="ledgerWallet"
+              @click="select('ledgerWallet')"
+              class="unselected">    Ledger Hardware Device</button>
+      <button id="manualInput"
+              @click="select('manualInput')"
+              class="unselected">    Manual Input Address</button>
     </b-container>
     <b-row class="btn-bottom">
       <b-col class="col-lef">
@@ -77,7 +46,7 @@
         <b-button
           block
           class="btn-confirm"
-          :style="{background:(isValidAddress && isValidPubKey ? '' : '#FFBE96')}"
+          :style="{background:'#FFBE96'}"
           variant="warning"
           size="lg"
           @click="importOk">Confirm
@@ -86,10 +55,10 @@
     </b-row>
   </b-modal>
 </template>
-
 <script>
-import crypto from '@/utils/crypto'
-import { PUBLIC_KEY_LENGTH, PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/constants.js'
+import Vue from 'vue'
+// import crypto from '@/utils/crypto'
+// import { PUBLIC_KEY_LENGTH } from '@/constants.js'
 export default {
     name: 'ImportColdWallet',
     props: {
@@ -101,47 +70,30 @@ export default {
     },
     data: function() {
         return {
-            jsonObj: '',
-            qrInit: false,
-            paused: false,
-            coldAddress: '',
-            coldPubKey: '',
-            opc: '',
-            api: '',
-            protocol: ''
-        }
-    },
-    computed: {
-        isValidAddress: function() {
-            if (this.coldAddress === this.address) {
-                return false
-            }
-            if (!this.coldAddress) {
-                return void 0
-            }
-            let isValid = false
-            try {
-                isValid = crypto.isValidAddress(this.coldAddress)
-            } catch (e) {
-                console.log(e)
-            }
-            return isValid
-        },
-        isValidPubKey: function() {
-            if (!this.coldPubKey) {
-                return void 0
-            }
-            return this.coldPubKey.length <= PUBLIC_KEY_LENGTH
-        },
-        addressExisted: function() {
-            return this.coldAddress === this.address
+            method: 'appWallet'
         }
     },
     methods: {
+        select: function(type) {
+            if (type === 'appWallet') {
+                this.method = 'appWallet'
+                document.getElementById(type).className = 'selected'
+                document.getElementById('ledgerWallet').className = 'unselected'
+                document.getElementById('manualInput').className = 'unselected'
+            } else if (type === 'ledgerWallet') {
+                this.method = 'ledgerWallet'
+                document.getElementById('appWallet').className = 'unselected'
+                document.getElementById('manualInput').className = 'unselected'
+                document.getElementById(type).className = 'selected'
+            } else if (type === 'manualInput') {
+                this.method = 'manualInput'
+                document.getElementById(type).className = 'selected'
+                document.getElementById('ledgerWallet').className = 'unselected'
+                document.getElementById('appWallet').className = 'unselected'
+            }
+        },
         showingUp() {
-            this.coldAddress = ''
-            this.coldPubKey = ''
-            this.paused = false
+            this.method = 'appWallet'
         },
         importClose: function(evt) {
             if (this.qrInit) {
@@ -149,69 +101,35 @@ export default {
             }
         },
         importOk: function(evt) {
-            if (this.qrInit || !this.coldAddress || !this.isValidAddress || !this.coldPubKey || !this.isValidPubKey) {
-                evt.preventDefault()
-            } else {
-                this.$emit('import-cold', this.coldAddress, this.coldPubKey, this.jsonObj)
+            if (this.method === 'manualInput') {
+                // this.$root.$emit('bv::show::modal', 'ManualInputBase', 'ManualInputBase')
                 this.closeModal()
             }
+            // if (this.qrInit || !this.coldAddress || !this.isValidAddress || !this.coldPubKey || !this.isValidPubKey) {
+            //     evt.preventDefault()
+            // } else {
+            //     this.$emit('import-cold', this.coldAddress, this.coldPubKey, this.jsonObj)
+            //     this.closeModal()
+            // }
         },
         importCancel: function(evt) {
             if (this.qrInit) {
                 evt.preventDefault()
             }
         },
-        async onInit(promise) {
-            try {
-                this.qrInit = true
-                await promise
-            } catch (error) {
-                if (error.name === 'NotAllowedError') {
-                    throw Error('user denied camera access permission')
-                } else if (error.name === 'NotFoundError') {
-                    throw Error('no suitable camera device installed')
-                } else if (error.name === 'NotSupportedError') {
-                    throw Error('page is not served over HTTPS (or localhost)')
-                } else if (error.name === 'NotReadableError') {
-                    throw Error('maybe camera is already in use')
-                } else if (error.name === 'OverconstarinedError') {
-                    throw Error('pass constraints do not match any camera')
-                } else {
-                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
-                }
-            } finally {
-                this.qrInit = false
-            }
-        },
-        onDecode: function(decodeString) {
-            this.paused = true
-            try {
-                this.jsonObj = JSON.parse(decodeString)
-                this.coldAddress = this.jsonObj.address
-                this.coldPubKey = this.jsonObj.publicKey
-                this.opc = this.jsonObj.opc
-                this.api = this.jsonObj.api
-                this.protocol = this.jsonObj.protocol
-            } catch (e) {
-                this.paused = false
-            }
-            if (!this.isValidAddress) {
-                this.coldAddress = 'please scan QR code of cold wallet address'
-                this.paused = false
-            } else if (this.api > API_VERSION || this.protocol !== PROTOCOL || this.opc !== OPC_ACCOUNT) {
-                this.coldAddress = 'invalid QR code'
-                this.paused = false
-            } else if (!this.isValidPubKey) {
-                this.coldPubKey = 'invalid public key'
-                this.paused = false
-            }
-        },
-        scanAgain: function() {
-            this.paused = false
-            this.coldAddress = ''
-        },
         closeModal: function() {
             this.$refs.importModal.hide()
+        },
+        importCold(coldAddress, pubKey, jsonObj) {
+            Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : jsonObj)
+            let unsortedColdAddresses = this.coldAddresses
+            let sortedColdAddresses = {}
+            Object.keys(unsortedColdAddresses).sort().forEach(function(key) {
+                sortedColdAddresses[key] = unsortedColdAddresses[key]
+            })
+            this.sortedAddresses = sortedColdAddresses
+            this.getBalance(coldAddress)
+            this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
         }
     }
 }
@@ -228,6 +146,21 @@ export default {
 .qrInfo {
     margin-bottom: 20px;
     color: #9091a3;
+}
+.monitor {
+    font-family: Roboto-Regular;
+    font-size: 26px;
+    color: #181B3A;
+    letter-spacing: 0;
+    text-align: center;
+}
+.information {
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    color: #9091A3;
+    letter-spacing: 0;
+    text-align: center;
+    margin-bottom: 40px;
 }
 .scan-again-btn {
     margin-top: 10px;
@@ -271,6 +204,38 @@ export default {
     color: #4F515E;
     letter-spacing: 0;
     text-align: center;
+}
+.selected {
+    padding-left: 30px;
+    width: 360px;
+    height: 60px;
+    display: block;
+    margin:0 auto ;
+    background: #FFFFFF;
+    border: 1px solid #FF8737;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    text-align: left;
+    color: #FF8737;
+    letter-spacing: 0;
+}
+.unselected {
+    padding-left: 30px;
+    width: 360px;
+    height: 60px;
+    display: block;
+    margin:0 auto ;
+    background: #FFFFFF;
+    border: 1px solid #E8E9ED;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    text-align: left;
+    color: #181B3A;
+    letter-spacing: 0;
 }
 .col-lef {
     padding-right: 10px;
