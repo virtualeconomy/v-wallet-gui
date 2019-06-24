@@ -210,6 +210,7 @@ export default {
             this.getBlockHeight()
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
+            this.walletType = 'hotWallet'
             let unsortedColdAddresses = {}
             let sortedColdAddresses = {}
             if (this.userInfo && this.userInfo.coldAddresses) {
