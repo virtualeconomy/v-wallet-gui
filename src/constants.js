@@ -11,7 +11,7 @@ var __assign = (this && this.__assign) || Object.assign || function(t) {
 };
 export const WALLET_VERSION = '0.2.1'
 export const INITIAL_SESSION_TIMEOUT = 5
-export const NETWORK_BYTE = 'Mf'.charCodeAt(0);
+export const NETWORK_BYTE = 'M'.charCodeAt(0);
 export const INITIAL_NONCE = 0;
 export const ADDRESS_VERSION = 5;
 export const PAYMENT_TX = 2;
