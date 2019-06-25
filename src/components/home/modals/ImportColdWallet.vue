@@ -279,15 +279,13 @@ export default {
     font-size: 15px;
     text-align: left;
     color: #181B3A;
-    letter-spacingf: 0;
+    letter-spacing: 0;
 }
 .col-lef {
     padding-right: 10px;
 }
 .col-rit {
     padding-left: 10px;
-}
-.ledgerWallet {
 }
 .row {
     margin-top: 25px;
