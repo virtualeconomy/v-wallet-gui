@@ -6,7 +6,6 @@
            @hide="importClose"
            @ok="importOk"
            @show="showingUp"
-           :ok-disabled="!coldAddress || !isValidAddress"
            :cancel-disabled="qrInit"
            title="Import Cold Wallet"
            hide-header
@@ -18,49 +17,72 @@
       @click="closeModal">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
-    <b-container fluid
-                 class="c-import">
-      <p class="monitor">Select Monitor Method</p>
-      <p class="information">You can select three method to monitor cold wallet.</p>
-      <button id="appWallet"
-              @click="select('appWallet')"
-              class="selected">    Mobile Wallet App</button>
-      <button id="ledgerWallet"
-              @click="select('ledgerWallet')"
-              class="unselected">    Ledger Hardware Device</button>
-      <button id="manualInput"
-              @click="select('manualInput')"
-              class="unselected">    Manual Input Address</button>
+    <b-container
+      class="text-left"
+      v-if="pageId===1">
+      <b-container fluid
+                   class="c-import">
+        <p class="monitor">Select Monitor Method</p>
+        <p class="information">You can select three method to monitor cold wallet.</p>
+        <button id="appWallet"
+                @click="select('appWallet')"
+                class="selected">    Mobile Wallet App</button>
+        <button id="ledgerWallet"
+                @click="select('ledgerWallet')"
+                class="unselected">    Ledger Hardware Device</button>
+        <button id="manualInput"
+                @click="select('manualInput')"
+                class="unselected">    Manual Input Address</button>
+      </b-container>
+      <b-row class="btn-bottom">
+        <b-col class="col-lef">
+          <b-button
+            class="btn-back"
+            block
+            variant="light"
+            size="lg"
+            @click="closeModal">Cancel
+          </b-button>
+        </b-col>
+        <b-col class="col-rit">
+          <b-button
+            block
+            class="btn-confirm"
+            :style="{background:'#FFBE96'}"
+            variant="warning"
+            size="lg"
+            @click="importOk">Confirm
+          </b-button>
+        </b-col>
+      </b-row>
     </b-container>
-    <b-row class="btn-bottom">
-      <b-col class="col-lef">
-        <b-button
-          class="btn-back"
-          block
-          variant="light"
-          size="lg"
-          @click="closeModal">Cancel
-        </b-button>
-      </b-col>
-      <b-col class="col-rit">
-        <b-button
-          block
-          class="btn-confirm"
-          :style="{background:'#FFBE96'}"
-          variant="warning"
-          size="lg"
-          @click="importOk">Confirm
-        </b-button>
-      </b-col>
-    </b-row>
+    <b-container
+      class="ledger"
+      v-if="pageId===2">
+      <LedgerWallet>
+      </LedgerWallet>
+      <b-row class="row">
+        <b-col class="col-back">
+          <b-button
+            class="btn-back"
+            block
+            variant="light"
+            size="lg"
+            @click="prevPage">Back
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-container>
   </b-modal>
 </template>
 <script>
 import Vue from 'vue'
+import LedgerWallet from '../elements/LedgerWallet'
 // import crypto from '@/utils/crypto'
 // import { PUBLIC_KEY_LENGTH } from '@/constants.js'
 export default {
     name: 'ImportColdWallet',
+    components: { LedgerWallet },
     props: {
         address: {
             type: String,
@@ -70,7 +92,9 @@ export default {
     },
     data: function() {
         return {
-            method: 'appWallet'
+            method: 'appWallet',
+            pageId: 1,
+            qrInit: false
         }
     },
     methods: {
@@ -104,6 +128,11 @@ export default {
             if (this.method === 'manualInput') {
                 // this.$root.$emit('bv::show::modal', 'ManualInputBase', 'ManualInputBase')
                 this.closeModal()
+            } else if (this.method === 'ledgerWallet') {
+                this.pageId++
+                if (this.pageId > 2) {
+                    this.closeModal()
+                }
             }
             // if (this.qrInit || !this.coldAddress || !this.isValidAddress || !this.coldPubKey || !this.isValidPubKey) {
             //     evt.preventDefault()
@@ -118,7 +147,11 @@ export default {
             }
         },
         closeModal: function() {
+            this.pageId = 1
             this.$refs.importModal.hide()
+        },
+        prevPage: function() {
+            this.pageId--
         },
         importCold(coldAddress, pubKey, jsonObj) {
             Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : jsonObj)
@@ -242,5 +275,15 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.col-back {
+    padding-left: 10px;
+    margin-top: -70px;
+    margin-right: 230px;
+    margin-left: 5px;
+}
+.row {
+    margin-top: 25px;
+    margin-bottom: 15px;
 }
 </style>
