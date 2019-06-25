@@ -58,7 +58,7 @@
     </b-container>
     <b-container
       class="ledger"
-      v-if="pageId===2">
+      v-if="pageId===2 && method === 'ledgerWallet'">
       <LedgerWallet>
       </LedgerWallet>
       <b-row class="row">
@@ -73,16 +73,31 @@
         </b-col>
       </b-row>
     </b-container>
+    <b-container class="ledger"
+                 v-if="pageId===2 && method === 'appWallet'">
+      <AppWallet></AppWallet>
+      <b-row class="row">
+        <b-col class="col-back">
+          <b-button class="btn-back"
+                    block
+                    variant="light"
+                    size="lg"
+                    @click="prevPage">Back
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-container>
   </b-modal>
 </template>
 <script>
 import Vue from 'vue'
 import LedgerWallet from '../elements/LedgerWallet'
+import AppWallet from '../elements/AppWallet'
 // import crypto from '@/utils/crypto'
 // import { PUBLIC_KEY_LENGTH } from '@/constants.js'
 export default {
     name: 'ImportColdWallet',
-    components: { LedgerWallet },
+    components: { LedgerWallet, AppWallet },
     props: {
         address: {
             type: String,
@@ -130,6 +145,12 @@ export default {
                 this.closeModal()
             } else if (this.method === 'ledgerWallet') {
                 this.pageId++
+                if (this.pageId > 2) {
+                    this.closeModal()
+                }
+            } else if (this.method === 'appWallet') {
+                this.pageId++
+                console.log(this.pageId)
                 if (this.pageId > 2) {
                     this.closeModal()
                 }
