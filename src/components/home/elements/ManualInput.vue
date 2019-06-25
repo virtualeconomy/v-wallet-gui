@@ -96,7 +96,7 @@ export default {
             return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubKey(this.coldPubKey))
         },
         sendData() {
-            var obj = {'device': this.device, 'protocol': 'v.systems', 'opc': 'account', 'api': 1}
+            var obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPubKey, 'device': this.device}
             this.$emit('import-cold', this.coldAddress, this.coldPubKey, obj)
             this.$emit('close-btn')
         }
