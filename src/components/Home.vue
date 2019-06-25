@@ -232,8 +232,12 @@ export default {
             for (const addr in this.coldAddresses) {
                 if (!this.coldAddresses[addr].hasOwnProperty('api')) {
                     localChanging = true
-                    let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': addr, 'api': 1, 'publicKey': this.coldAddresses[addr], 'device': 'false'}
+                    let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': addr, 'api': 1, 'publicKey': this.coldAddresses[addr]}
                     Vue.set(this.coldAddresses, addr, JSON.parse(JSON.stringify(tempObj)))
+                }
+                if (!this.coldAddresses[addr].hasOwnProperty('device')) {
+                    localChanging = true
+                    Vue.set(this.coldAddresses[addr], 'device', 'MobileApp')
                 }
             }
             if (localChanging) {

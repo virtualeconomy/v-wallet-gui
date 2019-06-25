@@ -59,8 +59,7 @@
     <b-container
       class="ledger"
       v-if="pageId===2 && method === 'ledgerWallet'">
-      <LedgerWallet>
-      </LedgerWallet>
+      <LedgerWallet @import-cold="importCold"></LedgerWallet>
       <b-row class="row">
         <b-col class="col-back">
           <b-button
@@ -87,16 +86,31 @@
         </b-col>
       </b-row>
     </b-container>
+    <b-container class="ledger"
+                 v-if="pageId===2 && method === 'manualInput'">
+      <ManualInput @import-cold="importCold"></ManualInput>
+      <b-row class="row">
+        <b-col class="col-back">
+          <b-button class="btn-back"
+                    block
+                    variant="light"
+                    size="lg"
+                    @click="prevPage">Back
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-container>
   </b-modal>
 </template>
 <script>
 import LedgerWallet from '../elements/LedgerWallet'
 import AppWallet from '../elements/AppWallet'
+import ManualInput from '../elements/ManualInput'
 // import crypto from '@/utils/crypto'
 // import { PUBLIC_KEY_LENGTH } from '@/constants.js'
 export default {
     name: 'ImportColdWallet',
-    components: { LedgerWallet, AppWallet },
+    components: { LedgerWallet, AppWallet, ManualInput },
     props: {
         address: {
             type: String,
@@ -140,8 +154,10 @@ export default {
         },
         importOk: function(evt) {
             if (this.method === 'manualInput') {
-                // this.$root.$emit('bv::show::modal', 'ManualInputBase', 'ManualInputBase')
-                this.closeModal()
+                this.pageId++
+                if (this.pageId > 2) {
+                    this.closeModal()
+                }
             } else if (this.method === 'ledgerWallet') {
                 this.pageId++
                 if (this.pageId > 2) {
@@ -154,12 +170,6 @@ export default {
                     this.closeModal()
                 }
             }
-            // if (this.qrInit || !this.coldAddress || !this.isValidAddress || !this.coldPubKey || !this.isValidPubKey) {
-            //     evt.preventDefault()
-            // } else {
-            //     this.$emit('import-cold', this.coldAddress, this.coldPubKey, this.jsonObj)
-            //     this.closeModal()
-            // }
         },
         importCold(coldAddr, coldPubKey, jsonObj) {
             this.$emit('import-cold', coldAddr, coldPubKey, jsonObj)
