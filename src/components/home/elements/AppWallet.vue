@@ -2,7 +2,7 @@
   <div id="appWalletModal"
        ref="appWalletModal"
        class="appWallet">
-    <div class="black-title">Monitor Use Mobile Wallet App
+    <div class="black-title">Monitor Mobile Cold Wallet
     </div>
     <div class="small-title">You can scan the QR Code of cold wallet if your <br>browser's camera is available
     </div>
@@ -128,13 +128,13 @@ export default {
             } catch (e) {
                 this.paused = false
             }
-            if (!this.isValidAddress) {
+            if (!this.isValidColdAddress(this.coldAddress)) {
                 this.coldAddress = 'please scan QR code of cold wallet address'
                 this.paused = false
             } else if (this.api > API_VERSION || this.protocol !== PROTOCOL || this.opc !== OPC_ACCOUNT) {
                 this.coldAddress = 'invalid QR code'
                 this.paused = false
-            } else if (!this.isValidPubKey) {
+            } else if (!this.isValidColdPubKey(this.coldPubKey)) {
                 this.coldPubKey = 'invalid public key'
                 this.paused = false
             }
@@ -163,7 +163,7 @@ export default {
             return pubkeyArr && pubkeyArr.length === 32
         },
         isSubmitDisabled() {
-            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubkey(this.coldPubkey))
+            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubkey(this.coldPubKey))
         },
         sendData() {
             return void 0
