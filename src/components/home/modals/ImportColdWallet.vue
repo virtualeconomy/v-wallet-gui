@@ -59,9 +59,7 @@
     <b-container
       class="ledger"
       v-if="pageId===2">
-      <LedgerWallet
-        class="ledgerWallet"
-        :address="'sui bian xie '">
+      <LedgerWallet>
       </LedgerWallet>
       <b-row class="row">
         <b-col class="col-back">

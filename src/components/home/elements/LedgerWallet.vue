@@ -52,7 +52,7 @@
                     placeholder="Retrieve public key of cold wallet from device">
       </b-form-input>
       <b-form-invalid-feedback id="inputLiveFeedback">
-        Invalid Pubkey
+        Invalid Public Key
       </b-form-invalid-feedback>
     </b-form-group>
     <b-row class="row">
