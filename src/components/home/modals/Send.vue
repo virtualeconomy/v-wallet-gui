@@ -322,13 +322,33 @@
             </b-col>
           </b-row>
         </b-container>
-        <b-container v-if="coldPageId===3"
+        <b-container v-if="coldPageId===3 && isLedgerWallet === false"
                      class="text-left">
           <ColdSignature :data-object="dataObject"
                          v-if="coldPageId===3"
                          @get-signature="getSignature"
                          @next-page="nextPage"
                          @prev-page="prevPage"></ColdSignature>
+        </b-container>
+        <b-container v-else-if="coldPageId===3 && isLedgerWallet === true"
+                     class="text-left">
+          <LedgerConfirm :address="coldAddress"
+                         :recipient="coldRecipient"
+                         :amount=inputAmount(coldAmount)
+                         :fee="coldFee"
+                         :attachment="coldAttachment"
+                         :tx-type="'Payment'"></LedgerConfirm>
+          <b-row class="row">
+            <b-col class="col-back">
+              <b-button
+                class="btn-back"
+                block
+                variant="light"
+                size="lg"
+                @click="prevPage">Back
+              </b-button>
+            </b-col>
+          </b-row>
         </b-container>
         <b-container v-show="coldPageId===4">
           <Confirm :address="coldAddress"
@@ -391,6 +411,7 @@ import browser from '@/utils/browser'
 import common from '@/utils/common'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
+import LedgerConfirm from './LedgerConfirm'
 var initData = {
     errorMessage: '',
     opc: '',
@@ -415,11 +436,12 @@ var initData = {
     timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     coldRecipientAddressList: {},
-    hotRecipientAddressList: {}
+    hotRecipientAddressList: {},
+    isLedgerWallet: true
 }
 export default {
     name: 'Send',
-    components: {ColdSignature, Success, Confirm},
+    components: {ColdSignature, Success, Confirm, LedgerConfirm},
     props: {
         balances: {
             type: Object,
@@ -893,5 +915,15 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.col-back {
+    padding-left: 10px;
+    margin-top: -70px;
+    margin-right: 230px;
+    margin-left: 5px;
+}
+.row {
+    margin-top: 26px;
+    margin-bottom: 10px;
 }
 </style>
