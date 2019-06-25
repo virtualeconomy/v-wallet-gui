@@ -9,7 +9,7 @@
     </div>
     <div class="image">
       <img class="image-input"
-           src="@/assets/imgs/icons/wallet/img_ledger_guide.png">
+           src="@/assets/imgs/icons/wallet/img_ledger_device.png">
     </div>
     <div class="account-form">
       <p class="account-input">Choose your account index and then click "Select"</p>
