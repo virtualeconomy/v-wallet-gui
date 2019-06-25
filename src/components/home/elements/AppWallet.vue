@@ -169,7 +169,7 @@ export default {
         },
         sendData() {
             this.$emit('import-cold', this.coldAddress, this.coldPubKey, this.jsonObj)
-            this.closeModal()
+            this.$emit('close-btn')
         }
     }
 }

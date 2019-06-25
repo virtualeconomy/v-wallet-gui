@@ -75,14 +75,14 @@
 <script>
 import crypto from '@/utils/crypto'
 import base58 from '@/libs/base58'
-import { PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/constants.js'
 export default {
     name: 'LedgerWallet',
     data: function() {
         return {
             coldAddress: '',
             coldPubkey: '',
-            addressIndex: 0
+            addressIndex: 0,
+            device: 'Ledger'
         }
     },
     props: {
@@ -131,55 +131,9 @@ export default {
             return void 0
         },
         sendData() {
-            this.$emit('import-cold', this.coldAddress, this.coldPubKey, this.jsonObj)
-            this.closeModal()
-        },
-        async onInit(promise) {
-            try {
-                this.qrInit = true
-                await promise
-            } catch (error) {
-                if (error.name === 'NotAllowedError') {
-                    throw Error('user denied camera access permission')
-                } else if (error.name === 'NotFoundError') {
-                    throw Error('no suitable camera device installed')
-                } else if (error.name === 'NotSupportedError') {
-                    throw Error('page is not served over HTTPS (or localhost)')
-                } else if (error.name === 'NotReadableError') {
-                    throw Error('maybe camera is already in use')
-                } else if (error.name === 'OverconstarinedError') {
-                    throw Error('pass constraints do not match any camera')
-                } else {
-                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
-                }
-            } finally {
-                this.qrInit = false
-            }
-        },
-        onDecode: function(decodeString) {
-            this.paused = true
-            try {
-                var obj = JSON.parse(decodeString)
-                obj.device = 'Ledger'
-                this.jsonObj = obj
-                this.coldAddress = this.jsonObj.address
-                this.coldPubKey = this.jsonObj.publicKey
-                this.opc = this.jsonObj.opc
-                this.api = this.jsonObj.api
-                this.protocol = this.jsonObj.protocol
-            } catch (e) {
-                this.paused = false
-            }
-            if (!this.isValidColdAddress(this.coldAddress)) {
-                this.coldAddress = 'please scan QR code of cold wallet address'
-                this.paused = false
-            } else if (this.api > API_VERSION || this.protocol !== PROTOCOL || this.opc !== OPC_ACCOUNT) {
-                this.coldAddress = 'invalid QR code'
-                this.paused = false
-            } else if (!this.isValidColdPubKey(this.coldPubKey)) {
-                this.coldPubKey = 'invalid public key'
-                this.paused = false
-            }
+            var obj = {'device': this.device}
+            this.$emit('import-cold', this.coldAddress, this.coldPubKey, obj)
+            this.$emit('close-btn')
         }
     }
 }

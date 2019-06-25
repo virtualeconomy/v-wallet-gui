@@ -59,7 +59,8 @@
     <b-container
       class="ledger"
       v-if="pageId===2 && method === 'ledgerWallet'">
-      <LedgerWallet @import-cold="importCold"></LedgerWallet>
+      <LedgerWallet @import-cold="importCold"
+                    @close-btn="closeModal"></LedgerWallet>
       <b-row class="row">
         <b-col class="col-back">
           <b-button
@@ -74,7 +75,8 @@
     </b-container>
     <b-container class="ledger"
                  v-if="pageId===2 && method === 'appWallet'">
-      <AppWallet @import-cold="importCold"></AppWallet>
+      <AppWallet @import-cold="importCold"
+                 @close-btn="closeModal"></AppWallet>
       <b-row class="row">
         <b-col class="col-back">
           <b-button class="btn-back"
@@ -88,7 +90,8 @@
     </b-container>
     <b-container class="ledger"
                  v-if="pageId===2 && method === 'manualInput'">
-      <ManualInput @import-cold="importCold"></ManualInput>
+      <ManualInput @import-cold="importCold"
+                   @close-btn="closeModal"></ManualInput>
       <b-row class="row">
         <b-col class="col-back">
           <b-button class="btn-back"
