@@ -163,7 +163,7 @@ export default {
             return pubkeyArr && pubkeyArr.length === 32
         },
         isSubmitDisabled() {
-            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubkey(this.coldPubKey))
+            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubKey(this.coldPubKey))
         },
         sendData() {
             return void 0

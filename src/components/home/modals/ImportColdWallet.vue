@@ -26,7 +26,7 @@
         <p class="information">You can select three method to monitor cold wallet.</p>
         <button id="appWallet"
                 @click="select('appWallet')"
-                class="selected">    Mobile Wallet App</button>
+                class="selected">    Mobile Cold Wallet App</button>
         <button id="ledgerWallet"
                 @click="select('ledgerWallet')"
                 class="unselected">    Ledger Hardware Device</button>
