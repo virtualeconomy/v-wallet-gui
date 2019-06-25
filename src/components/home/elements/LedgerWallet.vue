@@ -131,7 +131,7 @@ export default {
             return void 0
         },
         sendData() {
-            var obj = {'device': this.device}
+            var obj = {'device': this.device, 'protocol': 'v.systems', 'opc': 'account', 'api': 1}
             this.$emit('import-cold', this.coldAddress, this.coldPubKey, obj)
             this.$emit('close-btn')
         }
