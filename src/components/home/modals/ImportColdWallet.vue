@@ -64,22 +64,13 @@
         :address="'sui bian xie '">
       </LedgerWallet>
       <b-row class="row">
-        <b-col class="col-lef">
+        <b-col class="col-back">
           <b-button
             class="btn-back"
             block
             variant="light"
             size="lg"
             @click="prevPage">Back
-          </b-button>
-        </b-col>
-        <b-col class="col-rit">
-          <b-button
-            block
-            class="btn-confirm"
-            variant="warning"
-            size="lg"
-            @click="importOk">Confirm
           </b-button>
         </b-col>
       </b-row>
@@ -286,6 +277,12 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.col-back {
+    padding-left: 10px;
+    margin-top: -70px;
+    margin-right: 230px;
+    margin-left: 5px;
 }
 .row {
     margin-top: 25px;

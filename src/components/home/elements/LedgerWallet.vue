@@ -35,7 +35,7 @@
                     :state="isValidColdAddress(coldAddress)"
                     v-model="coldAddress"
                     aria-describedby="inputLiveFeedback"
-                    placeholder="Please input cold wallet address">
+                    placeholder="Retrieve cold wallet address from device">
       </b-form-input>
       <b-form-invalid-feedback id="inputLiveFeedback">
         Invalid ColdAddress
@@ -49,17 +49,32 @@
                     :state="isValidColdPubkey(coldPubkey)"
                     v-model="coldPubkey"
                     aria-describedby="inputLiveFeedback"
-                    placeholder="Please input public key of cold wallet">
+                    placeholder="Retrieve public key of cold wallet from device">
       </b-form-input>
       <b-form-invalid-feedback id="inputLiveFeedback">
-        Invalid ColdPubKey
+        Invalid Pubkey
       </b-form-invalid-feedback>
     </b-form-group>
+    <b-row class="row">
+      <b-col class="col-lef">
+      </b-col>
+      <b-col class="col-rit">
+        <b-button
+          block
+          class="btn-confirm"
+          variant="warning"
+          size="lg"
+          :disabled="isSubmitDisabled()"
+          @click="sendData">Confirm
+        </b-button>
+      </b-col>
+    </b-row>
   </div>
 </template>
 
 <script>
 import crypto from '@/utils/crypto'
+import base58 from '@/libs/base58'
 export default {
     name: 'LedgerWallet',
     data: function() {
@@ -91,17 +106,12 @@ export default {
             }
             return isValid
         },
-        isValidColdPubkey: function(pubKey) {
-            if (!pubKey) {
+        isValidColdPubkey: function(pubkey) {
+            if (!pubkey) {
                 return void 0
             }
-            let isValid = false
-            try {
-                isValid = crypto.isValidAddress(pubKey)
-            } catch (e) {
-                console.log(e)
-            }
-            return isValid
+            var pubkeyArr = base58.decode(pubkey)
+            return pubkeyArr && pubkeyArr.length === 32
         },
         minus() {
             if (this.addressIndex > 0) {
@@ -113,7 +123,13 @@ export default {
                 this.addressIndex++
             }
         },
+        isSubmitDisabled() {
+            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubkey(this.coldPubkey))
+        },
         selectAddress() {
+            return void 0
+        },
+        sendData() {
             return void 0
         }
     }
@@ -201,5 +217,22 @@ export default {
     font-weight:lighter;
     background:#fafafa;
     margin-left: 230px;
+}
+.col-lef {
+    padding-right: 10px;
+}
+.col-rit {
+    padding-left: 10px;
+}
+.row {
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+.btn-confirm {
+    height: 44px;
+    font-size: 17px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    text-align: center;
 }
 </style>
