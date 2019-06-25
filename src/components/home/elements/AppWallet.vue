@@ -92,6 +92,8 @@ export default {
     },
     methods: {
         closeModal() {
+            this.qrInit = false
+            this.paused = false
             this.$refs.appWalletModal.hide()
         },
         async onInit(promise) {
