@@ -75,7 +75,7 @@
     </b-container>
     <b-container class="ledger"
                  v-if="pageId===2 && method === 'appWallet'">
-      <AppWallet></AppWallet>
+      <AppWallet @import-cold="importCold"></AppWallet>
       <b-row class="row">
         <b-col class="col-back">
           <b-button class="btn-back"
@@ -90,7 +90,6 @@
   </b-modal>
 </template>
 <script>
-import Vue from 'vue'
 import LedgerWallet from '../elements/LedgerWallet'
 import AppWallet from '../elements/AppWallet'
 // import crypto from '@/utils/crypto'
@@ -162,6 +161,9 @@ export default {
             //     this.closeModal()
             // }
         },
+        importCold(coldAddr, coldPubKey, jsonObj) {
+            this.$emit('import-cold', coldAddr, coldPubKey, jsonObj)
+        },
         importCancel: function(evt) {
             if (this.qrInit) {
                 evt.preventDefault()
@@ -173,7 +175,8 @@ export default {
         },
         prevPage: function() {
             this.pageId--
-        },
+        }
+        /*
         importCold(coldAddress, pubKey, jsonObj) {
             Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : jsonObj)
             let unsortedColdAddresses = this.coldAddresses
@@ -184,7 +187,7 @@ export default {
             this.sortedAddresses = sortedColdAddresses
             this.getBalance(coldAddress)
             this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
-        }
+        } */
     }
 }
 </script>

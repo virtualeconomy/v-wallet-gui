@@ -232,7 +232,7 @@ export default {
             for (const addr in this.coldAddresses) {
                 if (!this.coldAddresses[addr].hasOwnProperty('api')) {
                     localChanging = true
-                    let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': addr, 'api': 1, 'publicKey': this.coldAddresses[addr]}
+                    let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': addr, 'api': 1, 'publicKey': this.coldAddresses[addr], 'device': 'false'}
                     Vue.set(this.coldAddresses, addr, JSON.parse(JSON.stringify(tempObj)))
                 }
             }
