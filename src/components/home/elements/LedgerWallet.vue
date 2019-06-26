@@ -46,8 +46,8 @@
       <b-form-input id="pubKey-input"
                     class="recipient-input"
                     type="text"
-                    :state="isValidColdPubkey(coldPubkey)"
-                    v-model="coldPubkey"
+                    :state="isValidColdPubKey(coldPubKey)"
+                    v-model="coldPubKey"
                     aria-describedby="inputLiveFeedback"
                     placeholder="Retrieve public key of cold wallet from device">
       </b-form-input>
@@ -80,8 +80,9 @@ export default {
     data: function() {
         return {
             coldAddress: '',
-            coldPubkey: '',
-            addressIndex: 0
+            coldPubKey: '',
+            addressIndex: 0,
+            device: 'Ledger'
         }
     },
     props: {
@@ -106,12 +107,12 @@ export default {
             }
             return isValid
         },
-        isValidColdPubkey: function(pubkey) {
-            if (!pubkey) {
+        isValidColdPubKey: function(pubKey) {
+            if (!pubKey) {
                 return void 0
             }
-            var pubkeyArr = base58.decode(pubkey)
-            return pubkeyArr && pubkeyArr.length === 32
+            var pubKeyArr = base58.decode(pubKey)
+            return pubKeyArr && pubKeyArr.length === 32
         },
         minus() {
             if (this.addressIndex > 0) {
@@ -124,13 +125,15 @@ export default {
             }
         },
         isSubmitDisabled() {
-            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubkey(this.coldPubkey))
+            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubKey(this.coldPubKey))
         },
         selectAddress() {
             return void 0
         },
         sendData() {
-            return void 0
+            var obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPubKey, 'device': this.device}
+            this.$emit('import-cold', this.coldAddress, this.coldPubKey, obj)
+            this.$emit('close-btn')
         }
     }
 }

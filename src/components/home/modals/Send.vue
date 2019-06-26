@@ -437,7 +437,7 @@ var initData = {
     hasConfirmed: false,
     coldRecipientAddressList: {},
     hotRecipientAddressList: {},
-    isLedgerWallet: true
+    isLedgerWallet: false
 }
 export default {
     name: 'Send',

@@ -21,8 +21,8 @@
       </b-form-invalid-feedback>
     </b-form-group>
     <b-form-group label="Cold Wallet Public Key"
-                  label-for="pubKey-input">
-      <b-form-input id="pubKey-input"
+                  label-for="pubKey2-input">
+      <b-form-input id="pubKey2-input"
                     class="recipient-input"
                     type="text"
                     :state="isValidColdPubKey(coldPubKey)"
@@ -59,7 +59,8 @@ export default {
     data: function() {
         return {
             coldAddress: '',
-            coldPubKey: ''
+            coldPubKey: '',
+            device: 'ManualInput'
         }
     },
     props: {
@@ -95,7 +96,9 @@ export default {
             return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubKey(this.coldPubKey))
         },
         sendData() {
-            return void 0
+            var obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPubKey, 'device': this.device}
+            this.$emit('import-cold', this.coldAddress, this.coldPubKey, obj)
+            this.$emit('close-btn')
         }
     }
 }
