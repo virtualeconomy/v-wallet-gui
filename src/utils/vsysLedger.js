@@ -152,7 +152,7 @@ var Vsys = (function () {
         if (ver2 === void 0) { ver2 = [0, 0]; }
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                return [2, Buffer.concat([prefixBuffer, Buffer.from(ver2), dataBuffer])];
+                return [2, Buffer.concat([prefixBuffer, Buffer.from(ver2), Buffer.from(dataBuffer)])];
             });
         });
     };

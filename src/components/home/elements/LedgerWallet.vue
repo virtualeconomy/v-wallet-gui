@@ -108,6 +108,10 @@ export default {
         address: {
             type: String,
             default: ''
+        },
+        ledgerAddrPath: {
+            type: String,
+            default: ''
         }
     },
     methods: {
@@ -150,9 +154,9 @@ export default {
             this.alertMessage = 'Please confirm address on Ledger device!'
             this.dismissCountDown = 3
             const transport = await TransportU2F.create()
-            var app = new VsysLedger(transport, NETWORK_BYTE)
+            var ledger = new VsysLedger(transport, NETWORK_BYTE)
             var path = '44\'/360\'/' + this.addressIndex + '\'/0/0'
-            const result = await app.getWalletPublicKey(path, true)
+            const result = await ledger.getWalletPublicKey(path, true)
             if (!result || !result['publicKey']) {
                 this.alertMessage = 'Failed to get Public Key! Please make sure Ledger hardware device is connected and entered VSYS app.'
                 this.dismissCountDown = 5
@@ -160,12 +164,13 @@ export default {
             }
             this.coldPubKey = result['publicKey']
             this.coldAddress = result['address']
+            this.ledgerAddrPath = path
         },
         countDownChanged(dismissCountDown) {
             this.dismissCountDown = dismissCountDown
         },
         sendData() {
-            var obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPubKey, 'device': this.device}
+            var obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPubKey, 'device': this.device, 'path': this.ledgerAddrPath}
             this.$emit('import-cold', this.coldAddress, this.coldPubKey, obj)
             this.$emit('close-btn')
         }
