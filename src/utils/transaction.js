@@ -166,6 +166,10 @@ function transferShortTxt(description) {
     return typeArr.concat(lengthArr.concat(byteArr))
 }
 export default {
+    toBytes: function (transferData, tx_type) {
+        getFields(tx_type);
+        return getBytes(__assign(tx_type ? { transactionType: tx_type } : {}, transferData), tx_type);
+    },
     prepareForAPI: function(transferData, keyPair, tx_type) {
         getFields(tx_type)
         var signature = getSignature(transferData, keyPair, tx_type);
