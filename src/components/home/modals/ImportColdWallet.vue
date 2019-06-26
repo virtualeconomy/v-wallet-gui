@@ -26,13 +26,13 @@
         <p class="information">You can select three method to monitor cold wallet.</p>
         <button id="appWallet"
                 @click="select('appWallet')"
-                class="selected">    Mobile Cold Wallet App</button>
+                :class="classChoose('appWallet') ? 'selected' : 'unselected'">    Mobile Cold Wallet App</button>
         <button id="ledgerWallet"
                 @click="select('ledgerWallet')"
-                class="unselected">    Ledger Hardware Device</button>
+                :class="classChoose('ledgerWallet') ? 'selected' : 'unselected'">    Ledger Hardware Device</button>
         <button id="manualInput"
                 @click="select('manualInput')"
-                class="unselected">    Manual Input Address</button>
+                :class="classChoose('manualInput') ? 'selected' : 'unselected'">    Manual Input Address</button>
       </b-container>
       <b-row class="btn-bottom">
         <b-col class="col-lef">
@@ -59,8 +59,8 @@
     <b-container
       class="ledger"
       v-if="pageId===2 && method === 'ledgerWallet'">
-      <LedgerWallet>
-      </LedgerWallet>
+      <LedgerWallet @import-cold="importCold"
+                    @close-btn="closeModal"></LedgerWallet>
       <b-row class="row">
         <b-col class="col-back">
           <b-button
@@ -68,35 +68,37 @@
             block
             variant="light"
             size="lg"
-            @click="prevPage">Back
+            @click="prevPage('ledgerWallet')">Back
           </b-button>
         </b-col>
       </b-row>
     </b-container>
     <b-container class="ledger"
                  v-if="pageId===2 && method === 'appWallet'">
-      <AppWallet></AppWallet>
+      <AppWallet @import-cold="importCold"
+                 @close-btn="closeModal"></AppWallet>
       <b-row class="row">
         <b-col class="col-back">
           <b-button class="btn-back"
                     block
                     variant="light"
                     size="lg"
-                    @click="prevPage">Back
+                    @click="prevPage('appWallet')">Back
           </b-button>
         </b-col>
       </b-row>
     </b-container>
     <b-container class="ledger"
                  v-if="pageId===2 && method === 'manualInput'">
-      <ManualInput></ManualInput>
+      <ManualInput @import-cold="importCold"
+                   @close-btn="closeModal"></ManualInput>
       <b-row class="row">
         <b-col class="col-back">
           <b-button class="btn-back"
                     block
                     variant="light"
                     size="lg"
-                    @click="prevPage">Back
+                    @click="prevPage('manualInput')">Back
           </b-button>
         </b-col>
       </b-row>
@@ -104,7 +106,6 @@
   </b-modal>
 </template>
 <script>
-import Vue from 'vue'
 import LedgerWallet from '../elements/LedgerWallet'
 import AppWallet from '../elements/AppWallet'
 import ManualInput from '../elements/ManualInput'
@@ -128,6 +129,9 @@ export default {
         }
     },
     methods: {
+        classChoose: function(method) {
+            return this.method === method
+        },
         select: function(type) {
             if (type === 'appWallet') {
                 this.method = 'appWallet'
@@ -167,11 +171,13 @@ export default {
                 }
             } else if (this.method === 'appWallet') {
                 this.pageId++
-                console.log(this.pageId)
                 if (this.pageId > 2) {
                     this.closeModal()
                 }
             }
+        },
+        importCold(coldAddr, coldPubKey, jsonObj) {
+            this.$emit('import-cold', coldAddr, coldPubKey, jsonObj)
         },
         importCancel: function(evt) {
             if (this.qrInit) {
@@ -182,9 +188,11 @@ export default {
             this.pageId = 1
             this.$refs.importModal.hide()
         },
-        prevPage: function() {
+        prevPage: function(method) {
             this.pageId--
-        },
+            this.method = method
+        }
+        /*
         importCold(coldAddress, pubKey, jsonObj) {
             Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : jsonObj)
             let unsortedColdAddresses = this.coldAddresses
@@ -195,7 +203,7 @@ export default {
             this.sortedAddresses = sortedColdAddresses
             this.getBalance(coldAddress)
             this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
-        }
+        } */
     }
 }
 </script>

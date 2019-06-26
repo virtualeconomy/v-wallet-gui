@@ -92,6 +92,8 @@ export default {
     },
     methods: {
         closeModal() {
+            this.qrInit = false
+            this.paused = false
             this.$refs.appWalletModal.hide()
         },
         async onInit(promise) {
@@ -119,7 +121,9 @@ export default {
         onDecode: function(decodeString) {
             this.paused = true
             try {
-                this.jsonObj = JSON.parse(decodeString)
+                var obj = JSON.parse(decodeString)
+                obj.device = 'MobileApp'
+                this.jsonObj = obj
                 this.coldAddress = this.jsonObj.address
                 this.coldPubKey = this.jsonObj.publicKey
                 this.opc = this.jsonObj.opc
@@ -166,7 +170,8 @@ export default {
             return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubKey(this.coldPubKey))
         },
         sendData() {
-            return void 0
+            this.$emit('import-cold', this.coldAddress, this.coldPubKey, this.jsonObj)
+            this.$emit('close-btn')
         }
     }
 }
