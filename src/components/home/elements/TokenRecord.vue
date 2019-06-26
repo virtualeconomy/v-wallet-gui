@@ -114,7 +114,7 @@
                @updateBalance="updateBalance">
     </Supersede>
     <SplitToken :token-id="tokenId"
-                :maker="maker"
+                :issuer="issuer"
                 :address="address"
                 :wallet-type="walletType"
                 :addresses="addresses"
