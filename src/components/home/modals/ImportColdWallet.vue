@@ -26,13 +26,13 @@
         <p class="information">You can select three method to monitor cold wallet.</p>
         <button id="appWallet"
                 @click="select('appWallet')"
-                class="selected">    Mobile Cold Wallet App</button>
+                :class="classChoose('appWallet') ? 'selected' : 'unselected'">    Mobile Cold Wallet App</button>
         <button id="ledgerWallet"
                 @click="select('ledgerWallet')"
-                class="unselected">    Ledger Hardware Device</button>
+                :class="classChoose('ledgerWallet') ? 'selected' : 'unselected'">    Ledger Hardware Device</button>
         <button id="manualInput"
                 @click="select('manualInput')"
-                class="unselected">    Manual Input Address</button>
+                :class="classChoose('manualInput') ? 'selected' : 'unselected'">    Manual Input Address</button>
       </b-container>
       <b-row class="btn-bottom">
         <b-col class="col-lef">
@@ -68,7 +68,7 @@
             block
             variant="light"
             size="lg"
-            @click="prevPage">Back
+            @click="prevPage('ledgerWallet')">Back
           </b-button>
         </b-col>
       </b-row>
@@ -83,7 +83,7 @@
                     block
                     variant="light"
                     size="lg"
-                    @click="prevPage">Back
+                    @click="prevPage('appWallet')">Back
           </b-button>
         </b-col>
       </b-row>
@@ -98,7 +98,7 @@
                     block
                     variant="light"
                     size="lg"
-                    @click="prevPage">Back
+                    @click="prevPage('manualInput')">Back
           </b-button>
         </b-col>
       </b-row>
@@ -129,6 +129,9 @@ export default {
         }
     },
     methods: {
+        classChoose: function(method) {
+            return this.method === method
+        },
         select: function(type) {
             if (type === 'appWallet') {
                 this.method = 'appWallet'
@@ -168,7 +171,6 @@ export default {
                 }
             } else if (this.method === 'appWallet') {
                 this.pageId++
-                console.log(this.pageId)
                 if (this.pageId > 2) {
                     this.closeModal()
                 }
@@ -186,8 +188,9 @@ export default {
             this.pageId = 1
             this.$refs.importModal.hide()
         },
-        prevPage: function() {
+        prevPage: function(method) {
             this.pageId--
+            this.method = method
         }
         /*
         importCold(coldAddress, pubKey, jsonObj) {

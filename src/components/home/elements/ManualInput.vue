@@ -21,8 +21,8 @@
       </b-form-invalid-feedback>
     </b-form-group>
     <b-form-group label="Cold Wallet Public Key"
-                  label-for="pubKey-input">
-      <b-form-input id="pubKey-input"
+                  label-for="pubKey2-input">
+      <b-form-input id="pubKey2-input"
                     class="recipient-input"
                     type="text"
                     :state="isValidColdPubKey(coldPubKey)"
