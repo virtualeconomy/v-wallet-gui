@@ -26,6 +26,18 @@
           <b>Select</b>
         </b-btn>
       </div>
+      <div>
+        <b-alert
+          class="alert"
+          variant="info"
+          :show="dismissCountDown"
+          dismissible
+          @dismissed="dismissCountDown=0"
+          @dismiss-count-down="countDownChanged"
+        >
+          {{ alertMessage }}
+        </b-alert>
+      </div>
     </div>
     <b-form-group label="Cold Wallet Address"
                   label-for="coldAddress-input">
@@ -73,8 +85,13 @@
 </template>
 
 <script>
-import base58 from '@/libs/base58'
+import 'babel-polyfill'
+import { NETWORK_BYTE } from '@/constants.js'
 import crypto from '@/utils/crypto'
+import base58 from '@/libs/base58'
+import TransportU2F from '@ledgerhq/hw-transport-u2f'
+import VsysLedger from '@/utils/vsysLedger'
+
 export default {
     name: 'LedgerWallet',
     data: function() {
@@ -82,7 +99,9 @@ export default {
             coldAddress: '',
             coldPubKey: '',
             addressIndex: 0,
-            device: 'Ledger'
+            device: 'Ledger',
+            alertMessage: '',
+            dismissCountDown: 0
         }
     },
     props: {
@@ -127,8 +146,26 @@ export default {
                 this.addressIndex++
             }
         },
-        selectAddress() {
-            return void 0
+        isSubmitDisabled() {
+            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubKey(this.coldPubKey))
+        },
+        async selectAddress() {
+            this.alertMessage = 'Please confirm address on Ledger device!'
+            this.dismissCountDown = 3
+            const transport = await TransportU2F.create()
+            var app = new VsysLedger(transport, NETWORK_BYTE)
+            var path = '44\'/360\'/' + this.addressIndex + '\'/0/0'
+            const result = await app.getWalletPublicKey(path, true)
+            if (!result || !result['publicKey']) {
+                this.alertMessage = 'Failed to get Public Key! Please make sure Ledger hardware device is connected and entered VSYS app.'
+                this.dismissCountDown = 5
+                return void 0
+            }
+            this.coldPubKey = result['publicKey']
+            this.coldAddress = result['address']
+        },
+        countDownChanged(dismissCountDown) {
+            this.dismissCountDown = dismissCountDown
         },
         sendData() {
             var obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPubKey, 'device': this.device}
@@ -237,5 +274,9 @@ export default {
     color: #FFFFFF;
     letter-spacing: 0;
     text-align: center;
+}
+.alert {
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 </style>
