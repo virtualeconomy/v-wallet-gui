@@ -467,7 +467,7 @@ export default {
             this.contractId = ''
         },
         endSend: function() {
-            for (let delayTime = 6000; delayTime < 150100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 setTimeout(this.sendBalanceChange, delayTime)
             }
             this.$refs.depositTokenModal.hide()
