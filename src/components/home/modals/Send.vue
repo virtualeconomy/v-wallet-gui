@@ -322,15 +322,7 @@
             </b-col>
           </b-row>
         </b-container>
-        <b-container v-if="coldPageId===3 && isLedgerWallet === false"
-                     class="text-left">
-          <ColdSignature :data-object="dataObject"
-                         v-if="coldPageId===3"
-                         @get-signature="getSignature"
-                         @next-page="nextPage"
-                         @prev-page="prevPage"></ColdSignature>
-        </b-container>
-        <b-container v-else-if="coldPageId===3 && isLedgerWallet === true"
+        <b-container v-if="coldPageId===3 && getDevice === 'Ledger'"
                      class="text-left">
           <LedgerConfirm :tx-info="dataObject"
                          :address-info="coldAddressInfo"
@@ -347,6 +339,14 @@
               </b-button>
             </b-col>
           </b-row>
+        </b-container>
+        <b-container v-else-if="coldPageId===3"
+                     class="text-left">
+          <ColdSignature :data-object="dataObject"
+                         v-if="coldPageId===3"
+                         @get-signature="getSignature"
+                         @next-page="nextPage"
+                         @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
           <Confirm :address="coldAddress"
@@ -434,8 +434,7 @@ var initData = {
     timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     coldRecipientAddressList: {},
-    hotRecipientAddressList: {},
-    isLedgerWallet: true
+    hotRecipientAddressList: {}
 }
 export default {
     name: 'Send',
@@ -490,6 +489,12 @@ export default {
         defaultColdAddress() {
             if (this.noColdAddress) return ''
             return Object.keys(this.coldAddresses)[0]
+        },
+        getDevice() {
+            if (this.coldAddressInfo.hasOwnProperty('device')) {
+                return this.coldAddressInfo.device
+            }
+            return ''
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
