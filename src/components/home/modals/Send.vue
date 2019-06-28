@@ -322,7 +322,7 @@
             </b-col>
           </b-row>
         </b-container>
-        <b-container v-if="coldPageId===3 && isLedgerWallet === false"
+        <b-container v-if="coldPageId===3 && getDevice !== 'Ledger'"
                      class="text-left">
           <ColdSignature :data-object="dataObject"
                          v-if="coldPageId===3"
@@ -330,14 +330,14 @@
                          @next-page="nextPage"
                          @prev-page="prevPage"></ColdSignature>
         </b-container>
-        <b-container v-else-if="coldPageId===3 && isLedgerWallet === true"
+        <b-container v-else-if="coldPageId===3 && getDevice === 'Ledger'"
                      class="text-left">
           <LedgerConfirm :address="coldAddress"
                          :recipient="coldRecipient"
                          :amount=inputAmount(coldAmount)
                          :fee="coldFee"
                          :attachment="coldAttachment"
-                         :tx-type="'Payment'"></LedgerConfirm>
+                         :tx-type="'payment'"></LedgerConfirm>
           <b-row class="row">
             <b-col class="col-back">
               <b-button
@@ -436,8 +436,7 @@ var initData = {
     timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     coldRecipientAddressList: {},
-    hotRecipientAddressList: {},
-    isLedgerWallet: false
+    hotRecipientAddressList: {}
 }
 export default {
     name: 'Send',
@@ -492,6 +491,12 @@ export default {
         defaultColdAddress() {
             if (this.noColdAddress) return ''
             return Object.keys(this.coldAddresses)[0]
+        },
+        getDevice() {
+            if (this.coldAddresses && this.coldAddresses[this.coldAddress] && this.coldAddresses[this.coldAddress].hasOwnProperty('device')) {
+                return this.coldAddresses[this.coldAddress].device
+            }
+            return ''
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))

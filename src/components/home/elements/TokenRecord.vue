@@ -259,6 +259,12 @@ export default {
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.seedaddress))
         },
+        getDevice() {
+            if (this.coldAddresses && this.coldAddresses[this.address] && this.coldAddresses[this.address].hasOwnProperty('device')) {
+                return this.coldAddresses[this.address].device
+            }
+            return ''
+        },
         seedaddress() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
@@ -371,33 +377,60 @@ export default {
             this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
         },
         sendToken() {
-            this.getTokenBalances()
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId)
+            if (this.getDevice && this.getDevice === 'Ledger') {
+                confirm('This feature is not supported')
+            } else {
+                this.getTokenBalances()
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId)
+            }
         },
         supersede() {
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'supersedeModal_' + this.tokenId)
+            if (this.getDevice && this.getDevice === 'Ledger') {
+                confirm('This feature is not supported')
+            } else {
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'supersedeModal_' + this.tokenId)
+            }
         },
         splitToken() {
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'splitTokenModal_' + this.tokenId)
+            if (this.getDevice && this.getDevice === 'Ledger') {
+                confirm('This feature is not supported')
+            } else {
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'splitTokenModal_' + this.tokenId)
+            }
         },
         issueToken() {
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)
+            if (this.getDevice && this.getDevice === 'Ledger') {
+                confirm('This feature is not supported')
+            } else {
+                this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)
+            }
         },
         withdrawToken() {
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'withdrawTokenModal_' + this.tokenId)
+            if (this.getDevice && this.getDevice === 'Ledger') {
+                confirm('This feature is not supported')
+            } else {
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'withdrawTokenModal_' + this.tokenId)
+            }
         },
         burnToken() {
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'burnTokenModal_' + this.tokenId)
+            if (this.getDevice && this.getDevice === 'Ledger') {
+                confirm('This feature is not supported')
+            } else {
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'burnTokenModal_' + this.tokenId)
+            }
         },
         depositToken() {
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'depositTokenModal_' + this.tokenId)
+            if (this.getDevice && this.getDevice === 'Ledger') {
+                confirm('This feature is not supported')
+            } else {
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'depositTokenModal_' + this.tokenId)
+            }
         },
         removeToken() {
             var isRemove = confirm('Are you sure to remove this token?')

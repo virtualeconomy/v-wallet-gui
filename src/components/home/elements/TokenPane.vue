@@ -26,7 +26,7 @@
     <div class="col align-self-center text-right">
       <b-button variant="white"
                 class="btn-creat"
-                v-b-modal.newTokenModal>
+                @click="createToken">
         <img v-if="!isMobile"
              class="icon-btn"
              src="@/assets/imgs/icons/wallet/ic_new_token_yellow.svg"><b>Create Token</b></b-button>
@@ -121,6 +121,14 @@ export default {
             require: true
         }
     },
+    computed: {
+        getDevice() {
+            if (this.coldAddresses && this.coldAddresses[this.address] && this.coldAddresses[this.address].hasOwnProperty('device')) {
+                return this.coldAddresses[this.address].device
+            }
+            return ''
+        }
+    },
     methods: {
         formatter(num) {
             return browser.bigNumberFormatter(num)
@@ -130,6 +138,13 @@ export default {
         },
         endSendSignal() {
             this.$emit('updateInfo')
+        },
+        createToken() {
+            if (this.getDevice && this.getDevice === 'Ledger') {
+                confirm('This feature is not supported')
+            } else {
+                this.$root.$emit('bv::show::modal', 'newTokenModal')
+            }
         }
     }
 }
