@@ -25,14 +25,9 @@
       <b-form-input id="pubKey2-input"
                     class="recipient-input"
                     type="text"
-                    :state="isValidColdPubKey(coldPubKey)"
                     v-model="coldPubKey"
-                    aria-describedby="inputLiveFeedback"
                     placeholder="Please input public key of cold wallet">
       </b-form-input>
-      <b-form-invalid-feedback id="inputLiveFeedback">
-        Invalid Public Key
-      </b-form-invalid-feedback>
     </b-form-group>
     <b-row class="row">
       <b-col class="col-lef">
@@ -43,7 +38,7 @@
           class="btn-confirm"
           variant="warning"
           size="lg"
-          :disabled="isSubmitDisabled()"
+          :disabled="!isValidColdAddress(coldAddress)"
           @click="sendData">Confirm
         </b-button>
       </b-col>
@@ -53,7 +48,6 @@
 
 <script>
 import crypto from '@/utils/crypto'
-import base58 from '@/libs/base58'
 export default {
     name: 'ManualInput',
     data: function() {
@@ -84,16 +78,6 @@ export default {
                 console.log(e)
             }
             return isValid
-        },
-        isValidColdPubKey: function(pubkey) {
-            if (!pubkey) {
-                return void 0
-            }
-            var pubkeyArr = base58.decode(pubkey)
-            return pubkeyArr && pubkeyArr.length === 32
-        },
-        isSubmitDisabled() {
-            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubKey(this.coldPubKey))
         },
         sendData() {
             var obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPubKey, 'device': this.device}

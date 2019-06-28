@@ -27,7 +27,7 @@
                       :selected-address="selectedAddress"
                       :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="pageId===2">
-            <Confirm :tx-type="'Lease'"
+            <Confirm :tx-type="'lease'"
                      :amount=inputAmount(amount)
                      :address="address"
                      :recipient="recipient"
@@ -103,10 +103,33 @@
               </b-col>
             </b-row>
           </b-container>
-          <ColdSignature :data-object="dataObject"
-                         v-if="coldPageId===3"
-                         @get-signature="getSignature"
-                         @prev-page="prevColdPage"></ColdSignature>
+          <b-container v-if="coldPageId===3 && getDevice !== 'Ledger'"
+                       class="text-left">
+            <ColdSignature :data-object="dataObject"
+                           v-if="coldPageId===3"
+                           @get-signature="getSignature"
+                           @prev-page="prevColdPage"></ColdSignature>
+          </b-container>
+          <b-container v-else-if="coldPageId===3 && getDevice === 'Ledger'"
+                       class="text-left">
+            <LedgerConfirm :address="coldAddress"
+                           :recipient="coldRecipient"
+                           :amount=inputAmount(coldAmount)
+                           :fee="fee"
+                           :attachment="attachment"
+                           :tx-type="'lease'"></LedgerConfirm>
+            <b-row class="row">
+              <b-col class="col-back">
+                <b-button
+                  class="btn-back"
+                  block
+                  variant="light"
+                  size="lg"
+                  @click="prevColdPage">Back
+                </b-button>
+              </b-col>
+            </b-row>
+          </b-container>
           <b-container v-else-if="coldPageId===4">
             <Confirm :tx-type="'Lease'"
                      :amount=inputAmount(coldAmount)
@@ -167,9 +190,10 @@ import LeaseSuccess from './LeaseSuccess'
 import TxInfoModal from '../elements/TxInfoModal'
 import BigNumber from 'bignumber.js'
 import JSONBigNumber from 'json-bignumber'
+import LedgerConfirm from './LedgerConfirm'
 export default {
     name: 'Lease',
-    components: { LeaseSuccess, Confirm, LeaseInput, ColdSignature, TxInfoModal },
+    components: { LeaseSuccess, Confirm, LeaseInput, ColdSignature, TxInfoModal, LedgerConfirm },
     data: function() {
         return {
             amount: BigNumber(0),
@@ -190,7 +214,8 @@ export default {
             timestamp: 0,
             hasConfirmed: false,
             isRaisingLease: 'true',
-            errorMessage: ''
+            errorMessage: '',
+            attachment: ''
         }
     },
     props: {
@@ -230,6 +255,12 @@ export default {
         },
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+        },
+        getDevice() {
+            if (this.coldAddresses && this.coldAddresses[this.coldAddress] && this.coldAddresses[this.coldAddress].hasOwnProperty('device')) {
+                return this.coldAddresses[this.coldAddress].device
+            }
+            return ''
         },
         dataObject() {
             return {
@@ -398,6 +429,25 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.col-back {
+    padding-left: 10px;
+    margin-top: -70px;
+    margin-right: 230px;
+    margin-left: 5px;
+}
+.row {
+    margin-top: 26px;
+    margin-bottom: 10px;
+}
+.btn-back {
+    background: #FAFAFA;
+    border: 1px solid #E8E9ED;
+    border-radius: 4px;
+    font-size: 17px;
+    color: #4F515E;
+    letter-spacing: 0;
+    text-align: center;
 }
 
 </style>

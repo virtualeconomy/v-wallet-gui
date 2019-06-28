@@ -46,8 +46,8 @@
       <b-form-input id="pubKey-input"
                     class="recipient-input"
                     type="text"
-                    :state="isValidColdPubKey(coldPubKey)"
                     v-model="coldPubKey"
+                    :state="isValidColdPubKey(coldPubKey)"
                     aria-describedby="inputLiveFeedback"
                     placeholder="Retrieve public key of cold wallet from device">
       </b-form-input>
@@ -73,8 +73,8 @@
 </template>
 
 <script>
-import crypto from '@/utils/crypto'
 import base58 from '@/libs/base58'
+import crypto from '@/utils/crypto'
 export default {
     name: 'LedgerWallet',
     data: function() {
@@ -107,6 +107,9 @@ export default {
             }
             return isValid
         },
+        isSubmitDisabled() {
+            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubKey(this.coldPubKey))
+        },
         isValidColdPubKey: function(pubKey) {
             if (!pubKey) {
                 return void 0
@@ -123,9 +126,6 @@ export default {
             if (this.addressIndex < 10) {
                 this.addressIndex++
             }
-        },
-        isSubmitDisabled() {
-            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubKey(this.coldPubKey))
         },
         selectAddress() {
             return void 0
