@@ -47,8 +47,13 @@
                     class="recipient-input"
                     type="text"
                     v-model="coldPubKey"
+                    :state="isValidColdPubKey(coldPubKey)"
+                    aria-describedby="inputLiveFeedback"
                     placeholder="Retrieve public key of cold wallet from device">
       </b-form-input>
+      <b-form-invalid-feedback id="inputLiveFeedback">
+        Invalid Public Key
+      </b-form-invalid-feedback>
     </b-form-group>
     <b-row class="row">
       <b-col class="col-lef">
@@ -59,7 +64,7 @@
           class="btn-confirm"
           variant="warning"
           size="lg"
-          :disabled="!isValidColdAddress(coldAddress)"
+          :disabled="isSubmitDisabled()"
           @click="sendData">Confirm
         </b-button>
       </b-col>
@@ -68,6 +73,7 @@
 </template>
 
 <script>
+import base58 from '@/libs/base58'
 import crypto from '@/utils/crypto'
 export default {
     name: 'LedgerWallet',
@@ -100,6 +106,16 @@ export default {
                 console.log(e)
             }
             return isValid
+        },
+        isSubmitDisabled() {
+            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubKey(this.coldPubKey))
+        },
+        isValidColdPubKey: function(pubKey) {
+            if (!pubKey) {
+                return void 0
+            }
+            var pubKeyArr = base58.decode(pubKey)
+            return pubKeyArr && pubKeyArr.length === 32
         },
         minus() {
             if (this.addressIndex > 0) {

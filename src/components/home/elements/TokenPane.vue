@@ -140,8 +140,8 @@ export default {
             this.$emit('updateInfo')
         },
         createToken() {
-            if (this.getDevice && this.getDevice === 'Ledger') {
-                confirm('This feature is not supported')
+            if (this.getDevice === 'Ledger') {
+                alert('This feature is not supported')
             } else {
                 this.$root.$emit('bv::show::modal', 'newTokenModal')
             }
