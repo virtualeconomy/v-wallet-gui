@@ -78,14 +78,8 @@ export default {
                 this.dismissCountDown = 10
                 return void 0
             }
-            const txData = {
-                recipient: this.txInfo['recipient'],
-                amount: this.txInfo['amount'],
-                fee: this.txInfo['fee'],
-                feeScale: this.txInfo['feeScale'],
-                timestamp: this.txInfo['timestamp'] * 1e6,
-                attachment: this.txInfo['attachment']
-            }
+            var txData = JSON.parse(JSON.stringify(this.txInfo)) // clone object
+            txData['timestamp'] = this.txInfo['timestamp'] * 1e6
             var dataBytes = transaction.toBytes(txData, this.txInfo['transactionType'])
             var path = this.addressInfo['path']
             this.alertMessage = 'Please confirm transaction on Ledger device!'

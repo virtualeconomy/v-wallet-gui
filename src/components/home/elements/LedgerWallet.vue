@@ -150,9 +150,6 @@ export default {
                 this.addressIndex++
             }
         },
-        isSubmitDisabled() {
-            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubKey(this.coldPubKey))
-        },
         async selectAddress() {
             this.alertMessage = 'Please confirm address on Ledger device!'
             this.dismissCountDown = 3

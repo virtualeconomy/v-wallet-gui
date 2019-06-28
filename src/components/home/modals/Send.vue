@@ -322,15 +322,7 @@
             </b-col>
           </b-row>
         </b-container>
-        <b-container v-if="coldPageId===3 && getDevice !== 'Ledger'"
-                     class="text-left">
-          <ColdSignature :data-object="dataObject"
-                         v-if="coldPageId===3"
-                         @get-signature="getSignature"
-                         @next-page="nextPage"
-                         @prev-page="prevPage"></ColdSignature>
-        </b-container>
-        <b-container v-else-if="coldPageId===3 && getDevice === 'Ledger'"
+        <b-container v-if="coldPageId===3 && getDevice === 'Ledger'"
                      class="text-left">
           <LedgerConfirm :tx-info="dataObject"
                          :address-info="coldAddressInfo"
@@ -347,6 +339,14 @@
               </b-button>
             </b-col>
           </b-row>
+        </b-container>
+        <b-container v-else-if="coldPageId===3"
+                     class="text-left">
+          <ColdSignature :data-object="dataObject"
+                         v-if="coldPageId===3"
+                         @get-signature="getSignature"
+                         @next-page="nextPage"
+                         @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
           <Confirm :address="coldAddress"
@@ -491,8 +491,8 @@ export default {
             return Object.keys(this.coldAddresses)[0]
         },
         getDevice() {
-            if (this.coldAddresses && this.coldAddresses[this.coldAddress] && this.coldAddresses[this.coldAddress].hasOwnProperty('device')) {
-                return this.coldAddresses[this.coldAddress].device
+            if (this.coldAddressInfo.hasOwnProperty('device')) {
+                return this.coldAddressInfo.device
             }
             return ''
         },
