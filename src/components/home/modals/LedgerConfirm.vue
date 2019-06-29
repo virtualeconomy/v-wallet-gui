@@ -1,5 +1,17 @@
 <template>
   <div>
+    <div>
+      <b-alert
+        class="alert"
+        variant="info"
+        :show="dismissCountDown"
+        dismissible
+        @dismissed="dismissCountDown=0"
+        @dismiss-count-down="countDownChanged"
+      >
+        {{ alertMessage }}
+      </b-alert>
+    </div>
     <div class="text-input">
       1.Connect Ledger hardware device with USB
       <br>
@@ -29,49 +41,56 @@
   </div>
 </template>
 <script>
-import BigNumber from 'bignumber.js'
-import { TX_FEE } from '@/constants.js'
+import { NETWORK_BYTE, PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '@/constants.js'
+import transaction from '@/utils/transaction'
+import TransportU2F from '@ledgerhq/hw-transport-u2f'
+import VsysLedger from '@/utils/vsysLedger'
 
 export default {
     name: 'LedgerConfirm',
+    data: function() {
+        return {
+            alertMessage: '',
+            dismissCountDown: 0
+        }
+    },
     props: {
-        address: {
-            type: String,
+        txInfo: {
+            type: Object,
             require: true,
-            default: ''
+            default: function() {}
         },
-        recipient: {
-            type: String,
+        addressInfo: {
+            type: Object,
             require: true,
-            default: ''
-        },
-        amount: {
-            type: BigNumber,
-            require: true,
-            default: function() {
-                return BigNumber(0)
-            }
-        },
-        fee: {
-            type: BigNumber,
-            require: true,
-            default: function() {
-                return BigNumber(TX_FEE)
-            }
-        },
-        attachment: {
-            type: String,
-            default: ''
-        },
-        txType: {
-            type: String,
-            require: true,
-            default: ''
+            default: function() {}
         }
     },
     methods: {
-        sendData() {
-            return void 0
+        async sendData() {
+            if (!this.txInfo || !this.supportedTxType(this.txInfo['transactionType'])) {
+                this.alertMessage = 'Unknown Transaction !'
+                this.dismissCountDown = 10
+                return void 0
+            }
+            if (!this.addressInfo || !this.addressInfo['path']) {
+                this.alertMessage = 'Invalid Ledger address data! Please remove the address and monitor it again.'
+                this.dismissCountDown = 10
+                return void 0
+            }
+            var txData = JSON.parse(JSON.stringify(this.txInfo)) // clone object
+            txData['timestamp'] = this.txInfo['timestamp'] * 1e6
+            var dataBytes = transaction.toBytes(txData, this.txInfo['transactionType'])
+            var path = this.addressInfo['path']
+            this.alertMessage = 'Please confirm transaction on Ledger device!'
+            this.dismissCountDown = 3
+            const transport = await TransportU2F.create()
+            var ledger = new VsysLedger(transport, NETWORK_BYTE)
+            var signature = await ledger.signTransaction(path, dataBytes)
+            this.$emit('get-signature', signature)
+        },
+        supportedTxType(type) {
+            return type === PAYMENT_TX || type === LEASE_TX || type === CANCEL_LEASE_TX
         }
     }
 }

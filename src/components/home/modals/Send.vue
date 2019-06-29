@@ -322,22 +322,12 @@
             </b-col>
           </b-row>
         </b-container>
-        <b-container v-if="coldPageId===3 && getDevice !== 'Ledger'"
+        <b-container v-if="coldPageId===3 && getDevice === 'Ledger'"
                      class="text-left">
-          <ColdSignature :data-object="dataObject"
-                         v-if="coldPageId===3"
+          <LedgerConfirm :tx-info="dataObject"
+                         :address-info="coldAddressInfo"
                          @get-signature="getSignature"
-                         @next-page="nextPage"
-                         @prev-page="prevPage"></ColdSignature>
-        </b-container>
-        <b-container v-else-if="coldPageId===3 && getDevice === 'Ledger'"
-                     class="text-left">
-          <LedgerConfirm :address="coldAddress"
-                         :recipient="coldRecipient"
-                         :amount=inputAmount(coldAmount)
-                         :fee="coldFee"
-                         :attachment="coldAttachment"
-                         :tx-type="'payment'"></LedgerConfirm>
+                         @prev-page="prevPage"></LedgerConfirm>
           <b-row class="row">
             <b-col class="col-back">
               <b-button
@@ -349,6 +339,14 @@
               </b-button>
             </b-col>
           </b-row>
+        </b-container>
+        <b-container v-else-if="coldPageId===3"
+                     class="text-left">
+          <ColdSignature :data-object="dataObject"
+                         v-if="coldPageId===3"
+                         @get-signature="getSignature"
+                         @next-page="nextPage"
+                         @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
           <Confirm :address="coldAddress"
@@ -493,8 +491,8 @@ export default {
             return Object.keys(this.coldAddresses)[0]
         },
         getDevice() {
-            if (this.coldAddresses && this.coldAddresses[this.coldAddress] && this.coldAddresses[this.coldAddress].hasOwnProperty('device')) {
-                return this.coldAddresses[this.coldAddress].device
+            if (this.coldAddressInfo.hasOwnProperty('device')) {
+                return this.coldAddressInfo.device
             }
             return ''
         },
@@ -514,13 +512,20 @@ export default {
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
+        coldAddressInfo() {
+            if (this.coldAddresses.hasOwnProperty(this.coldAddress)) {
+                return this.coldAddresses[this.coldAddress]
+            } else {
+                return {'api': 1, 'publicKey': '', 'device': 'unknown'}
+            }
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
                 api: this.coldApi(),
                 opc: OPC_TRANSACTION,
                 transactionType: PAYMENT_TX,
-                senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
+                senderPublicKey: this.coldAddressInfo.publicKey,
                 amount: BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).toFixed(0),
                 fee: this.coldFee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
@@ -547,7 +552,7 @@ export default {
             return BigNumber(num)
         },
         coldApi: function() {
-            if (this.coldAddresses[this.coldAddress].api === 1 && (BigNumber(this.coldAmount).isLessThan(BigNumber(Number.MAX_SAFE_INTEGER).dividedBy(1e8)) || BigNumber(this.coldAmount).multipliedBy(1e8).mod(100).isEqualTo(0))) {
+            if (this.coldAddressInfo.api === 1 && (BigNumber(this.coldAmount).isLessThan(BigNumber(Number.MAX_SAFE_INTEGER).dividedBy(1e8)) || BigNumber(this.coldAmount).multipliedBy(1e8).mod(100).isEqualTo(0))) {
                 return 1
             } else {
                 return API_VERSION
@@ -570,7 +575,7 @@ export default {
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress].publicKey, PAYMENT_TX)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddressInfo.publicKey, PAYMENT_TX)
             }
             const url = NODE_IP + '/vsys/broadcast/payment'
             apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') //  The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.

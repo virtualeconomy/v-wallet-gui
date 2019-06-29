@@ -103,21 +103,12 @@
               </b-col>
             </b-row>
           </b-container>
-          <b-container v-if="coldPageId===3 && getDevice !== 'Ledger'"
+          <b-container v-if="coldPageId===3 && getDevice === 'Ledger'"
                        class="text-left">
-            <ColdSignature :data-object="dataObject"
-                           v-if="coldPageId===3"
+            <LedgerConfirm :tx-info="dataObject"
+                           :address-info="coldAddressInfo"
                            @get-signature="getSignature"
-                           @prev-page="prevColdPage"></ColdSignature>
-          </b-container>
-          <b-container v-else-if="coldPageId===3 && getDevice === 'Ledger'"
-                       class="text-left">
-            <LedgerConfirm :address="coldAddress"
-                           :recipient="coldRecipient"
-                           :amount=inputAmount(coldAmount)
-                           :fee="fee"
-                           :attachment="attachment"
-                           :tx-type="'lease'"></LedgerConfirm>
+                           @prev-page="prevPage"></LedgerConfirm>
             <b-row class="row">
               <b-col class="col-back">
                 <b-button
@@ -129,6 +120,13 @@
                 </b-button>
               </b-col>
             </b-row>
+          </b-container>
+          <b-container v-else-if="coldPageId===3"
+                       class="text-left">
+            <ColdSignature :data-object="dataObject"
+                           v-if="coldPageId===3"
+                           @get-signature="getSignature"
+                           @prev-page="prevColdPage"></ColdSignature>
           </b-container>
           <b-container v-else-if="coldPageId===4">
             <Confirm :tx-type="'Lease'"
@@ -257,8 +255,8 @@ export default {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
         getDevice() {
-            if (this.coldAddresses && this.coldAddresses[this.coldAddress] && this.coldAddresses[this.coldAddress].hasOwnProperty('device')) {
-                return this.coldAddresses[this.coldAddress].device
+            if (this.coldAddressInfo.hasOwnProperty('device')) {
+                return this.coldAddressInfo.device
             }
             return ''
         },
@@ -284,6 +282,13 @@ export default {
         },
         defaultColdAddress() {
             return this.noColdAddress ? '' : Object.keys(this.coldAddresses)[0]
+        },
+        coldAddressInfo() {
+            if (this.coldAddresses.hasOwnProperty(this.coldAddress)) {
+                return this.coldAddresses[this.coldAddress]
+            } else {
+                return {'api': 1, 'publicKey': '', 'device': 'unknown'}
+            }
         }
     },
     methods: {

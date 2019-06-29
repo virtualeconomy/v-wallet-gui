@@ -59,21 +59,12 @@
     <b-container v-else-if="page==='success'">
       <CancelSuccess @show-details="showDetails"></CancelSuccess>
     </b-container>
-    <b-container v-else-if="page==='cold' && getDevice!=='Ledger'"
-                 class="text-left">
-      <ColdSignature :data-object="dataObject"
-                     @get-signature="getSignature"
-                     @prev-page="prevPage"
-                     :tx-type="txType"></ColdSignature>
-    </b-container>
     <b-container v-else-if="page==='cold' && getDevice==='Ledger'"
                  class="text-left">
-      <LedgerConfirm :address="address"
-                     :recipient="recipient"
-                     :amount=amount
-                     :fee="fee"
-                     :attachment="attachment"
-                     :tx-type="'Cancel lease'"></LedgerConfirm>
+      <LedgerConfirm :tx-info="dataObject"
+                     :address-info="coldAddressInfo"
+                     @get-signature="getSignature"
+                     @prev-page="prevPage"></LedgerConfirm>
       <b-row class="row">
         <b-col class="col-back">
           <b-button
@@ -85,6 +76,13 @@
           </b-button>
         </b-col>
       </b-row>
+    </b-container>
+    <b-container v-else-if="page==='cold'"
+                 class="text-left">
+      <ColdSignature :data-object="dataObject"
+                     @get-signature="getSignature"
+                     @prev-page="prevPage"
+                     :tx-type="txType"></ColdSignature>
     </b-container>
   </b-modal>
 </template>
@@ -204,13 +202,20 @@ export default {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
         getDevice() {
-            if (this.userInfo && this.userInfo.coldAddresses) {
-                var object = JSON.parse(this.userInfo.coldAddresses)
-                if (object[this.fromAddress] && object[this.fromAddress].hasOwnProperty('device')) {
-                    return object[this.fromAddress].device
-                }
+            if (this.coldAddressInfo.hasOwnProperty('device')) {
+                return this.coldAddressInfo.device
             }
             return ''
+        },
+        coldAddressInfo() {
+            var addrInfo  = {'api': 1, 'publicKey': '', 'device': 'unknown'}
+            if (this.userInfo && this.userInfo.hasOwnProperty('coldAddresses')) {
+                var object = JSON.parse(this.userInfo.coldAddresses)
+                if (object.hasOwnProperty(this.fromAddress)) {
+                    addrInfo = object[this.fromAddress]
+                }   
+            }
+            return addrInfo
         }
     },
     methods: {
