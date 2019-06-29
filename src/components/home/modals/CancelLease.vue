@@ -206,8 +206,8 @@ export default {
         getDevice() {
             if (this.userInfo && this.userInfo.coldAddresses) {
                 var object = JSON.parse(this.userInfo.coldAddresses)
-                if (object[this.address] && object[this.address].hasOwnProperty('device')) {
-                    return object[this.address].device
+                if (object[this.fromAddress] && object[this.fromAddress].hasOwnProperty('device')) {
+                    return object[this.fromAddress].device
                 }
             }
             return ''
