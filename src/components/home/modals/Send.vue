@@ -516,7 +516,7 @@ export default {
             if (this.coldAddresses.hasOwnProperty(this.coldAddress)) {
                 return this.coldAddresses[this.coldAddress]
             } else {
-                return {'api': 1, 'publicKey': ''}
+                return {'api': 1, 'publicKey': '', 'device': 'unknown'}
             }
         },
         dataObject() {
