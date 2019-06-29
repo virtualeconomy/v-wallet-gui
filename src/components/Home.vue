@@ -357,15 +357,23 @@ export default {
             })
         },
         importCold(coldAddress, pubKey, jsonObj) {
-            Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : jsonObj)
-            let unsortedColdAddresses = this.coldAddresses
-            let sortedColdAddresses = {}
-            Object.keys(unsortedColdAddresses).sort().forEach(function(key) {
-                sortedColdAddresses[key] = unsortedColdAddresses[key]
-            })
-            this.sortedAddresses = sortedColdAddresses
-            this.getBalance(coldAddress)
-            this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
+            var coldAddrs = {}
+            if (this.userInfo && this.userInfo.coldAddresses) {
+                coldAddrs = JSON.parse(this.userInfo.coldAddresses)
+            }
+            if (coldAddrs && coldAddrs[coldAddress]) {
+                alert('Address already exist')
+            } else {
+                Vue.set(this.coldAddresses, coldAddress, jsonObj)
+                let unsortedColdAddresses = this.coldAddresses
+                let sortedColdAddresses = {}
+                Object.keys(unsortedColdAddresses).sort().forEach(function(key) {
+                    sortedColdAddresses[key] = unsortedColdAddresses[key]
+                })
+                this.sortedAddresses = sortedColdAddresses
+                this.getBalance(coldAddress)
+                this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
+            }
         },
         getSeedPhrase() {
             if (this.secretInfo) {

@@ -159,7 +159,6 @@
 
 <script>
 import TxInfoModal from './TxInfoModal'
-import Vue from 'vue'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import crypto from '@/utils/crypto'
@@ -225,21 +224,6 @@ export default {
         }
     },
     computed: {
-        defaultAddress() {
-            return Vue.ls.get('address')
-        },
-        userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.defaultAddress))
-        },
-        getDevice() {
-            if (this.userInfo && this.userInfo.coldAddresses) {
-                var object = JSON.parse(this.userInfo.coldAddresses)
-                if (object[this.address] && object[this.address].hasOwnProperty('device')) {
-                    return object[this.address].device
-                }
-            }
-            return ''
-        },
         selfSend() {
             if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === true) {
                 return 'selfSend'
@@ -420,11 +404,7 @@ export default {
             this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.transType + this.txRecord.id + this.selfSend)
         },
         cancelLeasing() {
-            if (this.getDevice === 'Ledger') {
-                alert('This feature is not supported')
-            } else {
-                this.$root.$emit('bv::show::modal', 'cancelLeaseModal_' + this.txRecord.id)
-            }
+            this.$root.$emit('bv::show::modal', 'cancelLeaseModal_' + this.txRecord.id)
         },
         showDetails(cancelTime) {
             this.cancelTime = cancelTime
