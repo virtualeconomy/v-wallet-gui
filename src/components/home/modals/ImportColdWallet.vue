@@ -192,18 +192,6 @@ export default {
             this.pageId--
             this.method = method
         }
-        /*
-        importCold(coldAddress, pubKey, jsonObj) {
-            Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : jsonObj)
-            let unsortedColdAddresses = this.coldAddresses
-            let sortedColdAddresses = {}
-            Object.keys(unsortedColdAddresses).sort().forEach(function(key) {
-                sortedColdAddresses[key] = unsortedColdAddresses[key]
-            })
-            this.sortedAddresses = sortedColdAddresses
-            this.getBalance(coldAddress)
-            this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
-        } */
     }
 }
 </script>

@@ -59,11 +59,32 @@
     <b-container v-else-if="page==='success'">
       <CancelSuccess @show-details="showDetails"></CancelSuccess>
     </b-container>
-    <b-container v-else-if="page==='cold'">
+    <b-container v-else-if="page==='cold' && getDevice!=='Ledger'"
+                 class="text-left">
       <ColdSignature :data-object="dataObject"
                      @get-signature="getSignature"
                      @prev-page="prevPage"
                      :tx-type="txType"></ColdSignature>
+    </b-container>
+    <b-container v-else-if="page==='cold' && getDevice==='Ledger'"
+                 class="text-left">
+      <LedgerConfirm :address="address"
+                     :recipient="recipient"
+                     :amount=amount
+                     :fee="fee"
+                     :attachment="attachment"
+                     :tx-type="'Cancel lease'"></LedgerConfirm>
+      <b-row class="row">
+        <b-col class="col-back">
+          <b-button
+            class="btn-back"
+            block
+            variant="light"
+            size="lg"
+            @click="prevPage">Back
+          </b-button>
+        </b-col>
+      </b-row>
     </b-container>
   </b-modal>
 </template>
@@ -79,9 +100,10 @@ import seedLib from '@/libs/seed'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
+import LedgerConfirm from './LedgerConfirm'
 export default {
     name: 'CancelLease',
-    components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm },
+    components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm, LedgerConfirm },
     data: function() {
         return {
             errorMessage: '',
@@ -91,7 +113,8 @@ export default {
             sendError: false,
             signed: false,
             txType: CANCEL_LEASE_TX,
-            hasConfirmed: false
+            hasConfirmed: false,
+            attachment: ''
         }
     },
     props: {
@@ -179,6 +202,15 @@ export default {
         },
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+        },
+        getDevice() {
+            if (this.userInfo && this.userInfo.coldAddresses) {
+                var object = JSON.parse(this.userInfo.coldAddresses)
+                if (object[this.fromAddress] && object[this.fromAddress].hasOwnProperty('device')) {
+                    return object[this.fromAddress].device
+                }
+            }
+            return ''
         }
     },
     methods: {
@@ -335,5 +367,15 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.col-back {
+    padding-left: 10px;
+    margin-top: -70px;
+    margin-right: 230px;
+    margin-left: 5px;
+}
+.row {
+    margin-top: 26px;
+    margin-bottom: 10px;
 }
 </style>
