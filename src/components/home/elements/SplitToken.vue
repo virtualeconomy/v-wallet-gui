@@ -20,16 +20,16 @@
         <b-container
           class="text-left"
           v-if="pageId===1">
-          <b-form-group label="Maker Wallet Address"
+          <b-form-group label="Issuer Wallet Address"
                         label-for="address-input">
             <b-form-input id=address-input
                           class="address-input"
                           readonly
-                          v-model="address"
-                          :state="isValidMaker(address)"
+                          v-model="issuer"
+                          :state="isValidIssuer(address)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Cannot split token. You are not maker of this token.
+              Cannot split token. You are not issuer of this token.
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
@@ -134,17 +134,17 @@
             <b-form-input id=coldAddress-input
                           class="address-input"
                           readonly
-                          v-model="address"
-                          :state="isValidMaker(address)"
+                          v-model="issuer"
+                          :state="isValidIssuer(address)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Cannot split token. You are not maker of this token.
+              Cannot split token. You are not issuer of this token.
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
             <div class="unity">Current Unity {{ tokenUnity.toString() }}</div>
           </b-form-group>
-          <b-form-group label="New Issuer"
+          <b-form-group label="New Unity"
                         label-for="cold-amount-input">
             <b-form-input id="cold-recipient-input"
                           class="recipient-input"
@@ -350,7 +350,7 @@ export default {
             default: '',
             require: true
         },
-        maker: {
+        issuer: {
             type: String,
             default: '',
             require: true
@@ -409,11 +409,11 @@ export default {
         coldApi: function() {
             return API_VERSION
         },
-        isValidMaker: function(addr) {
-            return addr === this.maker
+        isValidIssuer: function(addr) {
+            return addr === this.issuer
         },
         isSubmitDisabled() {
-            return !(this.isValidMaker(this.address) && this.isValidUnity() && !this.isInsufficient() && this.isSplit)
+            return !(this.isValidIssuer(this.address) && this.isValidUnity() && !this.isInsufficient() && this.isSplit)
         },
         isBiggerThanMax() {
             var maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
@@ -429,7 +429,7 @@ export default {
             return BigNumber(this.newUnity).isInteger()
         },
         isValidUnity() {
-            if (BigNumber(this.newUnity).isEqualTo(0) && !this.isInsufficient()) {
+            if (BigNumber(this.newUnity).isEqualTo(0)) {
                 return void 0
             }
             return this.isNumFormatValid(this.newUnity) && !this.isBiggerThanMax() && !this.isNegative(this.newUnity) && this.isInteger()
@@ -440,7 +440,6 @@ export default {
                 if (this.hasConfirmed) {
                     return
                 }
-                this.hasConfirmed = true
                 this.fee = BigNumber(CONTRACT_EXEC_FEE)
                 this.feeScale = FEE_SCALE
                 const dataInfo = {
@@ -471,6 +470,7 @@ export default {
             this.$http.post(url, apiSchema).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
+                    this.hasConfirmed = true
                 } else {
                     this.coldPageId++
                 }
@@ -515,7 +515,7 @@ export default {
             this.coldSignature = ''
         },
         endSend: function() {
-            for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 setTimeout(this.sendBalanceChange, delayTime)
             }
             this.$refs.splitTokenModal.hide()

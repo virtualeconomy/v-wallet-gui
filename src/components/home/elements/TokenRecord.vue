@@ -103,18 +103,18 @@
                   :is-split="isSplit"
                   @updateBalance="updateBalance">
     </DepositToken>
-    <Supersede :token-id="tokenId"
+    <Supersede :issuer="issuer"
+               :token-id="tokenId"
                :maker="maker"
                :address="address"
                :wallet-type="walletType"
                :addresses="addresses"
                :cold-addresses="coldAddresses"
-               :token-balance="tokenBalance"
                :balance="balances[address]"
                @updateBalance="updateBalance">
     </Supersede>
     <SplitToken :token-id="tokenId"
-                :maker="maker"
+                :issuer="issuer"
                 :address="address"
                 :wallet-type="walletType"
                 :addresses="addresses"

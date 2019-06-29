@@ -25,7 +25,7 @@
             <b-form-input id=address-input
                           class="address-input"
                           readonly
-                          v-model="address"
+                          v-model="maker"
                           :state="isValidMaker(address)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
@@ -48,7 +48,7 @@
                  @click="scanChange"
                  title="scan qr-code">
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid Address (if using QR code scanner, make sure QR code is correct).
+              Invalid Address or Same as Current Issuer (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
@@ -129,12 +129,12 @@
              :active="walletType==='coldWallet'">
         <b-container v-if="coldPageId===1"
                      class="text-left">
-          <b-form-group label="Wallet Address"
+          <b-form-group label="Maker Wallet Address"
                         label-for="wallet-address">
             <b-form-input id=coldAddress-input
                           class="address-input"
                           readonly
-                          v-model="address"
+                          v-model="maker"
                           :state="isValidMaker(address)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
@@ -157,7 +157,7 @@
                  @click="scanChange"
                  title="scan qr-code">
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid Address (if using QR code scanner, make sure QR code is correct).
+              Invalid Address or Same as Current Issuer (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
@@ -275,7 +275,6 @@ import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '@/utils/browser'
-import common from '@/utils/common'
 import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
 export default {
@@ -300,13 +299,6 @@ export default {
         }
     },
     props: {
-        tokenBalance: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
         balance: {
             type: BigNumber,
             default: function() {
@@ -334,6 +326,11 @@ export default {
             require: true
         },
         maker: {
+            type: String,
+            default: '',
+            require: true
+        },
+        issuer: {
             type: String,
             default: '',
             require: true
@@ -393,6 +390,9 @@ export default {
             if (!issuer) {
                 return void 0
             }
+            if (this.issuer === issuer) {
+                return false
+            }
             let isValid = false
             try {
                 isValid = crypto.isValidAddress(issuer)
@@ -400,9 +400,6 @@ export default {
                 console.log(e)
             }
             return isValid
-        },
-        inputAmount(num) {
-            return BigNumber(num)
         },
         coldApi: function() {
             return API_VERSION
@@ -419,7 +416,6 @@ export default {
                 if (this.hasConfirmed) {
                     return
                 }
-                this.hasConfirmed = true
                 this.fee = BigNumber(CONTRACT_EXEC_FEE)
                 this.feeScale = FEE_SCALE
                 const dataInfo = {
@@ -435,12 +431,12 @@ export default {
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
                 const coldDataInfo = {
-                    contractId: this.contractId,
-                    senderPublicKey: this.coldAddresses[this.address].publicKey,
-                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
+                    contractId: this.dataObject.contractId,
+                    senderPublicKey: this.dataObject.senderPublicKey,
+                    fee: this.dataObject.fee,
+                    feeScale: this.dataObject.feeScale,
                     timestamp: this.dataObject.timestamp,
-                    functionIndex: SUPERSEDE_FUNCIDX,
+                    functionIndex: this.dataObject.functionId,
                     functionData: this.dataObject.function,
                     signature: this.coldSignature
                 }
@@ -450,6 +446,7 @@ export default {
             this.$http.post(url, apiSchema).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
+                    this.hasConfirmed = true
                 } else {
                     this.coldPageId++
                 }
@@ -487,7 +484,8 @@ export default {
             }
         },
         resetPage: function() {
-            this.amount = BigNumber(0)
+            this.errorMessage = ''
+            this.newIssuer = ''
             this.pageId = 1
             this.coldPageId = 1
             this.scanShow = false
@@ -498,7 +496,7 @@ export default {
             this.coldSignature = ''
         },
         endSend: function() {
-            for (let delayTime = 6000; delayTime < 30100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 setTimeout(this.sendBalanceChange, delayTime)
             }
             this.$refs.supersedeModal.hide()
@@ -601,25 +599,6 @@ export default {
                 this.coldPageId = 1
             }
             this.scanShow = false
-        },
-        isAmountValid(type) {
-            var amount = this.amount
-            if (BigNumber(amount).isEqualTo(0)) {
-                return void 0
-            }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededMaxSupply(amount) && !this.isNegative(amount)
-        },
-        isNumFormatValid(amount) {
-            return common.isNumFormatValid(amount)
-        },
-        isNegative(amount) {
-            return BigNumber(amount).isLessThan(0)
-        },
-        checkPrecision(amount) {
-            return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
-        },
-        isExceededMaxSupply(amount) {
-            return BigNumber(amount).isGreaterThan(BigNumber(this.maxSupply - this.currentSupply))
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
