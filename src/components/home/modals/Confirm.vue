@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img v-if="txType==='transfer'"
+    <img v-if="txType==='payment'"
          src="@/assets/imgs/icons/operate/ic_sent_big.svg">
     <img v-else-if="txType==='lease'"
          src="@/assets/imgs/icons/operate/ic_leasing_big.svg">
