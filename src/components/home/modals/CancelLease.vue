@@ -208,12 +208,12 @@ export default {
             return ''
         },
         coldAddressInfo() {
-            var addrInfo  = {'api': 1, 'publicKey': '', 'device': 'unknown'}
+            var addrInfo = {'api': 1, 'publicKey': '', 'device': 'unknown'}
             if (this.userInfo && this.userInfo.hasOwnProperty('coldAddresses')) {
                 var object = JSON.parse(this.userInfo.coldAddresses)
                 if (object.hasOwnProperty(this.fromAddress)) {
                     addrInfo = object[this.fromAddress]
-                }   
+                }
             }
             return addrInfo
         }

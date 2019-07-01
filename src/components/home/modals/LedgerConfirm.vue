@@ -84,10 +84,16 @@ export default {
             var path = this.addressInfo['path']
             this.alertMessage = 'Please confirm transaction on Ledger device!'
             this.dismissCountDown = 3
-            const transport = await TransportU2F.create()
-            var ledger = new VsysLedger(transport, NETWORK_BYTE)
-            var signature = await ledger.signTransaction(path, dataBytes)
-            this.$emit('get-signature', signature)
+            try {
+                const transport = await TransportU2F.create()
+                var ledger = new VsysLedger(transport, NETWORK_BYTE)
+                var signature = await ledger.signTransaction(path, dataBytes)
+                this.$emit('get-signature', signature)
+            } catch (err) {
+                this.alertMessage = err.hasOwnProperty('message') ? err.message : err
+                this.dismissCountDown = 10
+                return void 0
+            }
         },
         supportedTxType(type) {
             return type === PAYMENT_TX || type === LEASE_TX || type === CANCEL_LEASE_TX

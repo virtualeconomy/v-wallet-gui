@@ -153,18 +153,24 @@ export default {
         async selectAddress() {
             this.alertMessage = 'Please confirm address on Ledger device!'
             this.dismissCountDown = 3
-            const transport = await TransportU2F.create()
-            var ledger = new VsysLedger(transport, NETWORK_BYTE)
-            var path = '44\'/360\'/' + this.addressIndex + '\'/0/0'
-            const result = await ledger.getWalletPublicKey(path, true)
-            if (!result || !result['publicKey']) {
-                this.alertMessage = 'Failed to get Public Key! Please make sure Ledger hardware device is connected and entered VSYS app.'
-                this.dismissCountDown = 5
+            try {
+                const transport = await TransportU2F.create()
+                var ledger = new VsysLedger(transport, NETWORK_BYTE)
+                var path = '44\'/360\'/' + this.addressIndex + '\'/0/0'
+                const result = await ledger.getWalletPublicKey(path, true)
+                if (!result || !result['publicKey']) {
+                    this.alertMessage = 'Failed to get Public Key! Please make sure Ledger hardware device is connected and entered VSYS app.'
+                    this.dismissCountDown = 5
+                    return void 0
+                }
+                this.coldPubKey = result['publicKey']
+                this.coldAddress = result['address']
+                this.ledgerAddrPath = path
+            } catch (err) {
+                this.alertMessage = err.hasOwnProperty('message') ? err.message : err
+                this.dismissCountDown = 10
                 return void 0
             }
-            this.coldPubKey = result['publicKey']
-            this.coldAddress = result['address']
-            this.ledgerAddrPath = path
         },
         countDownChanged(dismissCountDown) {
             this.dismissCountDown = dismissCountDown
