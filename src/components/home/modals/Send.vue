@@ -137,7 +137,7 @@
                    :amount=inputAmount(amount)
                    :fee="fee"
                    :attachment="attachment"
-                   :tx-type="'Payment'">
+                   :tx-type="'payment'">
           </Confirm>
           <p
             v-show="sendError"
@@ -354,7 +354,7 @@
                    :amount=inputAmount(coldAmount)
                    :fee="coldFee"
                    :attachment="coldAttachment"
-                   :tx-type="'Payment'">
+                   :tx-type="'payment'">
           </Confirm>
           <p v-show="sendError">Sorry, transaction send failed! Failed reason: {{ errorMessage }}</p>
           <b-row>

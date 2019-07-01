@@ -129,7 +129,7 @@
                            @prev-page="prevColdPage"></ColdSignature>
           </b-container>
           <b-container v-else-if="coldPageId===4">
-            <Confirm :tx-type="'Lease'"
+            <Confirm :tx-type="'lease'"
                      :amount=inputAmount(coldAmount)
                      :address="coldAddress"
                      :recipient="coldRecipient"
