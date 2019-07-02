@@ -673,7 +673,7 @@ export default {
         endSend: function() {
             this.$refs.newTokenModal.hide()
             var stopParaArr = []
-            for (let delayTime = 6000; delayTime < 150100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 var stopPara = setTimeout(this.sendToAdd, delayTime)
                 stopParaArr.push(stopPara)
             }
