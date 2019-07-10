@@ -68,7 +68,7 @@
                  class="title">{{ txTitle }}<span v-if="isCanceled"
                                                   style="color:red"> (Cancelled)</span>
           </b-col>
-          <b-col v-else-if="txIcon === 'leased out canceled'"
+          <b-col v-else
                  class="title">{{ txTitle }}
           </b-col>
         </b-row>
