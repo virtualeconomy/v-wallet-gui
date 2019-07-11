@@ -54,7 +54,11 @@
                           :state="isAmountValid('hot')">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
+                                     v-if="!isNumFormatValid(amount)">
+              Invalid format.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -64,10 +68,6 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(amount)">
               Negative number is not allowed
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isNumFormatValid(amount)">
-              Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -170,7 +170,11 @@
                           :state="isAmountValid('cold')">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
+                                     v-if="!isNumFormatValid(amount)">
+              Invalid format.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -180,10 +184,6 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(amount)">
               Negative number is not allowed
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isNumFormatValid(amount)">
-              Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
