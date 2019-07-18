@@ -27,7 +27,7 @@
                       :selected-address="selectedAddress"
                       :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="pageId===2">
-            <Confirm :tx-type="'Lease'"
+            <Confirm :tx-type="'lease'"
                      :amount=inputAmount(amount)
                      :address="address"
                      :recipient="recipient"
@@ -108,7 +108,7 @@
                          @get-signature="getSignature"
                          @prev-page="prevColdPage"></ColdSignature>
           <b-container v-else-if="coldPageId===4">
-            <Confirm :tx-type="'Lease'"
+            <Confirm :tx-type="'lease'"
                      :amount=inputAmount(coldAmount)
                      :address="coldAddress"
                      :recipient="coldRecipient"
