@@ -13,6 +13,26 @@
                @click="showFee">
       </div>
       <b-dropdown
+        class="type-select"
+        router-tag="div"
+        no-caret
+        variant="light">
+        <template
+          slot="button-content">
+          <div style="display:inline-block; margin-right: 10px;">
+            <img
+              src="@/assets/imgs/icons/wallet/ic_filter.svg">
+            <span class="m-1"> Type </span>
+          </div>
+          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
+        </template>
+        <b-dropdown-item
+          class="selection"
+          v-for="type in showTypes"
+          :key="type"
+          @click="changeType(type)">{{ type }}</b-dropdown-item>
+      </b-dropdown>
+      <b-dropdown
         class="pd-select"
         router-tag="div"
         no-caret
@@ -62,6 +82,7 @@
             :key="monthYear+'c'"
             class="record-content">
             <div v-for="record in records"
+                 v-if="showingTypeValue === 0 || record['type'] === showingTypeValue"
                  :key="record.index">
               <Record :tx-record="record"
                       :fee-flag="feeFlag"
@@ -78,6 +99,26 @@
        class="records">
     <div class="title-records">
       <span>Transaction Records</span>
+      <b-dropdown
+        class="type-select"
+        router-tag="div"
+        no-caret
+        variant="light">
+        <template
+          slot="button-content">
+          <div style="display:inline-block; margin-right: 10px;">
+            <img
+              src="@/assets/imgs/icons/wallet/ic_filter.svg">
+            <span class="m-1"> Type </span>
+          </div>
+          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
+        </template>
+        <b-dropdown-item
+          class="selection"
+          v-for="type in showTypes"
+          :key="type"
+          @click="changeType(type)">{{ type }}</b-dropdown-item>
+      </b-dropdown>
       <b-dropdown class="pd-select"
                   router-tag="div"
                   no-caret
@@ -149,7 +190,10 @@ export default {
             feeFlag: false,
             txRecords: {},
             showNums: [10, 50, 100, 200, 500, 1000],
+            showTypes: ['Payment', 'Leasing', 'Cancel leasing', 'Register contract', 'Execute contract', 'Show all'],
+            showTypesValue: {'Payment': 2, 'Leasing': 3, 'Cancel leasing': 4, 'Register contract': 8, 'Execute contract': 9, 'Show all': 0},
             showingNum: 10,
+            showingTypeValue: 0,
             changeShowDisable: false,
             response: [],
             responseExport: [],
@@ -189,6 +233,7 @@ export default {
             }
             this.changeShowDisable = false
             this.showingNum = 10
+            this.showingType = 'Show all'
             if (this.address && Vue.ls.get('pwd')) {
                 this.getTxRecords()
             }
@@ -197,6 +242,7 @@ export default {
             if (newTab === 'trans') {
                 this.changeShowDisable = false
                 this.showingNum = 10
+                this.showingType = 'Show all'
                 if (this.address && Vue.ls.get('pwd')) {
                     this.getTxRecords()
                 }
@@ -252,6 +298,7 @@ export default {
                             }
                             return recList
                         }, {})
+                        this.showingTypeValue = 0
                         this.changeShowDisable = false
                     }
                 }, response => {
@@ -268,6 +315,9 @@ export default {
                     this.getTxRecords()
                 }
             }
+        },
+        changeType(newType) {
+            this.showingTypeValue = this.showTypesValue[newType]
         },
         showFee() {
             if (!this.feeFlag) this.feeFlag = true
@@ -359,7 +409,7 @@ export default {
 }
 .show-fee {
     position: absolute;
-    right:380px;
+    right:488px;
     width: 116px;
     height: 36px;
     border-color: #E8E9ED;
@@ -391,6 +441,17 @@ export default {
 .pd-select:hover, .pd-select:active {
     background-color: #FAFAFA !important;
 }
+.type-select {
+    position: absolute;
+    right: 380px;
+    display: flex;
+    height: 36px;
+    z-index: 100;
+    background-color: #FFF;
+}
+.type-select:hover, .type-select:active {
+    background-color: #FAFAFA !important;
+}
 .selection {
     font-size: 15px;
     color: #696B8A;
@@ -399,5 +460,12 @@ export default {
 .show-position {
     position: absolute;
     left: 13px;
+}
+.m-1 {
+    width: 116px;
+    height: 36px;
+    font-size: 15px;
+    color: #696B8A;
+    letter-spacing: 0;
 }
 </style>
