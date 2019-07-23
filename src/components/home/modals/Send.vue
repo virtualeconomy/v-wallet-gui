@@ -64,6 +64,8 @@
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
+            <p v-if="networkType === 'M' && superNodes.indexOf(coldRecipient) > -1"
+               class="super-node">Caution! It's super-node address. </p>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
               <div class="qr-window">
@@ -226,6 +228,8 @@
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
+            <p v-if="networkType === 'M' && superNodes.indexOf(coldRecipient) > -1"
+               class="super-node">Caution! It's super-node address. </p>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
               <div class="qr-window">
@@ -382,7 +386,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
+import { NETWORK_BYTE, SUPERNODES, NODE_IP, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
@@ -392,6 +396,8 @@ import common from '@/utils/common'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 var initData = {
+    networkType: String.fromCharCode(NETWORK_BYTE),
+    superNodes: SUPERNODES,
     errorMessage: '',
     opc: '',
     recipient: '',
@@ -887,6 +893,12 @@ export default {
     color: #4F515E;
     letter-spacing: 0;
     text-align: center;
+}
+.super-node {
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 80%;
+    color: #dc3545;
 }
 .col-lef {
     padding-right: 10px;
