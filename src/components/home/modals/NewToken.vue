@@ -70,7 +70,11 @@
                           onfocus="this.select()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(amount)">
+                                     v-if="!isNumFormatValid(amount)">
+              Invalid format.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="!checkPrecision(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -84,10 +88,6 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isBiggerThanMax(amount)">
               Please reduce Unity scale.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isNumFormatValid(amount)">
-              Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -226,7 +226,11 @@
                           onfocus="this.select()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(coldAmount)">
+                                     v-if="!isNumFormatValid(coldAmount)">
+              Invalid format.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="!checkPrecision(coldAmount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -236,10 +240,6 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(coldAmount)">
               Negative number is not allowed.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isNumFormatValid(coldAmount)">
-              Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isBiggerThanMax(coldAmount)">
@@ -482,10 +482,10 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(BigNumber(this.amount).isGreaterThan(0) && !this.isInsufficient('hot') && (this.isValidAttachment(this.contractDescription) || !this.contractDescription) && (this.isValidAttachment(this.tokenDescription) || !this.tokenDescription) && this.isAmountValid('hot') && this.address !== '')
+            return !(!this.isInsufficient('hot') && (this.isValidAttachment(this.contractDescription) || !this.contractDescription) && (this.isValidAttachment(this.tokenDescription) || !this.tokenDescription) && this.isAmountValid('hot') && this.address !== '')
         },
         isColdSubmitDisabled() {
-            return !(BigNumber(this.coldAmount).isGreaterThan(0) && (this.isValidAttachment(this.coldContractDescription) || !this.coldContractDescription) && (this.isValidAttachment(this.coldTokenDescription) || !this.coldTokenDescription) && this.isAmountValid('cold') && this.coldAddress !== '')
+            return !((this.isValidAttachment(this.coldContractDescription) || !this.coldContractDescription) && (this.isValidAttachment(this.coldTokenDescription) || !this.coldTokenDescription) && this.isAmountValid('cold') && this.coldAddress !== '')
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object

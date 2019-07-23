@@ -91,7 +91,11 @@
                           onfocus="this.select()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(amount)">
+                                     v-if="!isNumFormatValid(amount)">
+              Invalid format.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="!checkPrecision(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -105,10 +109,6 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(amount)">
               Negative number is not allowed.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isNumFormatValid(amount)">
-              Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -258,7 +258,11 @@
                           onfocus="this.select()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!checkPrecision(coldAmount)">
+                                     v-if="!isNumFormatValid(coldAmount)">
+              Invalid format.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="!checkPrecision(coldAmount)">
               The number in this field is invalid. It may exceed the maximum number of digits after the decimal point.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -268,10 +272,6 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isInsufficient('coldWallet')">
               Insufficient VSYS balance
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isNumFormatValid(coldAmount)">
-              Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(coldAmount)">
@@ -543,11 +543,10 @@ export default {
     },
     methods: {
         isSubmitDisabled(type) {
-            var amount = type === 'hotWallet' ? this.amount : this.coldAmount
             var recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
             var attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
             var address = type === 'hotWallet' ? this.address : this.coldAddress
-            return !(recipient && BigNumber(amount).isGreaterThan(0) && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
+            return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
         },
         isValidAttachment(attachment) {
             if (!attachment) {
@@ -801,7 +800,7 @@ export default {
         isAmountValid(type) {
             var amount = type === 'hotWallet' ? this.amount : this.coldAmount
             if (BigNumber(amount).isEqualTo(0)) {
-                return void 0
+                return true
             }
             return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount, type) && !this.isInsufficient(type) && !this.isNegative(amount)
         },
