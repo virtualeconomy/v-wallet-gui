@@ -64,7 +64,7 @@
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
-            <p v-if="networkType === 'M' && superNodes.indexOf(coldRecipient) > -1"
+            <p v-if="superNodes.indexOf(recipient) > -1"
                class="super-node">Caution! It's super-node address. </p>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
@@ -228,7 +228,7 @@
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
-            <p v-if="networkType === 'M' && superNodes.indexOf(coldRecipient) > -1"
+            <p v-if="superNodes.indexOf(coldRecipient) > -1"
                class="super-node">Caution! It's super-node address. </p>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
@@ -386,7 +386,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NETWORK_BYTE, SUPERNODES, NODE_IP, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
+import { NODE_IP, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, PAYMENT_TX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_TRANSACTION } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import crypto from '@/utils/crypto'
@@ -396,8 +396,7 @@ import common from '@/utils/common'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 var initData = {
-    networkType: String.fromCharCode(NETWORK_BYTE),
-    superNodes: SUPERNODES,
+    superNodes: [],
     errorMessage: '',
     opc: '',
     recipient: '',
@@ -458,6 +457,7 @@ export default {
         return initData
     },
     created() {
+        this.getSuperNodes()
         this.coldRecipientAddressList = new LRUCache(10)
         this.hotRecipientAddressList = new LRUCache(10)
         let item = window.localStorage.getItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ')
@@ -510,6 +510,19 @@ export default {
         }
     },
     methods: {
+        getSuperNodes() {
+            const slotsUrl = NODE_IP + '/consensus/allSlotsInfo'
+            this.$http.get(slotsUrl).then(response => {
+                let len = response.body.length
+                let slots = response.body
+                for (let i = 1; i < len; i++) {
+                    if (slots[i]['address'] !== 'None') {
+                        this.superNodes.push(slots[i]['address'])
+                    }
+                }
+            }, respError => {
+            })
+        },
         isSubmitDisabled(type) {
             var amount = type === 'hotWallet' ? this.amount : this.coldAmount
             var recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
