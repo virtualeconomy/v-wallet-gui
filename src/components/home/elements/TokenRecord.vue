@@ -4,14 +4,19 @@
     <b-row align-v="center">
       <b-col class="record-icon"
              cols="auto">
-        <img src="@/assets/imgs/icons/wallet/ic_token2.svg"
+        <img v-if="isCertified"
+             :src="officialTokenSvg"
+             width="32px"
+             height="32px">
+        <img v-else
+             src="@/assets/imgs/icons/wallet/ic_token2.svg"
              width="32px"
              height="32px">
       </b-col>
       <b-col class="record-detail"
              cols="auto">
         <b-row>
-          <b-col class="title">{{ tokenRecord }}</b-col>
+          <b-col class="title">{{ isCertified ? officialName : tokenRecord }}</b-col>
         </b-row>
       </b-col>
       <b-col class="record-blank"></b-col>
@@ -167,6 +172,7 @@ import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT, SHOW_UNSUPPORTED_FUNCTION } 
 import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
 import Vue from 'vue'
 import browser from '@/utils/browser'
+import certify from '@/utils/certify'
 export default {
     name: 'TokenRecord',
     components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede, SplitToken, WithdrawToken, DepositToken },
@@ -273,6 +279,19 @@ export default {
             if (this.tokens) {
                 return BigNumber(this.tokens.total).dividedBy(this.unity)
             } else return ''
+        },
+        isCertified() {
+            return certify.isCertified(this.tokenId)
+        },
+        officialName() {
+            return certify.officialName(this.tokenId)
+        },
+        officialTokenSvg() {
+            try {
+                return require('@/assets/imgs/icons/wallet/' + this.officialName + '.svg')
+            } catch (err) {
+                return require('@/assets/imgs/icons/wallet/ic_token1.svg')
+            }
         },
         tokenDescription() {
             if (this.tokens.description && this.tokens.description !== undefined) {
