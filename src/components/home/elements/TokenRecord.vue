@@ -5,7 +5,7 @@
       <b-col class="record-icon"
              cols="auto">
         <img v-if="isCertified"
-             src="@/assets/imgs/icons/wallet/ic_token1.svg"
+             :src="officialTokenSvg"
              width="32px"
              height="32px">
         <img v-else
@@ -285,6 +285,13 @@ export default {
         },
         officialName() {
             return certify.officialName(this.tokenId)
+        },
+        officialTokenSvg() {
+            try {
+                return require('@/assets/imgs/icons/wallet/' + this.officialName + '.svg')
+            } catch (err) {
+                return require('@/assets/imgs/icons/wallet/ic_token1.svg')
+            }
         },
         tokenDescription() {
             if (this.tokens.description && this.tokens.description !== undefined) {
