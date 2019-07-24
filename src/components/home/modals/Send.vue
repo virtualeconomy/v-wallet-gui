@@ -64,6 +64,8 @@
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
+            <p v-if="superNodes.indexOf(recipient) > -1"
+               class="super-node">Attention: You are doing PAYMENT, not LEASE, to super node address. You cannot get coins back once sent. Please confirm your action!</p>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
               <div class="qr-window">
@@ -226,6 +228,8 @@
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
+            <p v-if="superNodes.indexOf(coldRecipient) > -1"
+               class="super-node">Attention: You are doing PAYMENT, not LEASE, to super node address. You cannot get coins back once sent. Please confirm your action!</p>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
               <div class="qr-window">
@@ -392,6 +396,7 @@ import common from '@/utils/common'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 var initData = {
+    superNodes: [],
     errorMessage: '',
     opc: '',
     recipient: '',
@@ -452,6 +457,7 @@ export default {
         return initData
     },
     created() {
+        this.getSuperNodes()
         this.coldRecipientAddressList = new LRUCache(10)
         this.hotRecipientAddressList = new LRUCache(10)
         let item = window.localStorage.getItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ')
@@ -504,6 +510,19 @@ export default {
         }
     },
     methods: {
+        getSuperNodes() {
+            const slotsUrl = NODE_IP + '/consensus/allSlotsInfo'
+            this.$http.get(slotsUrl).then(response => {
+                let len = response.body.length
+                let slots = response.body
+                for (let i = 1; i < len; i++) {
+                    if (slots[i]['address'] !== 'None') {
+                        this.superNodes.push(slots[i]['address'])
+                    }
+                }
+            }, respError => {
+            })
+        },
         isSubmitDisabled(type) {
             var amount = type === 'hotWallet' ? this.amount : this.coldAmount
             var recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
@@ -887,6 +906,12 @@ export default {
     color: #4F515E;
     letter-spacing: 0;
     text-align: center;
+}
+.super-node {
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 80%;
+    color: #dc3545;
 }
 .col-lef {
     padding-right: 10px;
