@@ -74,4 +74,3 @@ export const OPC_SIGNATURE = 'signature'
 export const OPC_SEED = 'seed'
 export const OPC_CONTRACT = 'contract'
 export const SHOW_UNSUPPORTED_FUNCTION = false
-
