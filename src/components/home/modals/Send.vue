@@ -65,7 +65,7 @@
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
             <p v-if="superNodes.indexOf(recipient) > -1"
-               class="super-node">Caution! It's super-node address. </p>
+               class="super-node">Attention: You are doing PAYMENT, not LEASE, to super node address. You cannot get coins back once sent. Please confirm your action!</p>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
               <div class="qr-window">
@@ -229,7 +229,7 @@
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
             <p v-if="superNodes.indexOf(coldRecipient) > -1"
-               class="super-node">Caution! It's super-node address. </p>
+               class="super-node">Attention: You are doing PAYMENT, not LEASE, to super node address. You cannot get coins back once sent. Please confirm your action!</p>
             <div v-if="scanShow">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
               <div class="qr-window">
