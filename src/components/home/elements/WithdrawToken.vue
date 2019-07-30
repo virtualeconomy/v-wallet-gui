@@ -364,7 +364,7 @@ export default {
             return !(!this.isInsufficient() && this.isAmountValid() && this.isValidContractId(this.contractId))
         },
         isAmountValid() {
-            var amount = this.amount
+            let amount = this.amount
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
@@ -500,7 +500,7 @@ export default {
             return true
         },
         isValidContractId(contractId) {
-            var contractArr = base58.decode(contractId)
+            let contractArr = base58.decode(contractId)
             return contractArr && contractArr.length === 26 && contractArr[0] === 6
         },
         isInsufficient() {

@@ -349,7 +349,7 @@ export default {
             }
         },
         getTokenInfo() {
-            var contractId = transaction.tokenIDToContractID(this.tokenId)
+            let contractId = transaction.tokenIDToContractID(this.tokenId)
             const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(tokenUrl).then(response => {
                 this.tokens = response.body
@@ -419,17 +419,17 @@ export default {
             this.$root.$emit('bv::show::modal', 'depositTokenModal_' + this.tokenId)
         },
         removeToken() {
-            var isRemove = confirm('Are you sure to remove this token?')
+            let isRemove = confirm('Are you sure to remove this token?')
             if (isRemove) {
-                var user = JSON.parse(window.localStorage.getItem(this.seedaddress))
-                var arr = JSON.parse(user.tokens)
+                let user = JSON.parse(window.localStorage.getItem(this.seedaddress))
+                let arr = JSON.parse(user.tokens)
                 Vue.delete(arr, this.tokenId)
                 this.setUsrLocalStorage('tokens', JSON.stringify(arr))
                 this.removeFlag = true
                 this.$emit('removeFlag', this.removeFlag)
                 this.removeFlag = false
                 if (this.$store.state.eventPool) {
-                    var eventPool = this.$store.state.eventPool
+                    let eventPool = this.$store.state.eventPool
                     if (eventPool[this.tokenId] && eventPool[this.tokenId].newToken) {
                         var stopArr = eventPool[this.tokenId].newToken
                         for (var i in stopArr) {

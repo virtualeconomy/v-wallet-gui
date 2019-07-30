@@ -524,13 +524,13 @@ export default {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         isSubmitDisabled(type) {
-            var recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
-            var attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
-            var address = type === 'hotWallet' ? this.address : this.coldAddress
+            let recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
+            let attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
+            let address = type === 'hotWallet' ? this.address : this.coldAddress
             return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
         },
         isAmountValid(type) {
-            var amount = type === 'hotWallet' ? this.amount : this.coldAmount
+            let amount = type === 'hotWallet' ? this.amount : this.coldAmount
             if (BigNumber(amount).isEqualTo(0)) {
                 return true
             }
@@ -565,7 +565,7 @@ export default {
             return BigNumber(num)
         },
         sendData(walletType) {
-            var apiSchema
+            let apiSchema
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
                     return
@@ -634,7 +634,7 @@ export default {
         },
         prevPage() {
             this.sendError = false
-            var pageId = this.walletType === 'hotWallet' ? this.pageId : this.coldPageId
+            let pageId = this.walletType === 'hotWallet' ? this.pageId : this.coldPageId
             if (pageId === 1) {
                 this.$refs.sendModal.hide()
             } else {
@@ -713,11 +713,11 @@ export default {
         onDecode(decodeString) {
             this.paused = true
             try {
-                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
+                let jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
                 var recipient = jsonObj.address
-                var opc = jsonObj.opc
-                var api = jsonObj.api
-                var protocol = jsonObj.protocol
+                let opc = jsonObj.opc
+                let api = jsonObj.api
+                let protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
                     if (this.walletType === 'hotWallet') {
                         this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
@@ -811,11 +811,11 @@ export default {
             return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
         },
         isTokenInsufficient(amount, type) {
-            var balance = type === 'hotWallet' ? this.tokenBalances[this.address] : this.tokenBalances[this.coldAddress]
+            let balance = type === 'hotWallet' ? this.tokenBalances[this.address] : this.tokenBalances[this.coldAddress]
             return BigNumber(amount).isGreaterThan(BigNumber(balance))
         },
         isInsufficient(type) {
-            var balance = type === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
+            let balance = type === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
             return BigNumber(balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         options(addrs) {

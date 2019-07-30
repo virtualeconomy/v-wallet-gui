@@ -413,9 +413,9 @@ export default {
             return addr === this.issuer
         },
         isBiggerThanMax() {
-            var maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
-            var unityValue = BigNumber(this.newUnity)
-            var value = BigNumber(this.maxSupply).multipliedBy(unityValue)
+            let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
+            let unityValue = BigNumber(this.newUnity)
+            let value = BigNumber(this.maxSupply).multipliedBy(unityValue)
             if (value.isGreaterThan(maxValue) || unityValue.isGreaterThan(BigNumber(10).exponentiatedBy(16))) {
                 return true
             } else {

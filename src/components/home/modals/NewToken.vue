@@ -491,7 +491,7 @@ export default {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         isAmountValid(type) {
-            var amount = type === 'hot' ? this.amount : this.coldAmount
+            let amount = type === 'hot' ? this.amount : this.coldAmount
             if (BigNumber(amount).isEqualTo(0) && !this.isInsufficient(type)) {
                 return void 0
             }
@@ -533,8 +533,8 @@ export default {
             let tempDataObject = JSON.parse(JSON.stringify(this.dataObject))
             delete tempDataObject.senderPublicKey
             const text = JSON.stringify(tempDataObject)
-            var page = Math.ceil(text.length / qrSize)
-            var textArray = Array(page)
+            let page = Math.ceil(text.length / qrSize)
+            let textArray = Array(page)
             if (tempDataObject.opc === 'contract') {
                 this.qrTotalPage = page
                 for (var i = 0; i < this.qrTotalPage; i++) {
@@ -676,19 +676,19 @@ export default {
         },
         endSend() {
             this.$refs.newTokenModal.hide()
-            var stopParaArr = []
+            let stopParaArr = []
             for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 var stopPara = setTimeout(this.sendToAdd, delayTime)
                 stopParaArr.push(stopPara)
             }
-            var tmp = {'newToken': stopParaArr, 'removeToken': false}
-            var eventPool = this.$store.state.eventPool
+            let tmp = {'newToken': stopParaArr, 'removeToken': false}
+            let eventPool = this.$store.state.eventPool
             Vue.set(eventPool, this.tokenId, tmp)
             this.$store.commit('changeEventPool', eventPool)
         },
         sendToAdd() {
-            var userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            var tokens = {}
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            let tokens = {}
             if (userInfo && userInfo.tokens) {
                 tokens = JSON.parse(userInfo.tokens)
             }
@@ -773,9 +773,9 @@ export default {
             return BigNumber(amount).isLessThan(0)
         },
         isBiggerThanMax(amount) {
-            var maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
-            var unityValue = BigNumber(10).exponentiatedBy(this.unity)
-            var value = BigNumber(amount).multipliedBy(unityValue)
+            let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
+            let unityValue = BigNumber(10).exponentiatedBy(this.unity)
+            let value = BigNumber(amount).multipliedBy(unityValue)
             if (value.isGreaterThan(maxValue)) {
                 return true
             } else {
@@ -786,7 +786,7 @@ export default {
             return common.isNumFormatValid(amount)
         },
         isInsufficient(type) {
-            var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
+            let balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
             return BigNumber(balance).isLessThan(BigNumber(TOKEN_FEE))
         },
         checkPrecision(amount) {
