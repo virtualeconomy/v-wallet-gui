@@ -76,7 +76,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled()"
+                    :disabled="isSubmitDisabled"
                     @click="nextPage">Change
           </b-button>
         </b-container>
@@ -186,7 +186,7 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isSubmitDisabled()"
+                    :disabled="isSubmitDisabled"
                     @click="coldNextPage">Continue
           </b-button>
         </b-container>

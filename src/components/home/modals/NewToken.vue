@@ -490,12 +490,14 @@ export default {
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
-        isAmountValid(type) {
-            let amount = type === 'hot' ? this.amount : this.coldAmount
-            if (BigNumber(amount).isEqualTo(0) && !this.isInsufficient(type)) {
-                return void 0
+        isAmountValid() {
+            return function(type) {
+                let amount = type === 'hot' ? this.amount : this.coldAmount
+                if (BigNumber(amount).isEqualTo(0) && !this.isInsufficient(type)) {
+                    return void 0
+                }
+                return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isBiggerThanMax(amount) && !this.isNegative(amount)
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isBiggerThanMax(amount) && !this.isNegative(amount)
         },
         dataObject() {
             return {

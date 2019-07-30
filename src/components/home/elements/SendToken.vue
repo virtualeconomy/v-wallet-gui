@@ -523,18 +523,22 @@ export default {
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
-        isSubmitDisabled(type) {
-            let recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
-            let attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
-            let address = type === 'hotWallet' ? this.address : this.coldAddress
-            return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
-        },
-        isAmountValid(type) {
-            let amount = type === 'hotWallet' ? this.amount : this.coldAmount
-            if (BigNumber(amount).isEqualTo(0)) {
-                return true
+        isSubmitDisabled() {
+            return function(type) {
+                let recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
+                let attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
+                let address = type === 'hotWallet' ? this.address : this.coldAddress
+                return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount, type) && !this.isInsufficient(type) && !this.isNegative(amount)
+        },
+        isAmountValid() {
+            return function(type) {
+                let amount = type === 'hotWallet' ? this.amount : this.coldAmount
+                if (BigNumber(amount).isEqualTo(0)) {
+                    return true
+                }
+                return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount, type) && !this.isInsufficient(type) && !this.isNegative(amount)
+            }
         },
         dataObject() {
             return {

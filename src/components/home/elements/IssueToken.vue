@@ -51,7 +51,7 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('hot')">
+                          :state="isAmountValid">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="!isNumFormatValid(amount)">
@@ -83,7 +83,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled('hot')"
+                    :disabled="isSubmitDisabled"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -167,7 +167,7 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('cold')">
+                          :state="isAmountValid">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="!isNumFormatValid(amount)">
@@ -199,7 +199,7 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isSubmitDisabled('cold')"
+                    :disabled="isSubmitDisabled"
                     @click="coldNextPage">Continue
           </b-button>
         </b-container>
@@ -403,6 +403,22 @@ export default {
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
+        isValidAttachment() {
+            if (!this.attachment) {
+                return void 0
+            }
+            return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+        },
+        isSubmitDisabled() {
+            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid && !this.isInsufficient())
+        },
+        isAmountValid() {
+            let amount = this.amount
+            if (BigNumber(amount).isEqualTo(0)) {
+                return void 0
+            }
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededMaxSupply(amount) && !this.isNegative(amount)
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -419,22 +435,6 @@ export default {
                 function: transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)),
                 functionExplain: 'Issue ' + this.amount + ' Token'
             }
-        },
-        isValidAttachment() {
-            if (!this.attachment) {
-                return void 0
-            }
-            return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
-        },
-        isSubmitDisabled(type) {
-            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid(type) && !this.isInsufficient())
-        },
-        isAmountValid(type) {
-            let amount = this.amount
-            if (BigNumber(amount).isEqualTo(0)) {
-                return void 0
-            }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededMaxSupply(amount) && !this.isNegative(amount)
         }
     },
     methods: {

@@ -37,7 +37,7 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid()">
+                          :state="isAmountValid">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="!isNumFormatValid(amount)">
@@ -69,7 +69,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled()"
+                    :disabled="isSubmitDisabled"
                     @click="nextPage">Withdraw
           </b-button>
         </b-container>
@@ -141,7 +141,7 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid()">
+                          :state="isAmountValid">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="!isNumFormatValid(amount)">
@@ -173,7 +173,7 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isSubmitDisabled()"
+                    :disabled="isSubmitDisabled"
                     @click="coldNextPage">Withdraw
           </b-button>
         </b-container>
@@ -361,7 +361,7 @@ export default {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
         isSubmitDisabled() {
-            return !(!this.isInsufficient() && this.isAmountValid() && this.isValidContractId(this.contractId))
+            return !(!this.isInsufficient() && this.isAmountValid && this.isValidContractId(this.contractId))
         },
         isAmountValid() {
             let amount = this.amount
