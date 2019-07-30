@@ -493,7 +493,7 @@ export default {
         dataObject() {
             return {
                 protocol: PROTOCOL,
-                api: this.coldApi(),
+                api: API_VERSION,
                 opc: OPC_CONTRACT,
                 address: this.coldAddress,
                 senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
@@ -566,9 +566,6 @@ export default {
             if (this.unity < 16) {
                 this.unity++
             }
-        },
-        coldApi() {
-            return API_VERSION
         },
         sendData: function(walletType) {
             let apiSchema

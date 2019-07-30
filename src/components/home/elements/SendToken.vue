@@ -526,7 +526,7 @@ export default {
         dataObject() {
             return {
                 protocol: PROTOCOL,
-                api: this.coldApi(),
+                api: API_VERSION,
                 opc: OPC_FUNCTION,
                 address: this.coldAddress,
                 senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
@@ -556,9 +556,6 @@ export default {
         },
         inputAmount(num) {
             return BigNumber(num)
-        },
-        coldApi() {
-            return API_VERSION
         },
         sendData(walletType) {
             var apiSchema

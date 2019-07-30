@@ -393,7 +393,7 @@ export default {
         dataObject() {
             return {
                 protocol: PROTOCOL,
-                api: this.coldApi(),
+                api: API_VERSION,
                 opc: OPC_FUNCTION,
                 address: this.address,
                 senderPublicKey: this.coldAddresses[this.address].publicKey,
@@ -417,9 +417,6 @@ export default {
     methods: {
         inputAmount(num) {
             return BigNumber(num)
-        },
-        coldApi: function() {
-            return API_VERSION
         },
         isSubmitDisabled(type) {
             return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid(type) && !this.isInsufficient())

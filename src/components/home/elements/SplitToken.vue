@@ -390,7 +390,7 @@ export default {
         dataObject() {
             return {
                 protocol: PROTOCOL,
-                api: this.coldApi(),
+                api: API_VERSION,
                 opc: OPC_FUNCTION,
                 address: this.address,
                 senderPublicKey: this.coldAddresses[this.address].publicKey,
@@ -406,9 +406,6 @@ export default {
         }
     },
     methods: {
-        coldApi() {
-            return API_VERSION
-        },
         isValidIssuer(addr) {
             return addr === this.issuer
         },
