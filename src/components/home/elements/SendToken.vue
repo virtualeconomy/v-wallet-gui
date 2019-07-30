@@ -523,6 +523,12 @@ export default {
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
+        isSubmitDisabled(type) {
+            var recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
+            var attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
+            var address = type === 'hotWallet' ? this.address : this.coldAddress
+            return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -542,12 +548,6 @@ export default {
         }
     },
     methods: {
-        isSubmitDisabled(type) {
-            var recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
-            var attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
-            var address = type === 'hotWallet' ? this.address : this.coldAddress
-            return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
-        },
         isValidAttachment(attachment) {
             if (!attachment) {
                 return void 0

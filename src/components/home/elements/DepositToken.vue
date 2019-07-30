@@ -356,6 +356,9 @@ export default {
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
+        isSubmitDisabled() {
+            return !(!this.isInsufficient() && this.isAmountValid() && this.isValidContractId(this.contractId))
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -377,9 +380,6 @@ export default {
     methods: {
         inputAmount(num) {
             return BigNumber(num)
-        },
-        isSubmitDisabled() {
-            return !(!this.isInsufficient() && this.isAmountValid() && this.isValidContractId(this.contractId))
         },
         sendData(walletType) {
             let apiSchema

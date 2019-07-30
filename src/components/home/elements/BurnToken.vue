@@ -412,14 +412,14 @@ export default {
                 return void 0
             }
             return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+        },
+        isSubmitDisabled(type) {
+            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid(type) && !this.isInsufficient())
         }
     },
     methods: {
         inputAmount(num) {
             return BigNumber(num)
-        },
-        isSubmitDisabled(type) {
-            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid(type) && !this.isInsufficient())
         },
         sendData(walletType) {
             let apiSchema
@@ -649,7 +649,7 @@ export default {
         formatter(num) {
             return browser.bigNumberFormatter(num)
         },
-        isValidIssuer: function(recipient) {
+        isValidIssuer(recipient) {
             return recipient === this.issuer
         }
     }

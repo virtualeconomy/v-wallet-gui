@@ -387,6 +387,9 @@ export default {
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
+        isSubmitDisabled() {
+            return !(this.isValidIssuer(this.address) && this.isValidUnity() && !this.isInsufficient() && this.isSplit)
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -408,9 +411,6 @@ export default {
     methods: {
         isValidIssuer(addr) {
             return addr === this.issuer
-        },
-        isSubmitDisabled() {
-            return !(this.isValidIssuer(this.address) && this.isValidUnity() && !this.isInsufficient() && this.isSplit)
         },
         isBiggerThanMax() {
             var maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
