@@ -415,6 +415,13 @@ export default {
         },
         isSubmitDisabled(type) {
             return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid(type) && !this.isInsufficient())
+        },
+        isAmountValid(type) {
+            var amount = this.amount
+            if (BigNumber(amount).isEqualTo(0)) {
+                return void 0
+            }
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount) && !this.isNegative(amount)
         }
     },
     methods: {
@@ -614,13 +621,6 @@ export default {
                 this.coldPageId = 1
             }
             this.scanShow = false
-        },
-        isAmountValid(type) {
-            var amount = this.amount
-            if (BigNumber(amount).isEqualTo(0)) {
-                return void 0
-            }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount) && !this.isNegative(amount)
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)

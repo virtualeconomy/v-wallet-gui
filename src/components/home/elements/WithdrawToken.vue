@@ -363,6 +363,13 @@ export default {
         isSubmitDisabled() {
             return !(!this.isInsufficient() && this.isAmountValid() && this.isValidContractId(this.contractId))
         },
+        isAmountValid() {
+            var amount = this.amount
+            if (BigNumber(amount).isEqualTo(0)) {
+                return void 0
+            }
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && this.isEnoughContractBanlance(amount) && !this.isNegative(amount)
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -479,13 +486,6 @@ export default {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
-        },
-        isAmountValid() {
-            var amount = this.amount
-            if (BigNumber(amount).isEqualTo(0)) {
-                return void 0
-            }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && this.isEnoughContractBanlance(amount) && !this.isNegative(amount)
         },
         isNumFormatValid(amount) {
             return common.isNumFormatValid(amount)

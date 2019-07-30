@@ -529,6 +529,13 @@ export default {
             var address = type === 'hotWallet' ? this.address : this.coldAddress
             return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
         },
+        isAmountValid(type) {
+            var amount = type === 'hotWallet' ? this.amount : this.coldAmount
+            if (BigNumber(amount).isEqualTo(0)) {
+                return true
+            }
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount, type) && !this.isInsufficient(type) && !this.isNegative(amount)
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -793,13 +800,6 @@ export default {
                 this.walletType = 'coldWallet'
             }
             this.scanShow = false
-        },
-        isAmountValid(type) {
-            var amount = type === 'hotWallet' ? this.amount : this.coldAmount
-            if (BigNumber(amount).isEqualTo(0)) {
-                return true
-            }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount, type) && !this.isInsufficient(type) && !this.isNegative(amount)
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
