@@ -382,13 +382,13 @@ export default {
         inputAmount(num) {
             return BigNumber(num)
         },
-        coldApi: function() {
+        coldApi() {
             return API_VERSION
         },
         isSubmitDisabled() {
             return !(!this.isInsufficient() && this.isAmountValid() && this.isValidContractId(this.contractId))
         },
-        sendData: function(walletType) {
+        sendData(walletType) {
             let apiSchema
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
@@ -436,16 +436,16 @@ export default {
                 this.sendError = true
             })
         },
-        nextPage: function() {
+        nextPage() {
             this.timeStamp = Date.now() * 1e6
             this.hasConfirmed = false
             this.pageId++
         },
-        coldNextPage: function() {
+        coldNextPage() {
             this.sendError = false
             this.coldPageId++
         },
-        prevPage: function() {
+        prevPage() {
             this.sendError = false
             if (this.pageId === 1) {
                 this.$refs.sendModal.hide()
@@ -453,7 +453,7 @@ export default {
                 this.pageId--
             }
         },
-        coldPrevPage: function() {
+        coldPrevPage() {
             this.sendError = false
             if (this.coldPageId === 1) {
                 this.$refs.sendModal.hide()
@@ -461,7 +461,7 @@ export default {
                 this.coldPageId--
             }
         },
-        resetPage: function() {
+        resetPage() {
             this.amount = BigNumber(0)
             this.pageId = 1
             this.coldPageId = 1
@@ -469,16 +469,16 @@ export default {
             this.coldSignature = ''
             this.contractId = ''
         },
-        endSend: function() {
+        endSend() {
             for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 setTimeout(this.sendBalanceChange, delayTime)
             }
             this.$refs.withdrawTokenModal.hide()
         },
-        sendBalanceChange: function() {
+        sendBalanceChange() {
             this.$emit('updateBalance', 'update')
         },
-        getSignature: function(signature) {
+        getSignature(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
@@ -509,7 +509,7 @@ export default {
             var contractArr = base58.decode(contractId)
             return contractArr && contractArr.length === 26 && contractArr[0] === 6
         },
-        getKeypair: function(index) {
+        getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {

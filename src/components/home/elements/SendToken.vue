@@ -557,10 +557,10 @@ export default {
         inputAmount(num) {
             return BigNumber(num)
         },
-        coldApi: function() {
+        coldApi() {
             return API_VERSION
         },
-        sendData: function(walletType) {
+        sendData(walletType) {
             var apiSchema
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
@@ -609,7 +609,7 @@ export default {
             })
             this.$emit('endSendSignal')
         },
-        addRecipientList: function() {
+        addRecipientList() {
             if (this.walletType === 'hotWallet') {
                 this.hotRecipientAddressList.set(this.recipient, '0')
                 window.localStorage.setItem('Hot ' + this.defaultAddress + ' sendTokenRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
@@ -618,7 +618,7 @@ export default {
                 window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendTokenRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
             }
         },
-        nextPage: function() {
+        nextPage() {
             this.sendError = false
             this.hasConfirmed = false
             if (this.walletType === 'hotWallet') {
@@ -628,7 +628,7 @@ export default {
                 this.coldPageId++
             }
         },
-        prevPage: function() {
+        prevPage() {
             this.sendError = false
             var pageId = this.walletType === 'hotWallet' ? this.pageId : this.coldPageId
             if (pageId === 1) {
@@ -641,7 +641,7 @@ export default {
                 }
             }
         },
-        resetPage: function() {
+        resetPage() {
             this.opc = ''
             this.recipient = ''
             this.amount = BigNumber(0)
@@ -661,10 +661,10 @@ export default {
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
-        endSend: function() {
+        endSend() {
             this.$refs.sendTokenModal.hide()
         },
-        scanChange: function(evt) {
+        scanChange(evt) {
             if (!this.qrInit) {
                 this.scanShow = !this.scanShow
             }
@@ -672,7 +672,7 @@ export default {
                 this.paused = false
             }
         },
-        isValidRecipient: function(recipient) {
+        isValidRecipient(recipient) {
             if (!recipient) {
                 return void 0
             }
@@ -706,7 +706,7 @@ export default {
                 this.qrInit = false
             }
         },
-        onDecode: function(decodeString) {
+        onDecode(decodeString) {
             this.paused = true
             try {
                 var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
@@ -762,7 +762,7 @@ export default {
                 }
             }
         },
-        getSignature: function(signature) {
+        getSignature(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
@@ -827,7 +827,7 @@ export default {
                 return options
             }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
         },
-        getKeypair: function(index) {
+        getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {

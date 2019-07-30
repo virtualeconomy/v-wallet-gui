@@ -567,7 +567,7 @@ export default {
                 this.unity++
             }
         },
-        coldApi: function() {
+        coldApi() {
             return API_VERSION
         },
         sendData: function(walletType) {
@@ -619,17 +619,17 @@ export default {
             })
             this.$emit('endSendSignal')
         },
-        nextPage: function() {
+        nextPage() {
             this.sendError = false
             this.timeStamp = Date.now() * 1e6
             this.hasConfirmed = false
             this.pageId++
         },
-        coldNextPage: function() {
+        coldNextPage() {
             this.sendError = false
             this.coldPageId++
         },
-        prevPage: function() {
+        prevPage() {
             this.sendError = false
             if (this.pageId === 1) {
                 this.$refs.newTokenModal.hide()
@@ -637,7 +637,7 @@ export default {
                 this.pageId--
             }
         },
-        coldPrevPage: function() {
+        coldPrevPage() {
             this.sendError = false
             if (this.coldPageId === 1) {
                 this.$refs.newTokenModal.hide()
@@ -645,7 +645,7 @@ export default {
                 this.coldPageId--
             }
         },
-        resetPage: function() {
+        resetPage() {
             this.opc = ''
             this.unity = 8
             this.qrTotalPage = 1
@@ -670,7 +670,7 @@ export default {
             this.coldContractDescription = ''
             this.coldTokenDescription = ''
         },
-        endSend: function() {
+        endSend() {
             this.$refs.newTokenModal.hide()
             var stopParaArr = []
             for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
@@ -682,7 +682,7 @@ export default {
             Vue.set(eventPool, this.tokenId, tmp)
             this.$store.commit('changeEventPool', eventPool)
         },
-        sendToAdd: function() {
+        sendToAdd() {
             var userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             var tokens = {}
             if (userInfo && userInfo.tokens) {
@@ -701,7 +701,7 @@ export default {
             Vue.set(this.userInfo, fieldname, value)
             window.localStorage.setItem(this.seedAddress, JSON.stringify(this.userInfo))
         },
-        scanChange: function(evt) {
+        scanChange(evt) {
             if (!this.qrInit) {
                 this.scanShow = !this.scanShow
             }
@@ -731,7 +731,7 @@ export default {
                 this.qrInit = false
             }
         },
-        getSignature: function(signature) {
+        getSignature(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
@@ -801,7 +801,7 @@ export default {
                 return options
             }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
         },
-        getKeypair: function(index) {
+        getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {
