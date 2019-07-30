@@ -366,6 +366,9 @@ export default {
             }
             return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededBalance(amount) && !this.isNegative(amount)
         },
+        isExceededBalance(amount) {
+            return BigNumber(amount).isGreaterThan(this.tokenBalance)
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -493,15 +496,12 @@ export default {
         checkPrecision(amount) {
             return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
         },
-        isExceededBalance(amount) {
-            return BigNumber(amount).isGreaterThan(this.tokenBalance)
-        },
-        isInsufficient() {
-            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
-        },
         isValidContractId(contractId) {
             var contractArr = base58.decode(contractId)
             return contractArr && contractArr.length === 26 && contractArr[0] === 6
+        },
+        isInsufficient() {
+            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

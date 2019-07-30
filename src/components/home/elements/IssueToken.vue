@@ -645,14 +645,14 @@ export default {
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
         },
+        isInsufficient() {
+            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
+        },
         checkPrecision(amount) {
             return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
         },
         isExceededMaxSupply(amount) {
             return BigNumber(amount).isGreaterThan(BigNumber(this.maxSupply - this.currentSupply))
-        },
-        isInsufficient() {
-            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

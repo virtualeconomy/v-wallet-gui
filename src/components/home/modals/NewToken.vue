@@ -785,12 +785,12 @@ export default {
         isNumFormatValid(amount) {
             return common.isNumFormatValid(amount)
         },
-        checkPrecision(amount) {
-            return common.checkPrecision(amount, this.unity)
-        },
         isInsufficient(type) {
             var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
             return BigNumber(balance).isLessThan(BigNumber(TOKEN_FEE))
+        },
+        checkPrecision(amount) {
+            return common.checkPrecision(amount, this.unity)
         },
         options(addrs) {
             return Object.keys(addrs).reduce((options, addr) => {

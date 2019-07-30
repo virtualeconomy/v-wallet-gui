@@ -367,6 +367,9 @@ export default {
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
+        isSubmitDisabled() {
+            return !(this.isValidMaker(this.address) && this.isValidIssuer(this.newIssuer) && !this.isInsufficient())
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -406,9 +409,6 @@ export default {
         },
         isValidMaker: function(addr) {
             return addr === this.maker
-        },
-        isSubmitDisabled() {
-            return !(this.isValidMaker(this.address) && this.isValidIssuer(this.newIssuer) && !this.isInsufficient())
         },
         sendData: function(walletType) {
             let apiSchema
