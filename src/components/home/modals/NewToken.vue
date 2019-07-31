@@ -597,13 +597,13 @@ export default {
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
                 const coldDataInfo = {
-                    contract: this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT,
-                    senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
-                    fee: TOKEN_FEE * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
+                    contract: this.dataObject.contract,
+                    senderPublicKey: this.dataObject.senderPublicKey,
+                    fee: this.dataObject.fee,
+                    feeScale: this.dataObject.feeScale,
                     timestamp: this.dataObject.timestamp,
-                    initData: base58.encode(transaction.prepareCreate(BigNumber(this.coldAmount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.coldTokenDescription)[0]),
-                    description: this.coldContractDescription,
+                    initData: this.dataObject.contractInit,
+                    description: this.dataObject.description,
                     signature: this.coldSignature
                 }
                 apiSchema = coldDataInfo

@@ -453,13 +453,13 @@ export default {
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
                 const coldDataInfo = {
-                    contractId: this.contractId,
-                    senderPublicKey: this.coldAddresses[this.address].publicKey,
-                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
+                    contractId: this.dataObject.contractId,
+                    senderPublicKey: this.dataObject.senderPublicKey,
+                    fee: this.dataObject.fee,
+                    feeScale: this.dataObject.feeScale,
                     timestamp: this.dataObject.timestamp,
-                    functionIndex: BURN_FUNCIDX,
-                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)),
+                    functionIndex: this.dataObject.functionId,
+                    functionData: this.dataObject.function,
                     signature: this.coldSignature
                 }
                 apiSchema = coldDataInfo
