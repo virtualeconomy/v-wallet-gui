@@ -72,19 +72,20 @@
                     :current-supply="formatter(currentSupply)"
                     :token-description="tokenDescription">
     </TokenInfoModal>
-    <IssueToken :token-id="tokenId"
-                :issuer="issuer"
-                :address="address"
-                :wallet-type="walletType"
-                :addresses="addresses"
-                :cold-addresses="coldAddresses"
-                :token-balance="tokenBalance"
-                :balance="balances[address]"
-                :max-supply="maxSupply"
-                :current-supply="currentSupply"
-                :token-unity="unity"
-                @updateBalance="updateBalance">
-    </IssueToken>
+    <IssueAndBurnToken :token-id="tokenId"
+                       :issuer="issuer"
+                       :address="address"
+                       :wallet-type="walletType"
+                       :addresses="addresses"
+                       :cold-addresses="coldAddresses"
+                       :token-balance="tokenBalance"
+                       :balance="balances[address]"
+                       :max-supply="maxSupply"
+                       :current-supply="currentSupply"
+                       :token-unity="unity"
+                       :function-name="functionName"
+                       @updateBalance="updateBalance">
+    </IssueAndBurnToken>
     <WithdrawToken :token-id="tokenId"
                    :address="address"
                    :maker="maker"
@@ -161,10 +162,9 @@ import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import TokenInfoModal from './TokenInfoModal'
 import SendToken from './SendToken'
-import IssueToken from './IssueToken'
 import WithdrawToken from './WithdrawToken'
 import BigNumber from 'bignumber.js'
-import BurnToken from './BurnToken'
+import IssueAndBurnToken from './IssueAndBurnToken'
 import Supersede from './Supersede'
 import SplitToken from './SplitToken'
 import DepositToken from './DepositToken'
@@ -175,7 +175,7 @@ import browser from '@/utils/browser'
 import certify from '@/utils/certify'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede, SplitToken, WithdrawToken, DepositToken },
+    components: { TokenInfoModal, SendToken, Supersede, SplitToken, WithdrawToken, DepositToken, IssueAndBurnToken },
     data: function() {
         return {
             isSplit: false,
@@ -190,6 +190,7 @@ export default {
             issuer: '',
             maker: '',
             functionIndex: SEND_FUNCIDX,
+            functionName: '',
             contractId: '',
             showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION
         }
@@ -403,16 +404,18 @@ export default {
             this.$root.$emit('bv::show::modal', 'splitTokenModal_' + this.tokenId)
         },
         issueToken() {
+            this.functionName = 'Issue Token'
             this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)
+            this.$root.$emit('bv::show::modal', 'issueAndBurnTokenModal_' + this.tokenId)
         },
         withdrawToken() {
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'withdrawTokenModal_' + this.tokenId)
         },
         burnToken() {
+            this.functionName = 'Destroy Token'
             this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'burnTokenModal_' + this.tokenId)
+            this.$root.$emit('bv::show::modal', 'issueAndBurnTokenModal_' + this.tokenId)
         },
         depositToken() {
             this.getTokenInfo()
