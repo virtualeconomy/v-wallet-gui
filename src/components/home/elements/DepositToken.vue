@@ -62,7 +62,7 @@
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
-            <span v-if="isInsufficient()"
+            <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
           </b-form-group>
           <b-button variant="warning"
@@ -167,7 +167,7 @@
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
-            <span v-if="isInsufficient()"
+            <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
           </b-form-group>
           <b-button variant="warning"
@@ -357,7 +357,7 @@ export default {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
         isSubmitDisabled() {
-            return !(!this.isInsufficient() && this.isAmountValid && this.isValidContractId(this.contractId))
+            return !(!this.isInsufficient && this.isAmountValid && this.isValidContractId(this.contractId))
         },
         isAmountValid() {
             let amount = this.amount
@@ -370,6 +370,9 @@ export default {
             return function(amount) {
                 return BigNumber(amount).isGreaterThan(this.tokenBalance)
             }
+        },
+        isInsufficient() {
+            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         dataObject() {
             return {
@@ -501,9 +504,6 @@ export default {
         isValidContractId(contractId) {
             let contractArr = base58.decode(contractId)
             return contractArr && contractArr.length === 26 && contractArr[0] === 6
-        },
-        isInsufficient() {
-            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

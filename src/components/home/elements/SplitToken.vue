@@ -67,7 +67,7 @@
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
-            <span v-if="isInsufficient()"
+            <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
             <span v-if="!isSplit"
                   class="vsys-check">Cannot change unity. This token does not support split function.</span>
@@ -177,7 +177,7 @@
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
-            <span v-if="isInsufficient()"
+            <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
             <span v-if="!isSplit"
                   class="vsys-check">Cannot change unity. This token does not support split function.</span>
@@ -388,7 +388,10 @@ export default {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         isSubmitDisabled() {
-            return !(this.isValidIssuer(this.address) && this.isValidUnity() && !this.isInsufficient() && this.isSplit)
+            return !(this.isValidIssuer(this.address) && this.isValidUnity() && !this.isInsufficient && this.isSplit)
+        },
+        isInsufficient() {
+            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         dataObject() {
             return {
@@ -530,9 +533,6 @@ export default {
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
-        },
-        isInsufficient() {
-            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

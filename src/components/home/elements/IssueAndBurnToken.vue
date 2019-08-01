@@ -112,7 +112,7 @@
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
-            <span v-if="isInsufficient()"
+            <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
           </b-form-group>
           <b-button variant="warning"
@@ -233,7 +233,7 @@
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
-            <span v-if="isInsufficient()"
+            <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
           </b-form-group>
           <b-button variant="warning"
@@ -456,7 +456,7 @@ export default {
             return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         isSubmitDisabled() {
-            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid && !this.isInsufficient())
+            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid && !this.isInsufficient)
         },
         isAmountValid() {
             let amount = this.amount
@@ -464,6 +464,9 @@ export default {
                 return void 0
             }
             return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededMaxSupply(amount) && !this.isNegative(amount)
+        },
+        isInsufficient() {
+            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         dataObject() {
             return {
@@ -690,9 +693,6 @@ export default {
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
-        },
-        isInsufficient() {
-            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         checkPrecision(amount) {
             return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
