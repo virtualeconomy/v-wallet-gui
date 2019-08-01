@@ -88,7 +88,6 @@
     </IssueAndBurnToken>
     <WithdrawToken :token-id="tokenId"
                    :address="address"
-                   :maker="maker"
                    :wallet-type="walletType"
                    :addresses="addresses"
                    :cold-addresses="coldAddresses"
