@@ -8,13 +8,22 @@
       </div>
       <div class="home">
         <div>
-          <div class="title-des">
+          <div v-show="!showSeedErr"
+               class="title-des">
             <H1>
               Restore your account
             </H1>
             <hr>
           </div>
         </div>
+        <b-alert
+          class="alert"
+          variant="info"
+          :show="dismissCountDown"
+          dismissible
+          @dismissed="dismissCountDown=0">
+          {{ alertMessage }}
+        </b-alert>
         <div class="login-forms">
           <p
             class="subtit"
@@ -47,6 +56,7 @@
             :variant="'warning'"
             :size="'lg'"
             @click="checkSeed"
+            :disabled="isSubmitDisabled"
             :block=true>
             Continue
           </b-button>
@@ -93,6 +103,8 @@ export default {
 
     data: function() {
         return {
+            dismissCountDown: 0,
+            alertMessage: 'Warning! The seed phrase above is from a user-supplied source.An insecure entropy source can lead to total loss of the wallet.',
             pageId: 'registration',
             seedInput: '',
             showSeedErr: false,
@@ -100,6 +112,9 @@ export default {
         }
     },
     computed: {
+        isSubmitDisabled() {
+            return this.seedInput === ''
+        },
         isValidSeed() {
             const wordList = this.seedPhrase.split(' ')
             return (wordList.length === 15 || wordList.length === 18) && seedLib.isSystemPhrase(wordList)
@@ -111,8 +126,13 @@ export default {
     methods: {
 
         checkSeed() {
-            this.showSeedErr = true
             this.seedPhrase = this.seedInput.trim()
+            if (!this.isValidSeed) {
+                this.dismissCountDown = 3
+                this.showSeedErr = false
+            } else {
+                this.showSeedErr = true
+            }
         },
 
         preventDefault(event) {
@@ -144,6 +164,7 @@ export default {
     background-color: rgb(249, 249, 249);
 }
 .brand-logo {
+    margin-top: 50px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -155,7 +176,7 @@ export default {
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 80px;
+    margin-top: 20px;
 }
 .login-forms {
     width: 450px;
