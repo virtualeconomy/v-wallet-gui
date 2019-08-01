@@ -339,11 +339,6 @@ export default {
         isSplit: {
             type: Boolean,
             default: false
-        },
-        maker: {
-            type: String,
-            default: '',
-            require: true
         }
     },
     computed: {
