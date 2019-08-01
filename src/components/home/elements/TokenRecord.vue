@@ -72,19 +72,20 @@
                     :current-supply="formatter(currentSupply)"
                     :token-description="tokenDescription">
     </TokenInfoModal>
-    <IssueToken :token-id="tokenId"
-                :issuer="issuer"
-                :address="address"
-                :wallet-type="walletType"
-                :addresses="addresses"
-                :cold-addresses="coldAddresses"
-                :token-balance="tokenBalance"
-                :balance="balances[address]"
-                :max-supply="maxSupply"
-                :current-supply="currentSupply"
-                :token-unity="unity"
-                @updateBalance="updateBalance">
-    </IssueToken>
+    <IssueAndBurnToken :token-id="tokenId"
+                       :issuer="issuer"
+                       :address="address"
+                       :wallet-type="walletType"
+                       :addresses="addresses"
+                       :cold-addresses="coldAddresses"
+                       :token-balance="tokenBalance"
+                       :balance="balances[address]"
+                       :max-supply="maxSupply"
+                       :current-supply="currentSupply"
+                       :token-unity="unity"
+                       :function-name="functionName"
+                       @updateBalance="updateBalance">
+    </IssueAndBurnToken>
     <WithdrawToken :token-id="tokenId"
                    :address="address"
                    :maker="maker"
@@ -161,10 +162,9 @@ import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import TokenInfoModal from './TokenInfoModal'
 import SendToken from './SendToken'
-import IssueToken from './IssueToken'
 import WithdrawToken from './WithdrawToken'
 import BigNumber from 'bignumber.js'
-import BurnToken from './BurnToken'
+import IssueAndBurnToken from './IssueAndBurnToken'
 import Supersede from './Supersede'
 import SplitToken from './SplitToken'
 import DepositToken from './DepositToken'
@@ -175,7 +175,7 @@ import browser from '@/utils/browser'
 import certify from '@/utils/certify'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, IssueToken, BurnToken, Supersede, SplitToken, WithdrawToken, DepositToken },
+    components: { TokenInfoModal, SendToken, Supersede, SplitToken, WithdrawToken, DepositToken, IssueAndBurnToken },
     data: function() {
         return {
             isSplit: false,
@@ -190,6 +190,7 @@ export default {
             issuer: '',
             maker: '',
             functionIndex: SEND_FUNCIDX,
+            functionName: '',
             contractId: '',
             showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION
         }
@@ -355,7 +356,7 @@ export default {
             }
         },
         getTokenInfo() {
-            var contractId = transaction.tokenIDToContractID(this.tokenId)
+            let contractId = transaction.tokenIDToContractID(this.tokenId)
             const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(tokenUrl).then(response => {
                 this.tokens = response.body
@@ -424,7 +425,9 @@ export default {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {
-                this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)
+                this.functionName = 'Issue Token'
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'issueAndBurnTokenModal_' + this.tokenId)
             }
         },
         withdrawToken() {
@@ -439,8 +442,9 @@ export default {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {
+                this.functionName = 'Destroy Token'
                 this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'burnTokenModal_' + this.tokenId)
+                this.$root.$emit('bv::show::modal', 'issueAndBurnTokenModal_' + this.tokenId)
             }
         },
         depositToken() {
@@ -452,17 +456,17 @@ export default {
             }
         },
         removeToken() {
-            var isRemove = confirm('Are you sure to remove this token?')
+            let isRemove = confirm('Are you sure to remove this token?')
             if (isRemove) {
-                var user = JSON.parse(window.localStorage.getItem(this.seedaddress))
-                var arr = JSON.parse(user.tokens)
+                let user = JSON.parse(window.localStorage.getItem(this.seedaddress))
+                let arr = JSON.parse(user.tokens)
                 Vue.delete(arr, this.tokenId)
                 this.setUsrLocalStorage('tokens', JSON.stringify(arr))
                 this.removeFlag = true
                 this.$emit('removeFlag', this.removeFlag)
                 this.removeFlag = false
                 if (this.$store.state.eventPool) {
-                    var eventPool = this.$store.state.eventPool
+                    let eventPool = this.$store.state.eventPool
                     if (eventPool[this.tokenId] && eventPool[this.tokenId].newToken) {
                         var stopArr = eventPool[this.tokenId].newToken
                         for (var i in stopArr) {

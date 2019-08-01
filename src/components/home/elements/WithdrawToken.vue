@@ -37,7 +37,7 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid()">
+                          :state="isAmountValid">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="!isNumFormatValid(amount)">
@@ -62,14 +62,14 @@
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
-            <span v-if="isInsufficient()"
+            <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled()"
+                    :disabled="isSubmitDisabled"
                     @click="nextPage">Withdraw
           </b-button>
         </b-container>
@@ -141,7 +141,7 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid()">
+                          :state="isAmountValid">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="!isNumFormatValid(amount)">
@@ -166,14 +166,14 @@
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
-            <span v-if="isInsufficient()"
+            <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isSubmitDisabled()"
+                    :disabled="isSubmitDisabled"
                     @click="coldNextPage">Withdraw
           </b-button>
         </b-container>
@@ -360,10 +360,23 @@ export default {
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
+        isSubmitDisabled() {
+            return !(!this.isInsufficient && this.isAmountValid && this.isValidContractId(this.contractId))
+        },
+        isAmountValid() {
+            let amount = this.amount
+            if (BigNumber(amount).isEqualTo(0)) {
+                return void 0
+            }
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && this.isEnoughContractBanlance(amount) && !this.isNegative(amount)
+        },
+        isInsufficient() {
+            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
-                api: this.coldApi(),
+                api: API_VERSION,
                 opc: OPC_FUNCTION,
                 address: this.address,
                 // senderPublicKey: this.coldAddresses[this.address].publicKey,
@@ -382,13 +395,7 @@ export default {
         inputAmount(num) {
             return BigNumber(num)
         },
-        coldApi: function() {
-            return API_VERSION
-        },
-        isSubmitDisabled() {
-            return !(!this.isInsufficient() && this.isAmountValid() && this.isValidContractId(this.contractId))
-        },
-        sendData: function(walletType) {
+        sendData(walletType) {
             let apiSchema
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
@@ -410,12 +417,12 @@ export default {
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
                 const coldDataInfo = {
-                    contractId: this.contractId,
-                    // senderPublicKey: this.coldAddresses[this.address].publicKey,
-                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
+                    contractId: this.dataObject.contractId,
+                    // senderPublicKey: this.dataObject.senderPublicKey,
+                    fee: this.dataObject.fee,
+                    feeScale: this.dataObject.feeScale,
                     timestamp: this.dataObject.timestamp,
-                    functionIndex: this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX,
+                    functionIndex: this.dataObject.functionId,
                     functionData: this.dataObject.function,
                     signature: this.coldSignature
                 }
@@ -436,16 +443,16 @@ export default {
                 this.sendError = true
             })
         },
-        nextPage: function() {
+        nextPage() {
             this.timeStamp = Date.now() * 1e6
             this.hasConfirmed = false
             this.pageId++
         },
-        coldNextPage: function() {
+        coldNextPage() {
             this.sendError = false
             this.coldPageId++
         },
-        prevPage: function() {
+        prevPage() {
             this.sendError = false
             if (this.pageId === 1) {
                 this.$refs.sendModal.hide()
@@ -453,7 +460,7 @@ export default {
                 this.pageId--
             }
         },
-        coldPrevPage: function() {
+        coldPrevPage() {
             this.sendError = false
             if (this.coldPageId === 1) {
                 this.$refs.sendModal.hide()
@@ -461,7 +468,7 @@ export default {
                 this.coldPageId--
             }
         },
-        resetPage: function() {
+        resetPage() {
             this.amount = BigNumber(0)
             this.pageId = 1
             this.coldPageId = 1
@@ -469,26 +476,19 @@ export default {
             this.coldSignature = ''
             this.contractId = ''
         },
-        endSend: function() {
+        endSend() {
             for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 setTimeout(this.sendBalanceChange, delayTime)
             }
             this.$refs.withdrawTokenModal.hide()
         },
-        sendBalanceChange: function() {
+        sendBalanceChange() {
             this.$emit('updateBalance', 'update')
         },
-        getSignature: function(signature) {
+        getSignature(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
-        },
-        isAmountValid() {
-            var amount = this.amount
-            if (BigNumber(amount).isEqualTo(0)) {
-                return void 0
-            }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && this.isEnoughContractBanlance(amount) && !this.isNegative(amount)
         },
         isNumFormatValid(amount) {
             return common.isNumFormatValid(amount)
@@ -502,14 +502,11 @@ export default {
         isEnoughContractBanlance(amount) {
             return true
         },
-        isInsufficient() {
-            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
-        },
         isValidContractId(contractId) {
-            var contractArr = base58.decode(contractId)
+            let contractArr = base58.decode(contractId)
             return contractArr && contractArr.length === 26 && contractArr[0] === 6
         },
-        getKeypair: function(index) {
+        getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {

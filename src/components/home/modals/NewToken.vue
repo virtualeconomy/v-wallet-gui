@@ -490,10 +490,25 @@ export default {
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
+        isAmountValid() {
+            return function(type) {
+                let amount = type === 'hot' ? this.amount : this.coldAmount
+                if (BigNumber(amount).isEqualTo(0) && !this.isInsufficient(type)) {
+                    return void 0
+                }
+                return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isBiggerThanMax(amount) && !this.isNegative(amount)
+            }
+        },
+        isInsufficient() {
+            return function(type) {
+                let balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
+                return BigNumber(balance).isLessThan(BigNumber(TOKEN_FEE))
+            }
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
-                api: this.coldApi(),
+                api: API_VERSION,
                 opc: OPC_CONTRACT,
                 address: this.coldAddress,
                 senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
@@ -526,8 +541,8 @@ export default {
             let tempDataObject = JSON.parse(JSON.stringify(this.dataObject))
             delete tempDataObject.senderPublicKey
             const text = JSON.stringify(tempDataObject)
-            var page = Math.ceil(text.length / qrSize)
-            var textArray = Array(page)
+            let page = Math.ceil(text.length / qrSize)
+            let textArray = Array(page)
             if (tempDataObject.opc === 'contract') {
                 this.qrTotalPage = page
                 for (var i = 0; i < this.qrTotalPage; i++) {
@@ -567,9 +582,6 @@ export default {
                 this.unity++
             }
         },
-        coldApi: function() {
-            return API_VERSION
-        },
         sendData: function(walletType) {
             let apiSchema
             if (walletType === 'hotWallet') {
@@ -591,13 +603,13 @@ export default {
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
                 const coldDataInfo = {
-                    contract: this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT,
-                    senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
-                    fee: TOKEN_FEE * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
+                    contract: this.dataObject.contract,
+                    senderPublicKey: this.dataObject.senderPublicKey,
+                    fee: this.dataObject.fee,
+                    feeScale: this.dataObject.feeScale,
                     timestamp: this.dataObject.timestamp,
-                    initData: base58.encode(transaction.prepareCreate(BigNumber(this.coldAmount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.coldTokenDescription)[0]),
-                    description: this.coldContractDescription,
+                    initData: this.dataObject.contractInit,
+                    description: this.dataObject.description,
                     signature: this.coldSignature
                 }
                 apiSchema = coldDataInfo
@@ -619,17 +631,17 @@ export default {
             })
             this.$emit('endSendSignal')
         },
-        nextPage: function() {
+        nextPage() {
             this.sendError = false
             this.timeStamp = Date.now() * 1e6
             this.hasConfirmed = false
             this.pageId++
         },
-        coldNextPage: function() {
+        coldNextPage() {
             this.sendError = false
             this.coldPageId++
         },
-        prevPage: function() {
+        prevPage() {
             this.sendError = false
             if (this.pageId === 1) {
                 this.$refs.newTokenModal.hide()
@@ -637,7 +649,7 @@ export default {
                 this.pageId--
             }
         },
-        coldPrevPage: function() {
+        coldPrevPage() {
             this.sendError = false
             if (this.coldPageId === 1) {
                 this.$refs.newTokenModal.hide()
@@ -645,7 +657,7 @@ export default {
                 this.coldPageId--
             }
         },
-        resetPage: function() {
+        resetPage() {
             this.opc = ''
             this.unity = 8
             this.qrTotalPage = 1
@@ -670,21 +682,21 @@ export default {
             this.coldContractDescription = ''
             this.coldTokenDescription = ''
         },
-        endSend: function() {
+        endSend() {
             this.$refs.newTokenModal.hide()
-            var stopParaArr = []
+            let stopParaArr = []
             for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 var stopPara = setTimeout(this.sendToAdd, delayTime)
                 stopParaArr.push(stopPara)
             }
-            var tmp = {'newToken': stopParaArr, 'removeToken': false}
-            var eventPool = this.$store.state.eventPool
+            let tmp = {'newToken': stopParaArr, 'removeToken': false}
+            let eventPool = this.$store.state.eventPool
             Vue.set(eventPool, this.tokenId, tmp)
             this.$store.commit('changeEventPool', eventPool)
         },
-        sendToAdd: function() {
-            var userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            var tokens = {}
+        sendToAdd() {
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            let tokens = {}
             if (userInfo && userInfo.tokens) {
                 tokens = JSON.parse(userInfo.tokens)
             }
@@ -701,7 +713,7 @@ export default {
             Vue.set(this.userInfo, fieldname, value)
             window.localStorage.setItem(this.seedAddress, JSON.stringify(this.userInfo))
         },
-        scanChange: function(evt) {
+        scanChange(evt) {
             if (!this.qrInit) {
                 this.scanShow = !this.scanShow
             }
@@ -731,7 +743,7 @@ export default {
                 this.qrInit = false
             }
         },
-        getSignature: function(signature) {
+        getSignature(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
@@ -765,20 +777,13 @@ export default {
             }
             this.scanShow = false
         },
-        isAmountValid(type) {
-            var amount = type === 'hot' ? this.amount : this.coldAmount
-            if (BigNumber(amount).isEqualTo(0) && !this.isInsufficient(type)) {
-                return void 0
-            }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isBiggerThanMax(amount) && !this.isNegative(amount)
-        },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
         },
         isBiggerThanMax(amount) {
-            var maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
-            var unityValue = BigNumber(10).exponentiatedBy(this.unity)
-            var value = BigNumber(amount).multipliedBy(unityValue)
+            let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
+            let unityValue = BigNumber(10).exponentiatedBy(this.unity)
+            let value = BigNumber(amount).multipliedBy(unityValue)
             if (value.isGreaterThan(maxValue)) {
                 return true
             } else {
@@ -791,17 +796,13 @@ export default {
         checkPrecision(amount) {
             return common.checkPrecision(amount, this.unity)
         },
-        isInsufficient(type) {
-            var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return BigNumber(balance).isLessThan(BigNumber(TOKEN_FEE))
-        },
         options(addrs) {
             return Object.keys(addrs).reduce((options, addr) => {
                 options.push({ value: addr, text: addr })
                 return options
             }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
         },
-        getKeypair: function(index) {
+        getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {

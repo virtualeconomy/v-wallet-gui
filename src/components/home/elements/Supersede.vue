@@ -69,14 +69,14 @@
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
-            <span v-if="isInsufficient()"
+            <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled()"
+                    :disabled="isSubmitDisabled"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -180,7 +180,7 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isSubmitDisabled()"
+                    :disabled="isSubmitDisabled"
                     @click="coldNextPage">Continue
           </b-button>
         </b-container>
@@ -367,6 +367,12 @@ export default {
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
+        isSubmitDisabled() {
+            return !(this.isValidMaker(this.address) && this.isValidIssuer(this.newIssuer) && !this.isInsufficient)
+        },
+        isInsufficient() {
+            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -406,9 +412,6 @@ export default {
         },
         isValidMaker: function(addr) {
             return addr === this.maker
-        },
-        isSubmitDisabled() {
-            return !(this.isValidMaker(this.address) && this.isValidIssuer(this.newIssuer) && !this.isInsufficient())
         },
         sendData: function(walletType) {
             let apiSchema
@@ -537,11 +540,11 @@ export default {
         onDecode: function(decodeString) {
             this.paused = true
             try {
-                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
+                let jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
                 this.newIssuer = jsonObj.address
-                var opc = jsonObj.opc
-                var api = jsonObj.api
-                var protocol = jsonObj.protocol
+                let opc = jsonObj.opc
+                let api = jsonObj.api
+                let protocol = jsonObj.protocol
                 if (protocol !== PROTOCOL) {
                     this.paused = false
                     this.qrErrMsg = 'Invalid QR code protocol.'
@@ -599,9 +602,6 @@ export default {
                 this.coldPageId = 1
             }
             this.scanShow = false
-        },
-        isInsufficient() {
-            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         getKeypair: function(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

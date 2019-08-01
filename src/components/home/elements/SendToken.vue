@@ -523,10 +523,33 @@ export default {
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
+        isSubmitDisabled() {
+            return function(type) {
+                let recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
+                let attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
+                let address = type === 'hotWallet' ? this.address : this.coldAddress
+                return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
+            }
+        },
+        isAmountValid() {
+            return function(type) {
+                let amount = type === 'hotWallet' ? this.amount : this.coldAmount
+                if (BigNumber(amount).isEqualTo(0)) {
+                    return true
+                }
+                return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount, type) && !this.isInsufficient(type) && !this.isNegative(amount)
+            }
+        },
+        isInsufficient() {
+            return function(type) {
+                let balance = type === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
+                return BigNumber(balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
+            }
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
-                api: this.coldApi(),
+                api: API_VERSION,
                 opc: OPC_FUNCTION,
                 address: this.coldAddress,
                 senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
@@ -542,12 +565,6 @@ export default {
         }
     },
     methods: {
-        isSubmitDisabled(type) {
-            var recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
-            var attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
-            var address = type === 'hotWallet' ? this.address : this.coldAddress
-            return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
-        },
         isValidAttachment(attachment) {
             if (!attachment) {
                 return void 0
@@ -557,11 +574,8 @@ export default {
         inputAmount(num) {
             return BigNumber(num)
         },
-        coldApi: function() {
-            return API_VERSION
-        },
-        sendData: function(walletType) {
-            var apiSchema
+        sendData(walletType) {
+            let apiSchema
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
                     return
@@ -581,14 +595,14 @@ export default {
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
                 const coldDataInfo = {
-                    contractId: this.contractId,
-                    senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
-                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
+                    contractId: this.dataObject.contractId,
+                    senderPublicKey: this.dataObject.senderPublicKey,
+                    fee: this.dataObject.fee,
+                    feeScale: this.dataObject.feeScale,
                     timestamp: this.dataObject.timestamp,
-                    attachment: transaction.prepareSendAttachment(this.coldAttachment),
-                    functionIndex: this.functionIndex,
-                    functionData: transaction.prepareSend(this.coldRecipient, BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
+                    attachment: this.dataObject.attachment,
+                    functionIndex: this.dataObject.functionId,
+                    functionData: this.dataObject.function,
                     signature: this.coldSignature
                 }
                 apiSchema = coldDataInfo
@@ -609,7 +623,7 @@ export default {
             })
             this.$emit('endSendSignal')
         },
-        addRecipientList: function() {
+        addRecipientList() {
             if (this.walletType === 'hotWallet') {
                 this.hotRecipientAddressList.set(this.recipient, '0')
                 window.localStorage.setItem('Hot ' + this.defaultAddress + ' sendTokenRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
@@ -618,7 +632,7 @@ export default {
                 window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendTokenRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
             }
         },
-        nextPage: function() {
+        nextPage() {
             this.sendError = false
             this.hasConfirmed = false
             if (this.walletType === 'hotWallet') {
@@ -628,9 +642,9 @@ export default {
                 this.coldPageId++
             }
         },
-        prevPage: function() {
+        prevPage() {
             this.sendError = false
-            var pageId = this.walletType === 'hotWallet' ? this.pageId : this.coldPageId
+            let pageId = this.walletType === 'hotWallet' ? this.pageId : this.coldPageId
             if (pageId === 1) {
                 this.$refs.sendModal.hide()
             } else {
@@ -641,7 +655,7 @@ export default {
                 }
             }
         },
-        resetPage: function() {
+        resetPage() {
             this.opc = ''
             this.recipient = ''
             this.amount = BigNumber(0)
@@ -661,10 +675,10 @@ export default {
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
-        endSend: function() {
+        endSend() {
             this.$refs.sendTokenModal.hide()
         },
-        scanChange: function(evt) {
+        scanChange(evt) {
             if (!this.qrInit) {
                 this.scanShow = !this.scanShow
             }
@@ -672,7 +686,7 @@ export default {
                 this.paused = false
             }
         },
-        isValidRecipient: function(recipient) {
+        isValidRecipient(recipient) {
             if (!recipient) {
                 return void 0
             }
@@ -706,14 +720,14 @@ export default {
                 this.qrInit = false
             }
         },
-        onDecode: function(decodeString) {
+        onDecode(decodeString) {
             this.paused = true
             try {
-                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
+                let jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
                 var recipient = jsonObj.address
-                var opc = jsonObj.opc
-                var api = jsonObj.api
-                var protocol = jsonObj.protocol
+                let opc = jsonObj.opc
+                let api = jsonObj.api
+                let protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
                     if (this.walletType === 'hotWallet') {
                         this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
@@ -762,7 +776,7 @@ export default {
                 }
             }
         },
-        getSignature: function(signature) {
+        getSignature(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
@@ -797,13 +811,6 @@ export default {
             }
             this.scanShow = false
         },
-        isAmountValid(type) {
-            var amount = type === 'hotWallet' ? this.amount : this.coldAmount
-            if (BigNumber(amount).isEqualTo(0)) {
-                return true
-            }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount, type) && !this.isInsufficient(type) && !this.isNegative(amount)
-        },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
         },
@@ -814,12 +821,8 @@ export default {
             return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
         },
         isTokenInsufficient(amount, type) {
-            var balance = type === 'hotWallet' ? this.tokenBalances[this.address] : this.tokenBalances[this.coldAddress]
+            let balance = type === 'hotWallet' ? this.tokenBalances[this.address] : this.tokenBalances[this.coldAddress]
             return BigNumber(amount).isGreaterThan(BigNumber(balance))
-        },
-        isInsufficient(type) {
-            var balance = type === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return BigNumber(balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         options(addrs) {
             return Object.keys(addrs).reduce((options, addr) => {
@@ -827,7 +830,7 @@ export default {
                 return options
             }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
         },
-        getKeypair: function(index) {
+        getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {
