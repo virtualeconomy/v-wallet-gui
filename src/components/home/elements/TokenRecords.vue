@@ -152,9 +152,6 @@ export default {
         },
         endSendSignal() {
             this.$emit('updateInfo')
-        },
-        addToken() {
-            this.$root.$emit('bv::show::modal', 'addTokenModal')
         }
     }
 }

@@ -76,7 +76,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled()"
+                    :disabled="isSubmitDisabled"
                     @click="nextPage">Change
           </b-button>
         </b-container>
@@ -186,7 +186,7 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isSubmitDisabled()"
+                    :disabled="isSubmitDisabled"
                     @click="coldNextPage">Continue
           </b-button>
         </b-container>
@@ -387,10 +387,13 @@ export default {
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
+        isSubmitDisabled() {
+            return !(this.isValidIssuer(this.address) && this.isValidUnity() && !this.isInsufficient() && this.isSplit)
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
-                api: this.coldApi(),
+                api: API_VERSION,
                 opc: OPC_FUNCTION,
                 address: this.address,
                 senderPublicKey: this.coldAddresses[this.address].publicKey,
@@ -406,19 +409,13 @@ export default {
         }
     },
     methods: {
-        coldApi: function() {
-            return API_VERSION
-        },
-        isValidIssuer: function(addr) {
+        isValidIssuer(addr) {
             return addr === this.issuer
         },
-        isSubmitDisabled() {
-            return !(this.isValidIssuer(this.address) && this.isValidUnity() && !this.isInsufficient() && this.isSplit)
-        },
         isBiggerThanMax() {
-            var maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
-            var unityValue = BigNumber(this.newUnity)
-            var value = BigNumber(this.maxSupply).multipliedBy(unityValue)
+            let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
+            let unityValue = BigNumber(this.newUnity)
+            let value = BigNumber(this.maxSupply).multipliedBy(unityValue)
             if (value.isGreaterThan(maxValue) || unityValue.isGreaterThan(BigNumber(10).exponentiatedBy(16))) {
                 return true
             } else {
@@ -434,7 +431,7 @@ export default {
             }
             return this.isNumFormatValid(this.newUnity) && !this.isBiggerThanMax() && !this.isNegative(this.newUnity) && this.isInteger()
         },
-        sendData: function(walletType) {
+        sendData(walletType) {
             let apiSchema
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
@@ -455,12 +452,12 @@ export default {
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
                 const coldDataInfo = {
-                    contractId: this.contractId,
-                    senderPublicKey: this.coldAddresses[this.address].publicKey,
-                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
+                    contractId: this.dataObject.contractId,
+                    senderPublicKey: this.dataObject.senderPublicKey,
+                    fee: this.dataObject.fee,
+                    feeScale: this.dataObject.feeScale,
                     timestamp: this.dataObject.timestamp,
-                    functionIndex: SPLIT_FUNCIDX,
+                    functionIndex: this.dataObject.functionId,
                     functionData: this.dataObject.function,
                     signature: this.coldSignature
                 }
@@ -482,16 +479,16 @@ export default {
                 this.sendError = true
             })
         },
-        nextPage: function() {
+        nextPage() {
             this.timeStamp = Date.now() * 1e6
             this.hasConfirmed = false
             this.pageId++
         },
-        coldNextPage: function() {
+        coldNextPage() {
             this.sendError = false
             this.coldPageId++
         },
-        prevPage: function() {
+        prevPage() {
             this.sendError = false
             if (this.pageId === 1) {
                 this.$refs.sendModal.hide()
@@ -499,7 +496,7 @@ export default {
                 this.pageId--
             }
         },
-        coldPrevPage: function() {
+        coldPrevPage() {
             this.sendError = false
             if (this.coldPageId === 1) {
                 this.$refs.sendModal.hide()
@@ -507,23 +504,23 @@ export default {
                 this.coldPageId--
             }
         },
-        resetPage: function() {
+        resetPage() {
             this.newUnity = BigNumber(0)
             this.pageId = 1
             this.coldPageId = 1
             this.sendError = false
             this.coldSignature = ''
         },
-        endSend: function() {
+        endSend() {
             for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 setTimeout(this.sendBalanceChange, delayTime)
             }
             this.$refs.splitTokenModal.hide()
         },
-        sendBalanceChange: function() {
+        sendBalanceChange() {
             this.$emit('updateBalance', 'update')
         },
-        getSignature: function(signature) {
+        getSignature(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
@@ -537,7 +534,7 @@ export default {
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
-        getKeypair: function(index) {
+        getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {

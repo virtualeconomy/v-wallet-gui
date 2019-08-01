@@ -546,7 +546,7 @@ export default {
             }
         },
         sendData: function(walletType) {
-            var apiSchema
+            let apiSchema
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
                     return
