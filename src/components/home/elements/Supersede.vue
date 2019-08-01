@@ -69,7 +69,7 @@
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
-            <span v-if="isInsufficient()"
+            <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
           </b-form-group>
           <b-button variant="warning"
@@ -368,7 +368,10 @@ export default {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         isSubmitDisabled() {
-            return !(this.isValidMaker(this.address) && this.isValidIssuer(this.newIssuer) && !this.isInsufficient())
+            return !(this.isValidMaker(this.address) && this.isValidIssuer(this.newIssuer) && !this.isInsufficient)
+        },
+        isInsufficient() {
+            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         dataObject() {
             return {
@@ -599,9 +602,6 @@ export default {
                 this.coldPageId = 1
             }
             this.scanShow = false
-        },
-        isInsufficient() {
-            return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         getKeypair: function(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

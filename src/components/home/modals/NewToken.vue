@@ -499,6 +499,12 @@ export default {
                 return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isBiggerThanMax(amount) && !this.isNegative(amount)
             }
         },
+        isInsufficient() {
+            return function(type) {
+                let balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
+                return BigNumber(balance).isLessThan(BigNumber(TOKEN_FEE))
+            }
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -786,10 +792,6 @@ export default {
         },
         isNumFormatValid(amount) {
             return common.isNumFormatValid(amount)
-        },
-        isInsufficient(type) {
-            let balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return BigNumber(balance).isLessThan(BigNumber(TOKEN_FEE))
         },
         checkPrecision(amount) {
             return common.checkPrecision(amount, this.unity)

@@ -540,6 +540,12 @@ export default {
                 return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isTokenInsufficient(amount, type) && !this.isInsufficient(type) && !this.isNegative(amount)
             }
         },
+        isInsufficient() {
+            return function(type) {
+                let balance = type === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
+                return BigNumber(balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
+            }
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -817,10 +823,6 @@ export default {
         isTokenInsufficient(amount, type) {
             let balance = type === 'hotWallet' ? this.tokenBalances[this.address] : this.tokenBalances[this.coldAddress]
             return BigNumber(amount).isGreaterThan(BigNumber(balance))
-        },
-        isInsufficient(type) {
-            let balance = type === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return BigNumber(balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         options(addrs) {
             return Object.keys(addrs).reduce((options, addr) => {
