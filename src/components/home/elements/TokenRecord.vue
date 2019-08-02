@@ -321,7 +321,6 @@ export default {
         updateUnity() {
             const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(tokenUrl).then(response => {
-                console.log(response)
                 this.tokens = response.body
                 this.unity = BigNumber(this.tokens.unity)
                 this.updateBalance()
