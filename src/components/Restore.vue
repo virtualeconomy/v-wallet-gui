@@ -16,14 +16,6 @@
             <hr>
           </div>
         </div>
-        <b-alert
-          class="alert"
-          variant="info"
-          :show="dismissCountDown"
-          dismissible
-          @dismissed="dismissCountDown=0">
-          {{ alertMessage }}
-        </b-alert>
         <div class="login-forms">
           <p
             class="subtit"
@@ -103,8 +95,6 @@ export default {
 
     data: function() {
         return {
-            dismissCountDown: 0,
-            alertMessage: 'Warning! The seed phrase above is from a user-supplied source.An insecure entropy source can lead to total loss of the wallet.',
             pageId: 'registration',
             seedInput: '',
             showSeedErr: false,
@@ -128,8 +118,10 @@ export default {
         checkSeed() {
             this.seedPhrase = this.seedInput.trim()
             if (!this.isValidSeed) {
-                this.dismissCountDown = 3
-                this.showSeedErr = false
+                let isConfirmed = confirm('Warning! The seed phrase above is from a user-supplied source.An insecure entropy source can lead to total loss of the wallet.')
+                if (isConfirmed) {
+                    this.showSeedErr = true
+                }
             } else {
                 this.showSeedErr = true
             }
