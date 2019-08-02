@@ -498,12 +498,12 @@ export default {
         },
         endSend() {
             for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                setTimeout(this.sendBalanceChange, delayTime)
+                setTimeout(this.unityChange, delayTime)
             }
             this.$refs.splitTokenModal.hide()
         },
-        sendBalanceChange() {
-            this.$emit('updateBalance', 'update')
+        unityChange() {
+            this.$emit('updateUnity', 'update')
         },
         getSignature(signature) {
             this.coldSignature = signature
