@@ -8,7 +8,8 @@
       </div>
       <div class="home">
         <div>
-          <div class="title-des">
+          <div v-show="!showSeedErr"
+               class="title-des">
             <H1>
               Restore your account
             </H1>
@@ -47,6 +48,7 @@
             :variant="'warning'"
             :size="'lg'"
             @click="checkSeed"
+            :disabled="isSubmitDisabled"
             :block=true>
             Continue
           </b-button>
@@ -100,6 +102,9 @@ export default {
         }
     },
     computed: {
+        isSubmitDisabled() {
+            return this.seedInput === ''
+        },
         isValidSeed() {
             const wordList = this.seedPhrase.split(' ')
             return (wordList.length === 15 || wordList.length === 18) && seedLib.isSystemPhrase(wordList)
@@ -111,8 +116,15 @@ export default {
     methods: {
 
         checkSeed() {
-            this.showSeedErr = true
             this.seedPhrase = this.seedInput.trim()
+            if (!this.isValidSeed) {
+                let isConfirmed = confirm('Warning! The seed phrase above is from a user-supplied source.An insecure entropy source can lead to total loss of the wallet.')
+                if (isConfirmed) {
+                    this.showSeedErr = true
+                }
+            } else {
+                this.showSeedErr = true
+            }
         },
 
         preventDefault(event) {
@@ -144,6 +156,7 @@ export default {
     background-color: rgb(249, 249, 249);
 }
 .brand-logo {
+    margin-top: 50px;
     margin-left: auto;
     margin-right: auto;
 }
@@ -155,7 +168,7 @@ export default {
     max-width: 100%;
     margin-left: auto;
     margin-right: auto;
-    margin-top: 80px;
+    margin-top: 20px;
 }
 .login-forms {
     width: 450px;
