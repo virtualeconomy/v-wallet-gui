@@ -96,13 +96,13 @@
 
 import {NODE_IP, LEASE_TX, CANCEL_LEASE_TX} from '@/constants'
 import Vue from 'vue'
-import Record from './Record'
+import TransactionRecord from './TransactionRecord'
 import browser from '@/utils/browser'
 import JSONBigNumber from 'json-bignumber'
 export default {
     name: 'LeaseRecords',
     components: {
-        Record
+        TransactionRecord
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'

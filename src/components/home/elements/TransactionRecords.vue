@@ -166,7 +166,7 @@
 
 <script>
 import { NODE_IP, VSYS_PRECISION } from '@/constants'
-import Record from './Record'
+import TransactionRecord from './TransactionRecord'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
 import browser from '@/utils/browser'
@@ -174,9 +174,9 @@ import base58 from '@/libs/base58'
 import crypto from '@/utils/crypto'
 import JSONBigNumber from 'json-bignumber'
 export default {
-    name: 'Records',
+    name: 'TransactionRecords',
     components: {
-        Record,
+        TransactionRecord,
         JsonExcel
     },
     created() {
