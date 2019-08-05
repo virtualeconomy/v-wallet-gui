@@ -129,7 +129,7 @@
                 :token-unity="unity"
                 :max-supply="maxSupply"
                 :is-split="isSplit"
-                @updateBalance="updateBalance">
+                @updateUnity="updateUnity">
     </SplitToken>
     <SendToken :token-id="tokenId"
                :token-balances="tokenBalances"
@@ -142,16 +142,6 @@
                :token-unity="unity"
                @endSendSignal="endSendSignal">
     </SendToken>
-    <BurnToken :token-id="tokenId"
-               :issuer="issuer"
-               :address="address"
-               :wallet-type="walletType"
-               :addresses="addresses"
-               :cold-addresses="coldAddresses"
-               :token-balance="tokenBalance"
-               :balance="balances[address]"
-               :token-unity="unity"
-               @updateBalance="updateBalance"></BurnToken>
   </b-container>
 </template>
 
@@ -325,6 +315,15 @@ export default {
             const url = NODE_IP + '/contract/balance/' + this.address + '/' + this.tokenId
             this.$http.get(url).then(response => {
                 this.tokenBalance = BigNumber(response.body.balance).dividedBy(this.unity)
+            }, respError => {
+            })
+        },
+        updateUnity() {
+            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
+            this.$http.get(tokenUrl).then(response => {
+                this.tokens = response.body
+                this.unity = BigNumber(this.tokens.unity)
+                this.updateBalance()
             }, respError => {
             })
         },
