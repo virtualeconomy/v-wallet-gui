@@ -41,14 +41,14 @@
            :style="{height: myHeight}">
         <div v-for="record in leaseRecords"
              :key="record.id">
-          <Record :tx-record="record"
-                  :fee-flag="feeFlag"
-                  :cold-pub-key="coldPubKey"
-                  :trans-type="transType"
-                  :address-index="addressIndex"
-                  :address="address"
-                  :wallet-type="walletType"
-                  :is-canceled="beCanceledList[record.id]"></Record>
+          <TransactionRecord :tx-record="record"
+                             :fee-flag="feeFlag"
+                             :cold-pub-key="coldPubKey"
+                             :trans-type="transType"
+                             :address-index="addressIndex"
+                             :address="address"
+                             :wallet-type="walletType"
+                             :is-canceled="beCanceledList[record.id]"></TransactionRecord>
         </div>
       </div>
     </div>

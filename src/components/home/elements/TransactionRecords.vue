@@ -84,11 +84,11 @@
             <div v-for="record in records"
                  v-if="showingTypeValue === 0 || record['type'] === showingTypeValue"
                  :key="record.index">
-              <Record :tx-record="record"
-                      :fee-flag="feeFlag"
-                      :address="address"
-                      :wallet-type="walletType"
-                      :trans-type="transType"></Record>
+              <TransactionRecord :tx-record="record"
+                                 :fee-flag="feeFlag"
+                                 :address="address"
+                                 :wallet-type="walletType"
+                                 :trans-type="transType"></TransactionRecord>
             </div>
           </div>
         </template>

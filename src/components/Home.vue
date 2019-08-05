@@ -121,8 +121,8 @@
                   </div>
                 </template>
                 <div class="f-records">
-                  <Records :address="selectedAddress"
-                           :actived-tab="activedTab"></Records>
+                  <TransactionRecords :address="selectedAddress"
+                                      :actived-tab="activedTab"></TransactionRecords>
                 </div>
               </b-tab>
               <b-tab>
