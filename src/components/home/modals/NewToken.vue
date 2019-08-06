@@ -582,7 +582,7 @@ export default {
                 this.unity++
             }
         },
-        sendData: function(walletType) {
+        sendData(walletType) {
             let apiSchema
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {

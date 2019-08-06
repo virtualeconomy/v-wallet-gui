@@ -64,12 +64,16 @@
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
+                                     v-else-if="!checkPrecision(amount) && !isExceededMaxSupplyOrTokenSufficient(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupply(amount)">
+                                     v-else-if="isExceededMaxSupplyOrTokenSufficient(amount) && functionName === 'Issue Token'">
               The total supply can not larger than max supply.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isExceededMaxSupplyOrTokenSufficient(amount) && functionName === 'Destroy Token'">
+              Insufficient token.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(amount)">
@@ -94,12 +98,16 @@
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
+                                     v-else-if="!checkPrecision(amount) && !isExceededMaxSupplyOrTokenSufficient(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupply(amount)">
+                                     v-else-if="isExceededMaxSupplyOrTokenSufficient(amount) && functionName === 'Issue Token'">
               The total supply can not larger than max supply.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isExceededMaxSupplyOrTokenSufficient(amount) && functionName === 'Destroy Token'">
+              Insufficient token.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(amount)">
@@ -215,12 +223,16 @@
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount) && !isExceededMaxSupply(amount)">
+                                     v-else-if="!checkPrecision(amount) && !isExceededMaxSupplyOrTokenSufficient(amount)">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupply(amount)">
+                                     v-else-if="isExceededMaxSupplyOrTokenSufficient(amount) && functionName === 'Issue Token'">
               The total supply can not larger than max supply.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isExceededMaxSupplyOrTokenSufficient(amount) && functionName === 'Destroy Token'">
+              Insufficient token.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(amount)">
@@ -450,20 +462,17 @@ export default {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         isValidAttachment() {
-            if (!this.attachment) {
-                return void 0
-            }
             return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         isSubmitDisabled() {
-            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment || !this.attachment) && this.isAmountValid && !this.isInsufficient)
+            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment) && this.isAmountValid && !this.isInsufficient)
         },
         isAmountValid() {
             let amount = this.amount
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededMaxSupply(amount) && !this.isNegative(amount)
+            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededMaxSupplyOrTokenSufficient(amount) && !this.isNegative(amount)
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
@@ -697,8 +706,13 @@ export default {
         checkPrecision(amount) {
             return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
         },
-        isExceededMaxSupply(amount) {
-            return BigNumber(amount).isGreaterThan(BigNumber(this.maxSupply - this.currentSupply))
+        isExceededMaxSupplyOrTokenSufficient(amount) {
+            if (this.functionName === 'Issue Token') {
+                return BigNumber(amount).isGreaterThan(BigNumber(this.maxSupply - this.currentSupply))
+            }
+            if (this.functionName === 'Destroy Token') {
+                return BigNumber(amount).isGreaterThan(BigNumber(this.tokenBalance))
+            }
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

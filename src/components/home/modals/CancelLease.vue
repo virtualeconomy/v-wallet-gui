@@ -189,7 +189,7 @@ export default {
             this.coldSignature = ''
             this.hasConfirmed = false
         },
-        coldApi: function() {
+        coldApi() {
             return 1
         },
         closeModal() {

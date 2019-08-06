@@ -392,7 +392,7 @@ export default {
         }
     },
     methods: {
-        isValidIssuer: function(issuer) {
+        isValidIssuer(issuer) {
             if (!issuer) {
                 return void 0
             }
@@ -407,13 +407,13 @@ export default {
             }
             return isValid
         },
-        coldApi: function() {
+        coldApi() {
             return API_VERSION
         },
-        isValidMaker: function(addr) {
+        isValidMaker(addr) {
             return addr === this.maker
         },
-        sendData: function(walletType) {
+        sendData(walletType) {
             let apiSchema
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
@@ -461,16 +461,16 @@ export default {
                 this.sendError = true
             })
         },
-        nextPage: function() {
+        nextPage() {
             this.timeStamp = Date.now() * 1e6
             this.hasConfirmed = false
             this.pageId++
         },
-        coldNextPage: function() {
+        coldNextPage() {
             this.sendError = false
             this.coldPageId++
         },
-        prevPage: function() {
+        prevPage() {
             this.sendError = false
             if (this.pageId === 1) {
                 this.$refs.sendModal.hide()
@@ -478,7 +478,7 @@ export default {
                 this.pageId--
             }
         },
-        coldPrevPage: function() {
+        coldPrevPage() {
             this.sendError = false
             if (this.coldPageId === 1) {
                 this.$refs.sendModal.hide()
@@ -486,7 +486,7 @@ export default {
                 this.coldPageId--
             }
         },
-        resetPage: function() {
+        resetPage() {
             this.errorMessage = ''
             this.newIssuer = ''
             this.pageId = 1
@@ -498,16 +498,16 @@ export default {
             this.sendError = false
             this.coldSignature = ''
         },
-        endSend: function() {
+        endSend() {
             for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 setTimeout(this.sendBalanceChange, delayTime)
             }
             this.$refs.supersedeModal.hide()
         },
-        sendBalanceChange: function() {
+        sendBalanceChange() {
             this.$emit('updateBalance', 'update')
         },
-        scanChange: function(evt) {
+        scanChange(evt) {
             if (!this.qrInit) {
                 this.scanShow = !this.scanShow
             }
@@ -537,7 +537,7 @@ export default {
                 this.qrInit = false
             }
         },
-        onDecode: function(decodeString) {
+        onDecode(decodeString) {
             this.paused = true
             try {
                 let jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
@@ -554,7 +554,7 @@ export default {
                 } else if (opc !== OPC_ACCOUNT) {
                     this.paused = false
                     this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidIssuer(this.newIssuer) || this.newIssuer === '') {
+                } else if (!this.isValidIssuer(this.newIssuer)) {
                     this.paused = false
                     this.qrErrMsg = 'Invalid address of new issuer.'
                 } else {
@@ -569,7 +569,7 @@ export default {
                 }
             }
         },
-        getSignature: function(signature) {
+        getSignature(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
@@ -603,7 +603,7 @@ export default {
             }
             this.scanShow = false
         },
-        getKeypair: function(index) {
+        getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {
