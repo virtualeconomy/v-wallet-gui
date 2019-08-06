@@ -524,10 +524,8 @@ export default {
             })
         },
         isSubmitDisabled(type) {
-            var amount = type === 'hotWallet' ? this.amount : this.coldAmount
-            var recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
-            var attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
-            return !(recipient && BigNumber(amount).isGreaterThan(0) && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && this.address !== '')
+            let x = type === 'hotWallet' ? [this.amount, this.recipient, this.attachment] : [this.coldAmount, this.coldRecipient, this.coldAttachment]
+            return !(x[1] && BigNumber(x[0]).isGreaterThan(0) && this.isValidRecipient(x[1]) && (this.isValidAttachment(x[2]) || !x[2]) && this.isAmountValid(type) && this.address !== '')
         },
         isValidAttachment(attachment) {
             if (!attachment) {
@@ -538,14 +536,14 @@ export default {
         inputAmount(num) {
             return BigNumber(num)
         },
-        coldApi: function() {
+        coldApi() {
             if (this.coldAddresses[this.coldAddress].api === 1 && (BigNumber(this.coldAmount).isLessThan(BigNumber(Number.MAX_SAFE_INTEGER).dividedBy(1e8)) || BigNumber(this.coldAmount).multipliedBy(1e8).mod(100).isEqualTo(0))) {
                 return 1
             } else {
                 return API_VERSION
             }
         },
-        sendData: function(walletType) {
+        sendData(walletType) {
             let apiSchema
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
@@ -581,7 +579,7 @@ export default {
             })
             this.$emit('endSendSignal')
         },
-        nextPage: function() {
+        nextPage() {
             this.sendError = false
             this.hasConfirmed = false
             if (this.walletType === 'hotWallet') {
@@ -591,7 +589,7 @@ export default {
                 this.coldPageId++
             }
         },
-        addRecipientList: function(walletType) {
+        addRecipientList(walletType) {
             if (walletType === 'hotWallet') {
                 this.hotRecipientAddressList.set(this.recipient, '0')
                 window.localStorage.setItem('Hot ' + this.defaultAddress + ' sendRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
@@ -600,20 +598,14 @@ export default {
                 window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
             }
         },
-        prevPage: function() {
+        prevPage() {
             this.sendError = false
-            var pageId = this.walletType === 'hotWallet' ? this.pageId : this.coldPageId
-            if (pageId === 1) {
+            var pageId = this.walletType === 'hotWallet' ? --this.pageId : --this.coldPageId
+            if (pageId === 0) {
                 this.$refs.sendModal.hide()
-            } else {
-                if (this.walletType === 'hotWallet') {
-                    this.pageId--
-                } else {
-                    this.coldPageId--
-                }
             }
         },
-        resetPage: function() {
+        resetPage() {
             this.opc = ''
             this.recipient = ''
             this.amount = BigNumber(0)
@@ -633,10 +625,10 @@ export default {
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
-        endSend: function() {
+        endSend() {
             this.$refs.sendModal.hide()
         },
-        scanChange: function(evt) {
+        scanChange(evt) {
             if (!this.qrInit) {
                 this.scanShow = !this.scanShow
             }
@@ -644,7 +636,7 @@ export default {
                 this.paused = false
             }
         },
-        isValidRecipient: function(recipient) {
+        isValidRecipient(recipient) {
             if (!recipient) {
                 return void 0
             }
@@ -678,7 +670,7 @@ export default {
                 this.qrInit = false
             }
         },
-        onDecode: function(decodeString) {
+        onDecode(decodeString) {
             this.paused = true
             try {
                 var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
@@ -686,19 +678,20 @@ export default {
                 var opc = jsonObj.opc
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
+                var tempAmount = 0
+                var tempAttachment = ''
                 if (jsonObj.hasOwnProperty('amount')) {
-                    if (this.walletType === 'hotWallet') {
-                        this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                    } else {
-                        this.coldAmount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                    }
+                    tempAmount = jsonObj.amount
                 }
                 if (jsonObj.hasOwnProperty('invoice')) {
-                    if (this.walletType === 'hotWallet') {
-                        this.attachment = jsonObj.invoice
-                    } else {
-                        this.coldAttachment = jsonObj.invoice
-                    }
+                    tempAttachment = jsonObj.invoice
+                }
+                if (this.walletType === 'hotWallet') {
+                    this.amount = BigNumber(tempAmount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.attachment = tempAttachment
+                } else {
+                    this.coldAmount = BigNumber(tempAmount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.coldAttachment = tempAttachment
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
@@ -734,7 +727,7 @@ export default {
                 }
             }
         },
-        getSignature: function(signature) {
+        getSignature(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
@@ -796,7 +789,7 @@ export default {
                 return options
             }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
         },
-        getKeypair: function(index) {
+        getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {

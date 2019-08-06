@@ -121,8 +121,8 @@
                   </div>
                 </template>
                 <div class="f-records">
-                  <Records :address="selectedAddress"
-                           :actived-tab="activedTab"></Records>
+                  <TransactionRecords :address="selectedAddress"
+                                      :actived-tab="activedTab"></TransactionRecords>
                 </div>
               </b-tab>
               <b-tab>
@@ -174,7 +174,7 @@ import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
 import { INITIAL_SESSION_TIMEOUT, NODE_IP, VSYS_PRECISION } from '@/constants.js'
 import seedLib from '@/libs/seed.js'
-import Records from './home/elements/Records'
+import TransactionRecords from './home/elements/TransactionRecords'
 import LeasePane from './home/elements/LeasePane'
 import LeaseRecords from './home/elements/LeaseRecords'
 import TokenPane from './home/elements/TokenPane'
@@ -431,7 +431,7 @@ export default {
         // TransPane,
         NavBar,
         Asset,
-        Records,
+        TransactionRecords,
         LeaseRecords,
         LeasePane,
         TokenPane,

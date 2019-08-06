@@ -118,7 +118,7 @@ export default {
         checkSeed() {
             this.seedPhrase = this.seedInput.trim()
             if (!this.isValidSeed) {
-                let isConfirmed = confirm('Warning! The seed phrase above is from a user-supplied source.An insecure entropy source can lead to total loss of the wallet.')
+                let isConfirmed = confirm('Warning! The seed phrase above is from a user-supplied source. An insecure entropy source can lead to total loss of the wallet.')
                 if (isConfirmed) {
                     this.showSeedErr = true
                 }

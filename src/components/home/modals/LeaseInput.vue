@@ -227,7 +227,7 @@ export default {
             }
             return isValid && !this.isSameWithSender
         },
-        scanChange: function() {
+        scanChange() {
             if (!this.qrInit) {
                 this.scanShow = !this.scanShow
             }
@@ -258,7 +258,7 @@ export default {
                 this.qrInit = false
             }
         },
-        onDecode: function(decodeString) {
+        onDecode(decodeString) {
             this.qrErrMsg = void 0
             this.paused = true
             try {
@@ -339,7 +339,7 @@ export default {
         formatter(num) {
             return browser.bigNumberFormatter(num)
         },
-        addRecipientList: function() {
+        addRecipientList() {
             if (this.walletType === 'hot') {
                 this.hotRecipientAddressList.set(this.recipient, '1')
                 window.localStorage.setItem('Hot ' + this.defaultAddress + ' leaseRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
