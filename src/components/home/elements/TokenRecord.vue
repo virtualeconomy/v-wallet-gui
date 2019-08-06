@@ -138,7 +138,7 @@
                :addresses="addresses"
                :selected-address="address"
                :wallet-type="walletType"
-               :function-index="functionIndex"
+               :is-split="isSplit"
                :token-unity="unity"
                @endSendSignal="endSendSignal">
     </SendToken>
@@ -157,7 +157,7 @@ import IssueAndBurnToken from './IssueAndBurnToken'
 import Supersede from './Supersede'
 import SplitToken from './SplitToken'
 import DepositToken from './DepositToken'
-import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT, SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
+import { NODE_IP, SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
 import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
 import Vue from 'vue'
 import browser from '@/utils/browser'
@@ -178,7 +178,6 @@ export default {
             removeFlag: false,
             issuer: '',
             maker: '',
-            functionIndex: SEND_FUNCIDX,
             functionName: '',
             contractId: '',
             showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION
@@ -368,16 +367,12 @@ export default {
             const url2 = NODE_IP + '/contract/content/' + contractId
             this.$http.get(url2).then(response => {
                 var tokentype = response.body.textual.descriptors
-                this.functionIndex = -9
                 if (tokentype === CONTRACT_DESCRIPTOR) {
-                    this.functionIndex = SEND_FUNCIDX
                     this.isSplit = false
                 } else if (tokentype === CONTRACT_WITH_SPLIT_DESCRIPTOR) {
-                    this.functionIndex = SEND_FUNCIDX_SPLIT
                     this.isSplit = true
                 } else {
                     this.isSplit = false
-                    this.functionIndex = -999
                 }
             }, respError => {
                 console.log('failed to load tokentype ')

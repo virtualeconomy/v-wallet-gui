@@ -392,7 +392,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION, SEND_FUNCIDX } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import crypto from '@/utils/crypto'
@@ -425,7 +425,8 @@ var initData = {
     timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     coldRecipientAddressList: {},
-    hotRecipientAddressList: {}
+    hotRecipientAddressList: {},
+    functionIndex: this ? (this.isSplit ? SEND_FUNCIDX_SPLIT : SEND_FUNCIDX) : SEND_FUNCIDX_SPLIT
 }
 export default {
     name: 'Send',
@@ -475,10 +476,9 @@ export default {
             },
             require: true
         },
-        functionIndex: {
-            type: Number,
-            default: SEND_FUNCIDX,
-            require: true
+        isSplit: {
+            type: Boolean,
+            default: false
         }
     },
     data: function() {
@@ -558,7 +558,7 @@ export default {
                 timestamp: Date.now(),
                 attachment: transaction.prepareSendAttachment(this.coldAttachment),
                 contractId: this.contractId,
-                functionId: this.functionIndex,
+                functionId: this.isSplit ? SEND_FUNCIDX_SPLIT : SEND_FUNCIDX,
                 function: transaction.prepareSend(this.coldRecipient, BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
                 functionExplain: 'send ' + this.coldAmount + ' token to ' + this.coldRecipient
             }
@@ -588,10 +588,11 @@ export default {
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
                     attachment: transaction.prepareSendAttachment(this.attachment),
-                    functionIndex: this.functionIndex,
+                    functionIndex: this.isSplit ? SEND_FUNCIDX_SPLIT : SEND_FUNCIDX,
                     functionData: transaction.prepareSend(this.recipient, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, this.functionIndex, transaction.prepareSend(this.recipient, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), FEE_SCALE, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    signature: transaction.prepareExecContractSignature(this.contractId, this.isSplit ? SEND_FUNCIDX_SPLIT : SEND_FUNCIDX, transaction.prepareSend(this.recipient, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), FEE_SCALE, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
+                console.log(dataInfo.functionIndex)
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
                 const coldDataInfo = {
