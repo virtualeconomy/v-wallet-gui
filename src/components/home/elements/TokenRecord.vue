@@ -158,7 +158,7 @@ import Supersede from './Supersede'
 import SplitToken from './SplitToken'
 import DepositToken from './DepositToken'
 import { NODE_IP, SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
-import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
+import { CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import certify from '@/utils/certify'
@@ -367,13 +367,7 @@ export default {
             const url2 = NODE_IP + '/contract/content/' + contractId
             this.$http.get(url2).then(response => {
                 var tokentype = response.body.textual.descriptors
-                if (tokentype === CONTRACT_DESCRIPTOR) {
-                    this.isSplit = false
-                } else if (tokentype === CONTRACT_WITH_SPLIT_DESCRIPTOR) {
-                    this.isSplit = true
-                } else {
-                    this.isSplit = false
-                }
+                this.isSplit = (tokentype === CONTRACT_WITH_SPLIT_DESCRIPTOR)
             }, respError => {
                 console.log('failed to load tokentype ')
             })

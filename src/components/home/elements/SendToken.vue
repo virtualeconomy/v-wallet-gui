@@ -592,7 +592,6 @@ export default {
                     functionData: transaction.prepareSend(this.recipient, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
                     signature: transaction.prepareExecContractSignature(this.contractId, this.isSplit ? SEND_FUNCIDX_SPLIT : SEND_FUNCIDX, transaction.prepareSend(this.recipient, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), FEE_SCALE, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
-                console.log(dataInfo.functionIndex)
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
                 const coldDataInfo = {

@@ -600,15 +600,9 @@ export default {
         },
         prevPage() {
             this.sendError = false
-            let pageId = this.walletType === 'hotWallet' ? this.pageId : this.coldPageId
-            if (pageId === 1) {
+            var pageId = this.walletType === 'hotWallet' ? --this.pageId : --this.coldPageId
+            if (pageId === 0) {
                 this.$refs.sendModal.hide()
-            } else {
-                if (this.walletType === 'hotWallet') {
-                    this.pageId--
-                } else {
-                    this.coldPageId--
-                }
             }
         },
         resetPage() {
@@ -684,19 +678,20 @@ export default {
                 var opc = jsonObj.opc
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
+                var tempAmount = 0
+                var tempAttachment = ''
                 if (jsonObj.hasOwnProperty('amount')) {
-                    if (this.walletType === 'hotWallet') {
-                        this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                    } else {
-                        this.coldAmount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                    }
+                    tempAmount = jsonObj.amount
                 }
                 if (jsonObj.hasOwnProperty('invoice')) {
-                    if (this.walletType === 'hotWallet') {
-                        this.attachment = jsonObj.invoice
-                    } else {
-                        this.coldAttachment = jsonObj.invoice
-                    }
+                    tempAttachment = jsonObj.invoice
+                }
+                if (this.walletType === 'hotWallet') {
+                    this.amount = BigNumber(tempAmount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.attachment = tempAttachment
+                } else {
+                    this.coldAmount = BigNumber(tempAmount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.coldAttachment = tempAttachment
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
