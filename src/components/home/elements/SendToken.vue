@@ -525,8 +525,8 @@ export default {
         },
         isSubmitDisabled() {
             return function(type) {
-                let [recipient, attachment, address] = type === 'hotWallet' ? [this.amount, this.recipient, this.attachment] : [this.coldAmount, this.coldRecipient, this.coldAttachment]
-                return !(recipient && this.isValidRecipient(recipient) && this.isValidAttachment(attachment) && this.isAmountValid(type) && address !== '')
+                let [recipient, attachment, address] = type === 'hotWallet' ? [this.recipient, this.attachment, this.address] : [this.coldRecipient, this.coldAttachment, this.coldAddress]
+                return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
             }
         },
         isAmountValid() {
@@ -726,19 +726,20 @@ export default {
                 let opc = jsonObj.opc
                 let api = jsonObj.api
                 let protocol = jsonObj.protocol
+                var tempAmount = 0
+                var tempAttachment = ''
                 if (jsonObj.hasOwnProperty('amount')) {
-                    if (this.walletType === 'hotWallet') {
-                        this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                    } else {
-                        this.coldAmount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                    }
+                    tempAmount = BigNumber(jsonObj.amount)
                 }
                 if (jsonObj.hasOwnProperty('invoice')) {
-                    if (this.walletType === 'hotWallet') {
-                        this.attachment = jsonObj.invoice
-                    } else {
-                        this.coldAttachment = jsonObj.invoice
-                    }
+                    tempAttachment = jsonObj.invoice
+                }
+                if (this.walletType === 'hotWallet') {
+                    this.amount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.attachment = tempAttachment
+                } else {
+                    this.coldAmount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.coldAttachment = tempAttachment
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false

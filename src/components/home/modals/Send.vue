@@ -524,8 +524,8 @@ export default {
             })
         },
         isSubmitDisabled(type) {
-            let x = type === 'hotWallet' ? [this.amount, this.recipient, this.attachment] : [this.coldAmount, this.coldRecipient, this.coldAttachment]
-            return !(x[1] && BigNumber(x[0]).isGreaterThan(0) && this.isValidRecipient(x[1]) && (this.isValidAttachment(x[2]) || !x[2]) && this.isAmountValid(type) && this.address !== '')
+            let [amount, recipient, attachment] = type === 'hotWallet' ? [this.amount, this.recipient, this.attachment] : [this.coldAmount, this.coldRecipient, this.coldAttachment]
+            return !(recipient && BigNumber(amount).isGreaterThan(0) && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && this.address !== '')
         },
         isValidAttachment(attachment) {
             if (!attachment) {
