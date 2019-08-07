@@ -528,7 +528,7 @@ export default {
                 let recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
                 let attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
                 let address = type === 'hotWallet' ? this.address : this.coldAddress
-                return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
+                return !(recipient && this.isValidRecipient(recipient) && this.isValidAttachment(attachment) && this.isAmountValid(type) && address !== '')
             }
         },
         isAmountValid() {
@@ -566,9 +566,6 @@ export default {
     },
     methods: {
         isValidAttachment(attachment) {
-            if (!attachment) {
-                return void 0
-            }
             return common.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         inputAmount(num) {

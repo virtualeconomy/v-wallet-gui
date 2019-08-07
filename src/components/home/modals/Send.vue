@@ -681,16 +681,16 @@ export default {
                 var tempAmount = 0
                 var tempAttachment = ''
                 if (jsonObj.hasOwnProperty('amount')) {
-                    tempAmount = jsonObj.amount
+                    tempAmount = BigNumber(jsonObj.amount)
                 }
                 if (jsonObj.hasOwnProperty('invoice')) {
                     tempAttachment = jsonObj.invoice
                 }
                 if (this.walletType === 'hotWallet') {
-                    this.amount = BigNumber(tempAmount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.amount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
                     this.attachment = tempAttachment
                 } else {
-                    this.coldAmount = BigNumber(tempAmount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.coldAmount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
                     this.coldAttachment = tempAttachment
                 }
                 if (protocol !== PROTOCOL) {
