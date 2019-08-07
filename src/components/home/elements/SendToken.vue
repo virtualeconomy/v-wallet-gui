@@ -121,7 +121,7 @@
                              v-model="attachment"
                              :rows="3"
                              :no-resize="true"
-                             :state="isValidAttachment(attachment)">
+                             :state="attachmentLength(attachment)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
@@ -288,7 +288,7 @@
                              v-model="coldAttachment"
                              :rows="3"
                              :no-resize="true"
-                             :state="isValidAttachment(coldAttachment)">
+                             :state="attachmentLength(coldAttachment)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
@@ -526,7 +526,7 @@ export default {
         isSubmitDisabled() {
             return function(type) {
                 let [recipient, attachment, address] = type === 'hotWallet' ? [this.recipient, this.attachment, this.address] : [this.coldRecipient, this.coldAttachment, this.coldAddress]
-                return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
+                return !(recipient && this.isValidRecipient(recipient) && this.isValidAttachment(attachment) && this.isAmountValid(type) && address !== '')
             }
         },
         isAmountValid() {
@@ -542,6 +542,14 @@ export default {
             return function(type) {
                 let balance = type === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
                 return BigNumber(balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
+            }
+        },
+        attachmentLength() {
+            return function(attachment) {
+                if (!attachment) {
+                    return void 0
+                }
+                return common.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
             }
         },
         dataObject() {
@@ -564,9 +572,6 @@ export default {
     },
     methods: {
         isValidAttachment(attachment) {
-            if (!this.attachment) {
-                return void 0
-            }
             return common.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         inputAmount(num) {
