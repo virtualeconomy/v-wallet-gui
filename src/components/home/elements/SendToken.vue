@@ -121,7 +121,7 @@
                              v-model="attachment"
                              :rows="3"
                              :no-resize="true"
-                             :state="isValidAttachment(attachment)">
+                             :state="attachmentLength(attachment)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
@@ -288,7 +288,7 @@
                              v-model="coldAttachment"
                              :rows="3"
                              :no-resize="true"
-                             :state="isValidAttachment(coldAttachment)">
+                             :state="attachmentLength(coldAttachment)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
@@ -525,9 +525,7 @@ export default {
         },
         isSubmitDisabled() {
             return function(type) {
-                let recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
-                let attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
-                let address = type === 'hotWallet' ? this.address : this.coldAddress
+                let [recipient, attachment, address] = type === 'hotWallet' ? [this.recipient, this.attachment, this.address] : [this.coldRecipient, this.coldAttachment, this.coldAddress]
                 return !(recipient && this.isValidRecipient(recipient) && this.isValidAttachment(attachment) && this.isAmountValid(type) && address !== '')
             }
         },
@@ -544,6 +542,14 @@ export default {
             return function(type) {
                 let balance = type === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
                 return BigNumber(balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
+            }
+        },
+        attachmentLength() {
+            return function(attachment) {
+                if (!attachment) {
+                    return void 0
+                }
+                return common.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
             }
         },
         dataObject() {
@@ -725,19 +731,20 @@ export default {
                 let opc = jsonObj.opc
                 let api = jsonObj.api
                 let protocol = jsonObj.protocol
+                var tempAmount = 0
+                var tempAttachment = ''
                 if (jsonObj.hasOwnProperty('amount')) {
-                    if (this.walletType === 'hotWallet') {
-                        this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                    } else {
-                        this.coldAmount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                    }
+                    tempAmount = BigNumber(jsonObj.amount)
                 }
                 if (jsonObj.hasOwnProperty('invoice')) {
-                    if (this.walletType === 'hotWallet') {
-                        this.attachment = jsonObj.invoice
-                    } else {
-                        this.coldAttachment = jsonObj.invoice
-                    }
+                    tempAttachment = jsonObj.invoice
+                }
+                if (this.walletType === 'hotWallet') {
+                    this.amount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.attachment = tempAttachment
+                } else {
+                    this.coldAmount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.coldAttachment = tempAttachment
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
