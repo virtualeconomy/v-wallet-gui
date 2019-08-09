@@ -189,7 +189,7 @@ export default {
             }
             return oldHeightStatus
         },
-        childByValue: function(heightStatus) {
+        childByValue(heightStatus) {
             this.showHeight = heightStatus
             if (this.showHeight) {
                 if (this.interval) {

@@ -128,17 +128,17 @@ export default {
         }
     },
     methods: {
-        changeSession: function() {
+        changeSession() {
             this.setUsrLocalStorage('sessionTimeout', this.selectedSession)
         },
-        showHeight: function() {
+        showHeight() {
             if (!this.heightStatus) this.heightStatus = true
             else this.heightStatus = false
         },
-        changeHeightStatus: function() {
+        changeHeightStatus() {
             window.localStorage.setItem('heightStatus', this.heightStatus)
         },
-        getHeightStatus: function() {
+        getHeightStatus() {
             let oldHeightStatus = false
             try {
                 oldHeightStatus = JSON.parse(window.localStorage.getItem('heightStatus'))
@@ -146,14 +146,14 @@ export default {
             }
             return oldHeightStatus
         },
-        enableFunction: function() {
+        enableFunction() {
             if (!this.curEnableStatus) this.curEnableStatus = true
             else this.curEnableStatus = false
         },
-        changeEnableStatus: function() {
+        changeEnableStatus() {
             window.localStorage.setItem('enableStatus', this.$store.state.enableStatus)
         },
-        getEnableStatus: function() {
+        getEnableStatus() {
             let oldEnableStatus = false
             try {
                 oldEnableStatus = JSON.parse(window.localStorage.getItem('enableStatus'))

@@ -88,7 +88,6 @@
     </IssueAndBurnToken>
     <WithdrawToken :token-id="tokenId"
                    :address="address"
-                   :maker="maker"
                    :wallet-type="walletType"
                    :addresses="addresses"
                    :cold-addresses="coldAddresses"
@@ -130,7 +129,7 @@
                 :token-unity="unity"
                 :max-supply="maxSupply"
                 :is-split="isSplit"
-                @updateBalance="updateBalance">
+                @updateUnity="updateUnity">
     </SplitToken>
     <SendToken :token-id="tokenId"
                :token-balances="tokenBalances"
@@ -139,20 +138,10 @@
                :addresses="addresses"
                :selected-address="address"
                :wallet-type="walletType"
-               :function-index="functionIndex"
+               :is-split="isSplit"
                :token-unity="unity"
                @endSendSignal="endSendSignal">
     </SendToken>
-    <BurnToken :token-id="tokenId"
-               :issuer="issuer"
-               :address="address"
-               :wallet-type="walletType"
-               :addresses="addresses"
-               :cold-addresses="coldAddresses"
-               :token-balance="tokenBalance"
-               :balance="balances[address]"
-               :token-unity="unity"
-               @updateBalance="updateBalance"></BurnToken>
   </b-container>
 </template>
 
@@ -168,8 +157,8 @@ import IssueAndBurnToken from './IssueAndBurnToken'
 import Supersede from './Supersede'
 import SplitToken from './SplitToken'
 import DepositToken from './DepositToken'
-import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT, SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
-import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
+import { NODE_IP, SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
+import { CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import certify from '@/utils/certify'
@@ -189,7 +178,6 @@ export default {
             removeFlag: false,
             issuer: '',
             maker: '',
-            functionIndex: SEND_FUNCIDX,
             functionName: '',
             contractId: '',
             showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION
@@ -335,6 +323,15 @@ export default {
             }, respError => {
             })
         },
+        updateUnity() {
+            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
+            this.$http.get(tokenUrl).then(response => {
+                this.tokens = response.body
+                this.unity = BigNumber(this.tokens.unity)
+                this.updateBalance()
+            }, respError => {
+            })
+        },
         getTokenBalances() {
             for (const addr in this.addresses) {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
@@ -376,17 +373,7 @@ export default {
             const url2 = NODE_IP + '/contract/content/' + contractId
             this.$http.get(url2).then(response => {
                 var tokentype = response.body.textual.descriptors
-                this.functionIndex = -9
-                if (tokentype === CONTRACT_DESCRIPTOR) {
-                    this.functionIndex = SEND_FUNCIDX
-                    this.isSplit = false
-                } else if (tokentype === CONTRACT_WITH_SPLIT_DESCRIPTOR) {
-                    this.functionIndex = SEND_FUNCIDX_SPLIT
-                    this.isSplit = true
-                } else {
-                    this.isSplit = false
-                    this.functionIndex = -999
-                }
+                this.isSplit = (tokentype === CONTRACT_WITH_SPLIT_DESCRIPTOR)
             }, respError => {
                 console.log('failed to load tokentype ')
             })

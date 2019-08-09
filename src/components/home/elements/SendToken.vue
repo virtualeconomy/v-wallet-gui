@@ -121,7 +121,7 @@
                              v-model="attachment"
                              :rows="3"
                              :no-resize="true"
-                             :state="isValidAttachment(attachment)">
+                             :state="attachmentLength(attachment)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
@@ -288,7 +288,7 @@
                              v-model="coldAttachment"
                              :rows="3"
                              :no-resize="true"
-                             :state="isValidAttachment(coldAttachment)">
+                             :state="attachmentLength(coldAttachment)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group>
@@ -392,7 +392,7 @@
 import transaction from '@/utils/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION, SEND_FUNCIDX } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import crypto from '@/utils/crypto'
@@ -425,7 +425,8 @@ var initData = {
     timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     coldRecipientAddressList: {},
-    hotRecipientAddressList: {}
+    hotRecipientAddressList: {},
+    functionIndex: this ? (this.isSplit ? SEND_FUNCIDX_SPLIT : SEND_FUNCIDX) : SEND_FUNCIDX_SPLIT
 }
 export default {
     name: 'Send',
@@ -475,10 +476,9 @@ export default {
             },
             require: true
         },
-        functionIndex: {
-            type: Number,
-            default: SEND_FUNCIDX,
-            require: true
+        isSplit: {
+            type: Boolean,
+            default: false
         }
     },
     data: function() {
@@ -525,10 +525,8 @@ export default {
         },
         isSubmitDisabled() {
             return function(type) {
-                let recipient = type === 'hotWallet' ? this.recipient : this.coldRecipient
-                let attachment = type === 'hotWallet' ? this.attachment : this.coldAttachment
-                let address = type === 'hotWallet' ? this.address : this.coldAddress
-                return !(recipient && this.isValidRecipient(recipient) && (this.isValidAttachment(attachment) || !attachment) && this.isAmountValid(type) && address !== '')
+                let [recipient, attachment, address] = type === 'hotWallet' ? [this.recipient, this.attachment, this.address] : [this.coldRecipient, this.coldAttachment, this.coldAddress]
+                return !(recipient && this.isValidRecipient(recipient) && this.isValidAttachment(attachment) && this.isAmountValid(type) && address !== '')
             }
         },
         isAmountValid() {
@@ -546,6 +544,14 @@ export default {
                 return BigNumber(balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
             }
         },
+        attachmentLength() {
+            return function(attachment) {
+                if (!attachment) {
+                    return void 0
+                }
+                return common.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+            }
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -558,7 +564,7 @@ export default {
                 timestamp: Date.now(),
                 attachment: transaction.prepareSendAttachment(this.coldAttachment),
                 contractId: this.contractId,
-                functionId: this.functionIndex,
+                functionId: this.isSplit ? SEND_FUNCIDX_SPLIT : SEND_FUNCIDX,
                 function: transaction.prepareSend(this.coldRecipient, BigNumber(this.coldAmount).multipliedBy(this.tokenUnity)),
                 functionExplain: 'send ' + this.coldAmount + ' token to ' + this.coldRecipient
             }
@@ -566,9 +572,6 @@ export default {
     },
     methods: {
         isValidAttachment(attachment) {
-            if (!attachment) {
-                return void 0
-            }
             return common.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         inputAmount(num) {
@@ -588,9 +591,9 @@ export default {
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
                     attachment: transaction.prepareSendAttachment(this.attachment),
-                    functionIndex: this.functionIndex,
+                    functionIndex: this.isSplit ? SEND_FUNCIDX_SPLIT : SEND_FUNCIDX,
                     functionData: transaction.prepareSend(this.recipient, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, this.functionIndex, transaction.prepareSend(this.recipient, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), FEE_SCALE, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    signature: transaction.prepareExecContractSignature(this.contractId, this.isSplit ? SEND_FUNCIDX_SPLIT : SEND_FUNCIDX, transaction.prepareSend(this.recipient, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), FEE_SCALE, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
@@ -728,19 +731,20 @@ export default {
                 let opc = jsonObj.opc
                 let api = jsonObj.api
                 let protocol = jsonObj.protocol
+                var tempAmount = 0
+                var tempAttachment = ''
                 if (jsonObj.hasOwnProperty('amount')) {
-                    if (this.walletType === 'hotWallet') {
-                        this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                    } else {
-                        this.coldAmount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                    }
+                    tempAmount = BigNumber(jsonObj.amount)
                 }
                 if (jsonObj.hasOwnProperty('invoice')) {
-                    if (this.walletType === 'hotWallet') {
-                        this.attachment = jsonObj.invoice
-                    } else {
-                        this.coldAttachment = jsonObj.invoice
-                    }
+                    tempAttachment = jsonObj.invoice
+                }
+                if (this.walletType === 'hotWallet') {
+                    this.amount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.attachment = tempAttachment
+                } else {
+                    this.coldAmount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.coldAttachment = tempAttachment
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false

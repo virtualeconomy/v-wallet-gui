@@ -53,10 +53,6 @@
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isBiggerThanMax()">
-              Please reduce Unity scale.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="!isInteger()">
               Integer number is allowed.
             </b-form-invalid-feedback>
@@ -161,10 +157,6 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative(this.newUnity)">
               Negative number is not allowed.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isBiggerThanMax()">
-              Please reduce Unity scale.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="!isInteger()">
@@ -415,16 +407,6 @@ export default {
         isValidIssuer(addr) {
             return addr === this.issuer
         },
-        isBiggerThanMax() {
-            let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
-            let unityValue = BigNumber(this.newUnity)
-            let value = BigNumber(this.maxSupply).multipliedBy(unityValue)
-            if (value.isGreaterThan(maxValue) || unityValue.isGreaterThan(BigNumber(10).exponentiatedBy(16))) {
-                return true
-            } else {
-                return false
-            }
-        },
         isInteger() {
             return BigNumber(this.newUnity).isInteger()
         },
@@ -432,7 +414,7 @@ export default {
             if (BigNumber(this.newUnity).isEqualTo(0)) {
                 return void 0
             }
-            return this.isNumFormatValid(this.newUnity) && !this.isBiggerThanMax() && !this.isNegative(this.newUnity) && this.isInteger()
+            return this.isNumFormatValid(this.newUnity) && !this.isNegative(this.newUnity) && this.isInteger()
         },
         sendData(walletType) {
             let apiSchema
@@ -516,12 +498,12 @@ export default {
         },
         endSend() {
             for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                setTimeout(this.sendBalanceChange, delayTime)
+                setTimeout(this.unityChange, delayTime)
             }
             this.$refs.splitTokenModal.hide()
         },
-        sendBalanceChange() {
-            this.$emit('updateBalance', 'update')
+        unityChange() {
+            this.$emit('updateUnity', 'update')
         },
         getSignature(signature) {
             this.coldSignature = signature

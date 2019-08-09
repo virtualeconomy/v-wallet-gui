@@ -84,11 +84,11 @@
             <div v-for="record in records"
                  v-if="showingTypeValue === 0 || record['type'] === showingTypeValue"
                  :key="record.index">
-              <Record :tx-record="record"
-                      :fee-flag="feeFlag"
-                      :address="address"
-                      :wallet-type="walletType"
-                      :trans-type="transType"></Record>
+              <TransactionRecord :tx-record="record"
+                                 :fee-flag="feeFlag"
+                                 :address="address"
+                                 :wallet-type="walletType"
+                                 :trans-type="transType"></TransactionRecord>
             </div>
           </div>
         </template>
@@ -166,7 +166,7 @@
 
 <script>
 import { NODE_IP, VSYS_PRECISION } from '@/constants'
-import Record from './Record'
+import TransactionRecord from './TransactionRecord'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
 import browser from '@/utils/browser'
@@ -174,9 +174,9 @@ import base58 from '@/libs/base58'
 import crypto from '@/utils/crypto'
 import JSONBigNumber from 'json-bignumber'
 export default {
-    name: 'Records',
+    name: 'TransactionRecords',
     components: {
-        Record,
+        TransactionRecord,
         JsonExcel
     },
     created() {

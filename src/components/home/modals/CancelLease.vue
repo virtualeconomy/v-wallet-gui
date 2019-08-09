@@ -226,7 +226,7 @@ export default {
             this.coldSignature = ''
             this.hasConfirmed = false
         },
-        coldApi: function() {
+        coldApi() {
             return 1
         },
         closeModal() {
@@ -261,7 +261,7 @@ export default {
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
-                    this.errorMessage = 'Unknown.Please check network connection!'
+                    this.errorMessage = 'Unknown. Please check network connection!'
                 }
                 this.sendError = true
             })

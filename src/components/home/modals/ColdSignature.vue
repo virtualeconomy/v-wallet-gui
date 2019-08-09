@@ -187,10 +187,10 @@ export default {
                 this.qrInit = false
             }
         },
-        scanChange: function() {
+        scanChange() {
             this.scanShow = !this.scanShow
         },
-        onDecode: function(decodeString) {
+        onDecode(decodeString) {
             this.paused = true
             this.qrError = false
             this.protocolError = false
@@ -240,7 +240,7 @@ export default {
                 this.qrError = true
             }
         },
-        scanAgain: function() {
+        scanAgain() {
             this.paused = false
             this.qrError = false
             this.protocolError = false
@@ -248,7 +248,7 @@ export default {
             this.sgError = false
             this.opcError = false
         },
-        prevPage: function() {
+        prevPage() {
             if (this.isScanPage) {
                 this.isScanPage = false
                 this.isTotalScan = false
@@ -256,7 +256,7 @@ export default {
                 this.$emit('prev-page')
             }
         },
-        nextPage: function() {
+        nextPage() {
             this.isScanPage = true
             this.paused = false
         },
