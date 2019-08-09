@@ -109,6 +109,7 @@
 import LedgerWallet from '../elements/LedgerWallet'
 import AppWallet from '../elements/AppWallet'
 import ManualInput from '../elements/ManualInput'
+import { API_VERSION, PROTOCOL, OPC_ACCOUNT } from '@/constants.js'
 
 export default {
     name: 'ImportColdWallet',

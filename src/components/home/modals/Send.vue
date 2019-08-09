@@ -523,6 +523,8 @@ export default {
                 return this.coldAddresses[this.coldAddress]
             } else {
                 return {'api': 1, 'publicKey': '', 'device': 'unknown'}
+            }
+        },
         attachmentLength() {
             return function(attachment) {
                 if (!attachment) {
