@@ -34,7 +34,7 @@ export default {
         VHeader
     },
     methods: {
-        changePage: function(newPageId) {
+        changePage(newPageId) {
             this.pageId = newPageId
         }
     }

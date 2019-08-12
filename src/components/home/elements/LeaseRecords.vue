@@ -41,14 +41,14 @@
            :style="{height: myHeight}">
         <div v-for="record in leaseRecords"
              :key="record.id">
-          <Record :tx-record="record"
-                  :fee-flag="feeFlag"
-                  :cold-pub-key="coldPubKey"
-                  :trans-type="transType"
-                  :address-index="addressIndex"
-                  :address="address"
-                  :wallet-type="walletType"
-                  :is-canceled="beCanceledList[record.id]"></Record>
+          <TransactionRecord :tx-record="record"
+                             :fee-flag="feeFlag"
+                             :cold-pub-key="coldPubKey"
+                             :trans-type="transType"
+                             :address-index="addressIndex"
+                             :address="address"
+                             :wallet-type="walletType"
+                             :is-canceled="beCanceledList[record.id]"></TransactionRecord>
         </div>
       </div>
     </div>
@@ -96,13 +96,13 @@
 
 import {NODE_IP, LEASE_TX, CANCEL_LEASE_TX} from '@/constants'
 import Vue from 'vue'
-import Record from './Record'
+import TransactionRecord from './TransactionRecord'
 import browser from '@/utils/browser'
 import JSONBigNumber from 'json-bignumber'
 export default {
     name: 'LeaseRecords',
     components: {
-        Record
+        TransactionRecord
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'

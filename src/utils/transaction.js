@@ -19,6 +19,7 @@ var convert_1 = require("../utils/convert");
 var constants = require("../constants");
 var INT_TYPE = constants.INT_TYPE
 var ACCOUNT_TYPE = constants.ACCOUNT_ADDR_TYPE
+var CONTRACT_TYPE = constants.CONTRACT_TYPE
 var AMOUNT_TYPE = constants.AMOUNT_TYPE
 var SHORTTEXT_TYPE = constants.SHORTTEXT_TYPE
 // Fields of the original data object
@@ -134,6 +135,12 @@ function castToAPISchema(data, tx_type) {
     __assign(apiSchema, { recipient : transformRecipient() })
     return apiSchema
 }
+function transferContract(contractId) {
+    var contractArr = base58_1.default.decode(contractId)
+    var typeArr = [CONTRACT_TYPE]
+    typeArr = typeArr.concat(Array.from(contractArr))
+    return typeArr
+}
 function transferAmount(amountData) {
     var byteArr = convert_1.default.bigNumberToByteArray(amountData)
     var typeArr = new Array(1);
@@ -209,10 +216,21 @@ export default {
         var encodeArr = parametersNum.concat(amountArr)
         return base58_1.default.encode(Uint8Array.from(encodeArr));
     },
+    prepareSupersede: function(newIssuer) {
+        var accountArr = transferAccount(newIssuer)
+        var parametersNum = convert_1.default.shortToByteArray(1)
+        var encodeArr = parametersNum.concat(accountArr)
+        return base58_1.default.encode(Uint8Array.from(encodeArr));
+    },
+    prepareSplit: function(newUnity) {
+        var unityArr = transferAmount(newUnity)
+        var parametersNum = convert_1.default.shortToByteArray(1)
+        var encodeArr = parametersNum.concat(unityArr)
+        return base58_1.default.encode(Uint8Array.from(encodeArr));
+    },
     prepareSend: function(recipient, amount) {
         var accountArr = transferAccount(recipient)
         var amountArr = transferAmount(amount)
-
         var parametersNum = convert_1.default.shortToByteArray(2)
 
 
@@ -221,6 +239,24 @@ export default {
     },
     prepareSendAttachment: function(description) {
         return base58_1.default.encode(convert_1.default.stringToByteArray(description))
+    },
+    prepareWithdraw: function(contractId, addr, amount) {
+        var contractArr = transferContract(contractId)
+        var addrArr = transferAccount(addr)
+        var amountArr = transferAmount(amount)
+        var parametersNum = convert_1.default.shortToByteArray(3)
+
+        var encodeArr = parametersNum.concat(contractArr.concat(addrArr.concat(amountArr)))
+        return base58_1.default.encode(Uint8Array.from(encodeArr))
+    },
+    prepareDeposit: function(addr, contractId, amount) {
+      var addrArr = transferAccount(addr)
+      var contractArr = transferContract(contractId)
+      var amountArr = transferAmount(amount)
+      var parametersNum = convert_1.default.shortToByteArray(3)
+
+      var encodeArr = parametersNum.concat(addrArr.concat(contractArr.concat(amountArr)))
+      return base58_1.default.encode(Uint8Array.from(encodeArr))
     },
     prepareCreate: function(max, unity, tokenDescription) {
         var maxArr = transferAmount(max)

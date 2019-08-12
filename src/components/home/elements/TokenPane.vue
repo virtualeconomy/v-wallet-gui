@@ -150,6 +150,7 @@ export default {
     border: 1px solid #E03146 !important;
 };
 .btn-receive {
+    margin-bottom: 6px;
     margin-left: 15px;
     background-color: @receiveColor;
     color: white;
@@ -172,6 +173,7 @@ export default {
     margin-right: 10px;
 }
 .btn-creat {
+    margin-bottom: 6px;
     border-color: #FF8837;
     color: #FF8837;
     margin-right: 15px;
@@ -179,6 +181,7 @@ export default {
     font-weight:lighter;
 }
 .btn-send {
+    margin-bottom: 6px;
     background-color: @sendColor;
     color: white;
     border: 1px solid @sendColor;

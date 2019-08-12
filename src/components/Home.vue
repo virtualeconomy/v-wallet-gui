@@ -121,8 +121,8 @@
                   </div>
                 </template>
                 <div class="f-records">
-                  <Records :address="selectedAddress"
-                           :actived-tab="activedTab"></Records>
+                  <TransactionRecords :address="selectedAddress"
+                                      :actived-tab="activedTab"></TransactionRecords>
                 </div>
               </b-tab>
               <b-tab>
@@ -174,7 +174,7 @@ import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
 import { INITIAL_SESSION_TIMEOUT, NODE_IP, VSYS_PRECISION } from '@/constants.js'
 import seedLib from '@/libs/seed.js'
-import Records from './home/elements/Records'
+import TransactionRecords from './home/elements/TransactionRecords'
 import LeasePane from './home/elements/LeasePane'
 import LeaseRecords from './home/elements/LeaseRecords'
 import TokenPane from './home/elements/TokenPane'
@@ -210,6 +210,7 @@ export default {
             this.getBlockHeight()
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
+            this.walletType = 'hotWallet'
             let unsortedColdAddresses = {}
             let sortedColdAddresses = {}
             if (this.userInfo && this.userInfo.coldAddresses) {
@@ -412,7 +413,7 @@ export default {
             else this.sortFlag = 0
         },
         updateInfo() {
-            for (let delayTime = 6000; delayTime < 150100; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                 setTimeout(() => {
                     for (const addr in this.addresses) {
                         this.getBalance(addr)
@@ -430,7 +431,7 @@ export default {
         // TransPane,
         NavBar,
         Asset,
-        Records,
+        TransactionRecords,
         LeaseRecords,
         LeasePane,
         TokenPane,
