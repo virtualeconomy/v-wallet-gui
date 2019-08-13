@@ -92,7 +92,7 @@ export default {
         addModal() {
             this.init = true
             this.tokens = {}
-            var tmpUserInfo = JSON.parse(window.localStorage.getItem(this.seedAddress))
+            let tmpUserInfo = JSON.parse(window.localStorage.getItem(this.seedAddress))
             if (tmpUserInfo && tmpUserInfo.tokens) {
                 this.tokens = JSON.parse(tmpUserInfo.tokens)
             }

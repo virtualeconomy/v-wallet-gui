@@ -112,7 +112,7 @@ export default {
         }
     },
     computed: {
-        isValidAddress: function() {
+        isValidAddress() {
             if (this.coldAddress === this.address) {
                 return false
             }
@@ -127,13 +127,13 @@ export default {
             }
             return isValid
         },
-        isValidPubKey: function() {
+        isValidPubKey() {
             if (!this.coldPubKey) {
                 return void 0
             }
             return this.coldPubKey.length <= PUBLIC_KEY_LENGTH
         },
-        addressExisted: function() {
+        addressExisted() {
             return this.coldAddress === this.address
         }
     },
@@ -143,12 +143,12 @@ export default {
             this.coldPubKey = ''
             this.paused = false
         },
-        importClose: function(evt) {
+        importClose(evt) {
             if (this.qrInit) {
                 evt.preventDefault()
             }
         },
-        importOk: function(evt) {
+        importOk(evt) {
             if (this.qrInit || !this.coldAddress || !this.isValidAddress || !this.coldPubKey || !this.isValidPubKey) {
                 evt.preventDefault()
             } else {
@@ -156,7 +156,7 @@ export default {
                 this.closeModal()
             }
         },
-        importCancel: function(evt) {
+        importCancel(evt) {
             if (this.qrInit) {
                 evt.preventDefault()
             }
@@ -183,7 +183,7 @@ export default {
                 this.qrInit = false
             }
         },
-        onDecode: function(decodeString) {
+        onDecode(decodeString) {
             this.paused = true
             try {
                 this.jsonObj = JSON.parse(decodeString)
@@ -206,11 +206,11 @@ export default {
                 this.paused = false
             }
         },
-        scanAgain: function() {
+        scanAgain() {
             this.paused = false
             this.coldAddress = ''
         },
-        closeModal: function() {
+        closeModal() {
             this.$refs.importModal.hide()
         }
     }
