@@ -64,7 +64,13 @@
              v-if="transType==='lease'"
              cols="auto">
         <b-row>
-          <b-col class="title">{{ txTitle }}</b-col>
+          <b-col v-if="txIcon === 'leased out'"
+                 class="title">{{ txTitle }}<span v-if="isCanceled"
+                                                  style="color:red"> (Cancelled)</span>
+          </b-col>
+          <b-col v-else
+                 class="title">{{ txTitle }}
+          </b-col>
         </b-row>
         <b-row>
           <b-col class="detail-1"
@@ -80,7 +86,7 @@
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ formatter(txAmount) }} VSYS</span>
+          <span v-if="txIcon === 'sent' || txIcon === 'received' || txIcon === 'leased out' || txIcon === 'leased out canceled' || txIcon==='leased in' || txIcon==='leased in canceled'">{{ formatter(txAmount) }} VSYS</span>
         </div>
         <div class="tx-fee"
              v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'register contract' || txIcon === 'execute contract function') && feeFlag">

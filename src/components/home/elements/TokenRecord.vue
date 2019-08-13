@@ -4,14 +4,19 @@
     <b-row align-v="center">
       <b-col class="record-icon"
              cols="auto">
-        <img src="@/assets/imgs/icons/wallet/ic_token2.svg"
+        <img v-if="isCertified"
+             :src="officialTokenSvg"
+             width="32px"
+             height="32px">
+        <img v-else
+             src="@/assets/imgs/icons/wallet/ic_token2.svg"
              width="32px"
              height="32px">
       </b-col>
       <b-col class="record-detail"
              cols="auto">
         <b-row>
-          <b-col class="title">{{ tokenRecord }}</b-col>
+          <b-col class="title">{{ isCertified ? officialName : tokenRecord }}</b-col>
         </b-row>
       </b-col>
       <b-col class="record-blank"></b-col>
@@ -44,9 +49,16 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
-          <b-dropdown-item @click="sendToken">Send Token</b-dropdown-item>
+          <b-dropdown-item v-if="enableStatus"
+                           @click="supersede">Supersede</b-dropdown-item>
           <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
+          <b-dropdown-item v-if="enableStatus"
+                           @click="splitToken">Split Token</b-dropdown-item>
+          <b-dropdown-item v-if="enableStatus && showUnsupportedFunction"
+                           @click="depositToken">Deposit to Contract </b-dropdown-item>
+          <b-dropdown-item v-if="enableStatus && showUnsupportedFunction"
+                           @click="withdrawToken">Withdraw from Contract</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
@@ -60,7 +72,53 @@
                     :current-supply="formatter(currentSupply)"
                     :token-description="tokenDescription">
     </TokenInfoModal>
-    <IssueToken :token-id="tokenId"
+    <IssueAndBurnToken :token-id="tokenId"
+                       :issuer="issuer"
+                       :address="address"
+                       :wallet-type="walletType"
+                       :addresses="addresses"
+                       :cold-addresses="coldAddresses"
+                       :token-balance="tokenBalance"
+                       :balance="balances[address]"
+                       :max-supply="maxSupply"
+                       :current-supply="currentSupply"
+                       :token-unity="unity"
+                       :function-name="functionName"
+                       @updateBalance="updateBalance">
+    </IssueAndBurnToken>
+    <WithdrawToken :token-id="tokenId"
+                   :address="address"
+                   :wallet-type="walletType"
+                   :addresses="addresses"
+                   :cold-addresses="coldAddresses"
+                   :token-balance="tokenBalance"
+                   :balance="balances[address]"
+                   :token-unity="unity"
+                   :is-split="isSplit"
+                   @updateBalance="updateBalance">
+    </WithdrawToken>
+    <DepositToken :token-id="tokenId"
+                  :address="address"
+                  :wallet-type="walletType"
+                  :addresses="addresses"
+                  :cold-addresses="coldAddresses"
+                  :token-balance="tokenBalance"
+                  :balance="balances[address]"
+                  :token-unity="unity"
+                  :is-split="isSplit"
+                  @updateBalance="updateBalance">
+    </DepositToken>
+    <Supersede :issuer="issuer"
+               :token-id="tokenId"
+               :maker="maker"
+               :address="address"
+               :wallet-type="walletType"
+               :addresses="addresses"
+               :cold-addresses="coldAddresses"
+               :balance="balances[address]"
+               @updateBalance="updateBalance">
+    </Supersede>
+    <SplitToken :token-id="tokenId"
                 :issuer="issuer"
                 :address="address"
                 :wallet-type="walletType"
@@ -68,11 +126,11 @@
                 :cold-addresses="coldAddresses"
                 :token-balance="tokenBalance"
                 :balance="balances[address]"
-                :max-supply="maxSupply"
-                :current-supply="currentSupply"
                 :token-unity="unity"
-                @updateBalance="updateBalance">
-    </IssueToken>
+                :max-supply="maxSupply"
+                :is-split="isSplit"
+                @updateUnity="updateUnity">
+    </SplitToken>
     <SendToken :token-id="tokenId"
                :token-balances="tokenBalances"
                :balances="balances"
@@ -80,20 +138,10 @@
                :addresses="addresses"
                :selected-address="address"
                :wallet-type="walletType"
-               :function-index="functionIndex"
+               :is-split="isSplit"
                :token-unity="unity"
                @endSendSignal="endSendSignal">
     </SendToken>
-    <BurnToken :token-id="tokenId"
-               :issuer="issuer"
-               :address="address"
-               :wallet-type="walletType"
-               :addresses="addresses"
-               :cold-addresses="coldAddresses"
-               :token-balance="tokenBalance"
-               :balance="balances[address]"
-               :token-unity="unity"
-               @updateBalance="updateBalance"></BurnToken>
   </b-container>
 </template>
 
@@ -103,18 +151,23 @@ import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import TokenInfoModal from './TokenInfoModal'
 import SendToken from './SendToken'
-import IssueToken from './IssueToken'
+import WithdrawToken from './WithdrawToken'
 import BigNumber from 'bignumber.js'
-import BurnToken from './BurnToken'
-import { NODE_IP, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/constants.js'
-import { CONTRACT_DESCRIPTOR, CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
+import IssueAndBurnToken from './IssueAndBurnToken'
+import Supersede from './Supersede'
+import SplitToken from './SplitToken'
+import DepositToken from './DepositToken'
+import { NODE_IP, SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
+import { CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
 import Vue from 'vue'
 import browser from '@/utils/browser'
+import certify from '@/utils/certify'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, IssueToken, BurnToken },
+    components: { TokenInfoModal, SendToken, Supersede, SplitToken, WithdrawToken, DepositToken, IssueAndBurnToken },
     data: function() {
         return {
+            isSplit: false,
             tokenBalance: BigNumber(0),
             unity: BigNumber(1),
             tokenBalances: {},
@@ -125,9 +178,9 @@ export default {
             removeFlag: false,
             issuer: '',
             maker: '',
-            functionIndex: SEND_FUNCIDX,
+            functionName: '',
             contractId: '',
-            eventPool: {}
+            showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION
         }
     },
     props: {
@@ -195,6 +248,9 @@ export default {
     },
 
     computed: {
+        enableStatus() {
+            return this.$store.state.enableStatus
+        },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.seedaddress))
         },
@@ -212,6 +268,19 @@ export default {
             if (this.tokens) {
                 return BigNumber(this.tokens.total).dividedBy(this.unity)
             } else return ''
+        },
+        isCertified() {
+            return certify.isCertified(this.tokenId)
+        },
+        officialName() {
+            return certify.officialName(this.tokenId)
+        },
+        officialTokenSvg() {
+            try {
+                return require('@/assets/imgs/icons/wallet/' + this.officialName + '.svg')
+            } catch (err) {
+                return require('@/assets/imgs/icons/wallet/ic_token1.svg')
+            }
         },
         tokenDescription() {
             if (this.tokens.description && this.tokens.description !== undefined) {
@@ -248,6 +317,15 @@ export default {
             }, respError => {
             })
         },
+        updateUnity() {
+            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
+            this.$http.get(tokenUrl).then(response => {
+                this.tokens = response.body
+                this.unity = BigNumber(this.tokens.unity)
+                this.updateBalance()
+            }, respError => {
+            })
+        },
         getTokenBalances() {
             for (const addr in this.addresses) {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
@@ -269,7 +347,7 @@ export default {
             }
         },
         getTokenInfo() {
-            var contractId = transaction.tokenIDToContractID(this.tokenId)
+            let contractId = transaction.tokenIDToContractID(this.tokenId)
             const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(tokenUrl).then(response => {
                 this.tokens = response.body
@@ -289,14 +367,7 @@ export default {
             const url2 = NODE_IP + '/contract/content/' + contractId
             this.$http.get(url2).then(response => {
                 var tokentype = response.body.textual.descriptors
-                this.functionIndex = -9
-                if (tokentype === CONTRACT_DESCRIPTOR) {
-                    this.functionIndex = SEND_FUNCIDX
-                } else if (tokentype === CONTRACT_WITH_SPLIT_DESCRIPTOR) {
-                    this.functionIndex = SEND_FUNCIDX_SPLIT
-                } else {
-                    this.functionIndex = -999
-                }
+                this.isSplit = (tokentype === CONTRACT_WITH_SPLIT_DESCRIPTOR)
             }, respError => {
                 console.log('failed to load tokentype ')
             })
@@ -311,36 +382,54 @@ export default {
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId)
         },
-        issueToken() {
+        supersede() {
             this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'issueTokenModal_' + this.tokenId)
+            this.$root.$emit('bv::show::modal', 'supersedeModal_' + this.tokenId)
+        },
+        splitToken() {
+            this.getTokenInfo()
+            this.$root.$emit('bv::show::modal', 'splitTokenModal_' + this.tokenId)
+        },
+        issueToken() {
+            this.functionName = 'Issue Token'
+            this.getTokenInfo()
+            this.$root.$emit('bv::show::modal', 'issueAndBurnTokenModal_' + this.tokenId)
+        },
+        withdrawToken() {
+            this.getTokenInfo()
+            this.$root.$emit('bv::show::modal', 'withdrawTokenModal_' + this.tokenId)
         },
         burnToken() {
+            this.functionName = 'Destroy Token'
             this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'burnTokenModal_' + this.tokenId)
+            this.$root.$emit('bv::show::modal', 'issueAndBurnTokenModal_' + this.tokenId)
+        },
+        depositToken() {
+            this.getTokenInfo()
+            this.$root.$emit('bv::show::modal', 'depositTokenModal_' + this.tokenId)
         },
         removeToken() {
-            var isRemove = confirm('Are you sure to remove this token?')
+            let isRemove = confirm('Are you sure to remove this token?')
             if (isRemove) {
-                var user = JSON.parse(window.localStorage.getItem(this.seedaddress))
-                var arr = JSON.parse(user.tokens)
+                let user = JSON.parse(window.localStorage.getItem(this.seedaddress))
+                let arr = JSON.parse(user.tokens)
                 Vue.delete(arr, this.tokenId)
                 this.setUsrLocalStorage('tokens', JSON.stringify(arr))
                 this.removeFlag = true
                 this.$emit('removeFlag', this.removeFlag)
                 this.removeFlag = false
                 if (this.$store.state.eventPool) {
-                    this.eventPool = this.$store.state.eventPool
-                    if (this.eventPool[this.tokenId] && this.eventPool[this.tokenId].newToken) {
-                        var stopArr = this.eventPool[this.tokenId].newToken
+                    let eventPool = this.$store.state.eventPool
+                    if (eventPool[this.tokenId] && eventPool[this.tokenId].newToken) {
+                        var stopArr = eventPool[this.tokenId].newToken
                         for (var i in stopArr) {
                             clearTimeout(stopArr[i])
                         }
                     }
-                    if (this.eventPool[this.tokenId] && this.eventPool[this.tokenId].removeToken) {
-                        this.eventPool[this.tokenId].removeToken = true
+                    if (eventPool[this.tokenId] && eventPool[this.tokenId].removeToken) {
+                        eventPool[this.tokenId].removeToken = true
                     }
-                    this.$store.commit('changeEventPool', this.eventPool)
+                    this.$store.commit('changeEventPool', eventPool)
                 }
             }
         },
