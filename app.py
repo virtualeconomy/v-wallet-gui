@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # Web Pages
 
-NODE_API_URL = "http://wallet.v.systems:9922"
+NODE_API_URL = ""
 
 @app.route("/")
 def index():
@@ -25,7 +25,7 @@ def index_rest(path):
 def proxy(path):
     resp = requests.request(
         method=request.method,
-        url=SITE_NAME+path,
+        url=NODE_API_URL+path,
         headers={key: value for (key, value) in request.headers if key != 'Host'},
         data=request.get_data(),
         cookies=request.cookies,
