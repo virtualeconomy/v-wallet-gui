@@ -28,8 +28,13 @@
                           v-model="address"
                           :state="isValidIssuer(address)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
-            <b-form-invalid-feedback id="inputLiveFeedback">
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-if="functionName === 'Issue Token'">
               Cannot issue token. You are not issuer of this token.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-if="functionName === 'Destroy Token'">
+              Cannot destroy token. You are not issuer of this token.
             </b-form-invalid-feedback>
             <b-btn
               block
@@ -188,8 +193,13 @@
                           v-model="address"
                           :state="isValidIssuer(address)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
-            <b-form-invalid-feedback id="inputLiveFeedback">
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-if="functionName === 'Issue Token'">
               Cannot issue token. You are not issuer of this token.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-if="functionName === 'Destroy Token'">
+              Cannot destroy token. You are not issuer of this token.
             </b-form-invalid-feedback>
             <b-btn
               block

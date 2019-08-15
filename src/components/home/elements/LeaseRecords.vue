@@ -87,7 +87,7 @@
          src="@/assets/imgs/icons/wallet/ic_wait.svg">
     <div v-if="!changeShowDisable"
          class="empty">
-      There are no transaction records.
+      There is no transaction record.
     </div>
   </div>
 </template>
