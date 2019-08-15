@@ -313,7 +313,7 @@ export default {
         updateBalance() {
             const url = NODE_IP + '/contract/balance/' + this.address + '/' + this.tokenId
             this.$http.get(url).then(response => {
-                this.tokenBalance = BigNumber(response.body.balance).dividedBy(this.unity)
+                this.tokenBalance = BigNumber(response.body.balance).dividedBy(response.body.unity)
             }, respError => {
             })
         },
@@ -331,7 +331,7 @@ export default {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
                 let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
                 this.$http.get(turl).then(response => {
-                    let value = BigNumber(response.body.balance).dividedBy(this.unity)
+                    let value = BigNumber(response.body.balance).dividedBy(response.body.unity)
                     Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
@@ -340,7 +340,7 @@ export default {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
                 let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
                 this.$http.get(turl).then(response => {
-                    let value = BigNumber(response.body.balance).dividedBy(this.unity)
+                    let value = BigNumber(response.body.balance).dividedBy(response.body.unity)
                     Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
