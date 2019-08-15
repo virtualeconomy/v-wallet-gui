@@ -59,7 +59,7 @@
                            @click="depositToken">Deposit to Contract </b-dropdown-item>
           <b-dropdown-item v-if="enableStatus && showUnsupportedFunction"
                            @click="withdrawToken">Withdraw from Contract</b-dropdown-item>
-          <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
+          <b-dropdown-item @click="removeToken">Hide Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
     </b-row>
