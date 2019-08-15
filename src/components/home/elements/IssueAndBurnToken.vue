@@ -34,7 +34,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="functionName === 'Destroy Token'">
-              Cannot Destroy token. You are not issuer of this token.
+              Cannot destroy token. You are not issuer of this token.
             </b-form-invalid-feedback>
             <b-btn
               block
@@ -199,7 +199,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="functionName === 'Destroy Token'">
-              Cannot Destroy token. You are not issuer of this token.
+              Cannot destroy token. You are not issuer of this token.
             </b-form-invalid-feedback>
             <b-btn
               block
