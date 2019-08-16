@@ -48,10 +48,16 @@
                      height="20">
               </span>
               <span class="balance"
-                    v-if="functionName === 'Issue Token'">Issue Available {{ formatter(maxSupply - currentSupply) }}
+                    v-if="functionName === 'Issue Token' && isValidIssuer(address)">Issue Available {{ formatter(maxSupply - currentSupply) }}
               </span>
               <span class="balance"
-                    v-if="functionName === 'Destroy Token'">Destroy Available {{ formatter(currentSupply) }}
+                    v-if="functionName === 'Issue Token' && !isValidIssuer(address)">Issue Available {{ formatter(0) }}
+              </span>
+              <span class="balance"
+                    v-if="functionName === 'Destroy Token' && isValidIssuer(address)">Destroy Available {{ formatter(tokenBalance) }}
+              </span>
+              <span class="balance"
+                    v-if="functionName === 'Destroy Token' && !isValidIssuer(address)">Destroy Available {{ formatter(0) }}
               </span>
             </b-btn>
           </b-form-group>
@@ -213,10 +219,16 @@
                      height="20">
               </span>
               <span class="balance"
-                    v-if="functionName === 'Issue Token'">Issue Available {{ formatter(maxSupply - currentSupply) }}
+                    v-if="functionName === 'Issue Token' && isValidIssuer(address)">Issue Available {{ formatter(maxSupply - currentSupply) }}
               </span>
               <span class="balance"
-                    v-if="functionName === 'Destroy Token'">Destroy Available {{ formatter(currentSupply) }}
+                    v-if="functionName === 'Issue Token' && !isValidIssuer(address)">Issue Available {{ formatter(0) }}
+              </span>
+              <span class="balance"
+                    v-if="functionName === 'Destroy Token' && isValidIssuer(address)">Destroy Available {{ formatter(tokenBalance) }}
+              </span>
+              <span class="balance"
+                    v-if="functionName === 'Destroy Token' && !isValidIssuer(address)">Destroy Available {{ formatter(0) }}
               </span>
             </b-btn>
           </b-form-group>

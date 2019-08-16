@@ -27,7 +27,7 @@
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      style="font-size: 15px;margin-top: 10px">
-              Token does not exist!
+              Error: Failed to get Token Info! (Please make sure Token ID is correct and network is available to connect node)
             </b-form-invalid-feedback>
             <b-button variant="warning"
                       class="btn-o"
