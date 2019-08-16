@@ -425,8 +425,9 @@ export default {
                         for (var i in stopArr) {
                             clearTimeout(stopArr[i])
                         }
+                        Vue.delete(eventPool, this.tokenId)
                     }
-                    if (eventPool[this.tokenId] && eventPool[this.tokenId].removeToken) {
+                    if (eventPool[this.tokenId] && !eventPool[this.tokenId].removeToken) {
                         eventPool[this.tokenId].removeToken = true
                     }
                     this.$store.commit('changeEventPool', eventPool)

@@ -621,7 +621,16 @@ export default {
                 } else {
                     this.coldPageId++
                 }
-                this.tokenId = transaction.contractIDToTokenID(response.body.contractId)
+                var tokenId = transaction.contractIDToTokenID(response.body.contractId)
+                let stopParaArr = []
+                for (let delayTime = 6000; delayTime <= 14000; delayTime += 4000) { //  Refresh interval will be 6s, 30s, 150s
+                    var stopPara = setTimeout(this.sendToAdd, delayTime, tokenId)
+                    stopParaArr.push(stopPara)
+                }
+                let tmp = {'newToken': stopParaArr}
+                let eventPool = this.$store.state.eventPool
+                Vue.set(eventPool, tokenId, tmp)
+                this.$store.commit('changeEventPool', eventPool)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -684,30 +693,35 @@ export default {
         },
         endSend() {
             this.$refs.newTokenModal.hide()
-            let stopParaArr = []
-            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                var stopPara = setTimeout(this.sendToAdd, delayTime)
-                stopParaArr.push(stopPara)
-            }
-            let tmp = {'newToken': stopParaArr, 'removeToken': false}
-            let eventPool = this.$store.state.eventPool
-            Vue.set(eventPool, this.tokenId, tmp)
-            this.$store.commit('changeEventPool', eventPool)
         },
-        sendToAdd() {
+        sendToAdd(tokenId) {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             let tokens = {}
             if (userInfo && userInfo.tokens) {
                 tokens = JSON.parse(userInfo.tokens)
             }
-            const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
-            this.$http.get(url).then(response => {
-                Vue.set(tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
-                this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
-                let sendFlag = true
-                bus.$emit('sendFlag', sendFlag)
-            }, respError => {
-            })
+            if (tokenId in tokens) {
+                if (this.$store.state.eventPool) {
+                    let eventPool = this.$store.state.eventPool
+                    if (eventPool[tokenId] && eventPool[tokenId].newToken) {
+                        var stopArr = eventPool[tokenId].newToken
+                        for (var i in stopArr) {
+                            clearTimeout(stopArr[i])
+                        }
+                        Vue.delete(eventPool, tokenId)
+                    }
+                    this.$store.commit('changeEventPool', eventPool)
+                }
+            } else {
+                const url = NODE_IP + '/contract/tokenInfo/' + tokenId
+                this.$http.get(url).then(response => {
+                    Vue.set(tokens, tokenId, JSON.parse(JSON.stringify(tokenId)))
+                    this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
+                    let sendFlag = true
+                    bus.$emit('sendFlag', sendFlag)
+                }, respError => {
+                })
+            }
         },
         setUsrLocalStorage(fieldname, value) {
             Vue.set(this.userInfo, fieldname, value)
