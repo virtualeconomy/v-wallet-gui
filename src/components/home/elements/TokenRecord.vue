@@ -427,9 +427,6 @@ export default {
                         }
                         Vue.delete(eventPool, this.tokenId)
                     }
-                    if (eventPool[this.tokenId] && !eventPool[this.tokenId].removeToken) {
-                        eventPool[this.tokenId].removeToken = true
-                    }
                     this.$store.commit('changeEventPool', eventPool)
                 }
             }

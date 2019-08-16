@@ -143,8 +143,9 @@ export default {
     },
     methods: {
         changeSession() {
-            Vue.set(this.userInfo, 'sessionTimeout', this.selectedSession)
-            window.localStorage.setItem(this.seedAddress, JSON.stringify(this.userInfo))
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            Vue.set(userInfo, 'sessionTimeout', this.selectedSession)
+            window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
         showHeight() {
             if (!this.heightStatus) this.heightStatus = true
