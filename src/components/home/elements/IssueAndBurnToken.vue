@@ -48,10 +48,10 @@
                      height="20">
               </span>
               <span class="balance"
-                    v-if="functionName === 'Issue Token'">Issue Available {{ formatter(maxSupply - currentSupply) }}
+                    v-if="functionName === 'Issue Token'">Issue Available {{ formatter(availableAmount) }}
               </span>
               <span class="balance"
-                    v-if="functionName === 'Destroy Token'">Destroy Available {{ formatter(currentSupply) }}
+                    v-if="functionName === 'Destroy Token'">Destroy Available {{ formatter(availableAmount) }}
               </span>
             </b-btn>
           </b-form-group>
@@ -213,10 +213,10 @@
                      height="20">
               </span>
               <span class="balance"
-                    v-if="functionName === 'Issue Token'">Issue Available {{ formatter(maxSupply - currentSupply) }}
+                    v-if="functionName === 'Issue Token'">Issue Available {{ formatter(availableAmount) }}
               </span>
               <span class="balance"
-                    v-if="functionName === 'Destroy Token'">Destroy Available {{ formatter(currentSupply) }}
+                    v-if="functionName === 'Destroy Token'">Destroy Available {{ formatter(availableAmount) }}
               </span>
             </b-btn>
           </b-form-group>
@@ -486,6 +486,18 @@ export default {
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
+        },
+        availableAmount() {
+            if (!this.isValidIssuer(this.address)) {
+                return 0
+            }
+            if (this.functionName === 'Issue Token') {
+                return this.maxSupply - this.currentSupply
+            }
+            if (this.functionName === 'Destroy Token') {
+                return this.tokenBalance
+            }
+            return 0
         },
         dataObject() {
             return {
