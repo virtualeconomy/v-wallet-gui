@@ -488,20 +488,16 @@ export default {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         availableNum() {
+            if (!this.isValidIssuer(this.address)) {
+                return 0
+            }
             if (this.functionName === 'Issue Token') {
-                if (this.isValidIssuer(this.address)) {
-                    return this.maxSupply - this.currentSupply
-                } else {
-                    return 0
-                }
+                return this.maxSupply - this.currentSupply
             }
             if (this.functionName === 'Destroy Token') {
-                if (this.isValidIssuer(this.address)) {
-                    return this.tokenBalance
-                } else {
-                    return 0
-                }
+                return this.tokenBalance
             }
+            return 0
         },
         dataObject() {
             return {
