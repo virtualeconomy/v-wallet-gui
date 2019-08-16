@@ -48,10 +48,10 @@
                      height="20">
               </span>
               <span class="balance"
-                    v-if="functionName === 'Issue Token'">Issue Available {{ formatter(availableNum) }}
+                    v-if="functionName === 'Issue Token'">Issue Available {{ formatter(availableAmount) }}
               </span>
               <span class="balance"
-                    v-if="functionName === 'Destroy Token'">Destroy Available {{ formatter(availableNum) }}
+                    v-if="functionName === 'Destroy Token'">Destroy Available {{ formatter(availableAmount) }}
               </span>
             </b-btn>
           </b-form-group>
@@ -213,10 +213,10 @@
                      height="20">
               </span>
               <span class="balance"
-                    v-if="functionName === 'Issue Token'">Issue Available {{ formatter(availableNum) }}
+                    v-if="functionName === 'Issue Token'">Issue Available {{ formatter(availableAmount) }}
               </span>
               <span class="balance"
-                    v-if="functionName === 'Destroy Token'">Destroy Available {{ formatter(availableNum) }}
+                    v-if="functionName === 'Destroy Token'">Destroy Available {{ formatter(availableAmount) }}
               </span>
             </b-btn>
           </b-form-group>
@@ -487,7 +487,7 @@ export default {
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
-        availableNum() {
+        availableAmount() {
             if (!this.isValidIssuer(this.address)) {
                 return 0
             }
