@@ -59,7 +59,7 @@
                            @click="depositToken">Deposit to Contract </b-dropdown-item>
           <b-dropdown-item v-if="enableStatus && showUnsupportedFunction"
                            @click="withdrawToken">Withdraw from Contract</b-dropdown-item>
-          <b-dropdown-item @click="removeToken">Remove Token</b-dropdown-item>
+          <b-dropdown-item @click="removeToken">Hide Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
     </b-row>
@@ -248,13 +248,13 @@ export default {
     },
 
     computed: {
+        defaultAddress() {
+            return Vue.ls.get('address')
+        },
         enableStatus() {
             return this.$store.state.enableStatus
         },
-        userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.seedaddress))
-        },
-        seedaddress() {
+        seedAddress() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
             }
@@ -294,9 +294,10 @@ export default {
         }
     },
     methods: {
-        setUsrLocalStorage(fieldname, value) {
-            Vue.set(this.userInfo, fieldname, value)
-            window.localStorage.setItem(this.seedaddress, JSON.stringify(this.userInfo))
+        setUsrLocalStorage(feildname, value) {
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            Vue.set(userInfo, feildname, value)
+            window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
         closeModal() {
             this.$refs.infoModal.hide()
@@ -313,7 +314,7 @@ export default {
         updateBalance() {
             const url = NODE_IP + '/contract/balance/' + this.address + '/' + this.tokenId
             this.$http.get(url).then(response => {
-                this.tokenBalance = BigNumber(response.body.balance).dividedBy(this.unity)
+                this.tokenBalance = BigNumber(response.body.balance).dividedBy(response.body.unity)
             }, respError => {
             })
         },
@@ -331,7 +332,7 @@ export default {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
                 let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
                 this.$http.get(turl).then(response => {
-                    let value = BigNumber(response.body.balance).dividedBy(this.unity)
+                    let value = BigNumber(response.body.balance).dividedBy(response.body.unity)
                     Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
@@ -340,7 +341,7 @@ export default {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
                 let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
                 this.$http.get(turl).then(response => {
-                    let value = BigNumber(response.body.balance).dividedBy(this.unity)
+                    let value = BigNumber(response.body.balance).dividedBy(response.body.unity)
                     Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
@@ -411,7 +412,7 @@ export default {
         removeToken() {
             let isRemove = confirm('Are you sure to remove this token?')
             if (isRemove) {
-                let user = JSON.parse(window.localStorage.getItem(this.seedaddress))
+                let user = JSON.parse(window.localStorage.getItem(this.seedAddress))
                 let arr = JSON.parse(user.tokens)
                 Vue.delete(arr, this.tokenId)
                 this.setUsrLocalStorage('tokens', JSON.stringify(arr))
@@ -425,9 +426,7 @@ export default {
                         for (var i in stopArr) {
                             clearTimeout(stopArr[i])
                         }
-                    }
-                    if (eventPool[this.tokenId] && eventPool[this.tokenId].removeToken) {
-                        eventPool[this.tokenId].removeToken = true
+                        Vue.delete(eventPool, this.tokenId)
                     }
                     this.$store.commit('changeEventPool', eventPool)
                 }

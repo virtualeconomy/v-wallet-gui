@@ -21,7 +21,7 @@
         <div class="received-amount">TokenInfo</div>
       </div>
       <div class="tx-address">
-        <label>TokenId</label>
+        <label>Token ID</label>
         <span>{{ tokenId }}</span>
       </div>
       <div class="tx-address">
