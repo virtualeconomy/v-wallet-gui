@@ -129,9 +129,6 @@ export default {
         }
     },
     computed: {
-        userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.defaultAddress))
-        },
         defaultAddress() {
             return Vue.ls.get('address')
         },

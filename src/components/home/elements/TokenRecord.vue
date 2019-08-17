@@ -248,13 +248,13 @@ export default {
     },
 
     computed: {
+        defaultAddress() {
+            return Vue.ls.get('address')
+        },
         enableStatus() {
             return this.$store.state.enableStatus
         },
-        userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.seedaddress))
-        },
-        seedaddress() {
+        seedAddress() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
             }
@@ -294,9 +294,10 @@ export default {
         }
     },
     methods: {
-        setUsrLocalStorage(fieldname, value) {
-            Vue.set(this.userInfo, fieldname, value)
-            window.localStorage.setItem(this.seedaddress, JSON.stringify(this.userInfo))
+        setUsrLocalStorage(feildname, value) {
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            Vue.set(userInfo, feildname, value)
+            window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
         closeModal() {
             this.$refs.infoModal.hide()
@@ -411,7 +412,7 @@ export default {
         removeToken() {
             let isRemove = confirm('Are you sure to remove this token?')
             if (isRemove) {
-                let user = JSON.parse(window.localStorage.getItem(this.seedaddress))
+                let user = JSON.parse(window.localStorage.getItem(this.seedAddress))
                 let arr = JSON.parse(user.tokens)
                 Vue.delete(arr, this.tokenId)
                 this.setUsrLocalStorage('tokens', JSON.stringify(arr))

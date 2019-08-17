@@ -69,8 +69,8 @@ export default {
                 return Vue.ls.get('address')
             }
         },
-        userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.seedAddress))
+        defaultAddress() {
+            return Vue.ls.get('address')
         },
         isAddable() {
             return this.tokenId.length <= 0
@@ -85,9 +85,10 @@ export default {
             this.tokens = {}
             this.$refs.addTokenModal.hide()
         },
-        setUsrLocalStorage(fieldname, value) {
-            Vue.set(this.userInfo, fieldname, value)
-            window.localStorage.setItem(this.seedAddress, JSON.stringify(this.userInfo))
+        setUsrLocalStorage(feildname, value) {
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            Vue.set(userInfo, feildname, value)
+            window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
         addModal() {
             this.init = true

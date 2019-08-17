@@ -287,6 +287,14 @@ export default {
                     return this.coldAddresses[this.selectedAddress].publicKey
                 }
             }
+        },
+        defaultAddress() {
+            return Vue.ls.get('address')
+        },
+        seedAddress() {
+            if (Vue.ls.get('address')) {
+                return Vue.ls.get('address')
+            }
         }
     },
 
@@ -379,8 +387,9 @@ export default {
             }
         },
         setUsrLocalStorage(feildname, value) {
-            Vue.set(this.userInfo, feildname, value)
-            window.localStorage.setItem(this.address, JSON.stringify(this.userInfo))
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            Vue.set(userInfo, feildname, value)
+            window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
         selectWallet(addr, type) {
             this.walletType = type
