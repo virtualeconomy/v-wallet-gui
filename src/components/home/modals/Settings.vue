@@ -68,6 +68,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
 export default {
     name: 'Settings',
@@ -127,9 +128,21 @@ export default {
             ]
         }
     },
+    computed: {
+        defaultAddress() {
+            return Vue.ls.get('address')
+        },
+        seedAddress() {
+            if (Vue.ls.get('address')) {
+                return Vue.ls.get('address')
+            }
+        }
+    },
     methods: {
         changeSession() {
-            this.setUsrLocalStorage('sessionTimeout', this.selectedSession)
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            Vue.set(userInfo, 'sessionTimeout', this.selectedSession)
+            window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
         showHeight() {
             if (!this.heightStatus) this.heightStatus = true
