@@ -37,7 +37,7 @@
       <span>Token Watch List</span>
     </div>
     <div class="empty">
-      There are no token in watch list.
+      There is no token in watch list.
     </div>
     <div class="add-token">
       <span class="add-token-input-first">Don't see your tokens?</span>
