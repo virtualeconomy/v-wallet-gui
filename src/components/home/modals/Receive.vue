@@ -5,7 +5,8 @@
            hide-footer
            hide-header
            lazy
-           title="Receive">
+           title="Receive"
+           @hidden="resetPage">
     <button
       class="close btn-close"
       @click="closeModal">
@@ -163,9 +164,11 @@ export default {
         }
     },
     methods: {
-        closeModal() {
+        resetPage() {
             this.amount = 0
             this.invoice = ''
+        },
+        closeModal() {
             this.$refs.receiveModal.hide()
         },
         isAmountValid(amount) {
