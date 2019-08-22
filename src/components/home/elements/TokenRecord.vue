@@ -294,9 +294,9 @@ export default {
         }
     },
     methods: {
-        setUsrLocalStorage(feildname, value) {
+        setUsrLocalStorage(fieldName, value) {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            Vue.set(userInfo, feildname, value)
+            Vue.set(userInfo, fieldName, value)
             window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
         closeModal() {

@@ -6,6 +6,7 @@
            centered
            hide-header
            hide-footer>
+    <router-view v-if="isRouterAlive"></router-view>
     <div class="md-content">
       <button
         class="close btn-close"
@@ -101,6 +102,13 @@
         <label>Status</label>
         <span>{{ txStatus }}</span>
       </div>
+      <div v-if="txIcon==='register contract' && txStatus === 'Success' && (contractType === 'TokenContractWithSplit' || contractType === 'TokenContract')"
+           class="tx-status">
+        <label>Exists in watching list</label>
+        <span v-if="isTokenExisted()">Yes</span>
+        <span v-else>No (<b-button class="add-button"
+                                   @click="addModal">Add to list</b-button>)</span>
+      </div>
     </div>
     <b-row>
       <b-col class="col-lef">
@@ -130,11 +138,18 @@
 </template>
 
 <script>
+import bus from '@/assets/bus'
+import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { TX_FEE, TX_TEST_EXPLORER, NETWORK_BYTE, TX_EXPLORER } from '@/constants'
 export default {
     name: 'TxInfoModal',
+    provide() {
+        return {
+            reload: this.reload()
+        }
+    },
     props: {
         differenceHeight: {
             type: Number,
@@ -191,14 +206,31 @@ export default {
         txStatus: {
             type: String,
             default: ''
+        },
+        contractType: {
+            type: String,
+            default: ''
+        },
+        tokenId: {
+            type: String,
+            default: ''
         }
     },
     data: function() {
         return {
+            isRouterAlive: true,
             networkType: String.fromCharCode(NETWORK_BYTE)
         }
     },
     computed: {
+        defaultAddress() {
+            return Vue.ls.get('address')
+        },
+        seedAddress() {
+            if (Vue.ls.get('address')) {
+                return Vue.ls.get('address')
+            }
+        },
         txClass() {
             return this.txIcon.replace(/\s+/g, '')
         },
@@ -218,8 +250,40 @@ export default {
         }
     },
     methods: {
+        reload() {
+            this.isRouterAlive = false
+            this.$nextTick(() => (this.isRouterAlive = true))
+        },
+        setUsrLocalStorage(fieldName, value) {
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            Vue.set(userInfo, fieldName, value)
+            window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
+        },
         isMobile() {
             return browser.isMobile()
+        },
+        addModal() {
+            let tokens = {}
+            let tmpUserInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            if (tmpUserInfo && tmpUserInfo.tokens) {
+                tokens = JSON.parse(tmpUserInfo.tokens)
+            }
+            Vue.set(tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
+            if (!tokens.hasOwnProperty('')) {
+                this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
+            }
+            this.sendFlag = true
+            bus.$emit('sendFlag', this.sendFlag)
+            this.sendFlag = false
+            this.reload()
+        },
+        isTokenExisted() {
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            let tokens = {}
+            if (userInfo && userInfo.tokens) {
+                tokens = JSON.parse(userInfo.tokens)
+            }
+            return this.tokenId in tokens
         },
         txInfo() {
             if (this.networkType === 'T') {
@@ -475,4 +539,19 @@ export default {
     position: absolute;
     opacity: 0;
 }
+.add-button {
+    background-color: transparent;
+    opacity: 1;
+    border: none;
+    outline: none;
+    font-family: Roboto-Bold;
+    font-size: 13px;
+    color: #FF8837;
+    letter-spacing: 0;
+    text-align: right;
+    line-height: 15px;
+    padding-left:2px;
+    padding-right: 2px;
+    padding-bottom: 8px;
+ }
 </style>
