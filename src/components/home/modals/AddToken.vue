@@ -92,24 +92,28 @@ export default {
         },
         addModal() {
             this.init = true
+            let tokens = {}
             let tmpUserInfo = JSON.parse(window.localStorage.getItem(this.seedAddress))
             if (tmpUserInfo && tmpUserInfo.tokens) {
-                this.tokens = JSON.parse(tmpUserInfo.tokens)
+                tokens = JSON.parse(tmpUserInfo.tokens)
             }
-            const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
-            this.$http.get(url).then(response => {
-                this.responseErr = false
-                Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
-                if (!this.tokens.hasOwnProperty('')) {
-                    this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
-                }
-                this.sendFlag = true
-                bus.$emit('sendFlag', this.sendFlag)
-                this.sendFlag = false
+            if (this.tokenId in tokens) {
                 this.$refs.addTokenModal.hide()
-            }, respError => {
-                this.responseErr = true
-            })
+            }
+            if (this.tokenId) {
+                const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
+                this.$http.get(url).then(response => {
+                    this.responseErr = false
+                    Vue.set(tokens, response.body.tokenId, JSON.parse(JSON.stringify(response.body.tokenId)))
+                    this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
+                    this.sendFlag = true
+                    bus.$emit('sendFlag', this.sendFlag)
+                    this.sendFlag = false
+                    this.$refs.addTokenModal.hide()
+                }, respError => {
+                    this.responseErr = true
+                })
+            }
         },
         isValidToken() {
             if (!this.init || this.tokenId.length === 0 || this.responseErr === false) {
