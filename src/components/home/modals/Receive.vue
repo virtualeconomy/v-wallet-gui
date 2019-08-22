@@ -72,8 +72,13 @@
                          v-model="invoice"
                          :rows="3"
                          :no-resize="true"
+                         aria-describedby="inputInvoiceLiveFeedback"
                          :state="isValidInvoice">
         </b-form-textarea>
+        <b-form-invalid-feedback id="inputInvoiceLiveFeedback"
+                                 v-if="!isValidInvoice">
+          Invalid invoice. It may exceed the 140-character limit.
+        </b-form-invalid-feedback>
       </b-form-group>
       <div id="address-qrcode">
         <img :src="getQrCodeImg">
@@ -160,6 +165,7 @@ export default {
     methods: {
         closeModal() {
             this.amount = 0
+            this.invoice = ''
             this.$refs.receiveModal.hide()
         },
         isAmountValid(amount) {
