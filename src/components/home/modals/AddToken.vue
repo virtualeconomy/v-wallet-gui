@@ -92,7 +92,6 @@ export default {
         },
         addModal() {
             this.init = true
-            this.tokens = {}
             let tmpUserInfo = JSON.parse(window.localStorage.getItem(this.seedAddress))
             if (tmpUserInfo && tmpUserInfo.tokens) {
                 this.tokens = JSON.parse(tmpUserInfo.tokens)
@@ -101,7 +100,9 @@ export default {
             this.$http.get(url).then(response => {
                 this.responseErr = false
                 Vue.set(this.tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
-                this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
+                if (!this.tokens.hasOwnProperty('')) {
+                    this.setUsrLocalStorage('tokens', JSON.stringify(this.tokens))
+                }
                 this.sendFlag = true
                 bus.$emit('sendFlag', this.sendFlag)
                 this.sendFlag = false
