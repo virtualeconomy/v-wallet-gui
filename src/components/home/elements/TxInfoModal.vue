@@ -102,7 +102,7 @@
         <label>Status</label>
         <span>{{ txStatus }}</span>
       </div>
-      <div v-if="txIcon==='register contract' && txStatus === 'Success' && (contractType === 'TokenContractWithSplit' || contractType === 'TokenContract')"
+      <div v-if="txType==='Register Contract' && txStatus === 'Success' && (contractType === 'TokenContractWithSplit' || contractType === 'TokenContract')"
            class="tx-status">
         <label>Exists in watching list</label>
         <span v-if="isTokenExisted()">Yes</span>
@@ -164,6 +164,10 @@ export default {
             default: ''
         },
         txIcon: {
+            type: String,
+            default: ''
+        },
+        txType: {
             type: String,
             default: ''
         },
@@ -544,7 +548,6 @@ export default {
     opacity: 1;
     border: none;
     outline: none;
-    font-family: Roboto-Bold;
     font-size: 13px;
     color: #FF8837;
     letter-spacing: 0;
