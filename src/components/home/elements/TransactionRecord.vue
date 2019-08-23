@@ -65,7 +65,7 @@
              cols="auto">
         <b-row>
           <b-col v-if="txIcon === 'leased out'"
-                 class="title">{{ txTitle }}<span v-if="isCanceled"
+                 class="title">{{ txTitle }}<span v-if="leaseStatus === 'canceled'"
                                                   style="color:red"> (Cancelled)</span>
           </b-col>
           <b-col v-else
@@ -113,7 +113,7 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">TX info</b-dropdown-item>
-          <b-dropdown-item v-if="transType === 'lease' && txIcon==='leased out' && !isCanceled"
+          <b-dropdown-item v-if="transType === 'lease' && txIcon==='leased out' && leaseStatus === 'active'"
                            @click="cancelLeasing">Cancel Leasing</b-dropdown-item>
           <b-dropdown-item @click="copyTxId">Copy TX ID</b-dropdown-item>
         </b-dropdown>
@@ -229,9 +229,9 @@ export default {
             type: Number,
             default: 0
         },
-        isCanceled: {
-            type: Boolean,
-            default: false
+        leaseStatus: {
+            type: String,
+            default: 'active'
         }
     },
     computed: {
