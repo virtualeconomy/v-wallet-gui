@@ -134,6 +134,8 @@
                  :tx-amount="txAmount"
                  :tx-block="txBlock"
                  :tx-status="txStatus"
+                 :contract-type="contractType"
+                 :token-id="tokenId"
                  :tx-attachment="txAttachment"
                  :trans-type="transType"
                  :self-send="selfSend"
@@ -165,11 +167,12 @@
 
 <script>
 import TxInfoModal from './TxInfoModal'
+import transaction from '@/utils/transaction'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import crypto from '@/utils/crypto'
 import CancelLease from '../modals/CancelLease'
-import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '@/constants'
+import { NODE_IP, PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '@/constants'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 
@@ -182,7 +185,9 @@ export default {
             heightStatus: false,
             hovered: false,
             cancelTime: 0,
-            showCancelDetails: false
+            showCancelDetails: false,
+            contractType: '',
+            tokenId: ''
         }
     },
     props: {
@@ -386,6 +391,16 @@ export default {
             }
             return oldHeight
         },
+        getContractType() {
+            const contractUrl = NODE_IP + '/contract/info/' + this.txRecord.contractId
+            this.$http.get(contractUrl).then(response => {
+                this.contractType = response.body.type
+                this.tokenId = transaction.contractIDToTokenID(response.body.contractId)
+            }, respError => {
+                this.contractType = 'Failed to get contract type'
+                this.tokenId = 'Failed to get token id'
+            })
+        },
         getHeightStatus: function() {
             let oldHeightStatus = false
             try {
@@ -405,6 +420,9 @@ export default {
             this.hovered = false
         },
         showModal() {
+            if (this.txType === 'Register Contract') {
+                this.getContractType()
+            }
             this.differenceHeight = this.getLastHeight() - this.txRecord.height
             this.heightStatus = this.getHeightStatus()
             this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.transType + this.txRecord.id + this.selfSend)

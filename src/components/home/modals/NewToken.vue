@@ -715,7 +715,7 @@ export default {
             } else {
                 const url = NODE_IP + '/contract/tokenInfo/' + tokenId
                 this.$http.get(url).then(response => {
-                    Vue.set(tokens, tokenId, JSON.parse(JSON.stringify(tokenId)))
+                    Vue.set(tokens, response.body.tokenId, response.body.tokenId)
                     this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
                     let sendFlag = true
                     bus.$emit('sendFlag', sendFlag)
@@ -723,9 +723,9 @@ export default {
                 })
             }
         },
-        setUsrLocalStorage(feildname, value) {
+        setUsrLocalStorage(fieldName, value) {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            Vue.set(userInfo, feildname, value)
+            Vue.set(userInfo, fieldName, value)
             window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
         scanChange(evt) {
