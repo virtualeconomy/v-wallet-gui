@@ -119,8 +119,13 @@
                              v-model="attachment"
                              :rows="3"
                              :no-resize="true"
+                             aria-describedby="inputDescriptionLiveFeedback"
                              :state="attachmentLength(attachment)">
             </b-form-textarea>
+            <b-form-invalid-feedback id="inputDescriptionLiveFeedback"
+                                     v-if="!attachmentLength(attachment)">
+              The length of description is too long. It exceeds the max limit of 140.
+            </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
@@ -283,8 +288,13 @@
                              v-model="coldAttachment"
                              :rows="3"
                              :no-resize="true"
+                             aria-describedby="inputDescriptionLiveFeedback"
                              :state="attachmentLength(coldAttachment)">
             </b-form-textarea>
+            <b-form-invalid-feedback id="inputDescriptionLiveFeedback"
+                                     v-if="!attachmentLength(coldAttachment)">
+              The length of description is too long. It exceeds the max limit of 140.
+            </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(coldFee) }} VSYS</label>

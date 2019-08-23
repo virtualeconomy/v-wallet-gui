@@ -78,7 +78,7 @@
         </b-form-textarea>
         <b-form-invalid-feedback id="inputInvoiceLiveFeedback"
                                  v-if="!isValidInvoice">
-          Invalid invoice. It may exceed the 140-character limit.
+          The length of invoice is too long. It exceeds the max limit of 140.
         </b-form-invalid-feedback>
       </b-form-group>
       <div id="address-qrcode">
