@@ -272,8 +272,8 @@ export default {
             if (tmpUserInfo && tmpUserInfo.tokens) {
                 tokens = JSON.parse(tmpUserInfo.tokens)
             }
-            Vue.set(tokens, this.tokenId, JSON.parse(JSON.stringify(this.tokenId)))
-            if (!tokens.hasOwnProperty('')) {
+            if (this.tokenId) {
+                Vue.set(tokens, this.tokenId, this.tokenId)
                 this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
             }
             this.sendFlag = true
