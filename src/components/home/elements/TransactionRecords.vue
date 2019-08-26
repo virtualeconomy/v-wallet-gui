@@ -35,7 +35,7 @@
           class="selection"
           v-for="(typeValue, type) in showTypes"
           :key="type"
-          @click="changeType(type)"> Type </b-dropdown-item>
+          @click="changeType(type)"> {{ type }} </b-dropdown-item>
       </b-dropdown>
       <b-dropdown
         class="pd-select"
@@ -126,7 +126,7 @@
           class="selection"
           v-for="(typeValue, type) in showTypes"
           :key="type"
-          @click="changeType(type)"> Type </b-dropdown-item>
+          @click="changeType(type)"> {{ type }} </b-dropdown-item>
       </b-dropdown>
       <b-dropdown class="pd-select"
                   router-tag="div"
