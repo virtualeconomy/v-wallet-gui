@@ -16,27 +16,32 @@
         class="type-select"
         router-tag="div"
         no-caret
+        :disabled="changeShowDisable || changeTypeShowDisable"
         variant="light">
         <template
           slot="button-content">
           <div style="display:inline-block; margin-right: 10px;">
-            <img
-              src="@/assets/imgs/icons/wallet/ic_filter.svg">
+            <img v-if="!changeTypeShowDisable"
+                 src="@/assets/imgs/icons/wallet/ic_filter.svg">
+            <img height="16"
+                 width="16"
+                 v-if="changeTypeShowDisable"
+                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
             <span class="m-1"> Type </span>
           </div>
           <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
         </template>
         <b-dropdown-item
           class="selection"
-          v-for="type in showTypes"
+          v-for="(typeValue, type) in showTypes"
           :key="type"
-          @click="changeType(type)">{{ type }}</b-dropdown-item>
+          @click="changeType(type)"> Type </b-dropdown-item>
       </b-dropdown>
       <b-dropdown
         class="pd-select"
         router-tag="div"
         no-caret
-        :disabled="changeShowDisable"
+        :disabled="changeShowDisable || changeTypeShowDisable"
         variant="light">
         <template
           slot="button-content">
@@ -67,7 +72,7 @@
         :name="'txs_' + exportTime + '_' + address + '.' + downloadFileType">
         <b-btn
           class="btn-export"
-          :disabled="changeShowDisable"
+          :disabled="changeShowDisable || changeTypeShowDisable"
           variant="light"><img src="@/assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
       </json-excel>
     </div>
@@ -82,7 +87,6 @@
             :key="monthYear+'c'"
             class="record-content">
             <div v-for="record in records"
-                 v-if="showingTypeValue === 0 || record['type'] === showingTypeValue"
                  :key="record.index">
               <TransactionRecord :tx-record="record"
                                  :fee-flag="feeFlag"
@@ -103,26 +107,31 @@
         class="type-select"
         router-tag="div"
         no-caret
+        :disabled="changeShowDisable || changeTypeShowDisable"
         variant="light">
         <template
           slot="button-content">
           <div style="display:inline-block; margin-right: 10px;">
-            <img
-              src="@/assets/imgs/icons/wallet/ic_filter.svg">
+            <img v-if="!changeTypeShowDisable"
+                 src="@/assets/imgs/icons/wallet/ic_filter.svg">
+            <img height="16"
+                 width="16"
+                 v-if="changeTypeShowDisable"
+                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
             <span class="m-1"> Type </span>
           </div>
           <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
         </template>
         <b-dropdown-item
           class="selection"
-          v-for="type in showTypes"
+          v-for="(typeValue, type) in showTypes"
           :key="type"
-          @click="changeType(type)">{{ type }}</b-dropdown-item>
+          @click="changeType(type)"> Type </b-dropdown-item>
       </b-dropdown>
       <b-dropdown class="pd-select"
                   router-tag="div"
                   no-caret
-                  :disabled="changeShowDisable"
+                  :disabled="changeShowDisable || changeTypeShowDisable"
                   variant="light">
         <template slot="button-content">
           <div style="display:inline-block; margin-right: 10px;">
@@ -147,17 +156,17 @@
                   :type="downloadFileType"
                   :name="'txs_' + address + '.' + downloadFileType">
         <b-btn class="btn-export"
-               :disabled="changeShowDisable"
+               :disabled="changeShowDisable || changeTypeShowDisable"
                variant="light"><img src="@/assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
       </json-excel>
     </div>
     <img
       height="50"
       width="50"
-      v-if="changeShowDisable"
+      v-if="changeShowDisable || changeTypeShowDisable"
       src="@/assets/imgs/icons/wallet/ic_wait.svg">
     <div
-      v-if="!changeShowDisable"
+      v-if="!(changeShowDisable && changeTypeShowDisable)"
       class="empty">
       There is no transaction record.
     </div>
@@ -181,8 +190,8 @@ export default {
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 180 : window.innerHeight - 180) + 'px'
-        if (this.address && Vue.ls.get('pwd') && this.activedTab === 'trans') {
-            this.getTxRecords()
+        if (this.address && Vue.ls.get('pwd') && this.activeTab === 'trans') {
+            this.getTxRecords('all')
         }
     },
     data() {
@@ -190,11 +199,11 @@ export default {
             feeFlag: false,
             txRecords: {},
             showNums: [10, 50, 100, 200, 500, 1000],
-            showTypes: ['Payment', 'Leasing', 'Cancel leasing', 'Register contract', 'Execute contract', 'Show all'],
-            showTypesValue: {'Payment': 2, 'Leasing': 3, 'Cancel leasing': 4, 'Register contract': 8, 'Execute contract': 9, 'Show all': 0},
+            showTypes: {'Payment': 2, 'Leasing': 3, 'Cancel leasing': 4, 'Register contract': 8, 'Execute contract': 9, 'Show all': 0},
             showingNum: 10,
             showingTypeValue: 0,
             changeShowDisable: false,
+            changeTypeShowDisable: false,
             response: [],
             responseExport: [],
             downloadFileType: 'csv',
@@ -221,30 +230,32 @@ export default {
             type: String,
             default: ''
         },
-        activedTab: {
+        activeTab: {
             type: String,
             default: 'trans'
         }
     },
     watch: {
         address(newAddr, oldAddr) {
-            if (newAddr === '' || this.activedTab !== 'trans') {
+            if (newAddr === '' || this.activeTab !== 'trans') {
                 return
             }
             this.changeShowDisable = false
             this.showingNum = 10
-            this.showingType = 'Show all'
+            this.showingTypeValue = 0
+            this.changeTypeShowDisable = false
             if (this.address && Vue.ls.get('pwd')) {
-                this.getTxRecords()
+                this.getTxRecords('all')
             }
         },
-        activedTab(newTab, oldTab) {
+        activeTab(newTab, oldTab) {
             if (newTab === 'trans') {
                 this.changeShowDisable = false
+                this.changeTypeShowDisable = false
                 this.showingNum = 10
-                this.showingType = 'Show all'
+                this.showingTypeValue = 0
                 if (this.address && Vue.ls.get('pwd')) {
-                    this.getTxRecords()
+                    this.getTxRecords('all')
                 }
             }
         }
@@ -263,26 +274,29 @@ export default {
             const d = new Date(date / 1e6)
             return monthNames[d.getMonth()] + ', ' + d.getFullYear()
         },
-        getTxRecords() {
+        getTxRecords(type) {
             if (this.address) {
                 const addr = this.address
-                this.changeShowDisable = true
+                if (type === 'all') {
+                    this.changeTypeShowDisable = true
+                    this.changeShowDisable = true
+                } else if (type === 'num') {
+                    this.changeShowDisable = true
+                } else {
+                    this.changeTypeShowDisable = true
+                }
                 const recordLimit = this.showingNum
-                const url = NODE_IP + '/transactions/address/' + addr + '/limit/' + recordLimit
+                const txType = this.showingTypeValue
+                const url = this.showingTypeValue === 0 ? NODE_IP + '/transactions/list?address=' + addr + '&limit=' + recordLimit : NODE_IP + '/transactions/list?address=' + addr + '&limit=' + recordLimit + '&txType=' + txType
                 this.$http.get(url).then(response => {
-                    if (addr === this.address && recordLimit === this.showingNum) {
-                        this.response = response.body[0]
+                    if (addr === this.address && recordLimit === this.showingNum && txType === this.showingTypeValue) {
+                        this.response = response.body.transactions
                         let count = 0
-                        let tempResponse = JSONBigNumber.parse(response.bodyText)[0]
-                        for (var i = 0; i < response.body[0].length; i++) {
-                            response.body[0][i].amount = tempResponse[i].amount
-                            this.response[i].amount = response.body[0][i].amount
-                            if (response.body[0][i].lease) {
-                                response.body[0][i].lease.amount = tempResponse[i].lease.amount
-                                this.response[i].lease.amount = response.body[0][i].lease.amount
-                            }
+                        let tempResponse = JSONBigNumber.parse(response.bodyText).transactions
+                        for (let i = 0; i < this.response.length; i++) {
+                            this.response[i].amount = tempResponse[i].amount
                         }
-                        this.txRecords = response.body[0].reduce((recList, recItem) => {
+                        this.txRecords = response.body.transactions.reduce((recList, recItem) => {
                             const month = this.getMonthYearStr(recItem['timestamp'])
                             if (!recList[month]) {
                                 Vue.set(recList, month, [])
@@ -298,11 +312,12 @@ export default {
                             }
                             return recList
                         }, {})
-                        this.showingTypeValue = 0
+                        this.changeTypeShowDisable = false
                         this.changeShowDisable = false
                     }
                 }, response => {
-                    if (addr === this.address && recordLimit === this.showingNum) {
+                    if (addr === this.address && recordLimit === this.showingNum && txType === this.showingTypeValue) {
+                        this.changeTypeShowDisable = false
                         this.changeShowDisable = false
                     }
                 })
@@ -312,12 +327,17 @@ export default {
             if (!this.changeShowDisable) {
                 this.showingNum = newNum
                 if (this.address && Vue.ls.get('pwd')) {
-                    this.getTxRecords()
+                    this.getTxRecords('num')
                 }
             }
         },
         changeType(newType) {
-            this.showingTypeValue = this.showTypesValue[newType]
+            if (!this.changeTypeShowDisable) {
+                this.showingTypeValue = this.showTypes[newType]
+                if (this.address && Vue.ls.get('pwd')) {
+                    this.getTxRecords('type')
+                }
+            }
         },
         showFee() {
             if (!this.feeFlag) this.feeFlag = true
@@ -325,8 +345,8 @@ export default {
         },
         exportRecords() {
             if (this.response) {
-                var tempResponse = JSON.parse(JSON.stringify(this.response))
-                for (var i = 0; i < tempResponse.length; i++) {
+                let tempResponse = JSON.parse(JSON.stringify(this.response))
+                for (let i = 0; i < tempResponse.length; i++) {
                     if (tempResponse[i].amount) {
                         tempResponse[i].amount = this.response[i].amount.dividedBy(VSYS_PRECISION)
                     }

@@ -106,7 +106,7 @@ export default {
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
-        if (this.address && Vue.ls.get('pwd') && this.activedTab === 'lease') {
+        if (this.address && Vue.ls.get('pwd') && this.activeTab === 'lease') {
             this.getLeaseRecords()
         }
     },
@@ -153,14 +153,14 @@ export default {
             default: '',
             require: true
         },
-        activedTab: {
+        activeTab: {
             type: String,
             default: 'trans'
         }
     },
     watch: {
         address(newAddr, oldAddr) {
-            if (newAddr === '' || this.activedTab !== 'lease') {
+            if (newAddr === '' || this.activeTab !== 'lease') {
                 return
             }
             this.leaseRecords = []
@@ -170,7 +170,7 @@ export default {
                 this.getLeaseRecords()
             }
         },
-        activedTab(newTab, oldTab) {
+        activeTab(newTab, oldTab) {
             if (newTab === 'lease') {
                 this.changeShowDisable = false
                 this.showingNum = 10

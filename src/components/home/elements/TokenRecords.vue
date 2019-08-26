@@ -16,7 +16,7 @@
                      :cold-addresses="coldAddresses"
                      :wallet-type="walletType"
                      :balances="balances"
-                     :actived-tab="activedTab"
+                     :active-tab="activeTab"
                      @removeFlag="removeToken"
                      @endSendSignal="endSendSignal"></TokenRecord>
         <div class="add-token"
@@ -101,14 +101,14 @@ export default {
             default: '',
             require: true
         },
-        activedTab: {
+        activeTab: {
             type: String,
             default: 'token'
         }
     },
     watch: {
         address(newAddr, oldAddr) {
-            if (newAddr === '' || this.activedTab !== 'token') {
+            if (newAddr === '' || this.activeTab !== 'token') {
                 return
             }
             if (this.address && Vue.ls.get('pwd')) {
