@@ -61,8 +61,7 @@
            :cold-addresses="coldAddresses"
            :addresses="addresses"
            :selected-address="address"
-           :selected-wallet-type="walletType"
-           @endLeaseSignal="endLeaseSignal"></Lease>
+           :selected-wallet-type="walletType"></Lease>
   </div>
 </template>
 
@@ -137,9 +136,6 @@ export default {
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
-        },
-        endLeaseSignal() {
-            this.$emit('updateInfo')
         }
     }
 }

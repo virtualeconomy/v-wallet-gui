@@ -146,8 +146,7 @@
                              :leased-out="leasedOut"
                              :total="total"
                              :address="selectedAddress"
-                             :wallet-type="walletType"
-                             @updateInfo="updateInfo">
+                             :wallet-type="walletType">
                   </LeasePane>
                 </div>
                 <div class="f-records">
@@ -168,7 +167,6 @@
 
 <script>
 import NavBar from './home/elements/NavBar'
-// import TransPane from './home/elements/TransPane'
 import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
@@ -248,8 +246,10 @@ export default {
     beforeDestroy() {
         clearTimeout(this.sessionClearTimeout)
     },
-
     computed: {
+        refreshStatus() {
+            return this.$store.state.refreshStatus
+        },
         address() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
@@ -297,7 +297,22 @@ export default {
             }
         }
     },
-
+    watch: {
+        refreshStatus(cur, old) {
+            let refreshEvent = this.$store.state.refreshEvent
+            if (refreshEvent) {
+                for (let i in refreshEvent) {
+                    clearTimeout(refreshEvent[i])
+                }
+            }
+            let stopParaArr = []
+            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                let stopPara = setTimeout(this.getBalance, delayTime, this.selectedAddress)
+                stopParaArr.push(stopPara)
+            }
+            this.$store.commit('changeRefreshEvent', stopParaArr)
+        }
+    },
     methods: {
         setSessionClearTimeout() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT
@@ -420,18 +435,6 @@ export default {
         sortStatus() {
             if (this.sortFlag === 0) this.sortFlag = 1
             else this.sortFlag = 0
-        },
-        updateInfo() {
-            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                setTimeout(() => {
-                    for (const addr in this.addresses) {
-                        this.getBalance(addr)
-                    }
-                    for (const addr in this.coldAddresses) {
-                        this.getBalance(addr)
-                    }
-                }, delayTime)
-            }
         }
     },
 

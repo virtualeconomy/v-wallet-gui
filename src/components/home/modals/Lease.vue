@@ -337,6 +337,7 @@ export default {
                 } else {
                     this.coldPageId++
                 }
+                this.$store.commit('changeRefreshStatus')
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -344,7 +345,6 @@ export default {
                 }
                 this.sendError = true
             })
-            this.$emit('endLeaseSignal')
         },
         getSignature(signature, timestamp) {
             this.coldSignature = signature

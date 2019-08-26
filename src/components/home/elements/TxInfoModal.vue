@@ -138,7 +138,6 @@
 </template>
 
 <script>
-import bus from '@/assets/bus'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
@@ -276,9 +275,7 @@ export default {
                 Vue.set(tokens, this.tokenId, this.tokenId)
                 this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
             }
-            this.sendFlag = true
-            bus.$emit('sendFlag', this.sendFlag)
-            this.sendFlag = false
+            this.$store.commit('changeAddTokenStatus')
             this.reload()
         },
         isTokenExisted() {

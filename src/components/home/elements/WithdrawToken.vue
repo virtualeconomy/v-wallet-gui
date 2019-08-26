@@ -430,6 +430,7 @@ export default {
                 } else {
                     this.coldPageId++
                 }
+                this.$store.commit('changeRefreshStatus')
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {

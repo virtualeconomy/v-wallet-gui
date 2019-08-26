@@ -5,7 +5,10 @@ Vue.use(Vuex)
 const store = new Vuex.Store({
     state: {
         enableStatus: JSON.parse(window.localStorage.getItem('enableStatus')),
-        eventPool: {}
+        eventPool: {},
+        refreshEvent: {},
+        refreshStatus: 0,
+        addTokenStatus: 0
     },
     mutations: {
         changeEnableStatus(state, status) {
@@ -13,6 +16,15 @@ const store = new Vuex.Store({
         },
         changeEventPool(state, status) {
             state.eventPool = status
+        },
+        changeRefreshEvent(state, status) {
+            state.refreshEvent = status
+        },
+        changeRefreshStatus(state) {
+            state.refreshStatus = state.refreshStatus === 0 ? 1 : 0
+        },
+        changeAddTokenStatus(state) {
+            state.addTokenStatus = state.addTokenStatus === 0 ? 1 : 0
         }
     },
     actions: {

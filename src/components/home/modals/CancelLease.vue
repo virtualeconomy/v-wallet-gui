@@ -221,6 +221,7 @@ export default {
             const url = NODE_IP + '/leasing/broadcast/cancel'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 this.page = 'success'
+                this.$store.commit('changeRefreshStatus')
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {

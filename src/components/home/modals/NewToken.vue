@@ -382,7 +382,6 @@ import BigNumber from 'bignumber.js'
 import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
 import base58 from '@/libs/base58'
-import bus from '@/assets/bus'
 import common from '@/utils/common'
 var initData = {
     errorMessage: '',
@@ -631,6 +630,7 @@ export default {
                 let eventPool = this.$store.state.eventPool
                 Vue.set(eventPool, tokenId, tmp)
                 this.$store.commit('changeEventPool', eventPool)
+                this.$store.commit('changeRefreshStatus')
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -717,8 +717,7 @@ export default {
                 this.$http.get(url).then(response => {
                     Vue.set(tokens, response.body.tokenId, response.body.tokenId)
                     this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
-                    let sendFlag = true
-                    bus.$emit('sendFlag', sendFlag)
+                    this.$store.commit('changeAddTokenStatus')
                 }, respError => {
                 })
             }
