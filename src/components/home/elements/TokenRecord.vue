@@ -224,19 +224,19 @@ export default {
             },
             require: true
         },
-        activedTab: {
+        activeTab: {
             type: String,
             default: 'token'
         }
     },
     watch: {
         address(newAddr, oldAddr) {
-            if (newAddr === '' || this.activedTab !== 'token') {
+            if (newAddr === '' || this.activeTab !== 'token') {
                 return
             }
             this.updateBalance()
         },
-        activedTab(newTab, oldTab) {
+        activeTab(newTab, oldTab) {
             if (newTab === 'token') {
                 this.updateBalance()
             }
