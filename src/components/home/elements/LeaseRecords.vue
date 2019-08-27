@@ -48,7 +48,7 @@
                              :address-index="addressIndex"
                              :address="address"
                              :wallet-type="walletType"
-                             :is-canceled="beCanceledList[record.id]"></TransactionRecord>
+                             :lease-status="record.leaseStatus"></TransactionRecord>
         </div>
       </div>
     </div>
@@ -94,7 +94,7 @@
 
 <script>
 
-import {NODE_IP, LEASE_TX, CANCEL_LEASE_TX} from '@/constants'
+import { NODE_IP } from '@/constants'
 import Vue from 'vue'
 import TransactionRecord from './TransactionRecord'
 import browser from '@/utils/browser'
@@ -106,7 +106,7 @@ export default {
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
-        if (this.address && Vue.ls.get('pwd') && this.activedTab === 'lease') {
+        if (this.address && Vue.ls.get('pwd') && this.activeTab === 'lease') {
             this.getLeaseRecords()
         }
     },
@@ -117,7 +117,6 @@ export default {
             showNums: [10, 50, 100, 200, 500, 1000],
             showingNum: 10,
             changeShowDisable: false,
-            response: [],
             downloadFileType: 'csv',
             resFields: {
                 transaction_id: 'id',
@@ -131,8 +130,7 @@ export default {
                 attachment: 'attachment'
             },
             transType: 'lease',
-            myHeight: '0',
-            beCanceledList: {}
+            myHeight: '0'
         }
     },
     props: {
@@ -155,24 +153,24 @@ export default {
             default: '',
             require: true
         },
-        activedTab: {
+        activeTab: {
             type: String,
             default: 'trans'
         }
     },
     watch: {
         address(newAddr, oldAddr) {
-            if (newAddr === '' || this.activedTab !== 'lease') {
+            if (newAddr === '' || this.activeTab !== 'lease') {
                 return
             }
-            this.response = []
+            this.leaseRecords = []
             this.changeShowDisable = false
             this.showingNum = 10
             if (this.address && Vue.ls.get('pwd')) {
                 this.getLeaseRecords()
             }
         },
-        activedTab(newTab, oldTab) {
+        activeTab(newTab, oldTab) {
             if (newTab === 'lease') {
                 this.changeShowDisable = false
                 this.showingNum = 10
@@ -191,28 +189,14 @@ export default {
                 const addr = this.address
                 this.changeShowDisable = true
                 const recordLimit = this.showingNum
-                const url = NODE_IP + '/transactions/address/' + addr + '/limit/' + recordLimit
-                let self = this
+                const url = NODE_IP + '/transactions/list?address=' + this.address + '&limit=' + recordLimit + '&txType=3'
                 this.$http.get(url).then(response => {
-                    let rv = []
                     if (addr === this.address && recordLimit === this.showingNum) {
-                        this.response = response.body[0]
-                        let tempResponse = JSONBigNumber.parse(response.bodyText)[0]
-                        for (var i = 0; i < response.body[0].length; i++) {
-                            this.response[i].amount = tempResponse[i].amount
-                            if (this.response[i].lease) {
-                                this.response[i].lease.amount = tempResponse[i].lease.amount
-                            }
+                        this.leaseRecords = response.body.transactions
+                        let tempResponse = JSONBigNumber.parse(response.bodyText).transactions
+                        for (let i = 0; i < this.leaseRecords.length; i++) {
+                            this.leaseRecords[i].amount = tempResponse[i].amount
                         }
-                        this.response.forEach(function(v, i) {
-                            if (v.type === LEASE_TX || v.type === CANCEL_LEASE_TX) {
-                                rv.push(v)
-                                if (v.type === CANCEL_LEASE_TX) {
-                                    Vue.set(self.beCanceledList, v.lease.id, true)
-                                }
-                            }
-                        })
-                        this.leaseRecords = rv
                         this.changeShowDisable = false
                     }
                 }, response => {

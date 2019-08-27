@@ -104,7 +104,7 @@
                                 :cold-addresses="coldAddresses"
                                 :wallet-type="walletType"
                                 :balances="balance"
-                                :actived-tab="activedTab">
+                                :active-tab="activeTab">
                   </TokenRecords>
                 </div>
               </b-tab>
@@ -122,7 +122,7 @@
                 </template>
                 <div class="f-records">
                   <TransactionRecords :address="selectedAddress"
-                                      :actived-tab="activedTab"></TransactionRecords>
+                                      :active-tab="activeTab"></TransactionRecords>
                 </div>
               </b-tab>
               <b-tab>
@@ -152,7 +152,7 @@
                 </div>
                 <div class="f-records">
                   <LeaseRecords :address="selectedAddress"
-                                :actived-tab="activedTab"
+                                :active-tab="activeTab"
                                 :wallet-type="walletType"
                                 :cold-pub-key="coldPubKey"
                                 :address-index="addresses[selectedAddress]"></LeaseRecords>
@@ -195,7 +195,7 @@ export default {
             sortedAddresses: {},
             walletType: '',
             sortFlag: 0,
-            activedTab: 'token',
+            activeTab: 'token',
             available: BigNumber(0),
             leasedIn: BigNumber(0),
             leasedOut: BigNumber(0),
@@ -319,11 +319,11 @@ export default {
         tranTabChange(tabIndex) {
             this.getBalance(this.selectedAddress)
             if (tabIndex === 0) {
-                this.activedTab = 'token'
+                this.activeTab = 'token'
             } else if (tabIndex === 1) {
-                this.activedTab = 'trans'
+                this.activeTab = 'trans'
             } else if (tabIndex === 2) {
-                this.activedTab = 'lease'
+                this.activeTab = 'lease'
             }
         },
         resetSessionClearTimeout() {
@@ -398,9 +398,9 @@ export default {
                 return seedLib.fromExistingPhrasesWithIndex(this.getSeedPhrase(), nonce).keyPair.publicKey
             }
         },
-        setUsrLocalStorage(feildname, value) {
+        setUsrLocalStorage(fieldName, value) {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            Vue.set(userInfo, feildname, value)
+            Vue.set(userInfo, fieldName, value)
             window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
         selectWallet(addr, type) {

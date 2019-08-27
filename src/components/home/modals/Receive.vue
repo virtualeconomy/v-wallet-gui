@@ -5,7 +5,8 @@
            hide-footer
            hide-header
            lazy
-           title="Receive">
+           title="Receive"
+           @hidden="resetPage">
     <button
       class="close btn-close"
       @click="closeModal">
@@ -72,8 +73,13 @@
                          v-model="invoice"
                          :rows="3"
                          :no-resize="true"
+                         aria-describedby="inputInvoiceLiveFeedback"
                          :state="isValidInvoice">
         </b-form-textarea>
+        <b-form-invalid-feedback id="inputInvoiceLiveFeedback"
+                                 v-if="!isValidInvoice">
+          The length of invoice is too long. It exceeds the max limit of 140.
+        </b-form-invalid-feedback>
       </b-form-group>
       <div id="address-qrcode">
         <img :src="getQrCodeImg">
@@ -158,8 +164,11 @@ export default {
         }
     },
     methods: {
-        closeModal() {
+        resetPage() {
             this.amount = 0
+            this.invoice = ''
+        },
+        closeModal() {
             this.$refs.receiveModal.hide()
         },
         isAmountValid(amount) {
