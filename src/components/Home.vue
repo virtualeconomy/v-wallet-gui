@@ -95,7 +95,6 @@
                              :wallet-type="walletType"
                              :balances="balance"
                              :cold-addresses="coldAddresses"
-                             :total="total"
                              :addresses="addresses"></TokenPane>
                 </div>
                 <div class="f-records">
@@ -141,10 +140,6 @@
                   <LeasePane :cold-addresses="coldAddresses"
                              :addresses="addresses"
                              :balance="balance"
-                             :available="available"
-                             :leased-in="leasedIn"
-                             :leased-out="leasedOut"
-                             :total="total"
                              :address="selectedAddress"
                              :wallet-type="walletType">
                   </LeasePane>
@@ -193,11 +188,7 @@ export default {
             sortedAddresses: {},
             walletType: '',
             sortFlag: 0,
-            activedTab: 'token',
-            available: BigNumber(0),
-            leasedIn: BigNumber(0),
-            leasedOut: BigNumber(0),
-            total: BigNumber(0)
+            activedTab: 'token'
         }
     },
 
@@ -208,6 +199,8 @@ export default {
             this.getBlockHeight()
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
+            this.$store.dispatch('updateSelectedAddress', this.selectedAddress)
+            this.$store.dispatch('updateBalance', false)
             this.walletType = 'hotWallet'
             let unsortedColdAddresses = {}
             let sortedColdAddresses = {}
@@ -247,9 +240,6 @@ export default {
         clearTimeout(this.sessionClearTimeout)
     },
     computed: {
-        refreshStatus() {
-            return this.$store.state.refreshStatus
-        },
         address() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
@@ -297,22 +287,6 @@ export default {
             }
         }
     },
-    watch: {
-        refreshStatus(cur, old) {
-            let refreshEvent = this.$store.state.refreshEvent
-            if (refreshEvent) {
-                for (let i in refreshEvent) {
-                    clearTimeout(refreshEvent[i])
-                }
-            }
-            let stopParaArr = []
-            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                let stopPara = setTimeout(this.getBalance, delayTime, this.selectedAddress)
-                stopParaArr.push(stopPara)
-            }
-            this.$store.commit('changeRefreshEvent', stopParaArr)
-        }
-    },
     methods: {
         setSessionClearTimeout() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT
@@ -328,6 +302,7 @@ export default {
             }, oldTimeout * 60 * 1000)
         },
         tranTabChange(tabIndex) {
+            this.$store.dispatch('updateBalance', false)
             this.getBalance(this.selectedAddress)
             if (tabIndex === 0) {
                 this.activedTab = 'token'
@@ -349,10 +324,6 @@ export default {
                 let changestatus = value === this.balance[address]
                 Vue.set(this.balance, address, value)
                 if (address === this.selectedAddress) {
-                    this.total = tempResponse.regular.dividedBy(VSYS_PRECISION)
-                    this.available = tempResponse.available.dividedBy(VSYS_PRECISION)
-                    this.leasedOut = tempResponse.regular.minus(tempResponse.available).dividedBy(VSYS_PRECISION)
-                    this.leasedIn = tempResponse.effective.minus(tempResponse.available).dividedBy(VSYS_PRECISION)
                     if (changestatus) {
                         let addrtmp = this.selectedAddress
                         this.selectedAddress = ''
@@ -416,6 +387,7 @@ export default {
                     this.selectedAddress = addr
                 }, 0)
             }
+            this.$store.dispatch('updateSelectedAddress', addr)
             this.getBalance(addr)
         },
         deleteCold(addr) {

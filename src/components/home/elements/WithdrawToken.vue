@@ -430,7 +430,7 @@ export default {
                 } else {
                     this.coldPageId++
                 }
-                this.$store.commit('changeRefreshStatus')
+                this.$store.dispatch('updateBalance', true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {

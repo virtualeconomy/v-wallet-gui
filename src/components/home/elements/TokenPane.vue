@@ -6,7 +6,7 @@
            width="30"
            height="30">
       <span class="title">
-        {{ formatter(balance) }}
+        {{ formatter(this.$store.state['available']) }}
       </span>
       <p class="text-muted text-des mb-0">
         Available Balance
@@ -17,7 +17,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ formatter(total) }}
+        {{ formatter(this.$store.state['total']) }}
       </span>
       <p class="text-muted text-des mb-0">
         Total Balance
@@ -48,8 +48,7 @@
           :cold-addresses="coldAddresses"
           :addresses="addresses"
           :selected-address="address"
-          :wallet-type="walletType"
-          @endSendSignal="endSendSignal"></Send>
+          :wallet-type="walletType"></Send>
     <Receive show="false"
              :address="address"></Receive>
     <NewToken show="false"
@@ -57,8 +56,7 @@
               :cold-addresses="coldAddresses"
               :addresses="addresses"
               :selected-address="address"
-              :wallet-type="walletType"
-              @endLeaseSignal="endLeaseSignal"></NewToken>
+              :wallet-type="walletType"></NewToken>
   </div>
 </template>
 
@@ -108,13 +106,6 @@ export default {
             default: function() {},
             require: true
         },
-        total: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
         walletType: {
             type: String,
             default: '',
@@ -124,12 +115,6 @@ export default {
     methods: {
         formatter(num) {
             return browser.bigNumberFormatter(num)
-        },
-        endLeaseSignal() {
-            this.$emit('updateInfo')
-        },
-        endSendSignal() {
-            this.$emit('updateInfo')
         }
     }
 }

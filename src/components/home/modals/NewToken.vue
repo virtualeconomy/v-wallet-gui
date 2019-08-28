@@ -630,7 +630,7 @@ export default {
                 let eventPool = this.$store.state.eventPool
                 Vue.set(eventPool, tokenId, tmp)
                 this.$store.commit('changeEventPool', eventPool)
-                this.$store.commit('changeRefreshStatus')
+                this.$store.dispatch('updateBalance', true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -638,7 +638,6 @@ export default {
                 }
                 this.sendError = true
             })
-            this.$emit('endSendSignal')
         },
         nextPage() {
             this.sendError = false

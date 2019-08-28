@@ -6,7 +6,7 @@
            width="30"
            height="30">
       <span class="title">
-        {{ formatter(available) }}
+        {{ formatter(this.$store.state['available']) }}
       </span>
       <p class="text-muted text-des mb-0">
         Available Balance
@@ -17,7 +17,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ formatter(total) }}
+        {{ formatter(this.$store.state['total']) }}
       </span>
       <p class="text-muted text-des mb-0">
         Total Balance
@@ -28,7 +28,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ formatter(leasedIn) }}
+        {{ formatter(this.$store.state['leasedIn']) }}
       </span>
       <p class="text-muted text-des mb-0">
         Leased In
@@ -39,7 +39,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ formatter(leasedOut) }}
+        {{ formatter(this.$store.state['leasedOut']) }}
       </span>
       <p class="text-muted text-des mb-0">
         Leased Out
@@ -68,7 +68,6 @@
 <script>
 import Lease from '../modals/Lease'
 import browser from '@/utils/browser'
-import BigNumber from 'bignumber.js'
 
 export default {
     name: 'LeasePane',
@@ -89,34 +88,6 @@ export default {
         balance: {
             type: Object,
             default: function() {},
-            require: true
-        },
-        available: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
-        leasedIn: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
-        leasedOut: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
-        total: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
             require: true
         },
         address: {

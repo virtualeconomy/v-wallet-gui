@@ -15,7 +15,7 @@
              class="money-icon selected-icon"
              width="16"
              height="16">
-        <p class="mb-0 show-number balance"><b>{{ formatter(balance) }}</b></p>
+        <p class="mb-0 show-number balance"><b>{{ selected? formatter(this.$store.state['available']): formatter(balance) }}</b></p>
         <p class="mb-0 asset-title">Balance</p>
       </div>
     </div>
