@@ -15,7 +15,7 @@
              class="money-icon selected-icon"
              width="16"
              height="16">
-        <p class="mb-0 show-number balance"><b>{{ selected? formatter(this.$store.state['available']): formatter(balance) }}</b></p>
+        <p class="mb-0 show-number balance"><b>{{ selected? formatter(available): formatter(balance) }}</b></p>
         <p class="mb-0 asset-title">Balance</p>
       </div>
     </div>
@@ -25,6 +25,7 @@
 <script>
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
+import { mapState } from 'vuex'
 export default {
     name: 'Asset',
     props: {
@@ -50,6 +51,7 @@ export default {
         }
     },
     computed: {
+        ...mapState({ available: 'available' }),
         addrShow() {
             const addrChars = this.address.split('')
             addrChars.splice(6, 23, '******')

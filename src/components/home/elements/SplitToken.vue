@@ -275,6 +275,7 @@ import browser from '@/utils/browser'
 import common from '@/utils/common'
 import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
+import { mapActions } from 'vuex'
 export default {
     name: 'SplitToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -404,6 +405,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance']),
         isValidIssuer(addr) {
             return addr === this.issuer
         },
@@ -456,7 +458,7 @@ export default {
                 } else {
                     this.coldPageId++
                 }
-                this.$store.dispatch('updateBalance', true)
+                this.updateBalance(true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {

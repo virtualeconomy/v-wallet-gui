@@ -411,6 +411,7 @@ import browser from '@/utils/browser'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 import common from '@/utils/common'
+import { mapActions } from 'vuex'
 var initData = {
     errorMessage: '',
     opc: '',
@@ -581,6 +582,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance']),
         isValidAttachment(attachment) {
             return common.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
@@ -627,7 +629,7 @@ export default {
                 } else {
                     this.coldPageId++
                 }
-                this.$store.dispatch('updateBalance', true)
+                this.updateBalance(true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {

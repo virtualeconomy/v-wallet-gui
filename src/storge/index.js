@@ -69,6 +69,12 @@ const store = new Vuex.Store({
                 updateTask(6000)
             }
             context.commit('updateBalance')
+        },
+        changeEventPool(context, status) {
+            context.commit('changeEventPool', status)
+        },
+        changeAddTokenStatus(context) {
+            context.commit('changeAddTokenStatus')
         }
     },
     getters: {

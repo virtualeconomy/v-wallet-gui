@@ -359,6 +359,7 @@ import browser from '@/utils/browser'
 import common from '@/utils/common'
 import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
+import { mapActions } from 'vuex'
 export default {
     name: 'IssueAndBurnToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -518,6 +519,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance']),
         inputAmount(num) {
             return BigNumber(num)
         },
@@ -564,7 +566,7 @@ export default {
                 } else {
                     this.coldPageId++
                 }
-                this.$store.dispatch('updateBalance', true)
+                this.updateBalance(true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -616,7 +618,7 @@ export default {
             this.$refs.issueAndBurnTokenModal.hide()
         },
         sendBalanceChange() {
-            this.$emit('updateBalance', 'update')
+            this.$emit('updateTokenBalance', 'update')
         },
         scanChange(evt) {
             if (!this.qrInit) {

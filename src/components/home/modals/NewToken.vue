@@ -383,6 +383,7 @@ import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
 import base58 from '@/libs/base58'
 import common from '@/utils/common'
+import { mapActions } from 'vuex'
 var initData = {
     errorMessage: '',
     opc: '',
@@ -529,6 +530,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance', 'changeEventPool', 'changeAddTokenStatus']),
         isValidAttachment(attachment) {
             if (!attachment) {
                 return void 0
@@ -620,17 +622,17 @@ export default {
                 } else {
                     this.coldPageId++
                 }
-                var tokenId = transaction.contractIDToTokenID(response.body.contractId)
+                let tokenId = transaction.contractIDToTokenID(response.body.contractId)
                 let stopParaArr = []
                 for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                    var stopPara = setTimeout(this.sendToAdd, delayTime, tokenId)
+                    let stopPara = setTimeout(this.sendToAdd, delayTime, tokenId)
                     stopParaArr.push(stopPara)
                 }
                 let tmp = {'newToken': stopParaArr}
                 let eventPool = this.$store.state.eventPool
                 Vue.set(eventPool, tokenId, tmp)
-                this.$store.commit('changeEventPool', eventPool)
-                this.$store.dispatch('updateBalance', true)
+                this.changeEventPool(eventPool)
+                this.updateBalance(true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -703,20 +705,20 @@ export default {
                 if (this.$store.state.eventPool) {
                     let eventPool = this.$store.state.eventPool
                     if (eventPool[tokenId] && eventPool[tokenId].newToken) {
-                        var stopArr = eventPool[tokenId].newToken
-                        for (var i in stopArr) {
+                        let stopArr = eventPool[tokenId].newToken
+                        for (let i in stopArr) {
                             clearTimeout(stopArr[i])
                         }
                         Vue.delete(eventPool, tokenId)
                     }
-                    this.$store.commit('changeEventPool', eventPool)
+                    this.changeEventPool(eventPool)
                 }
             } else {
                 const url = NODE_IP + '/contract/tokenInfo/' + tokenId
                 this.$http.get(url).then(response => {
                     Vue.set(tokens, response.body.tokenId, response.body.tokenId)
                     this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
-                    this.$store.commit('changeAddTokenStatus')
+                    this.changeAddTokenStatus()
                 }, respError => {
                 })
             }

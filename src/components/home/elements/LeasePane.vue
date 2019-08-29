@@ -6,7 +6,7 @@
            width="30"
            height="30">
       <span class="title">
-        {{ formatter(this.$store.state['available']) }}
+        {{ formatter(available) }}
       </span>
       <p class="text-muted text-des mb-0">
         Available Balance
@@ -17,7 +17,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ formatter(this.$store.state['total']) }}
+        {{ formatter(total) }}
       </span>
       <p class="text-muted text-des mb-0">
         Total Balance
@@ -28,7 +28,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ formatter(this.$store.state['leasedIn']) }}
+        {{ formatter(leasedIn) }}
       </span>
       <p class="text-muted text-des mb-0">
         Leased In
@@ -39,7 +39,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ formatter(this.$store.state['leasedOut']) }}
+        {{ formatter(leasedOut) }}
       </span>
       <p class="text-muted text-des mb-0">
         Leased Out
@@ -68,6 +68,7 @@
 <script>
 import Lease from '../modals/Lease'
 import browser from '@/utils/browser'
+import { mapState } from 'vuex'
 
 export default {
     name: 'LeasePane',
@@ -101,6 +102,12 @@ export default {
             require: true
         }
     },
+    computed: mapState({
+        available: 'available',
+        total: 'total',
+        leasedIn: 'leasedIn',
+        leasedOut: 'leasedOut'
+    }),
     methods: {
         redirectToVsysrate() {
             window.open('http://vsysrate.com')

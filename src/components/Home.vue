@@ -175,6 +175,7 @@ import TokenRecords from './home/elements/TokenRecords'
 import AddToken from './home/modals/AddToken'
 import BigNumber from 'bignumber.js'
 import JSONBigNumber from 'json-bignumber'
+import { mapActions } from 'vuex'
 
 export default {
     name: 'Home',
@@ -199,8 +200,8 @@ export default {
             this.getBlockHeight()
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
-            this.$store.dispatch('updateSelectedAddress', this.selectedAddress)
-            this.$store.dispatch('updateBalance', false)
+            this.updateSelectedAddress(this.selectedAddress)
+            this.updateBalance(false)
             this.walletType = 'hotWallet'
             let unsortedColdAddresses = {}
             let sortedColdAddresses = {}
@@ -288,6 +289,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateSelectedAddress', 'updateBalance']),
         setSessionClearTimeout() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT
             try {
@@ -302,7 +304,7 @@ export default {
             }, oldTimeout * 60 * 1000)
         },
         tranTabChange(tabIndex) {
-            this.$store.dispatch('updateBalance', false)
+            this.updateBalance(false)
             this.getBalance(this.selectedAddress)
             if (tabIndex === 0) {
                 this.activedTab = 'token'
@@ -387,7 +389,7 @@ export default {
                     this.selectedAddress = addr
                 }, 0)
             }
-            this.$store.dispatch('updateSelectedAddress', addr)
+            this.updateSelectedAddress(addr)
             this.getBalance(addr)
         },
         deleteCold(addr) {
@@ -409,7 +411,6 @@ export default {
             else this.sortFlag = 0
         }
     },
-
     components: {
         ImportColdWallet,
         // TransPane,

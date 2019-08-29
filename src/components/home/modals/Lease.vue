@@ -167,6 +167,7 @@ import LeaseSuccess from './LeaseSuccess'
 import TxInfoModal from '../elements/TxInfoModal'
 import BigNumber from 'bignumber.js'
 import JSONBigNumber from 'json-bignumber'
+import { mapActions } from 'vuex'
 export default {
     name: 'Lease',
     components: { LeaseSuccess, Confirm, LeaseInput, ColdSignature, TxInfoModal },
@@ -256,6 +257,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance']),
         inputAmount(num) {
             return BigNumber(num)
         },
@@ -337,7 +339,7 @@ export default {
                 } else {
                     this.coldPageId++
                 }
-                this.$store.dispatch('updateBalance', true)
+                this.updateBalance(true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {

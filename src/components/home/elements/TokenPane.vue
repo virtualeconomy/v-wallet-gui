@@ -6,7 +6,7 @@
            width="30"
            height="30">
       <span class="title">
-        {{ formatter(this.$store.state['available']) }}
+        {{ formatter(available) }}
       </span>
       <p class="text-muted text-des mb-0">
         Available Balance
@@ -17,7 +17,7 @@
            width="16"
            height="16">
       <span class="sub-title">
-        {{ formatter(this.$store.state['total']) }}
+        {{ formatter(total) }}
       </span>
       <p class="text-muted text-des mb-0">
         Total Balance
@@ -66,6 +66,8 @@ import Receive from '../modals/Receive'
 import Send from '../modals/Send'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
+import { mapState } from 'vuex'
+
 export default {
     name: 'TokenPane',
     components: {
@@ -79,6 +81,10 @@ export default {
     created() {
         this.isMobile = browser.isMobile()
     },
+    computed: mapState({
+        available: 'available',
+        total: 'total'
+    }),
     props: {
         balance: {
             type: BigNumber,

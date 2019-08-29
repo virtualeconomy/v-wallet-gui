@@ -46,6 +46,7 @@
 <script>
 import Vue from 'vue'
 import { NODE_IP } from '@/constants.js'
+import { mapActions } from 'vuex'
 export default {
     name: 'AddToken',
     data() {
@@ -76,6 +77,7 @@ export default {
     },
 
     methods: {
+        ...mapActions(['changeAddTokenStatus']),
         closeModal() {
             this.init = false
             this.responseErr = false
@@ -104,7 +106,7 @@ export default {
                     this.responseErr = false
                     Vue.set(tokens, response.body.tokenId, response.body.tokenId)
                     this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
-                    this.$store.commit('changeAddTokenStatus')
+                    this.changeAddTokenStatus()
                     this.$refs.addTokenModal.hide()
                 }, respError => {
                     this.responseErr = true

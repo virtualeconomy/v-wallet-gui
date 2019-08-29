@@ -142,6 +142,7 @@ import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { TX_FEE, TX_TEST_EXPLORER, NETWORK_BYTE, TX_EXPLORER } from '@/constants'
+import { mapActions } from 'vuex'
 export default {
     name: 'TxInfoModal',
     provide() {
@@ -253,6 +254,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['changeAddTokenStatus']),
         reload() {
             this.isRouterAlive = false
             this.$nextTick(() => (this.isRouterAlive = true))
@@ -275,7 +277,7 @@ export default {
                 Vue.set(tokens, this.tokenId, this.tokenId)
                 this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
             }
-            this.$store.commit('changeAddTokenStatus')
+            this.changeAddTokenStatus()
             this.reload()
         },
         isTokenExisted() {
