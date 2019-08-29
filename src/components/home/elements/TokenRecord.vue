@@ -49,6 +49,7 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
+          <b-dropdown-item @click="verify">Verification</b-dropdown-item>
           <b-dropdown-item v-if="enableStatus"
                            @click="supersede">Supersede</b-dropdown-item>
           <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
@@ -377,6 +378,9 @@ export default {
         showModal() {
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
+        },
+        verify() {
+            window.open('https://docs.google.com/forms/d/e/1FAIpQLSer2SHC0qLi5l_4q-8zXcQG_nAraUBkMB9LPDI0MLuSB_03vg/viewform')
         },
         sendToken() {
             this.getTokenBalances()
