@@ -54,7 +54,6 @@
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import TokenRecord from './TokenRecord'
-import bus from '@/assets/bus'
 import AddToken from '../modals/AddToken'
 export default {
     name: 'TokenRecords',
@@ -114,9 +113,15 @@ export default {
             if (this.address && Vue.ls.get('pwd')) {
                 this.getTokenRecords()
             }
+        },
+        addTokenStatus(cur, old) {
+            this.getTokenRecords()
         }
     },
     computed: {
+        addTokenStatus() {
+            return this.$store.state.addTokenStatus
+        },
         seedaddress() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
@@ -126,23 +131,16 @@ export default {
             return JSON.parse(window.localStorage.getItem(this.seedaddress))
         }
     },
-    mounted() {
-        bus.$on('sendFlag', (data) => {
-            this.getTokenRecords()
-        })
-    },
     methods: {
         isMobile() {
             return browser.isMobile()
         },
         getTokenRecords() {
             if (this.address) {
-                // this.changeShowDisable = true
                 let records = JSON.parse(window.localStorage.getItem(this.seedaddress))
                 if (records.tokens) {
                     this.tokenRecords = JSON.parse(records.tokens)
                 }
-                // this.changeShowDisable = false
             }
         },
         removeToken(remove) {

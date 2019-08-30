@@ -61,15 +61,14 @@
            :cold-addresses="coldAddresses"
            :addresses="addresses"
            :selected-address="address"
-           :selected-wallet-type="walletType"
-           @endLeaseSignal="endLeaseSignal"></Lease>
+           :selected-wallet-type="walletType"></Lease>
   </div>
 </template>
 
 <script>
 import Lease from '../modals/Lease'
 import browser from '@/utils/browser'
-import BigNumber from 'bignumber.js'
+import { mapState } from 'vuex'
 
 export default {
     name: 'LeasePane',
@@ -92,34 +91,6 @@ export default {
             default: function() {},
             require: true
         },
-        available: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
-        leasedIn: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
-        leasedOut: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
-        total: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
         address: {
             type: String,
             default: '',
@@ -131,15 +102,18 @@ export default {
             require: true
         }
     },
+    computed: mapState({
+        available: 'available',
+        total: 'total',
+        leasedIn: 'leasedIn',
+        leasedOut: 'leasedOut'
+    }),
     methods: {
         redirectToVsysrate() {
             window.open('http://vsysrate.com')
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
-        },
-        endLeaseSignal() {
-            this.$emit('updateInfo')
         }
     }
 }

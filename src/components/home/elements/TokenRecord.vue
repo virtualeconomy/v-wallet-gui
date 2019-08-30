@@ -84,7 +84,7 @@
                        :current-supply="currentSupply"
                        :token-unity="unity"
                        :function-name="functionName"
-                       @updateBalance="updateBalance">
+                       @updateTokenBalance="updateTokenBalance">
     </IssueAndBurnToken>
     <WithdrawToken :token-id="tokenId"
                    :address="address"
@@ -95,7 +95,7 @@
                    :balance="balances[address]"
                    :token-unity="unity"
                    :is-split="isSplit"
-                   @updateBalance="updateBalance">
+                   @updateTokenBalance="updateTokenBalance">
     </WithdrawToken>
     <DepositToken :token-id="tokenId"
                   :address="address"
@@ -106,7 +106,7 @@
                   :balance="balances[address]"
                   :token-unity="unity"
                   :is-split="isSplit"
-                  @updateBalance="updateBalance">
+                  @updateTokenBalance="updateTokenBalance">
     </DepositToken>
     <Supersede :issuer="issuer"
                :token-id="tokenId"
@@ -116,7 +116,7 @@
                :addresses="addresses"
                :cold-addresses="coldAddresses"
                :balance="balances[address]"
-               @updateBalance="updateBalance">
+               @updateTokenBalance="updateTokenBalance">
     </Supersede>
     <SplitToken :token-id="tokenId"
                 :issuer="issuer"
@@ -234,17 +234,17 @@ export default {
             if (newAddr === '' || this.activeTab !== 'token') {
                 return
             }
-            this.updateBalance()
+            this.updateTokenBalance()
         },
         activeTab(newTab, oldTab) {
             if (newTab === 'token') {
-                this.updateBalance()
+                this.updateTokenBalance()
             }
         }
     },
     created() {
         this.getTokenInfo()
-        this.updateBalance()
+        this.updateTokenBalance()
     },
 
     computed: {
@@ -311,7 +311,7 @@ export default {
         formatter(num) {
             return browser.bigNumberFormatter(num)
         },
-        updateBalance() {
+        updateTokenBalance() {
             const url = NODE_IP + '/contract/balance/' + this.address + '/' + this.tokenId
             this.$http.get(url).then(response => {
                 this.tokenBalance = BigNumber(response.body.balance).dividedBy(response.body.unity)
@@ -323,7 +323,7 @@ export default {
             this.$http.get(tokenUrl).then(response => {
                 this.tokens = response.body
                 this.unity = BigNumber(this.tokens.unity)
-                this.updateBalance()
+                this.updateTokenBalance()
             }, respError => {
             })
         },
@@ -372,7 +372,7 @@ export default {
             }, respError => {
                 console.log('failed to load tokentype ')
             })
-            this.updateBalance()
+            this.updateTokenBalance()
         },
         showModal() {
             this.getTokenInfo()
