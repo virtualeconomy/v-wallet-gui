@@ -49,7 +49,8 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
-          <b-dropdown-item @click="verify">Verification</b-dropdown-item>
+          <b-dropdown-item v-if="!isCertified"
+                           @click="verify">Verification</b-dropdown-item>
           <b-dropdown-item v-if="enableStatus"
                            @click="supersede">Supersede</b-dropdown-item>
           <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
