@@ -9,7 +9,8 @@ Vue.use(VueResource)
 
 const store = new Vuex.Store({
     state: {
-        enableStatus: JSON.parse(window.localStorage.getItem('enableStatus')),
+        tokenSplitStatus: JSON.parse(window.localStorage.getItem('tokenSplitStatus')),
+        tokenManagementStatus: JSON.parse(window.localStorage.getItem('tokenManagementStatus')),
         eventPool: {},
         available: BigNumber(NaN),
         leasedIn: BigNumber(NaN),
@@ -20,8 +21,9 @@ const store = new Vuex.Store({
         addTokenStatus: 0
     },
     mutations: {
-        changeEnableStatus(state, status) {
-            state.enableStatus = status
+        changeSettingsStatus(state, status) {
+            state.tokenSplitStatus = status['split']
+            state.tokenManagementStatus = status['management']
         },
         updateBalance(state) {
             const url = NODE_IP + '/addresses/balance/details/' + state.selectedAddress
@@ -56,7 +58,6 @@ const store = new Vuex.Store({
                 context.state['intervalStatus'] = true
                 const updateTask = (interval) => {
                     setTimeout(() => {
-                        console.log('asd')
                         let previousValue = context.state['available']
                         context.commit('updateBalance')
                         if (previousValue === context.state['available'] && interval <= 150000) {
@@ -75,6 +76,11 @@ const store = new Vuex.Store({
         },
         changeAddTokenStatus(context) {
             context.commit('changeAddTokenStatus')
+        },
+        changeSettingsStatus(context, status) {
+            context.commit('changeSettingsStatus', status)
+            window.localStorage.setItem('tokenSplitStatus', status['split'])
+            window.localStorage.setItem('tokenManagementStatus', status['management'])
         }
     },
     getters: {
