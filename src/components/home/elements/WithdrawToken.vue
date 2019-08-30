@@ -274,6 +274,7 @@ import common from '@/utils/common'
 import BigNumber from 'bignumber.js'
 import base58 from '@/libs/base58'
 import transaction from '@/utils/transaction'
+import { mapActions } from 'vuex'
 export default {
     name: 'WithdrawToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -387,6 +388,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance']),
         inputAmount(num) {
             return BigNumber(num)
         },
@@ -430,6 +432,7 @@ export default {
                 } else {
                     this.coldPageId++
                 }
+                this.updateBalance(true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {

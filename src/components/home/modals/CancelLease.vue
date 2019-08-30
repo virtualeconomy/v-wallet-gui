@@ -79,6 +79,7 @@ import seedLib from '@/libs/seed'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
+import { mapActions } from 'vuex'
 export default {
     name: 'CancelLease',
     components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm },
@@ -182,6 +183,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance']),
         resetPage() {
             this.page = 'confirm'
             this.signed = false
@@ -221,6 +223,7 @@ export default {
             const url = NODE_IP + '/leasing/broadcast/cancel'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 this.page = 'success'
+                this.updateBalance(true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {

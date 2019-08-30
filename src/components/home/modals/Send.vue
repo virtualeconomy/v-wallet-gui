@@ -405,6 +405,7 @@ import browser from '@/utils/browser'
 import common from '@/utils/common'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
+import { mapActions } from 'vuex'
 var initData = {
     superNodes: [],
     errorMessage: '',
@@ -528,6 +529,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance']),
         getSuperNodes() {
             const slotsUrl = NODE_IP + '/consensus/allSlotsInfo'
             this.$http.get(slotsUrl).then(response => {
@@ -585,6 +587,7 @@ export default {
                 } else {
                     this.coldPageId++
                 }
+                this.updateBalance(true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {

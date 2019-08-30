@@ -46,7 +46,7 @@
 <script>
 import Vue from 'vue'
 import { NODE_IP } from '@/constants.js'
-import bus from '@/assets/bus'
+import { mapActions } from 'vuex'
 export default {
     name: 'AddToken',
     data() {
@@ -54,8 +54,7 @@ export default {
             tokens: {},
             tokenId: '',
             init: false,
-            responseErr: false,
-            sendFlag: false
+            responseErr: false
         }
     },
     watch: {
@@ -78,6 +77,7 @@ export default {
     },
 
     methods: {
+        ...mapActions(['changeAddTokenStatus']),
         closeModal() {
             this.init = false
             this.responseErr = false
@@ -106,9 +106,7 @@ export default {
                     this.responseErr = false
                     Vue.set(tokens, response.body.tokenId, response.body.tokenId)
                     this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
-                    this.sendFlag = true
-                    bus.$emit('sendFlag', this.sendFlag)
-                    this.sendFlag = false
+                    this.changeAddTokenStatus()
                     this.$refs.addTokenModal.hide()
                 }, respError => {
                     this.responseErr = true
