@@ -49,6 +49,8 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
+          <b-dropdown-item v-if="!isCertified"
+                           @click="verify">Verification</b-dropdown-item>
           <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
                            @click="supersede">Supersede</b-dropdown-item>
           <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
@@ -227,19 +229,19 @@ export default {
             },
             require: true
         },
-        activedTab: {
+        activeTab: {
             type: String,
             default: 'token'
         }
     },
     watch: {
         address(newAddr, oldAddr) {
-            if (newAddr === '' || this.activedTab !== 'token') {
+            if (newAddr === '' || this.activeTab !== 'token') {
                 return
             }
             this.updateTokenBalance()
         },
-        activedTab(newTab, oldTab) {
+        activeTab(newTab, oldTab) {
             if (newTab === 'token') {
                 this.updateTokenBalance()
             }
@@ -381,6 +383,9 @@ export default {
         showModal() {
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
+        },
+        verify() {
+            window.open('https://docs.google.com/forms/d/e/1FAIpQLSer2SHC0qLi5l_4q-8zXcQG_nAraUBkMB9LPDI0MLuSB_03vg/viewform')
         },
         sendToken() {
             this.getTokenBalances()
