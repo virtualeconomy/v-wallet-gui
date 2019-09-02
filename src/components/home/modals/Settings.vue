@@ -155,7 +155,7 @@ export default {
         }
     },
     methods: {
-        showMsgBoxTwo() {
+        showEnableSplitWarningMsgBox() {
             this.$bvModal.msgBoxConfirm('WARNING: Split/Reverse-Split is an experimental token feature requiring exchange support compatible with Unity Token Split Protocol. The proper use of token with split functionality requires due diligence of both the token issuer and the supporting exchanges. Token issuer shall agree to abide by the protocol and convention of proper use of the split/reverse-split functionality. Token issuer shall agree to defend, hold harmless, and indemnify V Systems Limited for damage and loss involving the use of split/reverse-split functionality of the token.', {
                 okVariant: 'warning',
                 okTitle: 'I agree',
@@ -195,7 +195,7 @@ export default {
         },
         enableTokenSplit() {
             if (!this.curSplitStatus) {
-                this.showMsgBoxTwo()
+                this.showEnableSplitWarningMsgBox()
             } else {
                 this.curSplitStatus = false
             }
