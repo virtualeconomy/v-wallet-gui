@@ -17,8 +17,7 @@
                      :wallet-type="walletType"
                      :balances="balances"
                      :active-tab="activeTab"
-                     @removeFlag="removeToken"
-                     @endSendSignal="endSendSignal"></TokenRecord>
+                     @removeFlag="removeToken"></TokenRecord>
         <div class="add-token"
              :style="{height:1}">
           <span class="add-token-input-first">Don't see your tokens?</span>
@@ -147,9 +146,6 @@ export default {
             if (remove === true) {
                 this.getTokenRecords()
             }
-        },
-        endSendSignal() {
-            this.$emit('updateInfo')
         }
     }
 }

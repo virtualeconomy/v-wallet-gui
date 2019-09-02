@@ -163,7 +163,6 @@ export default {
         },
         amount: {
             type: BigNumber,
-            require: true,
             default: function() {
                 return BigNumber(0)
             }

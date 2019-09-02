@@ -56,7 +56,6 @@ const store = new Vuex.Store({
                 context.state['intervalStatus'] = true
                 const updateTask = (interval) => {
                     setTimeout(() => {
-                        console.log('asd')
                         let previousValue = context.state['available']
                         context.commit('updateBalance')
                         if (previousValue === context.state['available'] && interval <= 150000) {

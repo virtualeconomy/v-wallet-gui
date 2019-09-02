@@ -142,7 +142,7 @@
                :wallet-type="walletType"
                :is-split="isSplit"
                :token-unity="unity"
-               @endSendSignal="endSendSignal">
+               @updateTokenBalance="updateTokenBalance">
     </SendToken>
   </b-container>
 </template>
@@ -436,9 +436,6 @@ export default {
                     this.$store.commit('changeEventPool', eventPool)
                 }
             }
-        },
-        endSendSignal() {
-            this.$emit('endSendSignal')
         }
     }
 }
