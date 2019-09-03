@@ -7,10 +7,10 @@
     <div class="inherit-height">
       <div class="scroll"
            :style="{height: myHeight}">
-        <TokenRecord v-for="(record,tokenId) in tokenRecords"
+        <TokenRecord v-for="(tokenMaker,tokenId) in tokenRecords"
                      :key="tokenId"
                      :token-id="tokenId"
-                     :token-record="record"
+                     :token-maker="tokenMaker"
                      :address="address"
                      :addresses="addresses"
                      :cold-addresses="coldAddresses"

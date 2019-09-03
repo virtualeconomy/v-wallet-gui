@@ -110,7 +110,7 @@
               <span class="unity-number-second">10<sup>16</sup></span>
             </div>
           </b-form-group>
-          <div v-if="enableStatus"
+          <div v-if="tokenSplitStatus"
                style="margin-top: 10px;">
             <span>
               <img id="img_read"
@@ -266,7 +266,7 @@
               <span class="unity-number-second">10<sup>16</sup></span>
             </div>
           </b-form-group>
-          <div v-if="enableStatus"
+          <div v-if="tokenSplitStatus"
                style="margin-top: 10px;">
             <span>
               <img id="img_read_cold"
@@ -383,7 +383,7 @@ import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
 import base58 from '@/libs/base58'
 import common from '@/utils/common'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 var initData = {
     errorMessage: '',
     opc: '',
@@ -453,8 +453,13 @@ export default {
         return initData
     },
     computed: {
-        enableStatus() {
-            return this.$store.state.enableStatus
+        ...mapState({
+            tokenSplitStatus: 'tokenSplitStatus'
+        }),
+        contractId() {
+            return function(tokenId) {
+                return transaction.tokenIDToContractID(tokenId)
+            }
         },
         defaultAddress() {
             return Vue.ls.get('address')
@@ -714,9 +719,9 @@ export default {
                     this.changeEventPool(eventPool)
                 }
             } else {
-                const url = NODE_IP + '/contract/tokenInfo/' + tokenId
+                const url = NODE_IP + '/contract/info/' + this.contractId(tokenId)
                 this.$http.get(url).then(response => {
-                    Vue.set(tokens, response.body.tokenId, response.body.tokenId)
+                    Vue.set(tokens, tokenId, response.body.info[1].data)
                     this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
                     this.changeAddTokenStatus()
                 }, respError => {
