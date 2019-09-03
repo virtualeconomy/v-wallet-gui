@@ -19,16 +19,18 @@
           <span class="time-height">Height: {{ currentHeight }}</span>
         </div>
         <b-nav-item-dropdown right
+                             class="drop-down"
                              no-caret>
           <template slot="button-content">
-            <div class="row username">
-              <span class="col align-self-center">{{ username }}</span>
+            <div class="row">
               <canvas class="avatar col"
                       width="50"
                       height="50"
                       :data-jdenticon-hash="avtHash"></canvas>
             </div>
           </template>
+          <b-dropdown-text class="username">Name: {{ username }}</b-dropdown-text>
+          <b-dropdown-divider></b-dropdown-divider>
           <b-dropdown-item v-b-modal.accountModal>Account</b-dropdown-item>
           <b-dropdown-item v-b-modal.settingsModal>Settings</b-dropdown-item>
           <b-dropdown-item v-b-modal.aboutModal>About</b-dropdown-item>
@@ -211,10 +213,14 @@ export default {
     width: 32px;
 }
 .username {
-    display: inline-block;
+    color: #696B8A !important;
+    white-space: nowrap;
 }
 .brand-logo {
     height: 24px;
+}
+.drop-down {
+    margin-right: 30px;
 }
 .nav-item {
     background-color: rgb(240, 240, 240);
