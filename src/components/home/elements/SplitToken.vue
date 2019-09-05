@@ -282,7 +282,7 @@ export default {
     data: function() {
         return {
             errorMessage: '',
-            newUnity: BigNumber(0),
+            newUnity: 0,
             attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
@@ -499,7 +499,7 @@ export default {
             }
         },
         resetPage() {
-            this.newUnity = BigNumber(0)
+            this.newUnity = 0
             this.pageId = 1
             this.coldPageId = 1
             this.sendError = false

@@ -114,7 +114,7 @@ export default {
         },
         walletType: {
             type: String,
-            default: '',
+            default: 'hotWallet',
             require: true
         }
     },

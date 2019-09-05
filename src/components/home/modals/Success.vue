@@ -1,8 +1,8 @@
 <template>
-  <div>
+  <div class="success">
     <img src="@/assets/imgs/icons/operate/ic_success_circle.svg">
     <div class="infos">
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="Amount"
                     label-for="amount_success">
@@ -13,7 +13,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="From"
                     label-for="walletAddress_success">
@@ -24,7 +24,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="To"
                     label-for="recipientAddress_success">
@@ -35,7 +35,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="Description"
                     label-for="attachment_success">
@@ -46,7 +46,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="Fee"
                     label-for="fee_success">
@@ -106,6 +106,9 @@ export default {
 </script>
 
 <style scoped>
+.success {
+    text-align: center;
+}
 .form-line {
     margin-bottom: 0px;
     border-top: 1px solid #E8E9ED;

@@ -4,14 +4,14 @@
            hide-footer
            hide-header
            ref="cancelLeaseModal"
-           @hidden="resetPage"
-           class="cl-modal">
+           @hidden="resetPage">
     <button
       class="close btn-close"
       @click="closeModal">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
-    <b-container v-if="page==='confirm'">
+    <b-container v-if="page==='confirm'"
+                 class="cl-modal">
       <div class="md-content">
         <div class="cl-title">
           <div class="cl-icon">

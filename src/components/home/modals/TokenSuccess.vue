@@ -8,7 +8,7 @@
     </div>
     <div class="infos">
       <b-form-group v-if="txType==='Withdraw Token from Contract' || txType==='Deposit Token to Contract'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="Contract ID"
                     label-for="contract_success">
@@ -20,7 +20,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-if="txType==='Destroy Token'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="Burn Amount"
                     label-for="amount_success">
@@ -32,7 +32,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-else-if="txType==='Register New Token'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="Max Supply"
                     label-for="amount_success">
@@ -44,7 +44,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-else-if="txType==='Send Token'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="Send Amount"
                     label-for="amount_success">
@@ -56,7 +56,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-else-if="txType==='Split Token'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="New Unity"
                     label-for="amount_success">
@@ -68,7 +68,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-else-if="txType==='Supersede'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="New Issuer"
                     label-for="amount_success">
@@ -80,7 +80,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-else-if="txType==='Issue Token'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="Issue Amount"
                     label-for="amount_success">
@@ -92,7 +92,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-else-if="txType==='Withdraw Token from Contract' || txType==='Deposit Token to Contract'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="Amount"
                     label-for="amount_success">
@@ -103,7 +103,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="From"
                     label-for="walletAddress_success">
@@ -115,7 +115,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-if="txType==='Send Token'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="To"
                     label-for="toAddress_success">
@@ -126,7 +126,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="Fee"
                     label-for="fee_success">

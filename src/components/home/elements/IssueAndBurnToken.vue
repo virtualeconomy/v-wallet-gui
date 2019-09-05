@@ -366,7 +366,7 @@ export default {
     data: function() {
         return {
             errorMessage: '',
-            amount: BigNumber(0),
+            amount: 0,
             attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
@@ -604,7 +604,7 @@ export default {
             }
         },
         resetPage() {
-            this.amount = BigNumber(0)
+            this.amount = 0
             this.pageId = 1
             this.coldPageId = 1
             this.scanShow = false

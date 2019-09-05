@@ -143,7 +143,7 @@ export default {
     data: function() {
         return {
             recipient: '',
-            amount: BigNumber(0),
+            amount: 0,
             scanShow: false,
             qrInit: false,
             qrErrMsg: void 0,
