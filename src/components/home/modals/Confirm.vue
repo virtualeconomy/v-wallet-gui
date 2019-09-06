@@ -45,7 +45,6 @@
         <b-form-input id="recipientAddress_confirm"
                       v-model="recipient"
                       class="addr"
-                      margin-left="0px"
                       readonly
                       :plaintext="true">
         </b-form-input>
@@ -54,7 +53,7 @@
                     class="form-line"
                     label="Description"
                     label-for="attachment_confirm"
-                    v-if="txType==='transfer'">
+                    v-if="txType==='payment'">
         <b-form-input id="attachment_confirm"
                       v-model="attachment"
                       class="des"
@@ -154,12 +153,16 @@ export default {
     text-align: right;
 }
 .addr {
+    margin-left: -50px;
+    width: 350px;
     font-size: 15px;
     color: #181B3A;
     letter-spacing: 0;
     text-align: right;
 }
 .des {
+    margin-left: -50px;
+    width: 350px;
     font-size: 15px;
     color: #181B3A;
     letter-spacing: 0;

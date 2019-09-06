@@ -227,6 +227,8 @@ export default {
     text-align: right;
 }
 .addr {
+    margin-left: -50px;
+    width: 350px;
     font-size: 15px;
     color: #181B3A;
     letter-spacing: 0;
