@@ -16,7 +16,8 @@
         "lint": "eslint --ext .js,.vue src test/unit test/e2e/specs",
         "build": "node build/build.js",
         "electron": "NODE_ENV=DEV electron electron.js",
-        "test-api": "babel-node --presets es2015 test_api.js"
+        "test-api": "babel-node --presets es2015 test_api.js",
+        "postbuild": "rm -rf app/ && mkdir app app/templates && cp dist/index.html app/templates && cp -a dist/static app/ && cp app.py app/"
     },
     "dependencies": {
         "@babel/runtime": "^7.3.1",
