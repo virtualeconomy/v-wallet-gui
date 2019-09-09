@@ -27,6 +27,7 @@ def proxy(path):
         method=request.method,
         url=NODE_API_URL+path,
         headers={key: value for (key, value) in request.headers if key != 'Host'},
+        params=request.args,
         data=request.get_data(),
         cookies=request.cookies,
         allow_redirects=False)
