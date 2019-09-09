@@ -16,7 +16,7 @@
       <b-col class="record-detail"
              cols="auto">
         <b-row>
-          <b-col class="title">{{ isCertified ? officialName : tokenRecord }}</b-col>
+          <b-col class="title">{{ isCertified ? officialName : tokenId }}</b-col>
         </b-row>
       </b-col>
       <b-col class="record-blank"></b-col>
@@ -49,15 +49,19 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
-          <b-dropdown-item v-if="enableStatus"
+          <b-dropdown-item v-if="!isCertified"
+                           @click="verify">Verification</b-dropdown-item>
+          <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
                            @click="supersede">Supersede</b-dropdown-item>
-          <b-dropdown-item @click="issueToken">Issue Token</b-dropdown-item>
-          <b-dropdown-item @click="burnToken">Destroy Token</b-dropdown-item>
-          <b-dropdown-item v-if="enableStatus"
+          <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
+                           @click="issueToken">Issue Token</b-dropdown-item>
+          <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
+                           @click="burnToken">Destroy Token</b-dropdown-item>
+          <b-dropdown-item v-if="tokenSplitStatus"
                            @click="splitToken">Split Token</b-dropdown-item>
-          <b-dropdown-item v-if="enableStatus && showUnsupportedFunction"
+          <b-dropdown-item v-if="tokenManagementStatus && showUnsupportedFunction"
                            @click="depositToken">Deposit to Contract </b-dropdown-item>
-          <b-dropdown-item v-if="enableStatus && showUnsupportedFunction"
+          <b-dropdown-item v-if="tokenManagementStatus && showUnsupportedFunction"
                            @click="withdrawToken">Withdraw from Contract</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Hide Token</b-dropdown-item>
         </b-dropdown>
@@ -162,6 +166,7 @@ import { CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import certify from '@/utils/certify'
+import { mapState } from 'vuex'
 export default {
     name: 'TokenRecord',
     components: { TokenInfoModal, SendToken, Supersede, SplitToken, WithdrawToken, DepositToken, IssueAndBurnToken },
@@ -208,7 +213,7 @@ export default {
             default: this ? this.defaultAddress : undefined,
             require: true
         },
-        tokenRecord: {
+        tokenMaker: {
             type: String,
             default: function() {},
             require: true
@@ -248,11 +253,12 @@ export default {
     },
 
     computed: {
+        ...mapState({
+            tokenManagementStatus: 'tokenManagementStatus',
+            tokenSplitStatus: 'tokenSplitStatus'
+        }),
         defaultAddress() {
             return Vue.ls.get('address')
-        },
-        enableStatus() {
-            return this.$store.state.enableStatus
         },
         seedAddress() {
             if (Vue.ls.get('address')) {
@@ -377,6 +383,9 @@ export default {
         showModal() {
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
+        },
+        verify() {
+            window.open('https://docs.google.com/forms/d/e/1FAIpQLSer2SHC0qLi5l_4q-8zXcQG_nAraUBkMB9LPDI0MLuSB_03vg/viewform')
         },
         sendToken() {
             this.getTokenBalances()

@@ -274,7 +274,7 @@ export default {
                 tokens = JSON.parse(tmpUserInfo.tokens)
             }
             if (this.tokenId) {
-                Vue.set(tokens, this.tokenId, this.tokenId)
+                Vue.set(tokens, this.tokenId, this.txAddress)
                 this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
             }
             this.changeAddTokenStatus()

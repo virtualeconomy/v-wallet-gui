@@ -46,6 +46,7 @@
 <script>
 import Vue from 'vue'
 import { NODE_IP } from '@/constants.js'
+import transaction from '@/utils/transaction'
 import { mapActions } from 'vuex'
 export default {
     name: 'AddToken',
@@ -63,6 +64,9 @@ export default {
         }
     },
     computed: {
+        contractId() {
+            return transaction.tokenIDToContractID(this.tokenId)
+        },
         seedAddress() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
@@ -101,10 +105,10 @@ export default {
                 this.$refs.addTokenModal.hide()
             }
             if (this.tokenId) {
-                const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
+                const url = NODE_IP + '/contract/info/' + this.contractId
                 this.$http.get(url).then(response => {
                     this.responseErr = false
-                    Vue.set(tokens, response.body.tokenId, response.body.tokenId)
+                    Vue.set(tokens, this.tokenId, response.body.info[1].data)
                     this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
                     this.changeAddTokenStatus()
                     this.$refs.addTokenModal.hide()
