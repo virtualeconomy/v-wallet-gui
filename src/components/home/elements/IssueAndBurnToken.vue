@@ -366,7 +366,7 @@ export default {
     data: function() {
         return {
             errorMessage: '',
-            amount: BigNumber(0),
+            amount: 0,
             attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
@@ -567,6 +567,9 @@ export default {
                     this.coldPageId++
                 }
                 this.updateBalance(true)
+                for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                    setTimeout(this.sendBalanceChange, delayTime)
+                }
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -601,7 +604,7 @@ export default {
             }
         },
         resetPage() {
-            this.amount = BigNumber(0)
+            this.amount = 0
             this.pageId = 1
             this.coldPageId = 1
             this.scanShow = false
@@ -612,9 +615,6 @@ export default {
             this.coldSignature = ''
         },
         endSend() {
-            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                setTimeout(this.sendBalanceChange, delayTime)
-            }
             this.$refs.issueAndBurnTokenModal.hide()
         },
         sendBalanceChange() {

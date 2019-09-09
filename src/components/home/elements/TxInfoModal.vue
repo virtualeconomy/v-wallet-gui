@@ -1,13 +1,12 @@
 <template>
   <b-modal :id="'txInfoModal_' + transType + modalId + selfSend"
            ref="infoModal"
-           class="tx-modal"
            lazy
            centered
            hide-header
            hide-footer>
     <router-view v-if="isRouterAlive"></router-view>
-    <div class="md-content">
+    <div class="tx-modal">
       <button
         class="close btn-close"
         @click="closeModal">
@@ -311,7 +310,9 @@ export default {
 
 <style scoped lang="less">
  .tx-modal {
-     text-align: center;
+    padding: 40px 24px;
+    padding-top: 0;
+    text-align: center;
     .tx-title {
         padding: 24px 0;
         border-bottom: 1px solid #1111;
@@ -512,11 +513,43 @@ export default {
         right:35px;
     }
     .tx-attachment:hover .tx-attachment-whole {
-         visibility: visible;
+        visibility: visible;
     }
-    .md-content {
-        padding: 40px 24px;
-        padding-top: 0;
+    .sent-amount {
+        font-size: 28px;
+        color: #F5354B;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .received-amount {
+        font-size: 28px;
+        color: #23A28C;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedin-amount {
+        font-size: 28px;
+        color: #86BEF7;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedout-amount {
+        font-size: 28px;
+        color: #73CC5A;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedoutcanceled-amount {
+        font-size: 28px;
+        color: #FF7A8A;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedincanceled-amount {
+        font-size: 28px;
+        color: #FFD192;
+        letter-spacing: 0;
+        text-align: center;
     }
 }
  .btn-back {
@@ -527,7 +560,7 @@ export default {
      color: #EB7D34;
      letter-spacing: 0;
      text-align: center;
-     margin-top: -10px;
+     margin-top: -20px;
  }
 .btn-close {
     position: absolute;

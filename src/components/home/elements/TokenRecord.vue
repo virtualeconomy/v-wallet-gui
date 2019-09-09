@@ -144,7 +144,7 @@
                :wallet-type="walletType"
                :is-split="isSplit"
                :token-unity="unity"
-               @endSendSignal="endSendSignal">
+               @updateTokenBalance="updateTokenBalance">
     </SendToken>
   </b-container>
 </template>
@@ -167,6 +167,7 @@ import Vue from 'vue'
 import browser from '@/utils/browser'
 import certify from '@/utils/certify'
 import { mapState } from 'vuex'
+import JSONBigNumber from 'json-bignumber'
 export default {
     name: 'TokenRecord',
     components: { TokenInfoModal, SendToken, Supersede, SplitToken, WithdrawToken, DepositToken, IssueAndBurnToken },
@@ -320,14 +321,16 @@ export default {
         updateTokenBalance() {
             const url = NODE_IP + '/contract/balance/' + this.address + '/' + this.tokenId
             this.$http.get(url).then(response => {
-                this.tokenBalance = BigNumber(response.body.balance).dividedBy(response.body.unity)
+                let tempResponse = JSONBigNumber.parse(response.bodyText)
+                this.tokenBalance = BigNumber(tempResponse.balance).dividedBy(tempResponse.unity)
             }, respError => {
             })
         },
         updateUnity() {
             const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(tokenUrl).then(response => {
-                this.tokens = response.body
+                let tempResponse = JSONBigNumber.parse(response.bodyText)
+                this.tokens = tempResponse
                 this.unity = BigNumber(this.tokens.unity)
                 this.updateTokenBalance()
             }, respError => {
@@ -338,7 +341,8 @@ export default {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
                 let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
                 this.$http.get(turl).then(response => {
-                    let value = BigNumber(response.body.balance).dividedBy(response.body.unity)
+                    let tempResponse = JSONBigNumber.parse(response.bodyText)
+                    let value = BigNumber(tempResponse.balance).dividedBy(tempResponse.unity)
                     Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
@@ -347,7 +351,8 @@ export default {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
                 let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
                 this.$http.get(turl).then(response => {
-                    let value = BigNumber(response.body.balance).dividedBy(response.body.unity)
+                    let tempResponse = JSONBigNumber.parse(response.bodyText)
+                    let value = BigNumber(tempResponse.balance).dividedBy(tempResponse.unity)
                     Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
@@ -357,7 +362,8 @@ export default {
             let contractId = transaction.tokenIDToContractID(this.tokenId)
             const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
             this.$http.get(tokenUrl).then(response => {
-                this.tokens = response.body
+                let tempResponse = JSONBigNumber.parse(response.bodyText)
+                this.tokens = tempResponse
                 this.unity = BigNumber(this.tokens.unity)
             }, respError => {
             })
@@ -440,9 +446,6 @@ export default {
                     this.$store.commit('changeEventPool', eventPool)
                 }
             }
-        },
-        endSendSignal() {
-            this.$emit('endSendSignal')
         }
     }
 }

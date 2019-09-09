@@ -2,7 +2,7 @@
   <div>
     <div class="infos">
       <b-form-group v-if="txType==='Withdraw Token from Contract' || txType==='Deposit Token to Contract'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="Contract ID"
                     label-for="contract_confirm">
@@ -14,7 +14,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-if="txType==='Destroy Token'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="Burn Amount"
                     label-for="amount_confirm">
@@ -26,7 +26,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-else-if="txType==='Register New Token'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="Total Supply"
                     label-for="amount_confirm">
@@ -38,7 +38,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-else-if="txType==='Send Token'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="Send Amount"
                     label-for="amount_confirm">
@@ -50,7 +50,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-else-if="txType==='Supersede'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="New Issuer"
                     label-for="amount_confirm">
@@ -62,7 +62,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-else-if="txType==='Split Token'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="New Unity"
                     label-for="amount_confirm">
@@ -74,7 +74,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-else-if="txType==='Issue Token'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="Issue Amount"
                     label-for="amount_confirm">
@@ -86,7 +86,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-else-if="txType==='Withdraw Token from Contract' || txType==='Deposit Token to Contract'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="Amount"
                     label-for="amount_confirm">
@@ -97,7 +97,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     label="Type"
                     class="form-line"
                     label-for="tranType">
@@ -108,7 +108,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="From"
                     label-for="walletAddress_confirm">
@@ -120,7 +120,7 @@
         </b-form-input>
       </b-form-group>
       <b-form-group v-if="txType==='Send Token'"
-                    horizontal
+                    label-cols
                     class="form-line"
                     label="To"
                     label-for="toAddress_confirm">
@@ -131,7 +131,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="Fee"
                     label-for="fee_confirm">
@@ -163,7 +163,6 @@ export default {
         },
         amount: {
             type: BigNumber,
-            require: true,
             default: function() {
                 return BigNumber(0)
             }
@@ -228,6 +227,8 @@ export default {
     text-align: right;
 }
 .addr {
+    margin-left: -50px;
+    width: 350px;
     font-size: 15px;
     color: #181B3A;
     letter-spacing: 0;

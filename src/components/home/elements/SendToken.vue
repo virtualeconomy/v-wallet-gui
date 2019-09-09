@@ -630,6 +630,9 @@ export default {
                     this.coldPageId++
                 }
                 this.updateBalance(true)
+                for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                    setTimeout(this.sendBalanceChange, delayTime)
+                }
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -693,6 +696,9 @@ export default {
         },
         endSend() {
             this.$refs.sendTokenModal.hide()
+        },
+        sendBalanceChange() {
+            this.$emit('updateTokenBalance', 'update')
         },
         scanChange(evt) {
             if (!this.qrInit) {

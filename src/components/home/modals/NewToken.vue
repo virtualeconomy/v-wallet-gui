@@ -390,13 +390,13 @@ var initData = {
     qrArray: new Array(0),
     support: false,
     recipient: '',
-    amount: BigNumber(0),
+    amount: 0,
     attachment: '',
     qrTotalPage: 1,
     pageId: 1,
     fee: BigNumber(TOKEN_FEE),
     coldRecipient: '',
-    coldAmount: BigNumber(0),
+    coldAmount: 0,
     coldPageId: 1,
     coldFee: BigNumber(TOKEN_FEE),
     address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
@@ -678,10 +678,10 @@ export default {
             this.qrTotalPage = 1
             this.qrArray = new Array(0)
             this.recipient = ''
-            this.amount = BigNumber(0)
+            this.amount = 0
             this.pageId = 1
             this.coldRecipient = ''
-            this.coldAmount = BigNumber(0)
+            this.coldAmount = 0
             this.coldPageId = 1
             this.scanShow = false
             this.qrInit = false
