@@ -268,7 +268,7 @@ export default {
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8).toString()
                 }
                 if (protocol !== PROTOCOL) {
                     this.paused = false
