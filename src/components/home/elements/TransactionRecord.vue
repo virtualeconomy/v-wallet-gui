@@ -91,7 +91,6 @@
         <div class="tx-fee"
              v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'register contract' || txIcon === 'execute contract function') && feeFlag">
           <span v-if="(txFee !== 0)"> Tx Fee: - {{ formatter(txFee) }} VSYS </span>
-          <span v-else> Tx Fee: {{ txFee }} VSYS </span>
         </div>
       </b-col>
       <b-col class="record-action"
