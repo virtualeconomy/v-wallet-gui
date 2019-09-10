@@ -58,7 +58,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isGreaterThanMax(this.newUnity)">
-              Unity is too big, and it should be no more than 2^63-1.
+              Unity is too large. Please change it to an integer less than 2^63.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -168,7 +168,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isGreaterThanMax(this.newUnity)">
-              Unity is too big, and it should be no more than 2^63-1.
+              Unity is too large. Please change it to an integer less than 2^63.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -533,11 +533,7 @@ export default {
         isGreaterThanMax(amount) {
             let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
             let unityValue = BigNumber(amount)
-            if (unityValue.isGreaterThan(maxValue)) {
-                return true
-            } else {
-                return false
-            }
+            return unityValue.isGreaterThan(maxValue)
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
