@@ -57,6 +57,10 @@
               Integer number is allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isGreaterThanMax(this.newUnity)">
+              Unity is too big, and it should be no more than 2^63-1.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
               Invalid Unity.
             </b-form-invalid-feedback>
@@ -161,6 +165,10 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="!isInteger()">
               Integer number is allowed.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isGreaterThanMax(this.newUnity)">
+              Unity is too big, and it should be no more than 2^63-1.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -419,7 +427,7 @@ export default {
             if (BigNumber(this.newUnity).isEqualTo(0)) {
                 return void 0
             }
-            return this.isNumFormatValid(this.newUnity) && !this.isNegative(this.newUnity) && this.isInteger()
+            return this.isNumFormatValid(this.newUnity) && !this.isNegative(this.newUnity) && this.isInteger() && !this.isGreaterThanMax(this.newUnity)
         },
         sendData(walletType) {
             let apiSchema
@@ -521,6 +529,15 @@ export default {
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
+        },
+        isGreaterThanMax(amount) {
+            let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
+            let unityValue = BigNumber(amount)
+            if (unityValue.isGreaterThan(maxValue)) {
+                return true
+            } else {
+                return false
+            }
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
