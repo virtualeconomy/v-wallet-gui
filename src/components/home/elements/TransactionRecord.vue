@@ -273,7 +273,12 @@ export default {
             return this.txType.toString().toLowerCase()
         },
         txClass() {
-            return this.txIcon.replace(/\s+/g, '')
+            let txName = this.txIcon.replace(/\s+/g, '')
+            if (txName === 'executecontractfunction' && this.txRecord.status !== 'Success') {
+                return txName + 'failed'
+            } else {
+                return txName
+            }
         },
         txAddress() {
             var sender = this.txRecord.proofs === undefined ? this.address : crypto.buildRawAddress(base58.decode(this.txRecord.proofs[0].publicKey))
@@ -540,14 +545,21 @@ export default {
 }
     .amount-executecontractfunction {
       font-size: 17px;
-      color: #F5354B;
+      color: #73CC5A;
       letter-spacing: 0;
       text-align: right;
       padding-right: 0px;
 }
+    .amount-executecontractfunctionfailed {
+        font-size: 17px;
+        color: #F5354B;
+        letter-spacing: 0;
+        text-align: right;
+        padding-right: 0px;
+}
     .amount-registercontract {
       font-size: 17px;
-      color: #F5354B;
+      color: #ff8737;
       letter-spacing: 0;
       text-align: right;
       padding-right: 0px;
