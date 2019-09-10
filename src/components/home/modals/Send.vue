@@ -696,7 +696,7 @@ export default {
                 var opc = jsonObj.opc
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
-                var tempAmount = 0
+                var tempAmount = BigNumber(0)
                 var tempAttachment = ''
                 if (jsonObj.hasOwnProperty('amount')) {
                     tempAmount = BigNumber(jsonObj.amount)
@@ -705,10 +705,10 @@ export default {
                     tempAttachment = jsonObj.invoice
                 }
                 if (this.walletType === 'hotWallet') {
-                    this.amount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.amount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8).toString()
                     this.attachment = tempAttachment
                 } else {
-                    this.coldAmount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.coldAmount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8).toString()
                     this.coldAttachment = tempAttachment
                 }
                 if (protocol !== PROTOCOL) {
