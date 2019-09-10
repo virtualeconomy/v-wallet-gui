@@ -221,6 +221,7 @@ export default {
 }
 .drop-down {
     margin-right: 30px;
+    margin-left: 20px;
 }
 .nav-item {
     background-color: rgb(240, 240, 240);
@@ -229,7 +230,6 @@ export default {
     position: relative;
     display: inline-block;
     margin-top:15px;
-    margin-right: 10px;
     height:19px;
     color: rgba(0, 0, 0, 0.5);
 }
