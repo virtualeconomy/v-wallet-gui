@@ -192,7 +192,7 @@ export default {
     },
     methods: {
         formatter(num) {
-            return browser.bigNumberFormatter(num)
+            return num.toString()
         }
     }
 }
