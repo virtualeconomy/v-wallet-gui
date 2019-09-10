@@ -90,7 +90,7 @@
         </div>
         <div class="tx-fee"
              v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'register contract' || txIcon === 'execute contract function') && feeFlag">
-          <span v-if="(txFee !== 0)"> Tx Fee: - {{ formatter(txFee) }} VSYS </span>
+          <span v-if="(!txFee.isEqualTo(0))"> Tx Fee: - {{ formatter(txFee) }} VSYS </span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -377,13 +377,14 @@ export default {
             return this.txRecord.id
         },
         txAttachment() {
-            var value = this.txRecord.attachment === void 0 ? '' : this.txRecord.attachment
-            var bytes = base58.decode(value)
+            let value = this.txRecord.attachment === void 0 ? '' : this.txRecord.attachment
+            let bytes = base58.decode(value)
             try {
-                return converters.byteArrayToString(bytes)
+                value = converters.byteArrayToString(bytes)
             } catch (e) {
-                return ''
+                value = ''
             }
+            return this.txRecord.description === void 0 ? value : this.txRecord.description
         }
     },
     methods: {

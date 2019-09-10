@@ -71,8 +71,8 @@
         <span>{{ formatter(txFee) || 0 }} VSYS</span>
       </div>
       <div class="tx-attachment"
-           v-if="txIcon === 'sent' || txIcon === 'received'">
-        <label>Attachment</label>
+           v-if="txIcon === 'sent' || txIcon === 'received' || txIcon === 'register contract' || txIcon === 'execute contract function'">
+        <label>Description</label>
         <span>{{ txAttachment }}</span>
         <span class="tx-attachment-whole">{{ txAttachment }}</span>
       </div>
