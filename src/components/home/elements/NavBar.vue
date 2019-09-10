@@ -31,10 +31,14 @@
           </template>
           <b-dropdown-text class="username">Name: {{ username }}</b-dropdown-text>
           <b-dropdown-divider></b-dropdown-divider>
-          <b-dropdown-item v-b-modal.accountModal>Account</b-dropdown-item>
-          <b-dropdown-item v-b-modal.settingsModal>Settings</b-dropdown-item>
-          <b-dropdown-item v-b-modal.aboutModal>About</b-dropdown-item>
-          <b-dropdown-divider></b-dropdown-divider><b-dropdown-item @click="logout">Logout</b-dropdown-item>
+          <b-dropdown-item class="drop-down-item"
+                           v-b-modal.accountModal>Account</b-dropdown-item>
+          <b-dropdown-item class="drop-down-item"
+                           v-b-modal.settingsModal>Settings</b-dropdown-item>
+          <b-dropdown-item class="drop-down-item"
+                           v-b-modal.aboutModal>About</b-dropdown-item>
+          <b-dropdown-divider></b-dropdown-divider><b-dropdown-item @click="logout"
+                                                                    class="drop-down-item">Logout</b-dropdown-item>
         </b-nav-item-dropdown>
       </b-navbar-nav>
     </b-navbar>
@@ -213,6 +217,7 @@ export default {
     width: 32px;
 }
 .username {
+    text-align: center;
     color: #696B8A !important;
     white-space: nowrap;
 }
@@ -222,6 +227,9 @@ export default {
 .drop-down {
     margin-right: 30px;
     margin-left: 20px;
+}
+.drop-down-item {
+    text-align: center;
 }
 .nav-item {
     background-color: rgb(240, 240, 240);
