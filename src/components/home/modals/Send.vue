@@ -411,12 +411,12 @@ var initData = {
     errorMessage: '',
     opc: '',
     recipient: '',
-    amount: BigNumber(0),
+    amount: 0,
     attachment: '',
     pageId: 1,
     fee: BigNumber(TX_FEE),
     coldRecipient: '',
-    coldAmount: BigNumber(0),
+    coldAmount: 0,
     coldAttachment: '',
     coldPageId: 1,
     coldFee: BigNumber(TX_FEE),
@@ -626,11 +626,11 @@ export default {
         resetPage() {
             this.opc = ''
             this.recipient = ''
-            this.amount = BigNumber(0)
+            this.amount = 0
             this.attachment = ''
             this.pageId = 1
             this.coldRecipient = ''
-            this.coldAmount = BigNumber(0)
+            this.coldAmount = 0
             this.coldAttachment = ''
             this.coldPageId = 1
             this.coldAddress = ''
@@ -696,7 +696,7 @@ export default {
                 var opc = jsonObj.opc
                 var api = jsonObj.api
                 var protocol = jsonObj.protocol
-                var tempAmount = 0
+                var tempAmount = BigNumber(0)
                 var tempAttachment = ''
                 if (jsonObj.hasOwnProperty('amount')) {
                     tempAmount = BigNumber(jsonObj.amount)
@@ -705,10 +705,10 @@ export default {
                     tempAttachment = jsonObj.invoice
                 }
                 if (this.walletType === 'hotWallet') {
-                    this.amount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.amount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8).toString()
                     this.attachment = tempAttachment
                 } else {
-                    this.coldAmount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.coldAmount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8).toString()
                     this.coldAttachment = tempAttachment
                 }
                 if (protocol !== PROTOCOL) {
@@ -773,11 +773,9 @@ export default {
             if (tabIndex === 0) {
                 this.resetPage()
                 this.pageId = 1
-                this.walletType = 'hotWallet'
             } else {
                 this.resetPage()
                 this.coldPageId = 1
-                this.walletType = 'coldWallet'
             }
             this.scanShow = false
         },

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="lease-success">
     <img src="@/assets/imgs/icons/operate/ic_success_circle.svg">
     <div>
       <p class="p-tips">Your transaction is on the way!</p>
@@ -54,6 +54,9 @@ export default {
 </script>
 
 <style scoped>
+.lease-success {
+    text-align: center;
+}
 .p-tips {
     font-size: 28px;
     color: #181B3A;

@@ -17,6 +17,14 @@
       <div class="label-title">Account</div>
       <b-form-group label="Wallet Address"
                     label-for="walletAddress">
+        <b-btn
+          id="addr-cpy"
+          class="btn-copy-addr"
+          v-b-popover.click.topright="'Copied!'"
+          @click="copyText('addr-cpy', 'addrToCopy')"
+          variant="link">
+          <img src="@/assets/imgs/icons/operate/ic_copy.svg">
+        </b-btn>
         <b-form-select id="walletAddress"
                        class="input-t"
                        v-model="currentAddress"
@@ -29,14 +37,6 @@
           class="hidden"
           readonly>
         </textarea>
-        <b-btn
-          id="addr-cpy"
-          class="btn-copy"
-          v-b-popover.click.topright="'Copied!'"
-          @click="copyText('addr-cpy', 'addrToCopy')"
-          variant="link">
-          <img src="@/assets/imgs/icons/operate/ic_copy.svg">
-        </b-btn>
       </b-form-group>
       <b-form-group label="Public Key"
                     label-for="pubKey">
@@ -461,6 +461,13 @@ export default {
     float: right;
     margin-top: -43px;
 }
+.btn-copy-addr {
+    position: absolute;
+    cursor: pointer;
+    float: right;
+    margin-left: 370px;
+    margin-top: 5px;
+}
 .btn-copy-append {
     border: 1px solid #ced4da;
     border-left: none;
@@ -477,11 +484,6 @@ export default {
 }
 .btn-append {
     width: 52px;
-}
-#addr-cpy {
-    position: absolute;
-    margin-left: 372px;
-    margin-top: -40px;
 }
 input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 30px #FAFAFA inset;

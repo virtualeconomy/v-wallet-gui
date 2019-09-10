@@ -17,7 +17,7 @@ const store = new Vuex.Store({
         leasedOut: BigNumber(NaN),
         selectedAddress: '',
         total: BigNumber(NaN),
-        intervalStatus: false,
+        intervalStatus: '',
         addTokenStatus: 0
     },
     mutations: {
@@ -54,16 +54,15 @@ const store = new Vuex.Store({
             context.commit('updateSelectedAddress', address)
         },
         updateBalance(context, repeatable) {
-            if (repeatable && !context.state['intervalStatus']) {
-                context.state['intervalStatus'] = true
+            let randomIdentity = Math.floor(Math.random() * 100)
+            context.state['intervalStatus'] = randomIdentity
+            if (repeatable) {
+                let previousValue = context.state['available']
                 const updateTask = (interval) => {
                     setTimeout(() => {
-                        let previousValue = context.state['available']
                         context.commit('updateBalance')
-                        if (previousValue === context.state['available'] && interval <= 150000) {
-                            updateTask(interval * 5)
-                        } else {
-                            context.state['intervalStatus'] = false
+                        if (previousValue.isEqualTo(context.state['available']) && randomIdentity === context.state['intervalStatus'] && interval <= 54000) {
+                            updateTask(interval * 3)
                         }
                     }, interval)
                 }

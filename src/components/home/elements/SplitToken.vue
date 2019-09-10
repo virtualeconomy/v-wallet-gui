@@ -78,7 +78,7 @@
         </b-container>
         <b-container v-if="pageId===2">
           <TokenConfirm :address="address"
-                        :new-unity="newUnity"
+                        :new-unity="inputUnity"
                         :fee="fee"
                         :tx-type="'Split Token'">
           </TokenConfirm>
@@ -109,7 +109,7 @@
         <b-container v-if="pageId===3">
           <TokenSuccess class="tokenSucced"
                         :address="address"
-                        :new-unity="newUnity"
+                        :new-unity="inputUnity"
                         :fee="fee"
                         :tx-type="'Split Token'">
           </TokenSuccess>
@@ -220,7 +220,7 @@
         </b-container>
         <b-container v-show="coldPageId===4">
           <TokenConfirm :address="address"
-                        :new-unity="newUnity"
+                        :new-unity="inputUnity"
                         :fee="fee"
                         :tx-type="'Split Token'">
           </TokenConfirm>
@@ -249,7 +249,7 @@
         <b-container v-show="coldPageId===5">
           <TokenSuccess class="tokenSucced"
                         :address="address"
-                        :new-unity="newUnity"
+                        :new-unity="inputUnity"
                         :fee="fee"
                         :tx-type="'Split Token'">
           </TokenSuccess>
@@ -282,7 +282,7 @@ export default {
     data: function() {
         return {
             errorMessage: '',
-            newUnity: BigNumber(0),
+            newUnity: 0,
             attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
@@ -402,6 +402,9 @@ export default {
                 function: transaction.prepareSplit(BigNumber(this.newUnity)),
                 functionExplain: 'Set token unity to ' + this.newUnity
             }
+        },
+        inputUnity() {
+            return BigNumber(this.newUnity)
         }
     },
     methods: {
@@ -459,6 +462,9 @@ export default {
                     this.coldPageId++
                 }
                 this.updateBalance(true)
+                for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                    setTimeout(this.unityChange, delayTime)
+                }
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -493,16 +499,13 @@ export default {
             }
         },
         resetPage() {
-            this.newUnity = BigNumber(0)
+            this.newUnity = 0
             this.pageId = 1
             this.coldPageId = 1
             this.sendError = false
             this.coldSignature = ''
         },
         endSend() {
-            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                setTimeout(this.unityChange, delayTime)
-            }
             this.$refs.splitTokenModal.hide()
         },
         unityChange() {

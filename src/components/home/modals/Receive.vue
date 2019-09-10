@@ -110,7 +110,7 @@ export default {
     data() {
         return {
             invoice: '',
-            amount: BigNumber(0)
+            amount: 0
         }
     },
     computed: {

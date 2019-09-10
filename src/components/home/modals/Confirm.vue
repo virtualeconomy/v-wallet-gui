@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div class="confirm">
     <img v-if="txType==='payment'"
          src="@/assets/imgs/icons/operate/ic_sent_big.svg">
     <img v-else-if="txType==='lease'"
          src="@/assets/imgs/icons/operate/ic_leasing_big.svg">
     <div class="infos">
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="Amount"
                     label-for="amount_confirm">
@@ -16,7 +16,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     label="Type"
                     class="form-line"
                     label-for="tranType">
@@ -27,7 +27,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="From"
                     label-for="walletAddress_confirm">
@@ -38,23 +38,22 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="To"
                     label-for="recipientAddress_confirm">
         <b-form-input id="recipientAddress_confirm"
                       v-model="recipient"
                       class="addr"
-                      margin-left="0px"
                       readonly
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="Description"
                     label-for="attachment_confirm"
-                    v-if="txType==='transfer'">
+                    v-if="txType==='payment'">
         <b-form-input id="attachment_confirm"
                       v-model="attachment"
                       class="des"
@@ -62,7 +61,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group horizontal
+      <b-form-group label-cols
                     class="form-line"
                     label="Fee"
                     label-for="fee_confirm">
@@ -134,6 +133,9 @@ export default {
     text-align: center;
     padding-top: 5px;
 }
+.confirm {
+    text-align: center;
+}
 .box {
 
     overflow-x: visible;
@@ -151,12 +153,16 @@ export default {
     text-align: right;
 }
 .addr {
+    margin-left: -50px;
+    width: 350px;
     font-size: 15px;
     color: #181B3A;
     letter-spacing: 0;
     text-align: right;
 }
 .des {
+    margin-left: -50px;
+    width: 350px;
     font-size: 15px;
     color: #181B3A;
     letter-spacing: 0;

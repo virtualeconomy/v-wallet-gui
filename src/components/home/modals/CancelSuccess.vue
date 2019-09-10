@@ -26,6 +26,7 @@ export default {
 
 <style scoped>
 .div-cancel {
+    text-align: center;
     padding-top: 40px;
 }
 .p-tips {
