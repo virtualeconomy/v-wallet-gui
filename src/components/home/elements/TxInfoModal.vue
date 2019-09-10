@@ -59,7 +59,7 @@
              :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
       </div>
       <div class="tx-address">
-        <label>{{ (txIcon === 'received' || txIcon === 'leased in' || txIcon === 'leased in canceled') ? 'From' : 'To' }}</label>
+        <label>{{ (txIcon === 'leased out' || txIcon === 'leased out canceled') ? 'To' : 'From' }}</label>
         <span>{{ displayAddress }}</span>
       </div>
       <div class="tx-timestamp">
