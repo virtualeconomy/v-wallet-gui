@@ -22,8 +22,12 @@
           <div class="cl-amount">{{ formatter(amount) }} VSYS</div>
         </div>
         <div class="cl-address">
-          <label>To</label>
+          <label>From</label>
           <span>{{ address }}</span>
+        </div>
+        <div class="cl-address">
+          <label>To</label>
+          <span>{{ recipient }}</span>
         </div>
         <div class="cl-fee">
           <label>Fee</label>

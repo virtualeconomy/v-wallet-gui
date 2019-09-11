@@ -58,7 +58,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isGreaterThanMax(this.newUnity)">
-              Unity is too large. Please change it to an integer less than 2^63.
+              Unity is too large. Please change it to an integer less than 2<sup>63</sup>.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -168,7 +168,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isGreaterThanMax(this.newUnity)">
-              Unity is too large. Please change it to an integer less than 2^63.
+              Unity is too large. Please change it to an integer less than 2<sup>63</sup>.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>

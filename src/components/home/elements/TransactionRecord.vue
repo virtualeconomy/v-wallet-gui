@@ -54,7 +54,7 @@
         <b-row>
           <b-col class="detail-1"
                  cols="auto">{{ (txIcon === 'sent' || txIcon === 'leased out' || txIcon === 'leased out canceled') ? 'To' : 'From' }}:</b-col>
-          <b-col class="detail-2">{{ txAddressShow }}</b-col>
+          <b-col class="detail-2">{{ (txIcon === 'sent' || txIcon === 'leased out' || txIcon === 'leased out canceled') ? txRecipientShow : txAddressShow }}</b-col>
           <b-col class="detail-3"
                  cols="auto"></b-col>
           <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
@@ -75,7 +75,7 @@
         <b-row>
           <b-col class="detail-1"
                  cols="auto">{{ (txIcon === 'leased out' || txIcon === 'leased out canceled') ? 'To' : 'From' }}:</b-col>
-          <b-col class="detail-2">{{ txAddressShow }}</b-col>
+          <b-col class="detail-2">{{ (txIcon === 'leased out' || txIcon === 'leased out canceled') ? txRecipientShow : txAddressShow }}</b-col>
           <b-col class="detail-3"
                  cols="auto"></b-col>
           <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
@@ -138,6 +138,7 @@
                  :tx-attachment="txAttachment"
                  :trans-type="transType"
                  :self-send="selfSend"
+                 :tx-recipient="txRecipient"
                  :v-if="transType==='payment'"></TxInfoModal>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-fee="txFee"
@@ -148,10 +149,12 @@
                  :trans-type="'cancelLease'"
                  v-if="transType==='lease'"
                  :tx-amount="txAmount"
-                 :tx-address="txAddress"></TxInfoModal>
+                 :tx-address="txAddress"
+                 :tx-recipient="txRecipient"></TxInfoModal>
     <CancelLease :modal-id="txRecord.id"
                  :wallet-type="walletType"
                  :address="txAddress"
+                 :recipient="txRecipient"
                  :amount="txAmount"
                  :from-address="address"
                  :fee="txFee"
@@ -280,19 +283,23 @@ export default {
             }
         },
         txAddress() {
-            var sender = this.txRecord.proofs === undefined ? this.address : crypto.buildRawAddress(base58.decode(this.txRecord.proofs[0].publicKey))
-            if (this.txType === 'Sent' || this.txType === 'Leased Out' || this.txType === 'Leased Out Canceled') {
-                if (this.txType === 'Leased Out Canceled') {
-                    return this.txRecord.lease.recipient
-                }
-                return this.txRecord.recipient
-            } else {
-                return sender
-            }
+            return this.txRecord.proofs === undefined ? this.address : crypto.buildRawAddress(base58.decode(this.txRecord.proofs[0].publicKey))
+        },
+        txRecipient() {
+            if (this.txType === 'Leased Out Canceled' || this.txType === 'Leased In Canceled') {
+                return this.txRecord.lease.recipient
+            } else return this.txRecord.recipient === undefined ? '' : this.txRecord.recipient
         },
         txAddressShow() {
             if (this.txAddress) {
                 const addrChars = this.txAddress.split('')
+                addrChars.splice(6, 23, '******')
+                return addrChars.join('')
+            }
+        },
+        txRecipientShow() {
+            if (this.txRecipient) {
+                const addrChars = this.txRecipient.split('')
                 addrChars.splice(6, 23, '******')
                 return addrChars.join('')
             }
