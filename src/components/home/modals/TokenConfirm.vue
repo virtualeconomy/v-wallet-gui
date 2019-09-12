@@ -147,7 +147,6 @@
 </template>
 
 <script>
-import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { TOKEN_FEE } from '@/constants'
 export default {
@@ -196,7 +195,7 @@ export default {
     },
     methods: {
         formatter(num) {
-            return browser.bigNumberFormatter(num)
+            return num.toString()
         }
     }
 }
