@@ -172,7 +172,6 @@ import TxInfoModal from './TxInfoModal'
 import transaction from '@/utils/transaction'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
-import crypto from '@/utils/crypto'
 import CancelLease from '../modals/CancelLease'
 import { NODE_IP, PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '@/constants'
 import browser from '@/utils/browser'
@@ -283,7 +282,7 @@ export default {
             }
         },
         txAddress() {
-            return this.txRecord.proofs === undefined ? this.address : crypto.buildRawAddress(base58.decode(this.txRecord.proofs[0].publicKey))
+            return this.txRecord.proofs === undefined ? this.address : this.txRecord.proofs[0].address
         },
         txRecipient() {
             if (this.txType === 'Leased Out Canceled' || this.txType === 'Leased In Canceled') {
@@ -366,7 +365,7 @@ export default {
             return BigNumber(this.txRecord.amount).dividedBy(VSYS_PRECISION)
         },
         txFee() {
-            var sender = this.txRecord.proofs === undefined ? this.address : crypto.buildRawAddress(base58.decode(this.txRecord.proofs[0].publicKey))
+            let sender = this.txRecord.proofs === undefined ? this.address : this.txRecord.proofs[0].address
             if (this.txTitle === 'Execute Contract Function') {
                 if (this.address !== sender) {
                     return BigNumber(0)

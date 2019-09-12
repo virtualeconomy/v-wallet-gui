@@ -58,7 +58,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isGreaterThanMax(this.newUnity)">
-              Unity is too large. Please change it to an integer less than 2<sup>63</sup>.
+              Unity is too large. Please change it to an integer less than 9223372036854775808.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -168,7 +168,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isGreaterThanMax(this.newUnity)">
-              Unity is too large. Please change it to an integer less than 2<sup>63</sup>.
+              Unity is too large. Please change it to an integer less than 9223372036854775808.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -530,9 +530,9 @@ export default {
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
         },
-        isGreaterThanMax(amount) {
+        isGreaterThanMax(newUnity) {
             let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
-            let unityValue = BigNumber(amount)
+            let unityValue = BigNumber(newUnity)
             return unityValue.isGreaterThan(maxValue)
         },
         getKeypair(index) {
