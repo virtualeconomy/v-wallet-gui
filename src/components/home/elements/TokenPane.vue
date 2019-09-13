@@ -81,10 +81,18 @@ export default {
     created() {
         this.isMobile = browser.isMobile()
     },
-    computed: mapState({
-        available: 'available',
-        total: 'total'
-    }),
+    computed: {
+        ...mapState({
+            available: 'available',
+            total: 'total'
+        }),
+        getDevice() {
+            if (this.coldAddresses && this.coldAddresses[this.address] && this.coldAddresses[this.address].hasOwnProperty('device')) {
+                return this.coldAddresses[this.address].device
+            }
+            return ''
+        }
+    },
     props: {
         balance: {
             type: BigNumber,
@@ -116,14 +124,6 @@ export default {
             type: String,
             default: 'hotWallet',
             require: true
-        }
-    },
-    computed: {
-        getDevice() {
-            if (this.coldAddresses && this.coldAddresses[this.address] && this.coldAddresses[this.address].hasOwnProperty('device')) {
-                return this.coldAddresses[this.address].device
-            }
-            return ''
         }
     },
     methods: {
