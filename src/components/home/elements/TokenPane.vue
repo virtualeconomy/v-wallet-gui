@@ -170,6 +170,7 @@ export default {
     margin-right: 15px;
     font-size: 17px;
     font-weight:lighter;
+    height: 42px;
 }
 .btn-send {
     margin-bottom: 6px;

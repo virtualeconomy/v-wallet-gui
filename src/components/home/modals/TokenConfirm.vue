@@ -56,7 +56,7 @@
                     label-for="amount_confirm">
         <b-form-input id="amount_confirm"
                       :value="newIssuer"
-                      class="des"
+                      class="addr"
                       readonly
                       :plaintext="true">
         </b-form-input>
@@ -147,7 +147,6 @@
 </template>
 
 <script>
-import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { TOKEN_FEE } from '@/constants'
 export default {
@@ -196,7 +195,7 @@ export default {
     },
     methods: {
         formatter(num) {
-            return browser.bigNumberFormatter(num)
+            return num.toString()
         }
     }
 }

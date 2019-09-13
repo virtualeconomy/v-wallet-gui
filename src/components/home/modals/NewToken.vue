@@ -95,7 +95,7 @@
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
-            <span style="font-size: 15px !important;color: #9091A3;">Unity: 10^{{ unity }}</span>
+            <span style="font-size: 15px !important;color: #9091A3;">Unity: 10<sup>{{ unity }}</sup> (The minimum amount will be {{ formatter(1/Math.pow(10, unity)) }} Token)</span>
             <div style="margin-top: 10px;">
               <span class="unity-number">10<sup>0</sup></span>
               <button class="bar-minus"
@@ -251,7 +251,7 @@
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
-            <span style="font-size: 15px !important;color: #9091A3;">Unity: 10^{{ unity }}</span>
+            <span style="font-size: 15px !important;color: #9091A3;">Unity: 10<sup>{{ unity }}</sup> (The minimum amount will be {{ formatter(1/Math.pow(10, unity)) }} Token)</span>
             <div style="margin-top: 10px;">
               <span class="unity-number">10<sup>0</sup></span>
               <button class="bar-minus"

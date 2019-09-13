@@ -57,7 +57,6 @@
 
 <script>
 import BigNumber from 'bignumber.js'
-import browser from '@/utils/browser'
 export default {
     name: 'TokenInfoModal',
     props: {
@@ -112,7 +111,7 @@ export default {
             this.$refs.tokenInfoModal.hide()
         },
         formatter(num) {
-            return browser.bigNumberFormatter(num)
+            return num.toString()
         }
     }
 }

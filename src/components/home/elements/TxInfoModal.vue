@@ -58,9 +58,15 @@
         <div v-if="txIcon!=='register contract'&& txIcon!=='execute contract function'"
              :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
       </div>
-      <div class="tx-address">
-        <label>{{ (txIcon === 'received' || txIcon === 'leased in' || txIcon === 'leased in canceled') ? 'From' : 'To' }}</label>
+      <div class="tx-address"
+           v-if="displayAddress!==''">
+        <label>From</label>
         <span>{{ displayAddress }}</span>
+      </div>
+      <div class="tx-address"
+           v-if="displayRecipient!==''">
+        <label>To</label>
+        <span>{{ displayRecipient }}</span>
       </div>
       <div class="tx-timestamp">
         <label>Timestamp</label>
@@ -71,8 +77,8 @@
         <span>{{ formatter(txFee) || 0 }} VSYS</span>
       </div>
       <div class="tx-attachment"
-           v-if="txIcon === 'sent' || txIcon === 'received'">
-        <label>Attachment</label>
+           v-if="txIcon === 'sent' || txIcon === 'received' || txIcon === 'register contract' || txIcon === 'execute contract function'">
+        <label>Description</label>
         <span>{{ txAttachment }}</span>
         <span class="tx-attachment-whole">{{ txAttachment }}</span>
       </div>
@@ -174,6 +180,10 @@ export default {
             type: String,
             default: ''
         },
+        txRecipient: {
+            type: String,
+            default: ''
+        },
         txAmount: {
             type: BigNumber,
             default: function() {
@@ -249,6 +259,13 @@ export default {
                 return this.txAddress.substring(0, 23) + '...'
             } else {
                 return this.txAddress
+            }
+        },
+        displayRecipient() {
+            if (this.isMobile() && this.txRecipient.length > 24) {
+                return this.txRecipient.substring(0, 23) + '...'
+            } else {
+                return this.txRecipient
             }
         }
     },

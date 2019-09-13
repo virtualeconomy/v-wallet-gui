@@ -137,6 +137,7 @@ export default {
     border-right: 1px solid #EDEDED;
 }
 .btn-leasing {
+    margin-top: 6px;
     margin-bottom: 6px;
     background: #FF8737;
     border-radius: 4px;
@@ -163,6 +164,7 @@ export default {
     letter-spacing: 0;
     width: 144px;
     height: 42px;
+    margin-left: 8px;
 }
 .btn-list:active, .btn-leasing:hover {
     background-color: #EB7D34 !important;
