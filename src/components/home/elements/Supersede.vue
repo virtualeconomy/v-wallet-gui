@@ -277,6 +277,7 @@ import ColdSignature from '../modals/ColdSignature'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
+import { mapActions } from 'vuex'
 export default {
     name: 'IssueToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -392,6 +393,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance']),
         isValidIssuer(issuer) {
             if (!issuer) {
                 return void 0
@@ -453,6 +455,7 @@ export default {
                 } else {
                     this.coldPageId++
                 }
+                this.updateBalance(true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {

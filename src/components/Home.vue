@@ -95,7 +95,6 @@
                              :wallet-type="walletType"
                              :balances="balance"
                              :cold-addresses="coldAddresses"
-                             :total="total"
                              :addresses="addresses"></TokenPane>
                 </div>
                 <div class="f-records">
@@ -141,13 +140,8 @@
                   <LeasePane :cold-addresses="coldAddresses"
                              :addresses="addresses"
                              :balance="balance"
-                             :available="available"
-                             :leased-in="leasedIn"
-                             :leased-out="leasedOut"
-                             :total="total"
                              :address="selectedAddress"
-                             :wallet-type="walletType"
-                             @updateInfo="updateInfo">
+                             :wallet-type="walletType">
                   </LeasePane>
                 </div>
                 <div class="f-records">
@@ -168,7 +162,6 @@
 
 <script>
 import NavBar from './home/elements/NavBar'
-// import TransPane from './home/elements/TransPane'
 import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
@@ -182,6 +175,7 @@ import TokenRecords from './home/elements/TokenRecords'
 import AddToken from './home/modals/AddToken'
 import BigNumber from 'bignumber.js'
 import JSONBigNumber from 'json-bignumber'
+import { mapActions } from 'vuex'
 
 export default {
     name: 'Home',
@@ -210,6 +204,8 @@ export default {
             this.getBlockHeight()
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
+            this.updateSelectedAddress(this.selectedAddress)
+            this.updateBalance(false)
             this.walletType = 'hotWallet'
             let unsortedColdAddresses = {}
             let sortedColdAddresses = {}
@@ -252,7 +248,6 @@ export default {
     beforeDestroy() {
         clearTimeout(this.sessionClearTimeout)
     },
-
     computed: {
         address() {
             if (Vue.ls.get('address')) {
@@ -301,8 +296,8 @@ export default {
             }
         }
     },
-
     methods: {
+        ...mapActions(['updateSelectedAddress', 'updateBalance']),
         setSessionClearTimeout() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT
             try {
@@ -317,6 +312,7 @@ export default {
             }, oldTimeout * 60 * 1000)
         },
         tranTabChange(tabIndex) {
+            this.updateBalance(false)
             this.getBalance(this.selectedAddress)
             if (tabIndex === 0) {
                 this.activeTab = 'token'
@@ -338,10 +334,6 @@ export default {
                 let changestatus = value === this.balance[address]
                 Vue.set(this.balance, address, value)
                 if (address === this.selectedAddress) {
-                    this.total = tempResponse.regular.dividedBy(VSYS_PRECISION)
-                    this.available = tempResponse.available.dividedBy(VSYS_PRECISION)
-                    this.leasedOut = tempResponse.regular.minus(tempResponse.available).dividedBy(VSYS_PRECISION)
-                    this.leasedIn = tempResponse.effective.minus(tempResponse.available).dividedBy(VSYS_PRECISION)
                     if (changestatus) {
                         let addrtmp = this.selectedAddress
                         this.selectedAddress = ''
@@ -413,6 +405,7 @@ export default {
                     this.selectedAddress = addr
                 }, 0)
             }
+            this.updateSelectedAddress(addr)
             this.getBalance(addr)
         },
         deleteCold(addr) {
@@ -432,21 +425,8 @@ export default {
         sortStatus() {
             if (this.sortFlag === 0) this.sortFlag = 1
             else this.sortFlag = 0
-        },
-        updateInfo() {
-            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                setTimeout(() => {
-                    for (const addr in this.addresses) {
-                        this.getBalance(addr)
-                    }
-                    for (const addr in this.coldAddresses) {
-                        this.getBalance(addr)
-                    }
-                }, delayTime)
-            }
         }
     },
-
     components: {
         ImportColdWallet,
         // TransPane,

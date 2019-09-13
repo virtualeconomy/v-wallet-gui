@@ -46,7 +46,8 @@
 <script>
 import Vue from 'vue'
 import { NODE_IP } from '@/constants.js'
-import bus from '@/assets/bus'
+import transaction from '@/utils/transaction'
+import { mapActions } from 'vuex'
 export default {
     name: 'AddToken',
     data() {
@@ -54,8 +55,7 @@ export default {
             tokens: {},
             tokenId: '',
             init: false,
-            responseErr: false,
-            sendFlag: false
+            responseErr: false
         }
     },
     watch: {
@@ -64,6 +64,9 @@ export default {
         }
     },
     computed: {
+        contractId() {
+            return transaction.tokenIDToContractID(this.tokenId)
+        },
         seedAddress() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
@@ -78,6 +81,7 @@ export default {
     },
 
     methods: {
+        ...mapActions(['changeAddTokenStatus']),
         closeModal() {
             this.init = false
             this.responseErr = false
@@ -99,16 +103,15 @@ export default {
             }
             if (this.tokenId in tokens) {
                 this.$refs.addTokenModal.hide()
+                return
             }
             if (this.tokenId) {
-                const url = NODE_IP + '/contract/tokenInfo/' + this.tokenId
+                const url = NODE_IP + '/contract/info/' + this.contractId
                 this.$http.get(url).then(response => {
                     this.responseErr = false
-                    Vue.set(tokens, response.body.tokenId, response.body.tokenId)
+                    Vue.set(tokens, this.tokenId, response.body.info[1].data)
                     this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
-                    this.sendFlag = true
-                    bus.$emit('sendFlag', this.sendFlag)
-                    this.sendFlag = false
+                    this.changeAddTokenStatus()
                     this.$refs.addTokenModal.hide()
                 }, respError => {
                     this.responseErr = true

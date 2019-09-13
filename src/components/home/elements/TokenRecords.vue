@@ -7,18 +7,17 @@
     <div class="inherit-height">
       <div class="scroll"
            :style="{height: myHeight}">
-        <TokenRecord v-for="(record,tokenId) in tokenRecords"
+        <TokenRecord v-for="(tokenMaker,tokenId) in tokenRecords"
                      :key="tokenId"
                      :token-id="tokenId"
-                     :token-record="record"
+                     :token-maker="tokenMaker"
                      :address="address"
                      :addresses="addresses"
                      :cold-addresses="coldAddresses"
                      :wallet-type="walletType"
                      :balances="balances"
                      :active-tab="activeTab"
-                     @removeFlag="removeToken"
-                     @endSendSignal="endSendSignal"></TokenRecord>
+                     @removeFlag="removeToken"></TokenRecord>
         <div class="add-token"
              :style="{height:1}">
           <span class="add-token-input-first">Don't see your tokens?</span>
@@ -54,7 +53,6 @@
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import TokenRecord from './TokenRecord'
-import bus from '@/assets/bus'
 import AddToken from '../modals/AddToken'
 export default {
     name: 'TokenRecords',
@@ -114,9 +112,15 @@ export default {
             if (this.address && Vue.ls.get('pwd')) {
                 this.getTokenRecords()
             }
+        },
+        addTokenStatus(cur, old) {
+            this.getTokenRecords()
         }
     },
     computed: {
+        addTokenStatus() {
+            return this.$store.state.addTokenStatus
+        },
         seedaddress() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
@@ -126,32 +130,22 @@ export default {
             return JSON.parse(window.localStorage.getItem(this.seedaddress))
         }
     },
-    mounted() {
-        bus.$on('sendFlag', (data) => {
-            this.getTokenRecords()
-        })
-    },
     methods: {
         isMobile() {
             return browser.isMobile()
         },
         getTokenRecords() {
             if (this.address) {
-                // this.changeShowDisable = true
                 let records = JSON.parse(window.localStorage.getItem(this.seedaddress))
                 if (records.tokens) {
                     this.tokenRecords = JSON.parse(records.tokens)
                 }
-                // this.changeShowDisable = false
             }
         },
         removeToken(remove) {
             if (remove === true) {
                 this.getTokenRecords()
             }
-        },
-        endSendSignal() {
-            this.$emit('updateInfo')
         }
     }
 }

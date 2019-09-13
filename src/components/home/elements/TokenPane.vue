@@ -6,7 +6,7 @@
            width="30"
            height="30">
       <span class="title">
-        {{ formatter(balance) }}
+        {{ formatter(available) }}
       </span>
       <p class="text-muted text-des mb-0">
         Available Balance
@@ -48,8 +48,7 @@
           :cold-addresses="coldAddresses"
           :addresses="addresses"
           :selected-address="address"
-          :wallet-type="walletType"
-          @endSendSignal="endSendSignal"></Send>
+          :wallet-type="walletType"></Send>
     <Receive show="false"
              :address="address"></Receive>
     <NewToken show="false"
@@ -57,8 +56,7 @@
               :cold-addresses="coldAddresses"
               :addresses="addresses"
               :selected-address="address"
-              :wallet-type="walletType"
-              @endLeaseSignal="endLeaseSignal"></NewToken>
+              :wallet-type="walletType"></NewToken>
   </div>
 </template>
 
@@ -68,6 +66,8 @@ import Receive from '../modals/Receive'
 import Send from '../modals/Send'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
+import { mapState } from 'vuex'
+
 export default {
     name: 'TokenPane',
     components: {
@@ -81,6 +81,10 @@ export default {
     created() {
         this.isMobile = browser.isMobile()
     },
+    computed: mapState({
+        available: 'available',
+        total: 'total'
+    }),
     props: {
         balance: {
             type: BigNumber,
@@ -108,16 +112,9 @@ export default {
             default: function() {},
             require: true
         },
-        total: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
         walletType: {
             type: String,
-            default: '',
+            default: 'hotWallet',
             require: true
         }
     },
@@ -132,12 +129,6 @@ export default {
     methods: {
         formatter(num) {
             return browser.bigNumberFormatter(num)
-        },
-        endLeaseSignal() {
-            this.$emit('updateInfo')
-        },
-        endSendSignal() {
-            this.$emit('updateInfo')
         },
         createToken() {
             if (this.getDevice === 'Ledger') {
@@ -194,6 +185,7 @@ export default {
     margin-right: 15px;
     font-size: 17px;
     font-weight:lighter;
+    height: 42px;
 }
 .btn-send {
     margin-bottom: 6px;

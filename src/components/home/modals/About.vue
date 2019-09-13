@@ -67,6 +67,9 @@ export default {
     position: absolute;
     right: 20px;
 }
+.about-container {
+    text-align: center;
+}
 .image-illustration{
     margin-top: 30px;
     margin-bottom: 40px;

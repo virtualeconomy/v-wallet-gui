@@ -411,16 +411,17 @@ import browser from '@/utils/browser'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 import common from '@/utils/common'
+import { mapActions } from 'vuex'
 var initData = {
     errorMessage: '',
     opc: '',
     recipient: '',
-    amount: BigNumber(0),
+    amount: 0,
     attachment: '',
     pageId: 1,
     fee: BigNumber(CONTRACT_EXEC_FEE),
     coldRecipient: '',
-    coldAmount: BigNumber(0),
+    coldAmount: 0,
     coldAttachment: '',
     coldPageId: 1,
     coldFee: BigNumber(CONTRACT_EXEC_FEE),
@@ -581,6 +582,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance']),
         isValidAttachment(attachment) {
             return common.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
@@ -627,6 +629,10 @@ export default {
                 } else {
                     this.coldPageId++
                 }
+                this.updateBalance(true)
+                for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                    setTimeout(this.sendBalanceChange, delayTime)
+                }
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -671,11 +677,11 @@ export default {
         resetPage() {
             this.opc = ''
             this.recipient = ''
-            this.amount = BigNumber(0)
+            this.amount = 0
             this.attachment = ''
             this.pageId = 1
             this.coldRecipient = ''
-            this.coldAmount = BigNumber(0)
+            this.coldAmount = 0
             this.coldAttachment = ''
             this.coldPageId = 1
             this.coldAddress = ''
@@ -690,6 +696,9 @@ export default {
         },
         endSend() {
             this.$refs.sendTokenModal.hide()
+        },
+        sendBalanceChange() {
+            this.$emit('updateTokenBalance', 'update')
         },
         scanChange(evt) {
             if (!this.qrInit) {
@@ -741,7 +750,7 @@ export default {
                 let opc = jsonObj.opc
                 let api = jsonObj.api
                 let protocol = jsonObj.protocol
-                var tempAmount = 0
+                var tempAmount = BigNumber(0)
                 var tempAttachment = ''
                 if (jsonObj.hasOwnProperty('amount')) {
                     tempAmount = BigNumber(jsonObj.amount)
@@ -750,10 +759,10 @@ export default {
                     tempAttachment = jsonObj.invoice
                 }
                 if (this.walletType === 'hotWallet') {
-                    this.amount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.amount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8).toString()
                     this.attachment = tempAttachment
                 } else {
-                    this.coldAmount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8)
+                    this.coldAmount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8).toString()
                     this.coldAttachment = tempAttachment
                 }
                 if (protocol !== PROTOCOL) {

@@ -1,12 +1,11 @@
 <template>
   <b-modal :id="'tokenInfoModal_' + tokenId"
            ref="tokenInfoModal"
-           class="tx-modal"
            lazy
            centered
            hide-header
            hide-footer>
-    <div class="md-content">
+    <div class="tx-modal">
       <button
         class="close btn-close"
         @click="closeModal">
@@ -58,7 +57,6 @@
 
 <script>
 import BigNumber from 'bignumber.js'
-import browser from '@/utils/browser'
 export default {
     name: 'TokenInfoModal',
     props: {
@@ -113,7 +111,7 @@ export default {
             this.$refs.tokenInfoModal.hide()
         },
         formatter(num) {
-            return browser.bigNumberFormatter(num)
+            return num.toString()
         }
     }
 }
@@ -121,6 +119,8 @@ export default {
 
 <style scoped lang="less">
 .tx-modal {
+    padding: 40px 24px;
+    padding-top: 0;
     text-align: center;
     .tx-title {
         padding: 24px 0;
@@ -254,10 +254,6 @@ export default {
         color: #FFD192;
         letter-spacing: 0;
         text-align: center;
-    }
-    .md-content {
-        padding: 40px 24px;
-        padding-top: 0;
     }
 }
 .btn-close {

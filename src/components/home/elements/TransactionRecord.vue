@@ -54,7 +54,7 @@
         <b-row>
           <b-col class="detail-1"
                  cols="auto">{{ (txIcon === 'sent' || txIcon === 'leased out' || txIcon === 'leased out canceled') ? 'To' : 'From' }}:</b-col>
-          <b-col class="detail-2">{{ txAddressShow }}</b-col>
+          <b-col class="detail-2">{{ (txIcon === 'sent' || txIcon === 'leased out' || txIcon === 'leased out canceled') ? txRecipientShow : txAddressShow }}</b-col>
           <b-col class="detail-3"
                  cols="auto"></b-col>
           <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
@@ -75,7 +75,7 @@
         <b-row>
           <b-col class="detail-1"
                  cols="auto">{{ (txIcon === 'leased out' || txIcon === 'leased out canceled') ? 'To' : 'From' }}:</b-col>
-          <b-col class="detail-2">{{ txAddressShow }}</b-col>
+          <b-col class="detail-2">{{ (txIcon === 'leased out' || txIcon === 'leased out canceled') ? txRecipientShow : txAddressShow }}</b-col>
           <b-col class="detail-3"
                  cols="auto"></b-col>
           <b-col class="detail-4">{{ txHourStr }}:{{ txMinuteStr }}, {{ txMonthStr }}  {{ txDayStr }}</b-col>
@@ -90,8 +90,7 @@
         </div>
         <div class="tx-fee"
              v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'register contract' || txIcon === 'execute contract function') && feeFlag">
-          <span v-if="(txFee !== 0)"> Tx Fee: - {{ formatter(txFee) }} VSYS </span>
-          <span v-else> Tx Fee: {{ txFee }} VSYS </span>
+          <span v-if="(!txFee.isEqualTo(0))"> Tx Fee: - {{ formatter(txFee) }} VSYS </span>
         </div>
       </b-col>
       <b-col class="record-action"
@@ -139,6 +138,7 @@
                  :tx-attachment="txAttachment"
                  :trans-type="transType"
                  :self-send="selfSend"
+                 :tx-recipient="txRecipient"
                  :v-if="transType==='payment'"></TxInfoModal>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-fee="txFee"
@@ -149,10 +149,12 @@
                  :trans-type="'cancelLease'"
                  v-if="transType==='lease'"
                  :tx-amount="txAmount"
-                 :tx-address="txAddress"></TxInfoModal>
+                 :tx-address="txAddress"
+                 :tx-recipient="txRecipient"></TxInfoModal>
     <CancelLease :modal-id="txRecord.id"
                  :wallet-type="walletType"
                  :address="txAddress"
+                 :recipient="txRecipient"
                  :amount="txAmount"
                  :from-address="address"
                  :fee="txFee"
@@ -170,7 +172,6 @@ import TxInfoModal from './TxInfoModal'
 import transaction from '@/utils/transaction'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
-import crypto from '@/utils/crypto'
 import CancelLease from '../modals/CancelLease'
 import { NODE_IP, PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '@/constants'
 import browser from '@/utils/browser'
@@ -273,22 +274,31 @@ export default {
             return this.txType.toString().toLowerCase()
         },
         txClass() {
-            return this.txIcon.replace(/\s+/g, '')
+            let txName = this.txIcon.replace(/\s+/g, '')
+            if (txName === 'executecontractfunction' && this.txRecord.status !== 'Success') {
+                return txName + 'failed'
+            } else {
+                return txName
+            }
         },
         txAddress() {
-            var sender = this.txRecord.proofs === undefined ? this.address : crypto.buildRawAddress(base58.decode(this.txRecord.proofs[0].publicKey))
-            if (this.txType === 'Sent' || this.txType === 'Leased Out' || this.txType === 'Leased Out Canceled') {
-                if (this.txType === 'Leased Out Canceled') {
-                    return this.txRecord.lease.recipient
-                }
-                return this.txRecord.recipient
-            } else {
-                return sender
-            }
+            return this.txRecord.proofs === undefined ? this.address : this.txRecord.proofs[0].address
+        },
+        txRecipient() {
+            if (this.txType === 'Leased Out Canceled' || this.txType === 'Leased In Canceled') {
+                return this.txRecord.lease.recipient
+            } else return this.txRecord.recipient === undefined ? '' : this.txRecord.recipient
         },
         txAddressShow() {
             if (this.txAddress) {
                 const addrChars = this.txAddress.split('')
+                addrChars.splice(6, 23, '******')
+                return addrChars.join('')
+            }
+        },
+        txRecipientShow() {
+            if (this.txRecipient) {
+                const addrChars = this.txRecipient.split('')
                 addrChars.splice(6, 23, '******')
                 return addrChars.join('')
             }
@@ -355,7 +365,7 @@ export default {
             return BigNumber(this.txRecord.amount).dividedBy(VSYS_PRECISION)
         },
         txFee() {
-            var sender = this.txRecord.proofs === undefined ? this.address : crypto.buildRawAddress(base58.decode(this.txRecord.proofs[0].publicKey))
+            let sender = this.txRecord.proofs === undefined ? this.address : this.txRecord.proofs[0].address
             if (this.txTitle === 'Execute Contract Function') {
                 if (this.address !== sender) {
                     return BigNumber(0)
@@ -373,13 +383,14 @@ export default {
             return this.txRecord.id
         },
         txAttachment() {
-            var value = this.txRecord.attachment === void 0 ? '' : this.txRecord.attachment
-            var bytes = base58.decode(value)
+            let value = this.txRecord.attachment === void 0 ? '' : this.txRecord.attachment
+            let bytes = base58.decode(value)
             try {
-                return converters.byteArrayToString(bytes)
+                value = converters.byteArrayToString(bytes)
             } catch (e) {
-                return ''
+                value = ''
             }
+            return this.txRecord.description === void 0 ? value : this.txRecord.description
         }
     },
     methods: {
@@ -540,14 +551,21 @@ export default {
 }
     .amount-executecontractfunction {
       font-size: 17px;
-      color: #F5354B;
+      color: #73CC5A;
       letter-spacing: 0;
       text-align: right;
       padding-right: 0px;
 }
+    .amount-executecontractfunctionfailed {
+        font-size: 17px;
+        color: #F5354B;
+        letter-spacing: 0;
+        text-align: right;
+        padding-right: 0px;
+}
     .amount-registercontract {
       font-size: 17px;
-      color: #F5354B;
+      color: #ff8737;
       letter-spacing: 0;
       text-align: right;
       padding-right: 0px;

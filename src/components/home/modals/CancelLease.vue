@@ -4,14 +4,14 @@
            hide-footer
            hide-header
            ref="cancelLeaseModal"
-           @hidden="resetPage"
-           class="cl-modal">
+           @hidden="resetPage">
     <button
       class="close btn-close"
       @click="closeModal">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
-    <b-container v-if="page==='confirm'">
+    <b-container v-if="page==='confirm'"
+                 class="cl-modal">
       <div class="md-content">
         <div class="cl-title">
           <div class="cl-icon">
@@ -22,8 +22,12 @@
           <div class="cl-amount">{{ formatter(amount) }} VSYS</div>
         </div>
         <div class="cl-address">
-          <label>To</label>
+          <label>From</label>
           <span>{{ address }}</span>
+        </div>
+        <div class="cl-address">
+          <label>To</label>
+          <span>{{ recipient }}</span>
         </div>
         <div class="cl-fee">
           <label>Fee</label>
@@ -99,6 +103,7 @@ import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import LedgerConfirm from './LedgerConfirm'
+import { mapActions } from 'vuex'
 export default {
     name: 'CancelLease',
     components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm, LedgerConfirm },
@@ -219,6 +224,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance']),
         resetPage() {
             this.page = 'confirm'
             this.signed = false
@@ -258,6 +264,7 @@ export default {
             const url = NODE_IP + '/leasing/broadcast/cancel'
             this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
                 this.page = 'success'
+                this.updateBalance(true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {

@@ -1,13 +1,12 @@
 <template>
   <b-modal :id="'txInfoModal_' + transType + modalId + selfSend"
            ref="infoModal"
-           class="tx-modal"
            lazy
            centered
            hide-header
            hide-footer>
     <router-view v-if="isRouterAlive"></router-view>
-    <div class="md-content">
+    <div class="tx-modal">
       <button
         class="close btn-close"
         @click="closeModal">
@@ -59,9 +58,15 @@
         <div v-if="txIcon!=='register contract'&& txIcon!=='execute contract function'"
              :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
       </div>
-      <div class="tx-address">
-        <label>{{ (txIcon === 'received' || txIcon === 'leased in' || txIcon === 'leased in canceled') ? 'From' : 'To' }}</label>
+      <div class="tx-address"
+           v-if="displayAddress!==''">
+        <label>From</label>
         <span>{{ displayAddress }}</span>
+      </div>
+      <div class="tx-address"
+           v-if="displayRecipient!==''">
+        <label>To</label>
+        <span>{{ displayRecipient }}</span>
       </div>
       <div class="tx-timestamp">
         <label>Timestamp</label>
@@ -72,8 +77,8 @@
         <span>{{ formatter(txFee) || 0 }} VSYS</span>
       </div>
       <div class="tx-attachment"
-           v-if="txIcon === 'sent' || txIcon === 'received'">
-        <label>Attachment</label>
+           v-if="txIcon === 'sent' || txIcon === 'received' || txIcon === 'register contract' || txIcon === 'execute contract function'">
+        <label>Description</label>
         <span>{{ txAttachment }}</span>
         <span class="tx-attachment-whole">{{ txAttachment }}</span>
       </div>
@@ -138,11 +143,11 @@
 </template>
 
 <script>
-import bus from '@/assets/bus'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { TX_FEE, TX_TEST_EXPLORER, NETWORK_BYTE, TX_EXPLORER } from '@/constants'
+import { mapActions } from 'vuex'
 export default {
     name: 'TxInfoModal',
     provide() {
@@ -172,6 +177,10 @@ export default {
             default: ''
         },
         txAddress: {
+            type: String,
+            default: ''
+        },
+        txRecipient: {
             type: String,
             default: ''
         },
@@ -251,9 +260,17 @@ export default {
             } else {
                 return this.txAddress
             }
+        },
+        displayRecipient() {
+            if (this.isMobile() && this.txRecipient.length > 24) {
+                return this.txRecipient.substring(0, 23) + '...'
+            } else {
+                return this.txRecipient
+            }
         }
     },
     methods: {
+        ...mapActions(['changeAddTokenStatus']),
         reload() {
             this.isRouterAlive = false
             this.$nextTick(() => (this.isRouterAlive = true))
@@ -273,12 +290,10 @@ export default {
                 tokens = JSON.parse(tmpUserInfo.tokens)
             }
             if (this.tokenId) {
-                Vue.set(tokens, this.tokenId, this.tokenId)
+                Vue.set(tokens, this.tokenId, this.txAddress)
                 this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
             }
-            this.sendFlag = true
-            bus.$emit('sendFlag', this.sendFlag)
-            this.sendFlag = false
+            this.changeAddTokenStatus()
             this.reload()
         },
         isTokenExisted() {
@@ -312,7 +327,9 @@ export default {
 
 <style scoped lang="less">
  .tx-modal {
-     text-align: center;
+    padding: 40px 24px;
+    padding-top: 0;
+    text-align: center;
     .tx-title {
         padding: 24px 0;
         border-bottom: 1px solid #1111;
@@ -513,11 +530,43 @@ export default {
         right:35px;
     }
     .tx-attachment:hover .tx-attachment-whole {
-         visibility: visible;
+        visibility: visible;
     }
-    .md-content {
-        padding: 40px 24px;
-        padding-top: 0;
+    .sent-amount {
+        font-size: 28px;
+        color: #F5354B;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .received-amount {
+        font-size: 28px;
+        color: #23A28C;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedin-amount {
+        font-size: 28px;
+        color: #86BEF7;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedout-amount {
+        font-size: 28px;
+        color: #73CC5A;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedoutcanceled-amount {
+        font-size: 28px;
+        color: #FF7A8A;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .leasedincanceled-amount {
+        font-size: 28px;
+        color: #FFD192;
+        letter-spacing: 0;
+        text-align: center;
     }
 }
  .btn-back {
@@ -528,7 +577,7 @@ export default {
      color: #EB7D34;
      letter-spacing: 0;
      text-align: center;
-     margin-top: -10px;
+     margin-top: -20px;
  }
 .btn-close {
     position: absolute;

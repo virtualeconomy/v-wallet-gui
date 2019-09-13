@@ -5,6 +5,7 @@
            centered
            hide-header
            hide-footer
+           ok-only
            @hide="resetSession">
     <button
       class="close btn-close"
@@ -39,9 +40,16 @@
       <div class="timeout-setting div-t">
         <input class="enable-function"
                type="checkbox"
-               v-model="curEnableStatus"
-               @click="enableFunction">
-        <label class="label-st">Enable Advanced Function</label>
+               v-model="curManagementStatus"
+               @click="enableTokenManagement">
+        <label class="label-st">Enable Token Management Functionality</label>
+      </div>
+      <div class="timeout-setting div-t">
+        <input class="enable-function"
+               type="checkbox"
+               v-model="curSplitStatus"
+               @click="enableTokenSplit">
+        <label class="label-st">Enable Token Split/Revert Functionality</label>
       </div>
     </div>
     <b-row class="btn-bottom">
@@ -70,9 +78,12 @@
 <script>
 import Vue from 'vue'
 import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
+import { mapState, mapActions } from 'vuex'
 export default {
     name: 'Settings',
     created() {
+        this.curManagementStatus = this.tokenManagementStatus
+        this.curSplitStatus = this.tokenSplitStatus
     },
     props: {
         setUsrLocalStorage: {
@@ -91,7 +102,8 @@ export default {
     data() {
         return {
             heightStatus: this.getHeightStatus(),
-            curEnableStatus: this.$store.state.enableStatus,
+            curSplitStatus: this.tokenSplitStatus,
+            curManagementStatus: this.tokenManagementStatus,
             selectedLang: 'en',
             langOptions: [
                 {
@@ -129,6 +141,10 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            tokenManagementStatus: 'tokenManagementStatus',
+            tokenSplitStatus: 'tokenSplitStatus'
+        }),
         defaultAddress() {
             return Vue.ls.get('address')
         },
@@ -139,6 +155,20 @@ export default {
         }
     },
     methods: {
+        showEnableSplitWarningMsgBox() {
+            this.$bvModal.msgBoxConfirm('WARNING: Split/Reverse-Split is an experimental token feature requiring exchange support compatible with Unity Token Split Protocol. The proper use of token with split functionality requires due diligence of both the token issuer and the supporting exchanges. Token issuer shall agree to abide by the protocol and convention of proper use of the split/reverse-split functionality. Token issuer shall agree to defend, hold harmless, and indemnify V Systems Limited for damage and loss involving the use of split/reverse-split functionality of the token.', {
+                okVariant: 'warning',
+                okTitle: 'I agree',
+                cancelTitle: 'I do not agree',
+                footerClass: 'p-2',
+                hideHeaderClose: false,
+                centered: true
+            })
+                .then(value => {
+                    this.curSplitStatus = value
+                })
+        },
+        ...mapActions(['changeEnableStatus', 'changeSettingsStatus']),
         changeSession() {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             Vue.set(userInfo, 'sessionTimeout', this.selectedSession)
@@ -159,20 +189,16 @@ export default {
             }
             return oldHeightStatus
         },
-        enableFunction() {
-            if (!this.curEnableStatus) this.curEnableStatus = true
-            else this.curEnableStatus = false
+        enableTokenManagement() {
+            if (!this.curManagementStatus) this.curManagementStatus = true
+            else this.curManagementStatus = false
         },
-        changeEnableStatus() {
-            window.localStorage.setItem('enableStatus', this.$store.state.enableStatus)
-        },
-        getEnableStatus() {
-            let oldEnableStatus = false
-            try {
-                oldEnableStatus = JSON.parse(window.localStorage.getItem('enableStatus'))
-            } catch (e) {
+        enableTokenSplit() {
+            if (!this.curSplitStatus) {
+                this.showEnableSplitWarningMsgBox()
+            } else {
+                this.curSplitStatus = false
             }
-            return oldEnableStatus
         },
         getSelectedSession() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT
@@ -189,14 +215,14 @@ export default {
             this.$emit('passParamToParent', this.heightStatus)
         },
         confirm() {
-            this.$store.commit('changeEnableStatus', this.curEnableStatus)
-            this.changeEnableStatus()
+            this.changeSettingsStatus({'split': this.curSplitStatus, 'management': this.curManagementStatus})
             this.changeHeightStatus()
             this.changeSession()
             this.$refs.settingModal.hide()
         },
         resetSession() {
-            this.curEnableStatus = this.getEnableStatus()
+            this.curSplitStatus = this.tokenSplitStatus
+            this.curManagementStatus = this.tokenManagementStatus
             this.heightStatus = this.getHeightStatus()
             this.selectedSession = this.getSelectedSession()
         }

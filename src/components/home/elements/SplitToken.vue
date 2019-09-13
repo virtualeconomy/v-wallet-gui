@@ -57,6 +57,10 @@
               Integer number is allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isGreaterThanMax(this.newUnity)">
+              Unity is too large. Please change it to an integer less than 9223372036854775808.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
               Invalid Unity.
             </b-form-invalid-feedback>
@@ -78,7 +82,7 @@
         </b-container>
         <b-container v-if="pageId===2">
           <TokenConfirm :address="address"
-                        :new-unity="newUnity"
+                        :new-unity="inputUnity"
                         :fee="fee"
                         :tx-type="'Split Token'">
           </TokenConfirm>
@@ -109,7 +113,7 @@
         <b-container v-if="pageId===3">
           <TokenSuccess class="tokenSucced"
                         :address="address"
-                        :new-unity="newUnity"
+                        :new-unity="inputUnity"
                         :fee="fee"
                         :tx-type="'Split Token'">
           </TokenSuccess>
@@ -161,6 +165,10 @@
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="!isInteger()">
               Integer number is allowed.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isGreaterThanMax(this.newUnity)">
+              Unity is too large. Please change it to an integer less than 9223372036854775808.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else>
@@ -220,7 +228,7 @@
         </b-container>
         <b-container v-show="coldPageId===4">
           <TokenConfirm :address="address"
-                        :new-unity="newUnity"
+                        :new-unity="inputUnity"
                         :fee="fee"
                         :tx-type="'Split Token'">
           </TokenConfirm>
@@ -249,7 +257,7 @@
         <b-container v-show="coldPageId===5">
           <TokenSuccess class="tokenSucced"
                         :address="address"
-                        :new-unity="newUnity"
+                        :new-unity="inputUnity"
                         :fee="fee"
                         :tx-type="'Split Token'">
           </TokenSuccess>
@@ -275,13 +283,14 @@ import browser from '@/utils/browser'
 import common from '@/utils/common'
 import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
+import { mapActions } from 'vuex'
 export default {
     name: 'SplitToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     data: function() {
         return {
             errorMessage: '',
-            newUnity: BigNumber(0),
+            newUnity: 0,
             attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
@@ -401,9 +410,13 @@ export default {
                 function: transaction.prepareSplit(BigNumber(this.newUnity)),
                 functionExplain: 'Set token unity to ' + this.newUnity
             }
+        },
+        inputUnity() {
+            return BigNumber(this.newUnity)
         }
     },
     methods: {
+        ...mapActions(['updateBalance']),
         isValidIssuer(addr) {
             return addr === this.issuer
         },
@@ -414,7 +427,7 @@ export default {
             if (BigNumber(this.newUnity).isEqualTo(0)) {
                 return void 0
             }
-            return this.isNumFormatValid(this.newUnity) && !this.isNegative(this.newUnity) && this.isInteger()
+            return this.isNumFormatValid(this.newUnity) && !this.isNegative(this.newUnity) && this.isInteger() && !this.isGreaterThanMax(this.newUnity)
         },
         sendData(walletType) {
             let apiSchema
@@ -456,6 +469,10 @@ export default {
                 } else {
                     this.coldPageId++
                 }
+                this.updateBalance(true)
+                for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                    setTimeout(this.unityChange, delayTime)
+                }
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -490,16 +507,13 @@ export default {
             }
         },
         resetPage() {
-            this.newUnity = BigNumber(0)
+            this.newUnity = 0
             this.pageId = 1
             this.coldPageId = 1
             this.sendError = false
             this.coldSignature = ''
         },
         endSend() {
-            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                setTimeout(this.unityChange, delayTime)
-            }
             this.$refs.splitTokenModal.hide()
         },
         unityChange() {
@@ -515,6 +529,11 @@ export default {
         },
         isNegative(amount) {
             return BigNumber(amount).isLessThan(0)
+        },
+        isGreaterThanMax(newUnity) {
+            let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
+            let unityValue = BigNumber(newUnity)
+            return unityValue.isGreaterThan(maxValue)
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

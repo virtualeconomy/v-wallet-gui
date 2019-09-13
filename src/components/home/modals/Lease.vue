@@ -167,6 +167,7 @@
     </b-modal>
     <TxInfoModal :modal-id="txId"
                  :tx-icon="'leased out'"
+                 :tx-recipient="txRecipient"
                  :tx-address="txAddress"
                  :tx-time="txTimestamp"
                  :tx-fee="fee"
@@ -189,6 +190,9 @@ import TxInfoModal from '../elements/TxInfoModal'
 import BigNumber from 'bignumber.js'
 import JSONBigNumber from 'json-bignumber'
 import LedgerConfirm from './LedgerConfirm'
+import { mapActions } from 'vuex'
+import base58 from '@/libs/base58'
+import crypto from '@/utils/crypto'
 export default {
     name: 'Lease',
     components: { LeaseSuccess, Confirm, LeaseInput, ColdSignature, TxInfoModal, LedgerConfirm },
@@ -207,6 +211,7 @@ export default {
             coldAddress: '',
             txId: '',
             txAddress: '',
+            txRecipient: '',
             txTimestamp: 0,
             txAmount: BigNumber(0),
             timestamp: 0,
@@ -292,6 +297,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance']),
         inputAmount(num) {
             return BigNumber(num)
         },
@@ -365,7 +371,8 @@ export default {
             apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
             this.$http.post(url, apiSchema).then(response => {
                 this.txId = response.body.id
-                this.txAddress = response.body.recipient
+                this.txAddress = crypto.buildRawAddress(base58.decode(response.body.proofs[0].publicKey))
+                this.txRecipient = response.body.recipient
                 this.txTimestamp = response.body.timestamp
                 this.txAmount = JSONBigNumber.parse(response.bodyText).amount.dividedBy(VSYS_PRECISION)
                 if (walletType === 'hotWallet') {
@@ -373,6 +380,7 @@ export default {
                 } else {
                     this.coldPageId++
                 }
+                this.updateBalance(true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -380,7 +388,6 @@ export default {
                 }
                 this.sendError = true
             })
-            this.$emit('endLeaseSignal')
         },
         getSignature(signature, timestamp) {
             this.coldSignature = signature

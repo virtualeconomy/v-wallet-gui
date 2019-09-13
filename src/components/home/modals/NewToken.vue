@@ -95,7 +95,7 @@
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
-            <span style="font-size: 15px !important;color: #9091A3;">Unity: 10^{{ unity }}</span>
+            <span style="font-size: 15px !important;color: #9091A3;">Unity: 10<sup>{{ unity }}</sup> (The minimum amount will be {{ formatter(1/Math.pow(10, unity)) }} Token)</span>
             <div style="margin-top: 10px;">
               <span class="unity-number">10<sup>0</sup></span>
               <button class="bar-minus"
@@ -110,7 +110,7 @@
               <span class="unity-number-second">10<sup>16</sup></span>
             </div>
           </b-form-group>
-          <div v-if="enableStatus"
+          <div v-if="tokenSplitStatus"
                style="margin-top: 10px;">
             <span>
               <img id="img_read"
@@ -251,7 +251,7 @@
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group>
-            <span style="font-size: 15px !important;color: #9091A3;">Unity: 10^{{ unity }}</span>
+            <span style="font-size: 15px !important;color: #9091A3;">Unity: 10<sup>{{ unity }}</sup> (The minimum amount will be {{ formatter(1/Math.pow(10, unity)) }} Token)</span>
             <div style="margin-top: 10px;">
               <span class="unity-number">10<sup>0</sup></span>
               <button class="bar-minus"
@@ -266,7 +266,7 @@
               <span class="unity-number-second">10<sup>16</sup></span>
             </div>
           </b-form-group>
-          <div v-if="enableStatus"
+          <div v-if="tokenSplitStatus"
                style="margin-top: 10px;">
             <span>
               <img id="img_read_cold"
@@ -382,21 +382,21 @@ import BigNumber from 'bignumber.js'
 import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
 import base58 from '@/libs/base58'
-import bus from '@/assets/bus'
 import common from '@/utils/common'
+import { mapActions, mapState } from 'vuex'
 var initData = {
     errorMessage: '',
     opc: '',
     qrArray: new Array(0),
     support: false,
     recipient: '',
-    amount: BigNumber(0),
+    amount: 0,
     attachment: '',
     qrTotalPage: 1,
     pageId: 1,
     fee: BigNumber(TOKEN_FEE),
     coldRecipient: '',
-    coldAmount: BigNumber(0),
+    coldAmount: 0,
     coldPageId: 1,
     coldFee: BigNumber(TOKEN_FEE),
     address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
@@ -453,8 +453,13 @@ export default {
         return initData
     },
     computed: {
-        enableStatus() {
-            return this.$store.state.enableStatus
+        ...mapState({
+            tokenSplitStatus: 'tokenSplitStatus'
+        }),
+        contractId() {
+            return function(tokenId) {
+                return transaction.tokenIDToContractID(tokenId)
+            }
         },
         defaultAddress() {
             return Vue.ls.get('address')
@@ -530,6 +535,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateBalance', 'changeEventPool', 'changeAddTokenStatus']),
         isValidAttachment(attachment) {
             if (!attachment) {
                 return void 0
@@ -621,16 +627,17 @@ export default {
                 } else {
                     this.coldPageId++
                 }
-                var tokenId = transaction.contractIDToTokenID(response.body.contractId)
+                let tokenId = transaction.contractIDToTokenID(response.body.contractId)
                 let stopParaArr = []
                 for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                    var stopPara = setTimeout(this.sendToAdd, delayTime, tokenId)
+                    let stopPara = setTimeout(this.sendToAdd, delayTime, tokenId)
                     stopParaArr.push(stopPara)
                 }
                 let tmp = {'newToken': stopParaArr}
                 let eventPool = this.$store.state.eventPool
                 Vue.set(eventPool, tokenId, tmp)
-                this.$store.commit('changeEventPool', eventPool)
+                this.changeEventPool(eventPool)
+                this.updateBalance(true)
             }, response => {
                 this.errorMessage = response.body.message
                 if (this.errorMessage === undefined) {
@@ -638,7 +645,6 @@ export default {
                 }
                 this.sendError = true
             })
-            this.$emit('endSendSignal')
         },
         nextPage() {
             this.sendError = false
@@ -672,10 +678,10 @@ export default {
             this.qrTotalPage = 1
             this.qrArray = new Array(0)
             this.recipient = ''
-            this.amount = BigNumber(0)
+            this.amount = 0
             this.pageId = 1
             this.coldRecipient = ''
-            this.coldAmount = BigNumber(0)
+            this.coldAmount = 0
             this.coldPageId = 1
             this.scanShow = false
             this.qrInit = false
@@ -704,21 +710,20 @@ export default {
                 if (this.$store.state.eventPool) {
                     let eventPool = this.$store.state.eventPool
                     if (eventPool[tokenId] && eventPool[tokenId].newToken) {
-                        var stopArr = eventPool[tokenId].newToken
-                        for (var i in stopArr) {
+                        let stopArr = eventPool[tokenId].newToken
+                        for (let i in stopArr) {
                             clearTimeout(stopArr[i])
                         }
                         Vue.delete(eventPool, tokenId)
                     }
-                    this.$store.commit('changeEventPool', eventPool)
+                    this.changeEventPool(eventPool)
                 }
             } else {
-                const url = NODE_IP + '/contract/tokenInfo/' + tokenId
+                const url = NODE_IP + '/contract/info/' + this.contractId(tokenId)
                 this.$http.get(url).then(response => {
-                    Vue.set(tokens, response.body.tokenId, response.body.tokenId)
+                    Vue.set(tokens, tokenId, response.body.info[1].data)
                     this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
-                    let sendFlag = true
-                    bus.$emit('sendFlag', sendFlag)
+                    this.changeAddTokenStatus()
                 }, respError => {
                 })
             }

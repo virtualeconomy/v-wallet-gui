@@ -1,6 +1,6 @@
 {
     "name": "v-wallet-gui",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "description": "web hot wallet of v systems",
     "author": {
         "name": "V SYSTEMS",
@@ -24,7 +24,7 @@
         "babel-polyfill": "^6.26.0",
         "bignumber.js": "^7.2.1",
         "bootstrap": "^4.1.1",
-        "bootstrap-vue": "2.0.0-rc.11",
+        "bootstrap-vue": "2.0.0-rc.28",
         "crypto-js": "^3.1.9-1",
         "identicon.js": "^2.3.2",
         "jr-qrcode": "^1.1.1",
