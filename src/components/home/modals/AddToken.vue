@@ -103,6 +103,7 @@ export default {
             }
             if (this.tokenId in tokens) {
                 this.$refs.addTokenModal.hide()
+                return
             }
             if (this.tokenId) {
                 const url = NODE_IP + '/contract/info/' + this.contractId

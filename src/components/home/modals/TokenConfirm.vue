@@ -56,7 +56,7 @@
                     label-for="amount_confirm">
         <b-form-input id="amount_confirm"
                       :value="newIssuer"
-                      class="des"
+                      class="addr"
                       readonly
                       :plaintext="true">
         </b-form-input>
