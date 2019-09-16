@@ -1,0 +1,3 @@
+[submodule "src/js-v-sdk"]
+	path = src/js-v-sdk
+	url = https://github.com/virtualeconomy/js-v-sdk.git
