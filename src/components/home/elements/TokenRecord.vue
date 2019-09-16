@@ -284,7 +284,7 @@ export default {
         },
         officialTokenSvg() {
             try {
-                return require('@/assets/imgs/icons/wallet/' + this.officialName + '.svg')
+                return require('@/assets/imgs/icons/token/' + this.officialName + '.svg')
             } catch (err) {
                 return require('@/assets/imgs/icons/wallet/ic_token1.svg')
             }
