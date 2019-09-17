@@ -1,11 +1,11 @@
 <template>
-  <b-modal :id="'issueAndBurnTokenModal_' + tokenId"
+  <b-modal :id="'issueOrDestroyTokenModal_' + tokenId"
            centered
            lazy
-           title="IssueAndBurnToken"
+           title="IssueOrDestroyToken"
            hide-footer
            hide-header
-           ref="issueAndBurnTokenModal"
+           ref="issueOrDestroyTokenModal"
            :busy="true"
            @hidden="resetPage">
     <button
@@ -361,7 +361,7 @@ import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
 import { mapActions } from 'vuex'
 export default {
-    name: 'IssueAndBurnToken',
+    name: 'IssueOrDestroyToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     data: function() {
         return {
@@ -615,7 +615,7 @@ export default {
             this.coldSignature = ''
         },
         endSend() {
-            this.$refs.issueAndBurnTokenModal.hide()
+            this.$refs.issueOrDestroyTokenModal.hide()
         },
         sendBalanceChange() {
             this.$emit('updateTokenBalance', 'update')

@@ -16,7 +16,7 @@
       <b-form-group v-if="txType==='Destroy Token'"
                     label-cols
                     class="form-line"
-                    label="Burn Amount"
+                    label="Destroy Amount"
                     label-for="amount_confirm">
         <b-form-input id="amount_confirm"
                       :value="formatter(amount)"
