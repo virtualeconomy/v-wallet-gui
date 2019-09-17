@@ -1,10 +1,15 @@
 "use strict";
-// make sure to add official token svg in src/assets/imgs/icons/wallet with 'tokenName.svg' format
+// make sure to add official token svg in src/assets/imgs/icons/token with 'tokenName.svg' format
 var certifiedTokensList = {
-    Mainnet: {},
-    Testnet: {'TWuyTczrVc4KeDUBpksxY8bpcogKfKqoVGE7cwcs3': 'VTEST'},
+    Mainnet: {
+        'TWZyVhJGfi7PoJvqdKkwg7c9jLbNLhoJKawvcMAXh': 'IPX'
+    },
+    Testnet: {
+        'TWuyTczrVc4KeDUBpksxY8bpcogKfKqoVGE7cwcs3': 'VTEST',
+        'TWtSxBEx7rmsQ34MyWzwBCYYwRJh4K9xsL9zPkMK8': 'DLL'
+    },
 }
-import {NETWORK_BYTE} from '@/constants.js'
+import { NETWORK_BYTE } from '@/constants.js'
 var certifiedTokens;
 if (String.fromCharCode(NETWORK_BYTE) === 'T') {
     certifiedTokens = certifiedTokensList['Testnet']

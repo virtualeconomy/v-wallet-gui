@@ -76,20 +76,20 @@
                     :current-supply="formatter(currentSupply)"
                     :token-description="tokenDescription">
     </TokenInfoModal>
-    <IssueAndBurnToken :token-id="tokenId"
-                       :issuer="issuer"
-                       :address="address"
-                       :wallet-type="walletType"
-                       :addresses="addresses"
-                       :cold-addresses="coldAddresses"
-                       :token-balance="tokenBalance"
-                       :balance="balances[address]"
-                       :max-supply="maxSupply"
-                       :current-supply="currentSupply"
-                       :token-unity="unity"
-                       :function-name="functionName"
-                       @updateTokenBalance="updateTokenBalance">
-    </IssueAndBurnToken>
+    <IssueOrDestroyToken :token-id="tokenId"
+                         :issuer="issuer"
+                         :address="address"
+                         :wallet-type="walletType"
+                         :addresses="addresses"
+                         :cold-addresses="coldAddresses"
+                         :token-balance="tokenBalance"
+                         :balance="balances[address]"
+                         :max-supply="maxSupply"
+                         :current-supply="currentSupply"
+                         :token-unity="unity"
+                         :function-name="functionName"
+                         @updateTokenBalance="updateTokenBalance">
+    </IssueOrDestroyToken>
     <WithdrawToken :token-id="tokenId"
                    :address="address"
                    :wallet-type="walletType"
@@ -157,7 +157,7 @@ import TokenInfoModal from './TokenInfoModal'
 import SendToken from './SendToken'
 import WithdrawToken from './WithdrawToken'
 import BigNumber from 'bignumber.js'
-import IssueAndBurnToken from './IssueAndBurnToken'
+import IssueOrDestroyToken from './IssueOrDestroyToken'
 import Supersede from './Supersede'
 import SplitToken from './SplitToken'
 import DepositToken from './DepositToken'
@@ -170,7 +170,7 @@ import { mapState } from 'vuex'
 import JSONBigNumber from 'json-bignumber'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, Supersede, SplitToken, WithdrawToken, DepositToken, IssueAndBurnToken },
+    components: { TokenInfoModal, SendToken, Supersede, SplitToken, WithdrawToken, DepositToken, IssueOrDestroyToken },
     data: function() {
         return {
             isSplit: false,
@@ -290,7 +290,7 @@ export default {
         },
         officialTokenSvg() {
             try {
-                return require('@/assets/imgs/icons/wallet/' + this.officialName + '.svg')
+                return require('@/assets/imgs/icons/token/' + this.officialName + '.svg')
             } catch (err) {
                 return require('@/assets/imgs/icons/wallet/ic_token1.svg')
             }
@@ -430,7 +430,7 @@ export default {
             } else {
                 this.functionName = 'Issue Token'
                 this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'issueAndBurnTokenModal_' + this.tokenId)
+                this.$root.$emit('bv::show::modal', 'issueOrDestroyTokenModal_' + this.tokenId)
             }
         },
         withdrawToken() {
@@ -447,7 +447,7 @@ export default {
             } else {
                 this.functionName = 'Destroy Token'
                 this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'issueAndBurnTokenModal_' + this.tokenId)
+                this.$root.$emit('bv::show::modal', 'issueOrDestroyTokenModal_' + this.tokenId)
             }
         },
         depositToken() {

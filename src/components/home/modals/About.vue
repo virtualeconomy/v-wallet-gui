@@ -17,7 +17,7 @@
       </div>
       <div class="about-vsyswallet">About V Wallet
       </div>
-      <div class="version">Version {{ vnumber }}
+      <div class="version">Version {{ vVersion }}
       </div>
       <div class="about_text">
         V Wallet is a reference implementation of cross-platform browser wallet for the V Systems blockchain network. It features basic hot wallet mode and cold wallet interaction/monitoring mode. It implements V Systems wallet format specification 1.0 and V Systems wallet QR code API 3.0.
@@ -30,27 +30,10 @@
 <script>
 import { WALLET_VERSION } from '@/constants.js'
 var initData = {
-    vnumber: WALLET_VERSION
+    vVersion: WALLET_VERSION
 }
-
 export default {
     name: 'About',
-    created() {
-    },
-    props: {
-        setUsrLocalStorage: {
-            type: Function,
-            require: true,
-            default: function() {
-                return ''
-            }
-        },
-        address: {
-            type: String,
-            require: true,
-            default: ''
-        }
-    },
     data: function() {
         return initData
     },

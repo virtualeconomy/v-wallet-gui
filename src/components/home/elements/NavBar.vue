@@ -52,8 +52,7 @@
     <Settings @passParamToParent="childByValue"
               :set-usr-local-storage="setUsrLocalStorage"
               :address="address"></Settings>
-    <About :set-usr-local-storage="setUsrLocalStorage"
-           :address="address"></About>
+    <About></About>
   </div>
 
 </template>

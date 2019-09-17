@@ -1,10 +1,10 @@
 <template>
-  <div v-if="Object.keys(txRecords).length > 0"
-       class="records">
+  <div class="records">
     <div
       class="title-records">
       <span>Transaction Records</span>
-      <div class="show-fee"
+      <div v-if="Object.keys(txRecords).length > 0"
+           class="show-fee"
            @click="showFee">
         <span class="show-position"> ShowTxFee </span>
         <input class="show-fee2"
@@ -77,7 +77,8 @@
       </json-excel>
     </div>
     <div class="inherit-height">
-      <div class="scroll"
+      <div v-if="Object.keys(txRecords).length > 0"
+           class="scroll"
            :style="{height: myHeight}">
         <template v-for="(records, monthYear, idx) in txRecords">
           <div :key="monthYear"
@@ -97,78 +98,14 @@
           </div>
         </template>
       </div>
-    </div>
-  </div>
-  <div v-else
-       class="records">
-    <div class="title-records">
-      <span>Transaction Records</span>
-      <b-dropdown
-        class="type-select"
-        router-tag="div"
-        no-caret
-        :disabled="changeShowDisable || changeTypeShowDisable"
-        variant="light">
-        <template
-          slot="button-content">
-          <div style="display:inline-block; margin-right: 10px;">
-            <img v-if="!changeTypeShowDisable"
-                 src="@/assets/imgs/icons/wallet/ic_filter.svg">
-            <img height="16"
-                 width="16"
-                 v-if="changeTypeShowDisable"
-                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
-            <span class="m-1"> Type </span>
-          </div>
-          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
-        </template>
-        <b-dropdown-item
-          class="selection"
-          v-for="(typeValue, type) in showTypes"
-          :key="type"
-          @click="changeType(type)"> {{ type }} </b-dropdown-item>
-      </b-dropdown>
-      <b-dropdown class="pd-select"
-                  router-tag="div"
-                  no-caret
-                  :disabled="changeShowDisable || changeTypeShowDisable"
-                  variant="light">
-        <template slot="button-content">
-          <div style="display:inline-block; margin-right: 10px;">
-            <img v-if="!changeShowDisable"
-                 src="@/assets/imgs/icons/wallet/ic_filter.svg">
-            <img height="16"
-                 width="16"
-                 v-if="changeShowDisable"
-                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
-            <span class="m-1">Latest {{ showingNum }} Records </span>
-          </div>
-          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
-        </template>
-        <b-dropdown-item class="selection"
-                         v-for="num in showNums"
-                         :key="num"
-                         @click="changeShowNum(num)">Show {{ num }} records</b-dropdown-item>
-      </b-dropdown>
-      <json-excel class="csv-export"
-                  :data="response ? [] : response"
-                  :fields="resFields"
-                  :type="downloadFileType"
-                  :name="'txs_' + address + '.' + downloadFileType">
-        <b-btn class="btn-export"
-               :disabled="changeShowDisable || changeTypeShowDisable"
-               variant="light"><img src="@/assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
-      </json-excel>
-    </div>
-    <img
-      height="50"
-      width="50"
-      v-if="changeShowDisable || changeTypeShowDisable"
-      src="@/assets/imgs/icons/wallet/ic_wait.svg">
-    <div
-      v-if="!(changeShowDisable && changeTypeShowDisable)"
-      class="empty">
-      There is no transaction record.
+      <img height="50"
+           width="50"
+           v-if="Object.keys(txRecords).length === 0 && (changeShowDisable || changeTypeShowDisable)"
+           src="@/assets/imgs/icons/wallet/ic_wait.svg">
+      <div v-if="Object.keys(txRecords).length === 0 && !(changeShowDisable || changeTypeShowDisable)"
+           class="empty">
+        There is no transaction record.
+      </div>
     </div>
   </div>
 </template>

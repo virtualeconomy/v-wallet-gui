@@ -6,3 +6,4 @@
 /src/libs/*.js
 /src/utils/*.js
 /src/constants.js
+/src/js-v-sdk/
