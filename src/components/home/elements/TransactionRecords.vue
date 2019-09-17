@@ -100,9 +100,9 @@
       </div>
       <img height="50"
            width="50"
-           v-if="Object.keys(txRecords).length === 0 && changeShowDisable || changeTypeShowDisable"
+           v-if="Object.keys(txRecords).length === 0 && (changeShowDisable || changeTypeShowDisable)"
            src="@/assets/imgs/icons/wallet/ic_wait.svg">
-      <div v-if="Object.keys(txRecords).length === 0 && !(changeShowDisable && changeTypeShowDisable)"
+      <div v-if="Object.keys(txRecords).length === 0 && !(changeShowDisable || changeTypeShowDisable)"
            class="empty">
         There is no transaction record.
       </div>

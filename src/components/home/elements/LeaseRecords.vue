@@ -36,9 +36,9 @@
         </b-dropdown-item>
       </b-dropdown>
     </div>
-    <div class="inherit-height">
-      <div v-if="leaseRecords.length > 0"
-           class="scroll"
+    <div v-if="leaseRecords.length > 0"
+         class="inherit-height">
+      <div class="scroll"
            :style="{height: myHeight}">
         <div v-for="record in leaseRecords"
              :key="record.id">
@@ -52,14 +52,14 @@
                              :lease-status="record.leaseStatus"></TransactionRecord>
         </div>
       </div>
-      <img height="50"
-           width="50"
-           v-if="changeShowDisable && leaseRecords.length === 0"
-           src="@/assets/imgs/icons/wallet/ic_wait.svg">
-      <div v-if="!changeShowDisable && leaseRecords.length === 0"
-           class="empty">
-        There is no transaction record.
-      </div>
+    </div>
+    <img height="50"
+         width="50"
+         v-if="changeShowDisable && leaseRecords.length === 0"
+         src="@/assets/imgs/icons/wallet/ic_wait.svg">
+    <div v-if="!changeShowDisable && leaseRecords.length === 0"
+         class="empty">
+      There is no transaction record.
     </div>
   </div>
 </template>
