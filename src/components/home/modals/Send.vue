@@ -336,7 +336,25 @@
             </b-col>
           </b-row>
         </b-container>
-        <b-container v-if="coldPageId===3"
+        <b-container v-if="coldPageId===3 && getDevice === 'Ledger'"
+                     class="text-left">
+          <LedgerConfirm :tx-info="dataObject"
+                         :address-info="coldAddressInfo"
+                         @get-signature="getSignature"
+                         @prev-page="prevPage"></LedgerConfirm>
+          <b-row class="row">
+            <b-col class="col-back">
+              <b-button
+                class="btn-back"
+                block
+                variant="light"
+                size="lg"
+                @click="prevPage">Back
+              </b-button>
+            </b-col>
+          </b-row>
+        </b-container>
+        <b-container v-else-if="coldPageId===3"
                      class="text-left">
           <ColdSignature :data-object="dataObject"
                          v-if="coldPageId===3"
@@ -405,6 +423,7 @@ import browser from '@/utils/browser'
 import common from '@/utils/common'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
+import LedgerConfirm from './LedgerConfirm'
 import { mapActions } from 'vuex'
 var initData = {
     superNodes: [],
@@ -435,7 +454,7 @@ var initData = {
 }
 export default {
     name: 'Send',
-    components: {ColdSignature, Success, Confirm},
+    components: {ColdSignature, Success, Confirm, LedgerConfirm},
     props: {
         balances: {
             type: Object,
@@ -488,6 +507,12 @@ export default {
             if (this.noColdAddress) return ''
             return Object.keys(this.coldAddresses)[0]
         },
+        getDevice() {
+            if (this.coldAddressInfo.hasOwnProperty('device')) {
+                return this.coldAddressInfo.device
+            }
+            return ''
+        },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
         },
@@ -504,6 +529,13 @@ export default {
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
+        coldAddressInfo() {
+            if (this.coldAddresses.hasOwnProperty(this.coldAddress)) {
+                return this.coldAddresses[this.coldAddress]
+            } else {
+                return {'api': 1, 'publicKey': '', 'device': 'unknown'}
+            }
+        },
         attachmentLength() {
             return function(attachment) {
                 if (!attachment) {
@@ -518,7 +550,7 @@ export default {
                 api: this.coldApi(),
                 opc: OPC_TRANSACTION,
                 transactionType: PAYMENT_TX,
-                senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
+                senderPublicKey: this.coldAddressInfo.publicKey,
                 amount: BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).toFixed(0),
                 fee: this.coldFee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
@@ -577,7 +609,7 @@ export default {
                 }
                 apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), PAYMENT_TX)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress].publicKey, PAYMENT_TX)
+                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddressInfo.publicKey, PAYMENT_TX)
             }
             const url = NODE_IP + '/vsys/broadcast/payment'
             apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') //  The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
@@ -927,5 +959,15 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.col-back {
+    padding-left: 10px;
+    margin-top: -70px;
+    margin-right: 230px;
+    margin-left: 5px;
+}
+.row {
+    margin-top: 26px;
+    margin-bottom: 10px;
 }
 </style>

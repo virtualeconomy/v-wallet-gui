@@ -26,7 +26,7 @@
     <div class="col align-self-center text-right">
       <b-button variant="white"
                 class="btn-creat"
-                v-b-modal.newTokenModal>
+                @click="createToken">
         <img v-if="!isMobile"
              class="icon-btn"
              src="@/assets/imgs/icons/wallet/ic_new_token_yellow.svg"><b>Create Token</b></b-button>
@@ -81,10 +81,18 @@ export default {
     created() {
         this.isMobile = browser.isMobile()
     },
-    computed: mapState({
-        available: 'available',
-        total: 'total'
-    }),
+    computed: {
+        ...mapState({
+            available: 'available',
+            total: 'total'
+        }),
+        getDevice() {
+            if (this.coldAddresses && this.coldAddresses[this.address] && this.coldAddresses[this.address].hasOwnProperty('device')) {
+                return this.coldAddresses[this.address].device
+            }
+            return ''
+        }
+    },
     props: {
         balance: {
             type: BigNumber,
@@ -121,6 +129,13 @@ export default {
     methods: {
         formatter(num) {
             return browser.bigNumberFormatter(num)
+        },
+        createToken() {
+            if (this.getDevice === 'Ledger') {
+                alert('This feature is not supported')
+            } else {
+                this.$root.$emit('bv::show::modal', 'newTokenModal')
+            }
         }
     }
 }

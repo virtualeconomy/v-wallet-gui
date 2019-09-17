@@ -103,10 +103,31 @@
               </b-col>
             </b-row>
           </b-container>
-          <ColdSignature :data-object="dataObject"
-                         v-if="coldPageId===3"
-                         @get-signature="getSignature"
-                         @prev-page="prevColdPage"></ColdSignature>
+          <b-container v-if="coldPageId===3 && getDevice === 'Ledger'"
+                       class="text-left">
+            <LedgerConfirm :tx-info="dataObject"
+                           :address-info="coldAddressInfo"
+                           @get-signature="getSignature"
+                           @prev-page="prevPage"></LedgerConfirm>
+            <b-row class="row">
+              <b-col class="col-back">
+                <b-button
+                  class="btn-back"
+                  block
+                  variant="light"
+                  size="lg"
+                  @click="prevColdPage">Back
+                </b-button>
+              </b-col>
+            </b-row>
+          </b-container>
+          <b-container v-else-if="coldPageId===3"
+                       class="text-left">
+            <ColdSignature :data-object="dataObject"
+                           v-if="coldPageId===3"
+                           @get-signature="getSignature"
+                           @prev-page="prevColdPage"></ColdSignature>
+          </b-container>
           <b-container v-else-if="coldPageId===4">
             <Confirm :tx-type="'lease'"
                      :amount=inputAmount(coldAmount)
@@ -168,12 +189,13 @@ import LeaseSuccess from './LeaseSuccess'
 import TxInfoModal from '../elements/TxInfoModal'
 import BigNumber from 'bignumber.js'
 import JSONBigNumber from 'json-bignumber'
+import LedgerConfirm from './LedgerConfirm'
 import { mapActions } from 'vuex'
 import base58 from '@/libs/base58'
 import crypto from '@/utils/crypto'
 export default {
     name: 'Lease',
-    components: { LeaseSuccess, Confirm, LeaseInput, ColdSignature, TxInfoModal },
+    components: { LeaseSuccess, Confirm, LeaseInput, ColdSignature, TxInfoModal, LedgerConfirm },
     data: function() {
         return {
             amount: BigNumber(0),
@@ -195,7 +217,8 @@ export default {
             timestamp: 0,
             hasConfirmed: false,
             isRaisingLease: 'true',
-            errorMessage: ''
+            errorMessage: '',
+            attachment: ''
         }
     },
     props: {
@@ -236,6 +259,12 @@ export default {
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
+        getDevice() {
+            if (this.coldAddressInfo.hasOwnProperty('device')) {
+                return this.coldAddressInfo.device
+            }
+            return ''
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -258,6 +287,13 @@ export default {
         },
         defaultColdAddress() {
             return this.noColdAddress ? '' : Object.keys(this.coldAddresses)[0]
+        },
+        coldAddressInfo() {
+            if (this.coldAddresses.hasOwnProperty(this.coldAddress)) {
+                return this.coldAddresses[this.coldAddress]
+            } else {
+                return {'api': 1, 'publicKey': '', 'device': 'unknown'}
+            }
         }
     },
     methods: {
@@ -405,6 +441,25 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.col-back {
+    padding-left: 10px;
+    margin-top: -70px;
+    margin-right: 230px;
+    margin-left: 5px;
+}
+.row {
+    margin-top: 26px;
+    margin-bottom: 10px;
+}
+.btn-back {
+    background: #FAFAFA;
+    border: 1px solid #E8E9ED;
+    border-radius: 4px;
+    font-size: 17px;
+    color: #4F515E;
+    letter-spacing: 0;
+    text-align: center;
 }
 
 </style>

@@ -63,7 +63,26 @@
     <b-container v-else-if="page==='success'">
       <CancelSuccess @show-details="showDetails"></CancelSuccess>
     </b-container>
-    <b-container v-else-if="page==='cold'">
+    <b-container v-else-if="page==='cold' && getDevice==='Ledger'"
+                 class="text-left">
+      <LedgerConfirm :tx-info="dataObject"
+                     :address-info="coldAddressInfo"
+                     @get-signature="getSignature"
+                     @prev-page="prevPage"></LedgerConfirm>
+      <b-row class="row">
+        <b-col class="col-back">
+          <b-button
+            class="btn-back"
+            block
+            variant="light"
+            size="lg"
+            @click="prevPage">Back
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-container>
+    <b-container v-else-if="page==='cold'"
+                 class="text-left">
       <ColdSignature :data-object="dataObject"
                      @get-signature="getSignature"
                      @prev-page="prevPage"
@@ -83,10 +102,11 @@ import seedLib from '@/libs/seed'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
+import LedgerConfirm from './LedgerConfirm'
 import { mapActions } from 'vuex'
 export default {
     name: 'CancelLease',
-    components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm },
+    components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm, LedgerConfirm },
     data: function() {
         return {
             errorMessage: '',
@@ -96,7 +116,8 @@ export default {
             sendError: false,
             signed: false,
             txType: CANCEL_LEASE_TX,
-            hasConfirmed: false
+            hasConfirmed: false,
+            attachment: ''
         }
     },
     props: {
@@ -184,6 +205,22 @@ export default {
         },
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+        },
+        getDevice() {
+            if (this.coldAddressInfo.hasOwnProperty('device')) {
+                return this.coldAddressInfo.device
+            }
+            return ''
+        },
+        coldAddressInfo() {
+            var addrInfo = {'api': 1, 'publicKey': '', 'device': 'unknown'}
+            if (this.userInfo && this.userInfo.hasOwnProperty('coldAddresses')) {
+                var object = JSON.parse(this.userInfo.coldAddresses)
+                if (object.hasOwnProperty(this.fromAddress)) {
+                    addrInfo = object[this.fromAddress]
+                }
+            }
+            return addrInfo
         }
     },
     methods: {
@@ -342,5 +379,15 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.col-back {
+    padding-left: 10px;
+    margin-top: -70px;
+    margin-right: 230px;
+    margin-left: 5px;
+}
+.row {
+    margin-top: 26px;
+    margin-bottom: 10px;
 }
 </style>

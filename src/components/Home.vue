@@ -231,6 +231,10 @@ export default {
                     let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': addr, 'api': 1, 'publicKey': this.coldAddresses[addr]}
                     Vue.set(this.coldAddresses, addr, JSON.parse(JSON.stringify(tempObj)))
                 }
+                if (!this.coldAddresses[addr].hasOwnProperty('device')) {
+                    localChanging = true
+                    Vue.set(this.coldAddresses[addr], 'device', 'MobileApp')
+                }
             }
             if (localChanging) {
                 this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
@@ -353,15 +357,23 @@ export default {
             })
         },
         importCold(coldAddress, pubKey, jsonObj) {
-            Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : jsonObj)
-            let unsortedColdAddresses = this.coldAddresses
-            let sortedColdAddresses = {}
-            Object.keys(unsortedColdAddresses).sort().forEach(function(key) {
-                sortedColdAddresses[key] = unsortedColdAddresses[key]
-            })
-            this.sortedAddresses = sortedColdAddresses
-            this.getBalance(coldAddress)
-            this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
+            var coldAddrs = {}
+            if (this.userInfo && this.userInfo.coldAddresses) {
+                coldAddrs = JSON.parse(this.userInfo.coldAddresses)
+            }
+            if (coldAddrs && coldAddrs[coldAddress]) {
+                alert('Address already exist')
+            } else {
+                Vue.set(this.coldAddresses, coldAddress, jsonObj)
+                let unsortedColdAddresses = this.coldAddresses
+                let sortedColdAddresses = {}
+                Object.keys(unsortedColdAddresses).sort().forEach(function(key) {
+                    sortedColdAddresses[key] = unsortedColdAddresses[key]
+                })
+                this.sortedAddresses = sortedColdAddresses
+                this.getBalance(coldAddress)
+                this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
+            }
         },
         getSeedPhrase() {
             if (this.secretInfo) {
