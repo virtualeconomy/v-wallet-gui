@@ -698,7 +698,7 @@ export default {
             this.$refs.sendTokenModal.hide()
         },
         sendBalanceChange() {
-            this.$emit('updateTokenBalance', 'update')
+            this.$emit('updateToken', 'update')
         },
         scanChange(evt) {
             if (!this.qrInit) {

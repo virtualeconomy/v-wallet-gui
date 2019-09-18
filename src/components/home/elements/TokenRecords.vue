@@ -9,8 +9,6 @@
            :style="{height: myHeight}">
         <TokenRecord v-for="(tokenMaker,tokenId) in tokenRecords"
                      :key="tokenId"
-                     :chain="chain"
-                     :account="account"
                      :token-id="tokenId"
                      :token-maker="tokenMaker"
                      :address="address"

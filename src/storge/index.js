@@ -3,12 +3,16 @@ import Vuex from 'vuex'
 import VueResource from 'vue-resource'
 import BigNumber from 'bignumber.js'
 import JSONBigNumber from 'json-bignumber'
-import { NODE_IP, VSYS_PRECISION } from '@/constants.js'
+import Blockchain from '@/js-v-sdk/src/blockchain'
+import Account from '@/js-v-sdk/src/account'
+import { NODE_IP, VSYS_PRECISION, NETWORK_BYTE } from '@/constants.js'
 Vue.use(Vuex)
 Vue.use(VueResource)
 
 const store = new Vuex.Store({
     state: {
+        account: new Account(NETWORK_BYTE),
+        chain: new Blockchain(NODE_IP, NETWORK_BYTE),
         tokenSplitStatus: JSON.parse(window.localStorage.getItem('tokenSplitStatus')),
         tokenManagementStatus: JSON.parse(window.localStorage.getItem('tokenManagementStatus')),
         eventPool: {},

@@ -176,7 +176,6 @@ import TokenPane from './home/elements/TokenPane'
 import TokenRecords from './home/elements/TokenRecords'
 import AddToken from './home/modals/AddToken'
 import BigNumber from 'bignumber.js'
-import JSONBigNumber from 'json-bignumber'
 import { mapActions } from 'vuex'
 import Blockchain from '@/js-v-sdk/src/blockchain'
 import Account from '@/js-v-sdk/src/account'
@@ -334,14 +333,12 @@ export default {
             this.setSessionClearTimeout()
         },
         getBalance: function(address) {
-            const url = NODE_IP + '/addresses/balance/details/' + address
-            this.$http.get(url).then(response => {
-                let tempResponse = JSONBigNumber.parse(response.bodyText)
-                let value = tempResponse.available.dividedBy(VSYS_PRECISION)
-                let changestatus = value === this.balance[address]
+            this.chain.getBalanceDetail(address).then(response => {
+                let value = BigNumber(response.available).dividedBy(VSYS_PRECISION)
+                let changeStatus = value === this.balance[address]
                 Vue.set(this.balance, address, value)
                 if (address === this.selectedAddress) {
-                    if (changestatus) {
+                    if (changeStatus) {
                         let addrtmp = this.selectedAddress
                         this.selectedAddress = ''
                         setTimeout(() => {
@@ -354,17 +351,16 @@ export default {
             })
         },
         getBlockHeight() {
-            const url = NODE_IP + '/blocks/last'
-            this.$http.get(url).then(response => {
-                let tempTime = new Date(response.body.timestamp / 1e6).toLocaleString()
-                window.localStorage.setItem('globalHeight', response.body.height)
+            this.chain.getLastBlock().then(response => {
+                let tempTime = new Date(response.timestamp / 1e6).toLocaleString()
+                window.localStorage.setItem('globalHeight', response.height)
                 window.localStorage.setItem('time', tempTime)
             }, respError => {
                 this.$router.push('/warning')
             })
         },
         importCold(coldAddress, pubKey, jsonObj) {
-            var coldAddrs = {}
+            let coldAddrs = {}
             if (this.userInfo && this.userInfo.coldAddresses) {
                 coldAddrs = JSON.parse(this.userInfo.coldAddresses)
             }
@@ -421,10 +417,10 @@ export default {
             this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
         },
         getAddresses() {
-            var addresses = []
-            var seedPhrase = this.getSeedPhrase()
-            for (var index = 0; index < this.walletAmount; index++) {
-                var seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index)
+            let addresses = []
+            let seedPhrase = this.getSeedPhrase()
+            for (let index = 0; index < this.walletAmount; index++) {
+                let seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index)
                 Vue.set(this.addresses, seed.address, index)
             }
             return addresses
@@ -436,7 +432,6 @@ export default {
     },
     components: {
         ImportColdWallet,
-        // TransPane,
         NavBar,
         Asset,
         TransactionRecords,

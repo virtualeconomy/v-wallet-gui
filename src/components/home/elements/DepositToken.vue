@@ -488,7 +488,7 @@ export default {
             this.$refs.depositTokenModal.hide()
         },
         sendBalanceChange() {
-            this.$emit('updateTokenBalance', 'update')
+            this.$emit('updateToken', 'update')
         },
         getSignature(signature) {
             this.coldSignature = signature

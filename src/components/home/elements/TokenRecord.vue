@@ -56,7 +56,7 @@
           <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
                            @click="issueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
-                           @click="burnToken">Destroy Token</b-dropdown-item>
+                           @click="destroyToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenSplitStatus"
                            @click="splitToken">Split Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenManagementStatus && showUnsupportedFunction"
@@ -82,15 +82,13 @@
                          :wallet-type="walletType"
                          :addresses="addresses"
                          :cold-addresses="coldAddresses"
-                         :chain="chain"
-                         :account="account"
                          :token-balance="tokenBalance"
                          :balance="balances[address]"
                          :max-supply="maxSupply"
                          :current-supply="currentSupply"
                          :token-unity="unity"
                          :function-name="functionName"
-                         @updateTokenBalance="updateTokenBalance">
+                         @updateToken="updateToken">
     </IssueOrDestroyToken>
     <WithdrawToken :token-id="tokenId"
                    :address="address"
@@ -101,7 +99,7 @@
                    :balance="balances[address]"
                    :token-unity="unity"
                    :is-split="isSplit"
-                   @updateTokenBalance="updateTokenBalance">
+                   @updateToken="updateToken">
     </WithdrawToken>
     <DepositToken :token-id="tokenId"
                   :address="address"
@@ -112,7 +110,7 @@
                   :balance="balances[address]"
                   :token-unity="unity"
                   :is-split="isSplit"
-                  @updateTokenBalance="updateTokenBalance">
+                  @updateToken="updateToken">
     </DepositToken>
     <Supersede :issuer="issuer"
                :token-id="tokenId"
@@ -121,8 +119,7 @@
                :wallet-type="walletType"
                :addresses="addresses"
                :cold-addresses="coldAddresses"
-               :balance="balances[address]"
-               @updateTokenBalance="updateTokenBalance">
+               :balance="balances[address]">
     </Supersede>
     <SplitToken :token-id="tokenId"
                 :issuer="issuer"
@@ -135,7 +132,7 @@
                 :token-unity="unity"
                 :max-supply="maxSupply"
                 :is-split="isSplit"
-                @updateUnity="updateUnity">
+                @updateToken="updateToken">
     </SplitToken>
     <SendToken :token-id="tokenId"
                :token-balances="tokenBalances"
@@ -146,13 +143,13 @@
                :wallet-type="walletType"
                :is-split="isSplit"
                :token-unity="unity"
-               @updateTokenBalance="updateTokenBalance">
+               @updateToken="updateToken">
     </SendToken>
   </b-container>
 </template>
 
 <script>
-import transaction from '@/utils/transaction'
+import common from '@/js-v-sdk/src/utils/common'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import TokenInfoModal from './TokenInfoModal'
@@ -163,13 +160,11 @@ import IssueOrDestroyToken from './IssueOrDestroyToken'
 import Supersede from './Supersede'
 import SplitToken from './SplitToken'
 import DepositToken from './DepositToken'
-import { NODE_IP, SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
-import { CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
+import { SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import certify from '@/utils/certify'
 import { mapState } from 'vuex'
-import JSONBigNumber from 'json-bignumber'
 export default {
     name: 'TokenRecord',
     components: { TokenInfoModal, SendToken, Supersede, SplitToken, WithdrawToken, DepositToken, IssueOrDestroyToken },
@@ -192,16 +187,6 @@ export default {
         }
     },
     props: {
-        chain: {
-            type: Object,
-            default: function() {},
-            require: true
-        },
-        account: {
-            type: Object,
-            default: function() {},
-            require: true
-        },
         address: {
             type: String,
             default: ''
@@ -252,21 +237,22 @@ export default {
             if (newAddr === '' || this.activeTab !== 'token') {
                 return
             }
-            this.updateTokenBalance()
+            this.updateToken()
         },
         activeTab(newTab, oldTab) {
             if (newTab === 'token') {
-                this.updateTokenBalance()
+                this.updateToken()
             }
         }
     },
     created() {
         this.getTokenInfo()
-        this.updateTokenBalance()
+        this.updateToken()
     },
 
     computed: {
         ...mapState({
+            chain: 'chain',
             tokenManagementStatus: 'tokenManagementStatus',
             tokenSplitStatus: 'tokenSplitStatus'
         }),
@@ -336,73 +322,49 @@ export default {
         formatter(num) {
             return browser.bigNumberFormatter(num)
         },
-        updateTokenBalance() {
-            const url = NODE_IP + '/contract/balance/' + this.address + '/' + this.tokenId
-            this.$http.get(url).then(response => {
-                let tempResponse = JSONBigNumber.parse(response.bodyText)
-                this.tokenBalance = BigNumber(tempResponse.balance).dividedBy(tempResponse.unity)
-            }, respError => {
-            })
-        },
-        updateUnity() {
-            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
-            this.$http.get(tokenUrl).then(response => {
-                let tempResponse = JSONBigNumber.parse(response.bodyText)
-                this.tokens = tempResponse
-                this.unity = BigNumber(this.tokens.unity)
-                this.updateTokenBalance()
+        updateToken() {
+            this.chain.getTokenBalance(this.address, this.tokenId).then(response => {
+                this.unity = BigNumber(response.unity)
+                this.tokenBalance = BigNumber(response.balance).dividedBy(response.unity)
             }, respError => {
             })
         },
         getTokenBalances() {
             for (const addr in this.addresses) {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
-                let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
-                this.$http.get(turl).then(response => {
-                    let tempResponse = JSONBigNumber.parse(response.bodyText)
-                    let value = BigNumber(tempResponse.balance).dividedBy(tempResponse.unity)
+                this.chain.getTokenBalance(addr, this.tokenId).then(response => {
+                    let value = BigNumber(response.balance).dividedBy(response.unity)
                     Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
             }
             for (const addr in this.coldAddresses) {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
-                let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
-                this.$http.get(turl).then(response => {
-                    let tempResponse = JSONBigNumber.parse(response.bodyText)
-                    let value = BigNumber(tempResponse.balance).dividedBy(tempResponse.unity)
+                this.chain.getTokenBalance(addr, this.tokenId).then(response => {
+                    let value = BigNumber(response.balance).dividedBy(response.unity)
                     Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
             }
         },
         getTokenInfo() {
-            let contractId = transaction.tokenIDToContractID(this.tokenId)
-            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
-            this.$http.get(tokenUrl).then(response => {
-                let tempResponse = JSONBigNumber.parse(response.bodyText)
-                this.tokens = tempResponse
+            let contractId = common.tokenIDToContractID(this.tokenId)
+            this.chain.getTokenInfo(this.tokenId).then(response => {
+                this.tokens = response
                 this.unity = BigNumber(this.tokens.unity)
             }, respError => {
             })
-
-            const url = NODE_IP + '/contract/info/' + contractId
-            this.$http.get(url).then(response => {
-                this.issuer = response.body.info[0].data
-                this.maker = response.body.info[1].data
-                this.contractId = response.body.contractId
+            this.chain.getContractInfo(contractId).then(response => {
+                this.issuer = response.info[0].data
+                this.maker = response.info[1].data
+                this.contractId = response.contractId
+                this.isSplit = response.type === 'TokenContractWithSplit'
             }, respError => {
+                this.contractId = contractId
                 this.issuer = 'Failed to get issuer'
+                this.maker = 'Failed to get maker'
             })
-
-            const url2 = NODE_IP + '/contract/content/' + contractId
-            this.$http.get(url2).then(response => {
-                var tokentype = response.body.textual.descriptors
-                this.isSplit = (tokentype === CONTRACT_WITH_SPLIT_DESCRIPTOR)
-            }, respError => {
-                console.log('failed to load tokentype ')
-            })
-            this.updateTokenBalance()
+            this.updateToken()
         },
         showModal() {
             this.getTokenInfo()
@@ -453,7 +415,7 @@ export default {
                 this.$root.$emit('bv::show::modal', 'withdrawTokenModal_' + this.tokenId)
             }
         },
-        burnToken() {
+        destroyToken() {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {

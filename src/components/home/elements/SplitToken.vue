@@ -517,7 +517,7 @@ export default {
             this.$refs.splitTokenModal.hide()
         },
         unityChange() {
-            this.$emit('updateUnity', 'update')
+            this.$emit('updateToken', 'update')
         },
         getSignature(signature) {
             this.coldSignature = signature

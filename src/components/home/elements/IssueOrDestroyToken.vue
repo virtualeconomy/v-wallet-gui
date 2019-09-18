@@ -319,7 +319,7 @@ import browser from '@/utils/browser'
 import common from '@/js-v-sdk/src/utils/common'
 import Transaction from '@/js-v-sdk/src/transaction'
 import BigNumber from 'bignumber.js'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 import certify from '@/utils/certify'
 export default {
     name: 'IssueOrDestroyToken',
@@ -339,15 +339,6 @@ export default {
         }
     },
     props: {
-        chain: {
-            type: Object,
-            default: function() {}
-        },
-        account: {
-            type: Object,
-            default: function() {},
-            require: true
-        },
         tokenBalance: {
             type: BigNumber,
             default: function() {
@@ -415,6 +406,10 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            chain: 'chain',
+            account: 'account'
+        }),
         contractId() {
             return common.tokenIDToContractID(this.tokenId)
         },
@@ -499,6 +494,7 @@ export default {
                 }
                 this.hasConfirmed = true
                 let builtTransaction = this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey)
+                this.account.buildFromPrivateKey(this.getKeypair(this.addresses[this.address]).privateKey)
                 let signature = this.account.getSignature(builtTransaction.toBytes())
                 sendTx = builtTransaction.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
@@ -555,7 +551,7 @@ export default {
             this.$refs.issueOrDestroyTokenModal.hide()
         },
         sendBalanceChange() {
-            this.$emit('updateTokenBalance', 'update')
+            this.$emit('updateToken', 'update')
         },
         getSignature(signature) {
             this.coldSignature = signature

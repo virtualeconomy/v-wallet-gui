@@ -279,7 +279,7 @@ import BigNumber from 'bignumber.js'
 import transaction from '@/utils/transaction'
 import { mapActions } from 'vuex'
 export default {
-    name: 'IssueToken',
+    name: 'Supersede',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     data: function() {
         return {
@@ -502,13 +502,7 @@ export default {
             this.coldSignature = ''
         },
         endSend() {
-            for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                setTimeout(this.sendBalanceChange, delayTime)
-            }
             this.$refs.supersedeModal.hide()
-        },
-        sendBalanceChange() {
-            this.$emit('updateBalance', 'update')
         },
         scanChange(evt) {
             if (!this.qrInit) {
