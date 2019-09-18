@@ -650,7 +650,7 @@ export default {
         },
         prevPage() {
             this.sendError = false
-            var pageId = this.walletType === 'hotWallet' ? --this.pageId : --this.coldPageId
+            let pageId = this.walletType === 'hotWallet' ? --this.pageId : --this.coldPageId
             if (pageId === 0) {
                 this.$refs.sendModal.hide()
             }

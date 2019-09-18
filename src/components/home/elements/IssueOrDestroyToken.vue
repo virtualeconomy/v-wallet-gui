@@ -28,13 +28,8 @@
                           v-model="address"
                           :state="isValidIssuer(address)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="functionName === 'Issue Token'">
-              Cannot issue token. You are not issuer of this token.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="functionName === 'Destroy Token'">
-              Cannot destroy token. You are not issuer of this token.
+            <b-form-invalid-feedback id="inputLiveFeedback">
+              Cannot {{ functionName === 'Issue Token' ? 'issue' : 'destroy' }} token. You are not issuer of this token.
             </b-form-invalid-feedback>
             <b-btn
               block
@@ -43,55 +38,21 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="@/assets/imgs/icons/wallet/ic_token2.svg"
+                <img v-if="isCertified"
+                     :src="officialTokenSvg"
+                     width="20"
+                     height="20">
+                <img v-else
+                     src="@/assets/imgs/icons/wallet/ic_token2.svg"
                      width="20"
                      height="20">
               </span>
-              <span class="balance"
-                    v-if="functionName === 'Issue Token'">Issue Available {{ formatter(availableAmount) }}
-              </span>
-              <span class="balance"
-                    v-if="functionName === 'Destroy Token'">Destroy Available {{ formatter(availableAmount) }}
+              <span class="balance">{{ functionName === 'Issue Token' ? 'Issue Available' : 'Destroy Available' }} {{ formatter(availableAmount) }}
               </span>
             </b-btn>
           </b-form-group>
-          <b-form-group label="Issue Amount"
-                        label-for="amount-input"
-                        v-if="functionName === 'Issue Token'">
-            <b-form-input id="amount-input"
-                          class="amount-input"
-                          v-model="amount"
-                          aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid">
-            </b-form-input>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!isNumFormatValid(amount)">
-              Invalid format.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount) && !isExceededMaxSupplyOrTokenSufficient(amount)">
-              Invalid format. The number of digits after the decimal point may be larger than the token precision.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupplyOrTokenSufficient(amount) && functionName === 'Issue Token'">
-              The total supply can not larger than max supply.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupplyOrTokenSufficient(amount) && functionName === 'Destroy Token'">
-              Insufficient token.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
-              Negative number is not allowed
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else>
-              Invalid Input.
-            </b-form-invalid-feedback>
-          </b-form-group>
-          <b-form-group label="Destroy Amount"
-                        label-for="amount-input"
-                        v-if="functionName === 'Destroy Token'">
+          <b-form-group :label="functionName === 'Issue Token' ? 'Issue Amount' : 'Destroy Amount'"
+                        label-for="amount-input">
             <b-form-input id="amount-input"
                           class="amount-input"
                           v-model="amount"
@@ -161,6 +122,7 @@
                 class="btn-confirm"
                 variant="warning"
                 size="lg"
+                :disabled="sendError"
                 @click="sendData('hotWallet')">Confirm
               </b-button>
             </b-col>
@@ -193,13 +155,8 @@
                           v-model="address"
                           :state="isValidIssuer(address)"
                           aria-describedby="inputLiveFeedback"></b-form-input>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="functionName === 'Issue Token'">
-              Cannot issue token. You are not issuer of this token.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="functionName === 'Destroy Token'">
-              Cannot destroy token. You are not issuer of this token.
+            <b-form-invalid-feedback id="inputLiveFeedback">
+              Cannot {{ functionName === 'Issue Token' ? 'issue' : 'destroy' }} token. You are not issuer of this token.
             </b-form-invalid-feedback>
             <b-btn
               block
@@ -208,19 +165,20 @@
               class="balance-input"
               readonly>
               <span class="balance-title">
-                <img src="@/assets/imgs/icons/wallet/ic_token2.svg"
+                <img v-if="isCertified"
+                     :src="officialTokenSvg"
+                     width="20"
+                     height="20">
+                <img v-else
+                     src="@/assets/imgs/icons/wallet/ic_token2.svg"
                      width="20"
                      height="20">
               </span>
-              <span class="balance"
-                    v-if="functionName === 'Issue Token'">Issue Available {{ formatter(availableAmount) }}
-              </span>
-              <span class="balance"
-                    v-if="functionName === 'Destroy Token'">Destroy Available {{ formatter(availableAmount) }}
+              <span class="balance">{{ functionName === 'Issue Token'? 'Issue Available' : 'Destroy Available' }} {{ formatter(availableAmount) }}
               </span>
             </b-btn>
           </b-form-group>
-          <b-form-group label="Issue Amount"
+          <b-form-group :label="functionName === 'Issue Token' ? 'Issue Amount' : 'Destroy Amount'"
                         label-for="cold-amount-input">
             <b-form-input id="cold-amount-input"
                           class="amount-input"
@@ -263,7 +221,7 @@
                     block
                     size="lg"
                     :disabled="isSubmitDisabled"
-                    @click="coldNextPage">Continue
+                    @click="nextPage">Continue
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
@@ -279,7 +237,7 @@
                 block
                 variant="light"
                 size="lg"
-                @click="coldPrevPage">Back
+                @click="prevPage">Back
               </b-button>
             </b-col>
             <b-col class="col-rit">
@@ -288,19 +246,20 @@
                 class="btn-confirm"
                 variant="warning"
                 size="lg"
-                @click="coldNextPage">Confirm
+                @click="nextPage">Confirm
               </b-button>
             </b-col>
           </b-row>
         </b-container>
         <b-container v-if="coldPageId===3"
                      class="text-left">
-          <ColdSignature :data-object="dataObject"
+          <ColdSignature :data-object="dataObject.toJsonForColdSignature()"
                          :qr-total-page="1"
                          v-if="coldPageId===3"
+                         :cold-public-key = "coldAddresses[address].publicKey"
                          @get-signature="getSignature"
-                         @next-page="coldNextPage"
-                         @prev-page="coldPrevPage"></ColdSignature>
+                         @next-page="nextPage"
+                         @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
           <TokenConfirm :address="address"
@@ -316,7 +275,7 @@
                 block
                 variant="light"
                 size="lg"
-                @click="coldPrevPage">Back
+                @click="prevPage">Back
               </b-button>
             </b-col>
             <b-col class="col-rit">
@@ -325,6 +284,7 @@
                 class="btn-confirm"
                 variant="warning"
                 size="lg"
+                :disabled="sendError"
                 @click="sendData('coldWallet')">Confirm
               </b-button>
             </b-col>
@@ -351,15 +311,16 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, ISSUE_FUNCIDX, BURN_FUNCIDX, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION } from '@/constants.js'
+import { CONTRACT_EXEC_FEE, ISSUE_FUNCIDX, BURN_FUNCIDX, NETWORK_BYTE } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '@/utils/browser'
-import common from '@/utils/common'
+import common from '@/js-v-sdk/src/utils/common'
+import Transaction from '@/js-v-sdk/src/transaction'
 import BigNumber from 'bignumber.js'
-import transaction from '@/utils/transaction'
 import { mapActions } from 'vuex'
+import certify from '@/utils/certify'
 export default {
     name: 'IssueOrDestroyToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -367,7 +328,6 @@ export default {
         return {
             errorMessage: '',
             amount: 0,
-            attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
             coldPageId: 5,
@@ -379,6 +339,15 @@ export default {
         }
     },
     props: {
+        chain: {
+            type: Object,
+            default: function() {}
+        },
+        account: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
         tokenBalance: {
             type: BigNumber,
             default: function() {
@@ -447,14 +416,10 @@ export default {
     },
     computed: {
         contractId() {
-            return transaction.tokenIDToContractID(this.tokenId)
+            return common.tokenIDToContractID(this.tokenId)
         },
         defaultAddress() {
             return Vue.ls.get('address')
-        },
-        defaultColdAddress() {
-            if (this.noColdAddress) return ''
-            return Object.keys(this.coldAddresses)[0]
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
@@ -469,14 +434,8 @@ export default {
         wordList() {
             return this.seedPhrase.split(' ')
         },
-        noColdAddress() {
-            return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
-        },
-        isValidAttachment() {
-            return this.attachment.length <= TRANSFER_ATTACHMENT_BYTE_LIMIT
-        },
         isSubmitDisabled() {
-            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && (this.isValidAttachment) && this.isAmountValid && !this.isInsufficient)
+            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && this.isAmountValid && !this.isInsufficient)
         },
         isAmountValid() {
             let amount = this.amount
@@ -493,29 +452,28 @@ export default {
                 return 0
             }
             if (this.functionName === 'Issue Token') {
-                return this.maxSupply - this.currentSupply
+                return this.maxSupply.minus(this.currentSupply)
             }
             if (this.functionName === 'Destroy Token') {
                 return this.tokenBalance
             }
-            return 0
+        },
+        isCertified() {
+            return certify.isCertified(this.tokenId)
+        },
+        officialName() {
+            return certify.officialName(this.tokenId)
+        },
+        officialTokenSvg() {
+            try {
+                return require('@/assets/imgs/icons/token/' + this.officialName + '.svg')
+            } catch (err) {
+                return require('@/assets/imgs/icons/wallet/ic_token1.svg')
+            }
         },
         dataObject() {
-            return {
-                protocol: PROTOCOL,
-                api: API_VERSION,
-                opc: OPC_FUNCTION,
-                address: this.address,
-                senderPublicKey: this.coldAddresses[this.address].publicKey,
-                fee: this.fee * VSYS_PRECISION,
-                feeScale: FEE_SCALE,
-                timestamp: Date.now(),
-                attachment: '',
-                contractId: this.contractId,
-                functionId: this.functionName === 'Issue Token' ? ISSUE_FUNCIDX : BURN_FUNCIDX,
-                function: transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                functionExplain: this.functionName === 'Issue Token' ? 'Issue ' + this.amount + ' Token' : 'Destroy ' + this.amount + ' Token'
-            }
+            let tra = this.buildTransaction(this.coldAddresses[this.address].publicKey)
+            return tra
         }
     },
     methods: {
@@ -526,41 +484,28 @@ export default {
         isValidIssuer(addr) {
             return addr === this.issuer
         },
+        buildTransaction(publicKey) {
+            let tra = new Transaction(NETWORK_BYTE)
+            let functionIndex = this.functionName === 'Issue Token' ? ISSUE_FUNCIDX : BURN_FUNCIDX
+            let functionData = {amount: this.amount, unity: this.tokenUnity}
+            tra.buildExecuteContractTx(publicKey, this.contractId, functionIndex, functionData, this.timeStamp)
+            return tra
+        },
         sendData(walletType) {
-            let apiSchema
+            let sendTx
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
                     return
                 }
                 this.hasConfirmed = true
-                this.fee = BigNumber(CONTRACT_EXEC_FEE)
-                this.feeScale = FEE_SCALE
-                const dataInfo = {
-                    contractId: this.contractId,
-                    senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
-                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
-                    timestamp: this.timeStamp,
-                    functionIndex: this.functionName === 'Issue Token' ? ISSUE_FUNCIDX : BURN_FUNCIDX,
-                    functionData: transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, this.functionName === 'Issue Token' ? ISSUE_FUNCIDX : BURN_FUNCIDX, transaction.prepareIssueAndBurn(BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
-                }
-                apiSchema = dataInfo
+                let builtTransaction = this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey)
+                let signature = this.account.getSignature(builtTransaction.toBytes())
+                sendTx = builtTransaction.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
-                const coldDataInfo = {
-                    contractId: this.dataObject.contractId,
-                    senderPublicKey: this.dataObject.senderPublicKey,
-                    fee: this.dataObject.fee,
-                    feeScale: this.dataObject.feeScale,
-                    timestamp: this.dataObject.timestamp,
-                    functionIndex: this.dataObject.functionId,
-                    functionData: this.dataObject.function,
-                    signature: this.coldSignature
-                }
-                apiSchema = coldDataInfo
+                let signature = this.coldSignature
+                sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
-            const url = NODE_IP + '/contract/broadcast/execute'
-            this.$http.post(url, apiSchema).then(response => {
+            this.chain.sendExecuteContractTx(sendTx).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
@@ -579,28 +524,20 @@ export default {
             })
         },
         nextPage() {
-            this.timeStamp = Date.now() * 1e6
-            this.hasConfirmed = false
-            this.pageId++
-        },
-        coldNextPage() {
             this.sendError = false
-            this.coldPageId++
+            this.hasConfirmed = false
+            if (this.walletType === 'hotWallet') {
+                this.pageId++
+                this.timeStamp = Date.now() * 1e6
+            } else {
+                this.coldPageId++
+            }
         },
         prevPage() {
             this.sendError = false
-            if (this.pageId === 1) {
-                this.$refs.sendModal.hide()
-            } else {
-                this.pageId--
-            }
-        },
-        coldPrevPage() {
-            this.sendError = false
-            if (this.coldPageId === 1) {
-                this.$refs.sendModal.hide()
-            } else {
-                this.coldPageId--
+            let pageId = this.walletType === 'hotWallet' ? --this.pageId : --this.coldPageId
+            if (pageId === 0) {
+                this.$refs.issueOrDestroyTokenModal.hide()
             }
         },
         resetPage() {
@@ -620,97 +557,10 @@ export default {
         sendBalanceChange() {
             this.$emit('updateTokenBalance', 'update')
         },
-        scanChange(evt) {
-            if (!this.qrInit) {
-                this.scanShow = !this.scanShow
-            }
-            if (this.scanShow) {
-                this.paused = false
-            }
-        },
-        async onInit(promise) {
-            try {
-                this.qrInit = true
-                await promise
-            } catch (error) {
-                if (error.name === 'NotAllowedError') {
-                    throw Error('user denied camera access permission')
-                } else if (error.name === 'NotFoundError') {
-                    throw Error('no suitable camera device installed')
-                } else if (error.name === 'NotSupportedError') {
-                    throw Error('page is not served over HTTPS (or localhost)')
-                } else if (error.name === 'NotReadableError') {
-                    throw Error('maybe camera is already in use')
-                } else if (error.name === 'OverconstarinedError') {
-                    throw Error('pass constraints do not match any camera')
-                } else {
-                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
-                }
-            } finally {
-                this.qrInit = false
-            }
-        },
-        onDecode(decodeString) {
-            this.paused = true
-            try {
-                let jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
-                this.recipient = jsonObj.address
-                let opc = jsonObj.opc
-                let api = jsonObj.api
-                let protocol = jsonObj.protocol
-                if (jsonObj.hasOwnProperty('amount')) {
-                    this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8)
-                }
-                if (jsonObj.hasOwnProperty('invoice')) {
-                    this.attachment = jsonObj.invoice
-                }
-                if (protocol !== PROTOCOL) {
-                    this.paused = false
-                    this.qrErrMsg = 'Invalid QR code protocol.'
-                } else if (api !== API_VERSION) {
-                    this.paused = false
-                    this.qrErrMsg = 'API version mismatch.'
-                } else if (opc !== OPC_ACCOUNT) {
-                    this.paused = false
-                    this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidIssuer(this.recipient) || this.recipient === '') {
-                    this.paused = false
-                    this.qrErrMsg = 'Invalid address of recipient.'
-                } else {
-                    this.qrErrMsg = void 0
-                }
-            } catch (e) {
-                if (this.isValidIssuer(decodeString)) {
-                    this.recipient = decodeString
-                } else {
-                    this.recipient = 'please scan QR code of recipient'
-                    this.paused = false
-                }
-            }
-        },
         getSignature(signature) {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
-        },
-        repaintLocation(location, ctx) {
-            if (location !== null) {
-                const {
-                    topLeftCorner,
-                    topRightCorner,
-                    bottomLeftCorner,
-                    bottomRightCorner
-                } = location
-                ctx.strokeStyle = 'orange' // instead of red
-                ctx.beginPath()
-                ctx.moveTo(topLeftCorner.x, topLeftCorner.y)
-                ctx.lineTo(bottomLeftCorner.x, bottomLeftCorner.y)
-                ctx.lineTo(bottomRightCorner.x, bottomRightCorner.y)
-                ctx.lineTo(topRightCorner.x, topRightCorner.y)
-                ctx.lineTo(topLeftCorner.x, topLeftCorner.y)
-                ctx.closePath()
-                ctx.stroke()
-            }
         },
         hideQrScan(tabIndex) {
             if (tabIndex === 0) {

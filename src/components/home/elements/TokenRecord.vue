@@ -82,6 +82,8 @@
                          :wallet-type="walletType"
                          :addresses="addresses"
                          :cold-addresses="coldAddresses"
+                         :chain="chain"
+                         :account="account"
                          :token-balance="tokenBalance"
                          :balance="balances[address]"
                          :max-supply="maxSupply"
@@ -190,6 +192,16 @@ export default {
         }
     },
     props: {
+        chain: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        account: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
         address: {
             type: String,
             default: ''

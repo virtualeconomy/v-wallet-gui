@@ -100,6 +100,8 @@
                 <div class="f-records">
                   <TokenRecords :address="selectedAddress"
                                 :addresses="addresses"
+                                :chain="chain"
+                                :account="account"
                                 :cold-addresses="coldAddresses"
                                 :wallet-type="walletType"
                                 :balances="balance"
@@ -165,7 +167,7 @@ import NavBar from './home/elements/NavBar'
 import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
-import { INITIAL_SESSION_TIMEOUT, NODE_IP, VSYS_PRECISION } from '@/constants.js'
+import { INITIAL_SESSION_TIMEOUT, NODE_IP, VSYS_PRECISION, NETWORK_BYTE } from '@/constants.js'
 import seedLib from '@/libs/seed.js'
 import TransactionRecords from './home/elements/TransactionRecords'
 import LeasePane from './home/elements/LeasePane'
@@ -176,11 +178,15 @@ import AddToken from './home/modals/AddToken'
 import BigNumber from 'bignumber.js'
 import JSONBigNumber from 'json-bignumber'
 import { mapActions } from 'vuex'
+import Blockchain from '@/js-v-sdk/src/blockchain'
+import Account from '@/js-v-sdk/src/account'
 
 export default {
     name: 'Home',
     data: function() {
         return {
+            chain: new Blockchain(NODE_IP, NETWORK_BYTE),
+            account: new Account(NETWORK_BYTE),
             balance: {},
             selectedAddress: '',
             sessionClearTimeout: void 0,
@@ -201,6 +207,7 @@ export default {
         if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
         } else {
+            this.account.buildFromSeed(this.getSeedPhrase(), 0)
             this.getBlockHeight()
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address

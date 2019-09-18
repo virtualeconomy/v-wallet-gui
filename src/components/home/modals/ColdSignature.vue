@@ -109,6 +109,10 @@ export default {
             type: Object,
             require: true,
             default: function() {}
+        },
+        coldPublicKey: {
+            type: String,
+            default: ''
         }
     },
     computed: {
@@ -223,8 +227,9 @@ export default {
                     } else {
                         data.timestamp *= 1e6
                     }
+                    data['senderPublicKey'] = this.coldPublicKey
                     if ((((dataOpc === OPC_TRANSACTION) && transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType)) ||
-                        ((dataOpc === OPC_FUNCTION) && transaction.isValidContractExecSignature(data, signature, data.senderPublicKey)) ||
+                        ((dataOpc === OPC_FUNCTION) && transaction.isValidContractExecSignature(data, signature, this.coldPublicKey)) ||
                         ((dataOpc === OPC_CONTRACT) && transaction.isValidContractSignature(data, signature, data.senderPublicKey))) && !this.qrError) {
                         var _this = this
                         setTimeout(function() {
