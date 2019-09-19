@@ -200,9 +200,9 @@
                       size="sm"
                       slot="prepend">
             <b-dropdown-item class="drop-item"
-                             @click="showAddr(addr)">address</b-dropdown-item>
+                             @click="showAddr(addr)"><span class="span">address</span></b-dropdown-item>
             <b-dropdown-item class="drop-item"
-                             @click="showKey(addr)">public key</b-dropdown-item>
+                             @click="showKey(addr)"><span class="span">public key</span></b-dropdown-item>
           </b-dropdown>
           <b-form-input readonly
                         size="sm"
@@ -307,8 +307,8 @@ export default {
     },
     created() {
         this.coldWalletNum = Object.keys(this.coldAddresses).length
-        var addrStrs = Object.keys(this.addresses)
-        for (var i = 0; i < addrStrs.length; i++) {
+        let addrStrs = Object.keys(this.addresses)
+        for (let i = 0; i < addrStrs.length; i++) {
             this.addressOptions[this.addresses[addrStrs[i]]] = addrStrs[i]
         }
         this.currentAddress = 0
@@ -316,7 +316,7 @@ export default {
     },
     computed: {
         refForCold() {
-            var coldAddressArray = Object.keys(this.coldAddresses)
+            let coldAddressArray = Object.keys(this.coldAddresses)
             return Object.keys(coldAddressArray).reduce(function(obj, key) {
                 obj[coldAddressArray[key]] = key
                 return obj
@@ -399,7 +399,7 @@ export default {
             }, 400)
         },
         copyColdText(addr) {
-            var index = this.refForCold[addr]
+            let index = this.refForCold[addr]
             this.$refs.coldToCopy[index].select()
             window.document.execCommand('copy')
             this.$root.$emit('bv::show::popover', addr)
@@ -426,8 +426,7 @@ export default {
     width: 100px;
 }
 .drop-item {
-    padding: 0px 10px;
-    width: 100px;
+    width: 85px;
 }
 .btn-close {
     position: absolute;
@@ -472,6 +471,9 @@ export default {
     border: 1px solid #ced4da;
     border-left: none;
     background-color: #fafafa;
+}
+.span {
+    margin-left: -15px;
 }
 .hidden {
     font-size: 12pt;
