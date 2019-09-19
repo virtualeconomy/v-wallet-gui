@@ -148,7 +148,7 @@
 
 <script>
 import BigNumber from 'bignumber.js'
-import { TOKEN_FEE } from '@/constants'
+import { CONTRACT_EXEC_FEE } from '@/constants'
 export default {
     name: 'TokenConfirm',
     props: {
@@ -176,7 +176,7 @@ export default {
             type: BigNumber,
             require: true,
             default: function() {
-                return BigNumber(TOKEN_FEE)
+                return BigNumber(CONTRACT_EXEC_FEE)
             }
         },
         txType: {

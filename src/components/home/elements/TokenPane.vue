@@ -51,17 +51,17 @@
           :wallet-type="walletType"></Send>
     <Receive show="false"
              :address="address"></Receive>
-    <NewToken show="false"
-              :balances="balances"
-              :cold-addresses="coldAddresses"
-              :addresses="addresses"
-              :selected-address="address"
-              :wallet-type="walletType"></NewToken>
+    <CreateToken show="false"
+                 :balances="balances"
+                 :cold-addresses="coldAddresses"
+                 :addresses="addresses"
+                 :selected-address="address"
+                 :wallet-type="walletType"></CreateToken>
   </div>
 </template>
 
 <script>
-import NewToken from '../modals/NewToken'
+import CreateToken from '../modals/CreateToken'
 import Receive from '../modals/Receive'
 import Send from '../modals/Send'
 import browser from '@/utils/browser'
@@ -71,7 +71,7 @@ import { mapState } from 'vuex'
 export default {
     name: 'TokenPane',
     components: {
-        NewToken, Receive, Send
+        CreateToken, Receive, Send
     },
     data() {
         return {
@@ -134,7 +134,7 @@ export default {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {
-                this.$root.$emit('bv::show::modal', 'newTokenModal')
+                this.$root.$emit('bv::show::modal', 'createTokenModal')
             }
         }
     }

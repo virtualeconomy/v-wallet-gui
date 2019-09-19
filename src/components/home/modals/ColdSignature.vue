@@ -126,7 +126,7 @@ export default {
                 background: '#ffffff',
                 foreground: '#000000'
             }
-            var text = ''
+            let text = ''
             if (this.qrTotalPage === 1) {
                 let data = JSON.parse(JSON.stringify(this.dataObject))
                 if (data.opc === OPC_FUNCTION) {
@@ -135,9 +135,6 @@ export default {
                 text = JSON.stringify(data).replace(/"amount":"(\d+)"/g, '"amount":$1')
             } else {
                 let tempData = JSON.parse(JSON.stringify(this.dataObject))
-                if (tempData.opc === OPC_CONTRACT) {
-                    delete tempData.senderPublicKey
-                }
                 let checkSum = crypto.sha256ForCheckSum(JSON.stringify(tempData))
                 text = 'Seg/' + (this.qrPage + 1) + '/' + this.qrTotalPage + '/' + checkSum + '/'
                 text += this.qrArray[this.qrPage]
@@ -202,23 +199,23 @@ export default {
             this.sgError = false
             this.opcError = false
             try {
-                var jsonObj = JSON.parse(decodeString)
-                var opc = jsonObj.opc
-                var api = jsonObj.api
-                var protocol = jsonObj.protocol
-                var signature = jsonObj.signature
+                let jsonObj = JSON.parse(decodeString)
+                let opc = jsonObj.opc
+                let api = jsonObj.api
+                let protocol = jsonObj.protocol
+                let signature = jsonObj.signature
                 if (!signature) {
                     this.paused = false
                     this.sgError = true
                     this.qrError = true
                 } else {
-                    var data = JSON.parse(JSON.stringify(this.dataObject))
+                    let data = JSON.parse(JSON.stringify(this.dataObject))
                     if (api > API_VERSION) this.apiError = true
                     if (protocol !== PROTOCOL) this.protocolError = true
                     if (opc !== OPC_SIGNATURE) this.opcError = true
                     delete data.transactionType
                     delete data.api
-                    var dataOpc = data.opc
+                    let dataOpc = data.opc
                     delete data.opc
                     delete data.protocol
                     if (dataOpc === OPC_FUNCTION || dataOpc === OPC_CONTRACT) {
@@ -230,8 +227,8 @@ export default {
                     data['senderPublicKey'] = this.coldPublicKey
                     if ((((dataOpc === OPC_TRANSACTION) && transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType)) ||
                         ((dataOpc === OPC_FUNCTION) && transaction.isValidContractExecSignature(data, signature, this.coldPublicKey)) ||
-                        ((dataOpc === OPC_CONTRACT) && transaction.isValidContractSignature(data, signature, data.senderPublicKey))) && !this.qrError) {
-                        var _this = this
+                        ((dataOpc === OPC_CONTRACT) && transaction.isValidContractSignature(data, signature, this.coldPublicKey))) && !this.qrError) {
+                        let _this = this
                         setTimeout(function() {
                             _this.$emit('get-signature', signature)
                         }, 300)

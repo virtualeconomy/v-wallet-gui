@@ -330,8 +330,7 @@ export default {
             amount: 0,
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
-            coldPageId: 5,
-            scanShow: false,
+            coldPageId: 1,
             sendError: false,
             coldSignature: '',
             timeStamp: Date.now() * 1e6,
@@ -511,8 +510,8 @@ export default {
                 for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                     setTimeout(this.sendBalanceChange, delayTime)
                 }
-            }, response => {
-                this.errorMessage = response.body.message
+            }, respErr => {
+                this.errorMessage = respErr.message
                 if (this.errorMessage === undefined) {
                     this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
                 }
@@ -540,12 +539,10 @@ export default {
             this.amount = 0
             this.pageId = 1
             this.coldPageId = 1
-            this.scanShow = false
-            this.qrInit = false
-            this.paused = false
-            this.qrErrMsg = void 0
             this.sendError = false
             this.coldSignature = ''
+            this.errorMessage = ''
+            this.hasConfirmed = false
         },
         endSend() {
             this.$refs.issueOrDestroyTokenModal.hide()
@@ -566,7 +563,6 @@ export default {
                 this.resetPage()
                 this.coldPageId = 1
             }
-            this.scanShow = false
         },
         isNumFormatValid(amount) {
             return common.isNumFormatValid(amount)
