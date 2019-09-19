@@ -46,19 +46,19 @@
                       class="input-t"
                       v-model="amount"
                       aria-describedby="inputLiveFeedback"
-                      :state="isAmountValid(amount)"
+                      :state="isValidAmount"
                       min="0">
         </b-form-input>
         <b-form-invalid-feedback id="inputLiveFeedback"
-                                 v-if="!checkPrecision(amount)">
+                                 v-if="!checkPrecision">
           The number in this field is invalid. The minimum unit of amount is 0.00000001.
         </b-form-invalid-feedback>
         <b-form-invalid-feedback id="inputLiveFeedback"
-                                 v-else-if="isNegative(amount)">
+                                 v-else-if="isNegative">
           Negative number is not allowed.
         </b-form-invalid-feedback>
         <b-form-invalid-feedback id="inputLiveFeedback"
-                                 v-else-if="!isNumFormatValid(amount)">
+                                 v-else-if="!isValidNumFormat">
           Invalid format.
         </b-form-invalid-feedback>
         <b-form-invalid-feedback id="inputLiveFeedback"
@@ -98,7 +98,7 @@
 import jrQrcode from 'jr-qrcode'
 import { PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION, TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants.js'
 import BigNumber from 'bignumber.js'
-import common from '@/utils/common'
+import common from '@/js-v-sdk/src/utils/common'
 export default {
     name: 'Receive',
     props: {
@@ -130,6 +130,21 @@ export default {
             }
             return common.getLength(this.invoice) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
+        isValidAmount() {
+            if (BigNumber(this.amount).isEqualTo(0)) {
+                return void 0
+            }
+            return this.checkPrecision && this.isValidNumFormat && !this.isNegative
+        },
+        isNegative() {
+            return BigNumber(this.amount).isLessThan(0)
+        },
+        isValidNumFormat() {
+            return common.isNumFormatValid(this.amount)
+        },
+        checkPrecision() {
+            return common.checkPrecision(this.amount, 8)
+        },
         getQrCodeImg() {
             const options = {
                 padding: 10,
@@ -143,7 +158,7 @@ export default {
             if (common.getLength(this.invoice) > TRANSFER_ATTACHMENT_BYTE_LIMIT || this.invoice === '') {
                 delete this.receivedObject.invoice
             }
-            if (!this.isAmountValid(this.amount)) {
+            if (!this.isValidAmount) {
                 delete this.receivedObject.amount
             }
             const text = JSON.stringify(this.receivedObject).replace(/"amount":"(\d+)"/g, '"amount":$1') // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
@@ -170,21 +185,6 @@ export default {
         },
         closeModal() {
             this.$refs.receiveModal.hide()
-        },
-        isAmountValid(amount) {
-            if (BigNumber(amount).isEqualTo(0)) {
-                return void 0
-            }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isNegative(amount)
-        },
-        isNegative(amount) {
-            return BigNumber(amount).isLessThan(0)
-        },
-        isNumFormatValid(amount) {
-            return common.isNumFormatValid(amount)
-        },
-        checkPrecision(amount) {
-            return common.checkPrecision(amount, 8)
         },
         copyAddr() {
             this.$refs.addrToCopy.select()

@@ -567,6 +567,11 @@ export default {
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
             this.chain.sendRegisterContractTx(sendTx).then(response => {
+                if (response.hasOwnProperty('error')) {
+                    this.errorMessage = response.message
+                    this.sendError = true
+                    return
+                }
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
