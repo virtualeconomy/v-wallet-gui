@@ -62,9 +62,10 @@
 import Settings from '../modals/Settings'
 import Account from '../modals/Account'
 import About from '../modals/About'
-import {NETWORK_BYTE, NODE_IP} from '@/constants.js'
+import { NETWORK_BYTE } from '@/constants.js'
 import Vue from 'vue'
 import jdenticon from '@/libs/jdenticon-2.1.0'
+import { mapState } from 'vuex'
 
 export default {
     name: 'NavBar',
@@ -132,7 +133,6 @@ export default {
         return {
             networkType: '',
             interval: 0,
-            response: '',
             currentTime: '',
             showHeight: false,
             currentHeight: 0
@@ -150,6 +150,9 @@ export default {
         jdenticon()
     },
     computed: {
+        ...mapState({
+            chain: 'chain'
+        })
     },
     beforeDestroy() {
         if (this.interval) {
@@ -159,15 +162,13 @@ export default {
     },
     methods: {
         getBlockHeight() {
-            const url = NODE_IP + '/blocks/last'
-            this.$http.get(url).then(response => {
-                this.response = response.body
-                let tempTime = new Date(this.response.timestamp / 1e6).toLocaleString()
-                window.localStorage.setItem('globalHeight', this.response.height)
+            this.chain.getLastBlock().then(response => {
+                let tempTime = new Date(response.timestamp / 1e6).toLocaleString()
+                window.localStorage.setItem('globalHeight', response.height)
                 window.localStorage.setItem('time', tempTime)
-                this.currentHeight = this.response.height
+                this.currentHeight = response.height
                 this.currentTime = tempTime
-            }, response => {
+            }, respErr => {
             })
         },
         getHeightStatus() {
