@@ -65,23 +65,23 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid"
+                          :state="isValidAmount"
                           onfocus="this.select()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!isNumFormatValid(amount)">
+                                     v-if="!isValidNumFormat">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount)">
+                                     v-else-if="!checkPrecision">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
+                                     v-else-if="isNegative">
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isBiggerThanMax(amount)">
+                                     v-else-if="isBiggerThanMax">
               Please reduce Unity scale.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -219,23 +219,23 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid"
+                          :state="isValidAmount"
                           onfocus="this.select()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!isNumFormatValid(amount)">
+                                     v-if="!isValidNumFormat">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount)">
+                                     v-else-if="!checkPrecision">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
+                                     v-else-if="isNegative">
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isBiggerThanMax(amount)">
+                                     v-else-if="isBiggerThanMax">
               Please reduce Unity scale.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -397,7 +397,7 @@ var initData = {
     timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     tokenId: '',
-    mutableWalletType: this ? this.walletType : 'hotWallet',
+    selectedWalletType: this ? this.walletType : 'hotWallet',
     contractDescription: '',
     tokenDescription: ''
 }
@@ -441,11 +441,6 @@ export default {
             account: 'account',
             tokenSplitStatus: 'tokenSplitStatus'
         }),
-        contractId() {
-            return function(tokenId) {
-                return common.tokenIDToContractID(tokenId)
-            }
-        },
         defaultAddress() {
             return Vue.ls.get('address')
         },
@@ -472,17 +467,31 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(!this.isInsufficient && (this.isValidDescription(this.contractDescription) || !this.contractDescription) && (this.isValidDescription(this.tokenDescription) || !this.tokenDescription) && this.isAmountValid)
+            return !(!this.isInsufficient && (this.isValidDescription(this.contractDescription) || !this.contractDescription) && (this.isValidDescription(this.tokenDescription) || !this.tokenDescription) && this.isValidAmount)
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
-        isAmountValid() {
-            let amount = this.amount
-            if (BigNumber(amount).isEqualTo(0) || this.isInsufficient) {
+        isNegative() {
+            return BigNumber(this.amount).isLessThan(0)
+        },
+        isBiggerThanMax() {
+            let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
+            let unityValue = BigNumber(10).exponentiatedBy(this.unity)
+            let value = BigNumber(this.amount).multipliedBy(unityValue)
+            return value.isGreaterThan(maxValue)
+        },
+        isValidNumFormat() {
+            return common.isNumFormatValid(this.amount)
+        },
+        checkPrecision() {
+            return common.checkPrecision(this.amount, this.unity)
+        },
+        isValidAmount() {
+            if (BigNumber(this.amount).isEqualTo(0) || this.isInsufficient) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isBiggerThanMax(amount) && !this.isNegative(amount)
+            return this.checkPrecision && this.isValidNumFormat && !this.isBiggerThanMax && !this.isNegative
         },
         isValidDescription() {
             return function(description) {
@@ -493,7 +502,7 @@ export default {
             }
         },
         isInsufficient() {
-            let balance = this.mutableWalletType === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
+            let balance = this.selectedWalletType === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
             return BigNumber(balance).isLessThan(BigNumber(CONTRACT_REGISTER_FEE))
         },
         dataObject() {
@@ -522,7 +531,7 @@ export default {
             this.qrArray = textArray
         },
         changeIcon() {
-            let imgId = this.mutableWalletType === 'hotWallet' ? 'img_read' : 'img_read_cold'
+            let imgId = this.selectedWalletType === 'hotWallet' ? 'img_read' : 'img_read_cold'
             if (this.support === false) {
                 document.getElementById(imgId).src = imgread2
                 this.support = true
@@ -599,7 +608,7 @@ export default {
         nextPage() {
             this.sendError = false
             this.hasConfirmed = false
-            if (this.mutableWalletType === 'hotWallet') {
+            if (this.selectedWalletType === 'hotWallet') {
                 this.pageId++
                 this.timeStamp = Date.now() * 1e6
             } else {
@@ -608,7 +617,7 @@ export default {
         },
         prevPage() {
             this.sendError = false
-            let pageId = this.mutableWalletType === 'hotWallet' ? --this.pageId : --this.coldPageId
+            let pageId = this.selectedWalletType === 'hotWallet' ? --this.pageId : --this.coldPageId
             if (pageId === 0) {
                 this.$refs.createTokenModal.hide()
             }
@@ -625,7 +634,7 @@ export default {
             this.support = false
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
-            this.mutableWalletType = this.walletType
+            this.selectedWalletType = this.walletType
             this.contractDescription = ''
             this.tokenDescription = ''
         },
@@ -651,7 +660,7 @@ export default {
                     this.changeEventPool(eventPool)
                 }
             } else {
-                this.chain.getTokenInfo(tokenId).then(response => {
+                this.chain.getContractInfo(common.tokenIDToContractID(tokenId)).then(response => {
                     Vue.set(tokens, tokenId, response.info[1].data)
                     this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
                     this.changeAddTokenStatus()
@@ -666,34 +675,17 @@ export default {
         },
         getSignature(signature) {
             this.coldSignature = signature
-            this.dataObject.timestamp *= 1e6
             this.coldPageId++
         },
         hideQrScan(tabIndex) {
+            this.resetPage()
             if (tabIndex === 0) {
-                this.resetPage()
-                this.mutableWalletType = 'hotWallet'
+                this.selectedWalletType = 'hotWallet'
                 this.pageId = 1
             } else {
-                this.resetPage()
-                this.mutableWalletType = 'coldWallet'
+                this.selectedWalletType = 'coldWallet'
                 this.coldPageId = 1
             }
-        },
-        isNegative(amount) {
-            return BigNumber(amount).isLessThan(0)
-        },
-        isBiggerThanMax(amount) {
-            let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
-            let unityValue = BigNumber(10).exponentiatedBy(this.unity)
-            let value = BigNumber(amount).multipliedBy(unityValue)
-            return value.isGreaterThan(maxValue)
-        },
-        isNumFormatValid(amount) {
-            return common.isNumFormatValid(amount)
-        },
-        checkPrecision(amount) {
-            return common.checkPrecision(amount, this.unity)
         },
         options(addrs) {
             return Object.keys(addrs).reduce((options, addr) => {

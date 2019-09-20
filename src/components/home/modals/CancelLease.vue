@@ -239,7 +239,7 @@ export default {
             this.$refs.cancelLeaseModal.hide()
         },
         sendCancelLease() {
-            var apiSchema
+            let apiSchema
             if (this.walletType === 'coldWallet') {
                 if (!this.signed) {
                     this.page = 'cold'

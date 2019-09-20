@@ -574,7 +574,7 @@ export default {
             return this.checkPrecision && this.isValidNumFormat && !this.isInsufficient && !this.isNegative
         },
         isSubmitDisabled() {
-            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && this.isValidDescription && this.isValidAmount && this.address !== '')
+            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && (this.isValidDescription || this.description === '') && this.isValidAmount && this.address !== '')
         },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddressInfo.publicKey)
@@ -749,6 +749,7 @@ export default {
                     this.qrErrMsg = void 0
                 }
             } catch (e) {
+                this.recipient = decodeString
                 if (this.isValidRecipient) {
                     recipient = decodeString
                 } else {
