@@ -314,9 +314,10 @@
         </b-container>
         <b-container v-if="coldPageId===3"
                      class="text-left">
-          <ColdSignature :data-object="dataObject"
+          <ColdSignature :data-object="dataObject.toJsonForColdSignature()"
                          :qr-total-page="1"
                          v-if="coldPageId===3"
+                         :cold-public-key = "coldAddresses[address].publicKey"
                          @get-signature="getSignature"
                          @next-page="nextPage"
                          @prev-page="prevPage"></ColdSignature>
@@ -373,15 +374,15 @@
 import crypto from '@/utils/crypto'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, SPLIT_FUNCIDX, SUPERSEDE_FUNCIDX, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT, OPC_FUNCTION } from '@/constants.js'
+import { NETWORK_BYTE, CONTRACT_EXEC_FEE, SPLIT_FUNCIDX, SUPERSEDE_FUNCIDX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '@/utils/browser'
-import common from '@/utils/common'
+import common from '@/js-v-sdk/src/utils/common'
+import Transaction from '@/js-v-sdk/src/transaction'
 import BigNumber from 'bignumber.js'
-import transaction from '@/utils/transaction'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 export default {
     name: 'SplitTokenOrSupersede',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -390,7 +391,6 @@ export default {
             errorMessage: '',
             newUnity: 0,
             newIssuer: '',
-            attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
             coldPageId: 5,
@@ -475,8 +475,12 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            chain: 'chain',
+            account: 'account'
+        }),
         contractId() {
-            return transaction.tokenIDToContractID(this.tokenId)
+            return common.tokenIDToContractID(this.tokenId)
         },
         defaultAddress() {
             return Vue.ls.get('address')
@@ -544,62 +548,36 @@ export default {
             return BigNumber(this.newUnity).isInteger()
         },
         dataObject() {
-            return {
-                protocol: PROTOCOL,
-                api: this.functionName === 'Split Token' ? API_VERSION : this.coldApi(),
-                opc: OPC_FUNCTION,
-                address: this.address,
-                senderPublicKey: this.coldAddresses[this.address].publicKey,
-                fee: this.fee * VSYS_PRECISION,
-                feeScale: FEE_SCALE,
-                timestamp: Date.now(),
-                attachment: '',
-                contractId: this.contractId,
-                functionId: this.functionName === 'Split Token' ? SPLIT_FUNCIDX : SUPERSEDE_FUNCIDX,
-                function: this.functionName === 'Split Token' ? transaction.prepareSplit(BigNumber(this.newUnity)) : transaction.prepareSupersede(this.newIssuer),
-                functionExplain: (this.functionName === 'Split Token' ? 'Set token unity to ' + this.newUnity : 'Set issuer to ' + this.newIssuer)
-            }
+            let tra = this.buildTransaction(this.coldAddresses[this.address].publicKey)
+            return tra
         }
     },
     methods: {
         ...mapActions(['updateBalance']),
-        coldApi() {
-            return API_VERSION
+        buildTransaction(publicKey) {
+            let tra = new Transaction(NETWORK_BYTE)
+            let functionIndex = this.functionName === 'Split Token' ? SPLIT_FUNCIDX : SUPERSEDE_FUNCIDX
+            let functionData = this.functionName === 'Split Token' ? {'new_unity': BigNumber(this.newUnity)} : {'new_issuer': (this.newIssuer)}
+            tra.buildExecuteContractTx(publicKey, this.contractId, functionIndex, functionData, this.timeStamp)
+            return tra
         },
         sendData(walletType) {
-            let apiSchema
+            let sendTx
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
                     return
                 }
                 this.fee = BigNumber(CONTRACT_EXEC_FEE)
                 this.feeScale = FEE_SCALE
-                const dataInfo = {
-                    contractId: this.contractId,
-                    senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
-                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
-                    timestamp: this.timeStamp,
-                    functionIndex: this.functionName === 'Split Token' ? SPLIT_FUNCIDX : SUPERSEDE_FUNCIDX,
-                    functionData: this.functionName === 'Split Token' ? transaction.prepareSplit(BigNumber(this.newUnity)) : transaction.prepareSupersede(this.newIssuer),
-                    signature: transaction.prepareExecContractSignature(this.contractId, this.functionName === 'Split Token' ? SPLIT_FUNCIDX : SUPERSEDE_FUNCIDX, this.functionName === 'Split Token' ? transaction.prepareSplit(BigNumber(this.newUnity)) : transaction.prepareSupersede(this.newIssuer), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
-                }
-                apiSchema = dataInfo
+                let builtTransaction = this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey)
+                this.account.buildFromPrivateKey(this.getKeypair(this.addresses[this.address]).privateKey)
+                let signature = this.account.getSignature(builtTransaction.toBytes())
+                sendTx = builtTransaction.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
-                const coldDataInfo = {
-                    contractId: this.dataObject.contractId,
-                    senderPublicKey: this.dataObject.senderPublicKey,
-                    fee: this.dataObject.fee,
-                    feeScale: this.dataObject.feeScale,
-                    timestamp: this.dataObject.timestamp,
-                    functionIndex: this.dataObject.functionId,
-                    functionData: this.dataObject.function,
-                    signature: this.coldSignature
-                }
-                apiSchema = coldDataInfo
+                let signature = this.coldSignature
+                sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
-            const url = NODE_IP + '/contract/broadcast/execute'
-            this.$http.post(url, apiSchema).then(response => {
+            this.chain.sendExecuteContractTx(sendTx).then(response => {
                 if (walletType === 'hotWallet') {
                     this.pageId++
                     this.hasConfirmed = true
