@@ -112,28 +112,21 @@
                   :is-split="isSplit"
                   @updateToken="updateToken">
     </DepositToken>
-    <Supersede :issuer="issuer"
-               :token-id="tokenId"
-               :maker="maker"
-               :address="address"
-               :wallet-type="walletType"
-               :addresses="addresses"
-               :cold-addresses="coldAddresses"
-               :balance="balances[address]">
-    </Supersede>
-    <SplitToken :token-id="tokenId"
-                :issuer="issuer"
-                :address="address"
-                :wallet-type="walletType"
-                :addresses="addresses"
-                :cold-addresses="coldAddresses"
-                :token-balance="tokenBalance"
-                :balance="balances[address]"
-                :token-unity="unity"
-                :max-supply="maxSupply"
-                :is-split="isSplit"
-                @updateToken="updateToken">
-    </SplitToken>
+    <SplitTokenOrSupersede :issuer="issuer"
+                           :token-id="tokenId"
+                           :maker="maker"
+                           :address="address"
+                           :wallet-type="walletType"
+                           :addresses="addresses"
+                           :cold-addresses="coldAddresses"
+                           :balance="balances[address]"
+                           :token-unity="unity"
+                           :function-name="functionName"
+                           :max-supply="maxSupply"
+                           :is-split="isSplit"
+                           :token-balance="tokenBalance"
+                           @updateToken="updateToken">
+    </SplitTokenOrSupersede>
     <SendToken :token-id="tokenId"
                :token-balances="tokenBalances"
                :balances="balances"
@@ -157,8 +150,7 @@ import SendToken from './SendToken'
 import WithdrawToken from './WithdrawToken'
 import BigNumber from 'bignumber.js'
 import IssueOrDestroyToken from './IssueOrDestroyToken'
-import Supersede from './Supersede'
-import SplitToken from './SplitToken'
+import SplitTokenOrSupersede from './SplitTokenOrSupersede'
 import DepositToken from './DepositToken'
 import { SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
 import Vue from 'vue'
@@ -167,7 +159,7 @@ import certify from '@/utils/certify'
 import { mapState } from 'vuex'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, Supersede, SplitToken, WithdrawToken, DepositToken, IssueOrDestroyToken },
+    components: { TokenInfoModal, SendToken, SplitTokenOrSupersede, WithdrawToken, DepositToken, IssueOrDestroyToken },
     data: function() {
         return {
             isSplit: false,
@@ -386,16 +378,18 @@ export default {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {
+                this.functionName = 'Supersede'
                 this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'supersedeModal_' + this.tokenId)
+                this.$root.$emit('bv::show::modal', 'splitTokenOrSupersedeModal_' + this.tokenId)
             }
         },
         splitToken() {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {
+                this.functionName = 'Split Token'
                 this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'splitTokenModal_' + this.tokenId)
+                this.$root.$emit('bv::show::modal', 'splitTokenOrSupersedeModal_' + this.tokenId)
             }
         },
         issueToken() {
