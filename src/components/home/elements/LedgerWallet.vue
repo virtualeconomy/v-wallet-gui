@@ -3,7 +3,7 @@
        ref="ledgerWalletModal"
        class="ledgerWallet">
     <div class="black-title">
-      Minitor Ledger Hardware Device
+      Monitor Ledger Hardware Device
     </div>
     <div class="small-title">Please connect Ledger hardware device with USB as shown in the picture blow and enter VSYS app
     </div>
@@ -33,8 +33,7 @@
           :show="dismissCountDown"
           dismissible
           @dismissed="dismissCountDown=0"
-          @dismiss-count-down="countDownChanged"
-        >
+          @dismiss-count-down="countDownChanged">
           {{ alertMessage }}
         </b-alert>
       </div>

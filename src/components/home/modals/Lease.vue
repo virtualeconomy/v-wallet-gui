@@ -20,7 +20,7 @@
                       @get-data="getData"
                       v-if="pageId===1"
                       :addresses="addresses"
-                      :wallet-type="'hot'"
+                      :wallet-type="'hotWallet'"
                       :default-address="defaultAddress"
                       :default-cold-address="defaultColdAddress"
                       ref="addrInput"
@@ -67,9 +67,9 @@
                :disabled="noColdAddress"
                :active="selectedWalletType==='coldWallet'">
           <LeaseInput :balances="balances"
-                      @get-cold-data="getColdData"
+                      @get-data="getData"
                       v-if="coldPageId===1"
-                      :wallet-type="'cold'"
+                      :wallet-type="'coldWallet'"
                       :cold-addresses="coldAddresses"
                       :default-address="defaultAddress"
                       :default-cold-address="defaultColdAddress"
@@ -78,9 +78,9 @@
                       :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="coldPageId===2">
             <Confirm :tx-type="'lease'"
-                     :amount=inputAmount(coldAmount)
+                     :amount=inputAmount(amount)
                      :address="coldAddress"
-                     :recipient="coldRecipient"
+                     :recipient="recipient"
                      :fee="fee"></Confirm>
             <b-row>
               <b-col class="col-lef">
@@ -105,7 +105,7 @@
           </b-container>
           <b-container v-if="coldPageId===3 && getDevice === 'Ledger'"
                        class="text-left">
-            <LedgerConfirm :tx-info="dataObject"
+            <LedgerConfirm :tx-info="dataObject.toJsonForColdSignature()"
                            :address-info="coldAddressInfo"
                            @get-signature="getSignature"
                            @prev-page="prevPage"></LedgerConfirm>
@@ -123,16 +123,16 @@
           </b-container>
           <b-container v-else-if="coldPageId===3"
                        class="text-left">
-            <ColdSignature :data-object="dataObject"
+            <ColdSignature :data-object="dataObject.toJsonForColdSignature()"
                            v-if="coldPageId===3"
                            @get-signature="getSignature"
                            @prev-page="prevColdPage"></ColdSignature>
           </b-container>
           <b-container v-else-if="coldPageId===4">
             <Confirm :tx-type="'lease'"
-                     :amount=inputAmount(coldAmount)
+                     :amount=inputAmount(amount)
                      :address="coldAddress"
-                     :recipient="coldRecipient"
+                     :recipient="recipient"
                      :fee="fee"></Confirm>
             <p v-show="sendError"
                class="text-danger">
@@ -160,7 +160,7 @@
             </b-row>
           </b-container>
           <LeaseSuccess v-else-if="coldPageId===5"
-                        :amount=inputAmount(coldAmount)
+                        :amount=inputAmount(amount)
                         @show-details="showDetails"></LeaseSuccess>
         </b-tab>
       </b-tabs>
@@ -179,29 +179,24 @@
 
 <script>
 import LeaseInput from './LeaseInput'
+import Transaction from '@/js-v-sdk/src/transaction'
 import Confirm from './Confirm'
 import ColdSignature from './ColdSignature'
 import Vue from 'vue'
-import { TX_FEE, VSYS_PRECISION, LEASE_TX, NODE_IP, FEE_SCALE, API_VERSION, OPC_TRANSACTION, PROTOCOL } from '@/constants'
-import transaction from '@/utils/transaction'
+import { TX_FEE, VSYS_PRECISION, NETWORK_BYTE } from '@/constants'
 import seedLib from '@/libs/seed'
 import LeaseSuccess from './LeaseSuccess'
 import TxInfoModal from '../elements/TxInfoModal'
 import BigNumber from 'bignumber.js'
-import JSONBigNumber from 'json-bignumber'
 import LedgerConfirm from './LedgerConfirm'
-import { mapActions } from 'vuex'
-import base58 from '@/libs/base58'
-import crypto from '@/utils/crypto'
+import { mapActions, mapState } from 'vuex'
 export default {
     name: 'Lease',
     components: { LeaseSuccess, Confirm, LeaseInput, ColdSignature, TxInfoModal, LedgerConfirm },
     data: function() {
         return {
             amount: BigNumber(0),
-            coldAmount: BigNumber(0),
             recipient: '',
-            coldRecipient: '',
             pageId: 1,
             coldPageId: 1,
             fee: BigNumber(TX_FEE),
@@ -217,8 +212,7 @@ export default {
             timestamp: 0,
             hasConfirmed: false,
             isRaisingLease: 'true',
-            errorMessage: '',
-            attachment: ''
+            errorMessage: ''
         }
     },
     props: {
@@ -249,6 +243,10 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            chain: 'chain',
+            account: 'account'
+        }),
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
         },
@@ -266,18 +264,8 @@ export default {
             return ''
         },
         dataObject() {
-            return {
-                protocol: PROTOCOL,
-                opc: OPC_TRANSACTION,
-                transactionType: LEASE_TX,
-                senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
-                amount: BigNumber(this.coldAmount).multipliedBy(VSYS_PRECISION).toFixed(0),
-                fee: this.fee * VSYS_PRECISION,
-                feeScale: FEE_SCALE,
-                recipient: this.coldRecipient,
-                timestamp: Date.now(),
-                api: this.coldApi()
-            }
+            let tra = this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
+            return tra
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -301,35 +289,25 @@ export default {
         inputAmount(num) {
             return BigNumber(num)
         },
-        coldApi() {
-            if (this.coldAddresses[this.coldAddress].api === 1 && (BigNumber(this.coldAmount).isLessThan(BigNumber(Number.MAX_SAFE_INTEGER).dividedBy(1e8)) || BigNumber(this.coldAmount).multipliedBy(1e8).mod(100).isEqualTo(0))) {
-                return 1
-            } else {
-                return API_VERSION
-            }
-        },
         closeModal() {
             this.$refs.leaseModal.hide()
         },
-        getData(recipient, amount, address) {
+        getData(recipient, amount, address, walletType) {
             this.recipient = recipient
             this.amount = BigNumber(amount)
-            this.address = address
-            this.timestamp = Date.now() * 1e6
-            this.hasConfirmed = false
-            this.pageId++
-        },
-        getColdData(recipient, amount, coldAddress) {
-            this.coldRecipient = recipient
-            this.coldAmount = BigNumber(amount)
-            this.coldAddress = coldAddress
-            this.coldPageId++
+            if (walletType === 'hotWallet') {
+                this.address = address
+                this.timestamp = Date.now() * 1e6
+                this.hasConfirmed = false
+                this.pageId++
+            } else {
+                this.coldAddress = address
+                this.coldPageId++
+            }
         },
         resetPage() {
             this.amount = BigNumber(0)
-            this.coldAmount = BigNumber(0)
             this.recipient = ''
-            this.coldRecipient = ''
             this.pageId = 1
             this.coldPageId = 1
             this.fee = BigNumber(TX_FEE)
@@ -349,49 +327,48 @@ export default {
             this.sendError = false
             this.coldPageId++
         },
+        buildTransaction(publicKey) {
+            let tra = new Transaction(NETWORK_BYTE)
+            tra.buildLeasingTx(publicKey, this.recipient, this.amount, this.timeStamp)
+            return tra
+        },
         sendData(walletType) {
-            var apiSchema
+            let sendTx
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
                     return
                 }
                 this.hasConfirmed = true
-                const dataInfo = {
-                    recipient: this.recipient,
-                    amount: BigNumber(this.amount).multipliedBy(VSYS_PRECISION).toFixed(0),
-                    fee: TX_FEE * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
-                    timestamp: this.timestamp
-                }
-                apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(this.addresses[this.address]), LEASE_TX)
+                let builtTransaction = this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey)
+                this.account.buildFromPrivateKey(this.getKeypair(this.addresses[this.address]).privateKey)
+                let signature = this.account.getSignature(builtTransaction.toBytes())
+                sendTx = builtTransaction.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
-                apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldAddresses[this.coldAddress].publicKey, LEASE_TX)
+                let signature = this.coldSignature
+                sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
-            const url = NODE_IP + '/leasing/broadcast/lease'
-            apiSchema = JSON.stringify(apiSchema).replace(/"amount":"(\d+)"/g, '"amount":$1') // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. But when BigNumber serializes to JSON, it is written in string. We need remove quotes (") here to transfer to Long type in JSON.
-            this.$http.post(url, apiSchema).then(response => {
-                this.txId = response.body.id
-                this.txAddress = crypto.buildRawAddress(base58.decode(response.body.proofs[0].publicKey))
-                this.txRecipient = response.body.recipient
-                this.txTimestamp = response.body.timestamp
-                this.txAmount = JSONBigNumber.parse(response.bodyText).amount.dividedBy(VSYS_PRECISION)
+            this.chain.sendLeasingTx(sendTx).then(response => {
+                this.txId = response.id
+                this.txAddress = response.proofs[0].address
+                this.txRecipient = response.recipient
+                this.txTimestamp = response.timestamp
+                this.txAmount = BigNumber(response.amount).dividedBy(VSYS_PRECISION)
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
                     this.coldPageId++
                 }
                 this.updateBalance(true)
-            }, response => {
-                this.errorMessage = response.body.message
+            }, respErr => {
+                this.errorMessage = respErr.message
                 if (this.errorMessage === undefined) {
                     this.errorMessage = 'Unknown.Please check network connection!'
                 }
                 this.sendError = true
             })
         },
-        getSignature(signature, timestamp) {
+        getSignature(signature) {
             this.coldSignature = signature
-            this.dataObject.timestamp *= 1e6
             this.coldPageId++
         },
         showDetails() {
