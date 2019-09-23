@@ -22,18 +22,10 @@
           v-if="pageId===1">
           <b-form-group :label="functionName === 'Split Token' ? 'Issuer Wallet Address' : 'Maker Wallet Address'"
                         label-for="address-input">
-            <b-form-input v-if="functionName === 'Split Token'"
-                          id=address-input
+            <b-form-input id=address-input
                           class="address-input"
                           readonly
-                          v-model="issuer"
-                          :state="isValidMakerOrIssuer"
-                          aria-describedby="inputLiveFeedback"></b-form-input>
-            <b-form-input v-if="functionName === 'Supersede'"
-                          id=address-input
-                          class="address-input"
-                          readonly
-                          v-model="maker"
+                          v-model="issuerOrMaker"
                           :state="isValidMakerOrIssuer"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
@@ -179,18 +171,10 @@
                      class="text-left">
           <b-form-group :label="functionName === 'Split Token' ? 'Wallet Address' : 'Maker Wallet Address'"
                         label-for="wallet-address">
-            <b-form-input v-if="functionName === 'Split Token'"
-                          id=coldAddress-input
+            <b-form-input id=coldAddress-input
                           class="address-input"
                           readonly
-                          v-model="issuer"
-                          :state="isValidMakerOrIssuer"
-                          aria-describedby="inputLiveFeedback"></b-form-input>
-            <b-form-input v-if="functionName === 'Supersede'"
-                          id=coldAddress-input
-                          class="address-input"
-                          readonly
-                          v-model="maker"
+                          v-model="issuerOrMaker"
                           :state="isValidMakerOrIssuer"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
@@ -269,11 +253,11 @@
               Invalid Unity.
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group v-if="functionName === 'Split Token'">
+          <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
             <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
-            <span v-if="!isSplit"
+            <span v-if="!isSplit && functionName === 'Split Token'"
                   class="vsys-check">Cannot change unity. This token does not support split function.</span>
           </b-form-group>
           <b-button variant="warning"
@@ -393,7 +377,7 @@ export default {
             newIssuer: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
-            coldPageId: 5,
+            coldPageId: 1,
             scanShow: false,
             qrInit: false,
             qrErrMsg: void 0,
@@ -414,6 +398,12 @@ export default {
         },
         balance: {
             type: BigNumber,
+            default: function() {
+            },
+            require: true
+        },
+        issuerOrMaker: {
+            type: String,
             default: function() {
             },
             require: true
@@ -527,11 +517,7 @@ export default {
             return isValid
         },
         isValidMakerOrIssuer() {
-            if (this.functionName === 'Split Token') {
-                return this.address === this.issuer
-            } else {
-                return this.address === this.maker
-            }
+            return this.address === this.issuerOrMaker
         },
         isValidNumFormat() {
             return common.isNumFormatValid(this.newUnity)
@@ -615,29 +601,17 @@ export default {
                 this.$refs.splitTokenOrSupersedeModal.hide()
             }
         },
-        coldPrevPage() {
-            this.sendError = false
-            if (this.coldPageId === 1) {
-                this.$refs.sendModal.hide()
-            } else {
-                this.coldPageId--
-            }
-        },
         resetPage() {
+            this.errorMessage = ''
+            this.newUnity = 0
+            this.newIssuer = ''
             this.pageId = 1
             this.coldPageId = 1
-            this.sendError = false
+            this.scanShow = false
+            this.qrInit = false
+            this.qrErrMsg = void 0
+            this.paused = false
             this.coldSignature = ''
-            if (this.functionName === 'Split Token') {
-                this.newUnity = 0
-            } else {
-                this.errorMessage = ''
-                this.newIssuer = ''
-                this.scanShow = false
-                this.qrInit = false
-                this.paused = false
-                this.qrErrMsg = void 0
-            }
         },
         endSend() {
             this.$refs.splitTokenOrSupersedeModal.hide()
@@ -679,11 +653,10 @@ export default {
             this.paused = true
             try {
                 let jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
-                var newIssuer = jsonObj.address
+                this.newIssuer = jsonObj.address
                 let opc = jsonObj.opc
                 let api = jsonObj.api
                 let protocol = jsonObj.protocol
-                this.newIssuer = newIssuer
                 if (protocol !== PROTOCOL) {
                     this.paused = false
                     this.qrErrMsg = 'Invalid QR code protocol.'
@@ -702,12 +675,11 @@ export default {
             } catch (e) {
                 this.newIssuer = decodeString
                 if (this.isValidIssuer) {
-                    newIssuer = decodeString
+                    this.newIssuer = decodeString
                 } else {
-                    newIssuer = 'please scan QR code of new issuer'
+                    this.newIssuer = 'please scan QR code of new issuer'
                     this.paused = false
                 }
-                this.newIssuer = newIssuer
             }
         },
         getSignature(signature) {

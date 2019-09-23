@@ -124,6 +124,7 @@
                            :function-name="functionName"
                            :max-supply="maxSupply"
                            :is-split="isSplit"
+                           :issuer-or-maker="issuerOrMaker"
                            :token-balance="tokenBalance"
                            @updateToken="updateToken">
     </SplitTokenOrSupersede>
@@ -266,6 +267,9 @@ export default {
             if (this.tokens) {
                 return BigNumber(this.tokens.max).dividedBy(this.unity)
             } else return ''
+        },
+        issuerOrMaker() {
+            return this.functionName === 'Split Token' ? this.issuer : this.maker
         },
         currentSupply() {
             if (this.tokens) {
