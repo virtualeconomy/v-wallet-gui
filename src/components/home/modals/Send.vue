@@ -718,7 +718,6 @@ export default {
             this.paused = true
             try {
                 let jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
-                var recipient = jsonObj.address
                 let opc = jsonObj.opc
                 let api = jsonObj.api
                 let protocol = jsonObj.protocol
@@ -730,7 +729,7 @@ export default {
                 if (jsonObj.hasOwnProperty('invoice')) {
                     tempDescription = jsonObj.invoice
                 }
-                this.recipient = recipient
+                this.recipient = jsonObj.address
                 this.amount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8).toString()
                 this.description = tempDescription
                 if (protocol !== PROTOCOL) {
@@ -742,7 +741,7 @@ export default {
                 } else if (opc !== OPC_ACCOUNT) {
                     this.paused = false
                     this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidRecipient || recipient === '') {
+                } else if (!this.isValidRecipient || this.recipient === '') {
                     this.paused = false
                     this.qrErrMsg = 'Invalid address of recipient.'
                 } else {
@@ -750,13 +749,10 @@ export default {
                 }
             } catch (e) {
                 this.recipient = decodeString
-                if (this.isValidRecipient) {
-                    recipient = decodeString
-                } else {
-                    recipient = 'please scan QR code of recipient'
+                if (!this.isValidRecipient) {
+                    this.recipient = 'please scan QR code of recipient'
                     this.paused = false
                 }
-                this.recipient = recipient
             }
         },
         getSignature(signature) {

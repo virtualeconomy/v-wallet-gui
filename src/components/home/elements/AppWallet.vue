@@ -20,13 +20,14 @@
               variant="warning"
               @click="scanAgain"
               centered>Scan again</button>
+      <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
     </div>
     <b-form-group label="Cold Wallet Address"
                   label-for="coldAddress-input">
       <b-form-input id="recipient-input"
                     class="recipient-input"
                     type="text"
-                    :state="isValidColdAddress(coldAddress)"
+                    :state="isValidColdAddress"
                     v-model="coldAddress"
                     aria-describedby="inputLiveFeedback"
                     placeholder="Please input cold wallet address">
@@ -40,7 +41,7 @@
       <b-form-input id="pubKey-input"
                     class="recipient-input"
                     type="text"
-                    v-model="coldPubKey"
+                    v-model="coldPublicKey"
                     placeholder="Please input public key of cold wallet">
       </b-form-input>
     </b-form-group>
@@ -53,7 +54,7 @@
           class="btn-confirm"
           variant="warning"
           size="lg"
-          :disabled="!isValidColdAddress(coldAddress)"
+          :disabled="isSubmitDisabled"
           @click="sendData">Confirm
         </b-button>
       </b-col>
@@ -62,8 +63,8 @@
 </template>
 
 <script>
-import crypto from '@/utils/crypto'
 import { PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/constants.js'
+import { mapState } from 'vuex'
 export default {
     name: 'AppWallet',
     data: function() {
@@ -72,10 +73,8 @@ export default {
             jsonObj: '',
             qrInit: false,
             paused: false,
-            coldPubKey: '',
-            opc: '',
-            api: '',
-            protocol: ''
+            coldPublicKey: '',
+            qrErrMsg: void 0
         }
     },
     props: {
@@ -84,10 +83,31 @@ export default {
             default: ''
         }
     },
+    computed: {
+        ...mapState({
+            account: 'account'
+        }),
+        isSubmitDisabled() {
+            return !this.isValidColdAddress || this.qrErrMsg !== void 0
+        },
+        isValidColdAddress() {
+            if (!this.coldAddress) {
+                return void 0
+            }
+            let isValid = false
+            try {
+                isValid = this.account.checkAddress(this.coldAddress)
+            } catch (e) {
+                console.log(e)
+            }
+            return isValid
+        }
+    },
     methods: {
         closeModal() {
             this.qrInit = false
             this.paused = false
+            this.qrErrMsg = void 0
             this.$refs.appWalletModal.hide()
         },
         async onInit(promise) {
@@ -115,43 +135,41 @@ export default {
         onDecode: function(decodeString) {
             this.paused = true
             try {
-                var obj = JSON.parse(decodeString)
+                let obj = JSON.parse(decodeString)
                 obj.device = 'MobileApp'
                 this.jsonObj = obj
                 this.coldAddress = this.jsonObj.address
-                this.coldPubKey = this.jsonObj.publicKey
-                this.opc = this.jsonObj.opc
-                this.api = this.jsonObj.api
-                this.protocol = this.jsonObj.protocol
+                this.coldPublicKey = this.jsonObj.publicKey
+                let opc = this.jsonObj.opc
+                let api = this.jsonObj.api
+                let protocol = this.jsonObj.protocol
+                if (protocol !== PROTOCOL) {
+                    this.paused = false
+                    this.qrErrMsg = 'Invalid QR code protocol.'
+                } else if (api > API_VERSION) {
+                    this.paused = false
+                    this.qrErrMsg = 'API version mismatch.'
+                } else if (opc !== OPC_ACCOUNT) {
+                    this.paused = false
+                    this.qrErrMsg = 'Wrong operation code in QR code.'
+                } else if (!this.isValidColdAddress || this.coldAddress === '') {
+                    this.paused = false
+                    this.qrErrMsg = 'Invalid Cold Address.'
+                } else {
+                    this.qrErrMsg = void 0
+                }
             } catch (e) {
-                this.paused = false
-            }
-            if (!this.isValidColdAddress(this.coldAddress)) {
-                this.coldAddress = 'please scan QR code of cold wallet address'
-                this.paused = false
-            } else if (this.api > API_VERSION || this.protocol !== PROTOCOL || this.opc !== OPC_ACCOUNT) {
-                this.coldAddress = 'invalid QR code'
                 this.paused = false
             }
         },
         scanAgain: function() {
+            this.qrErrMsg = void 0
             this.paused = false
             this.coldAddress = ''
-        },
-        isValidColdAddress: function(addr) {
-            if (!addr) {
-                return void 0
-            }
-            let isValid = false
-            try {
-                isValid = crypto.isValidAddress(addr)
-            } catch (e) {
-                console.log(e)
-            }
-            return isValid
+            this.coldPublicKey = ''
         },
         sendData() {
-            this.$emit('import-cold', this.coldAddress, this.coldPubKey, this.jsonObj)
+            this.$emit('import-cold', this.coldAddress, this.coldPublicKey, this.jsonObj)
             this.$emit('close-btn')
         }
     }

@@ -306,9 +306,6 @@ export default {
             Vue.set(userInfo, fieldName, value)
             window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
-        closeModal() {
-            this.$refs.infoModal.hide()
-        },
         hoverIco() {
             this.hovered = true
         },
@@ -443,8 +440,8 @@ export default {
                 if (this.$store.state.eventPool) {
                     let eventPool = this.$store.state.eventPool
                     if (eventPool[this.tokenId] && eventPool[this.tokenId].newToken) {
-                        var stopArr = eventPool[this.tokenId].newToken
-                        for (var i in stopArr) {
+                        let stopArr = eventPool[this.tokenId].newToken
+                        for (let i in stopArr) {
                             clearTimeout(stopArr[i])
                         }
                         Vue.delete(eventPool, this.tokenId)
