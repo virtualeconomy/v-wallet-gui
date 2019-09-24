@@ -43,7 +43,7 @@
             </span>
           </div>
           <Asset v-if="coldAddresses&&sortFlag===0"
-                 v-for="(coldPubkey, coldAddress) in coldAddresses"
+                 v-for="(coldPublicKey, coldAddress) in coldAddresses"
                  :address="coldAddress"
                  :key="coldAddress"
                  :balance="balance[coldAddress]"
@@ -52,7 +52,7 @@
                  @click.native="selectWallet(coldAddress, 'coldWallet')">
           </Asset>
           <Asset v-if="coldAddresses&&sortFlag===1"
-                 v-for="(coldPubkey, coldAddress) in sortedAddresses"
+                 v-for="(coldPublicKey, coldAddress) in sortedAddresses"
                  :address="coldAddress"
                  :key="coldAddress"
                  :balance="balance[coldAddress]"
@@ -150,7 +150,7 @@
                   <LeaseRecords :address="selectedAddress"
                                 :active-tab="activeTab"
                                 :wallet-type="walletType"
-                                :cold-pub-key="coldPubKey"
+                                :cold-public-key="coldPublicKey"
                                 :address-index="addresses[selectedAddress]"></LeaseRecords>
                 </div>
               </b-tab>
@@ -167,7 +167,7 @@ import NavBar from './home/elements/NavBar'
 import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
-import { INITIAL_SESSION_TIMEOUT, NODE_IP, VSYS_PRECISION, NETWORK_BYTE } from '@/constants.js'
+import { INITIAL_SESSION_TIMEOUT, VSYS_PRECISION } from '@/constants.js'
 import seedLib from '@/libs/seed.js'
 import TransactionRecords from './home/elements/TransactionRecords'
 import LeasePane from './home/elements/LeasePane'
@@ -176,16 +176,12 @@ import TokenPane from './home/elements/TokenPane'
 import TokenRecords from './home/elements/TokenRecords'
 import AddToken from './home/modals/AddToken'
 import BigNumber from 'bignumber.js'
-import { mapActions } from 'vuex'
-import Blockchain from '@/js-v-sdk/src/blockchain'
-import Account from '@/js-v-sdk/src/account'
+import { mapActions, mapState } from 'vuex'
 
 export default {
     name: 'Home',
     data: function() {
         return {
-            chain: new Blockchain(NODE_IP, NETWORK_BYTE),
-            account: new Account(NETWORK_BYTE),
             balance: {},
             selectedAddress: '',
             sessionClearTimeout: void 0,
@@ -255,6 +251,10 @@ export default {
         clearTimeout(this.sessionClearTimeout)
     },
     computed: {
+        ...mapState({
+            chain: 'chain',
+            account: 'account'
+        }),
         address() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
@@ -286,7 +286,7 @@ export default {
                     seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
             }
         },
-        coldPubKey() {
+        coldPublicKey() {
             if (this.walletType === 'coldWallet') {
                 if (this.coldAddresses[this.selectedAddress]) {
                     return this.coldAddresses[this.selectedAddress].publicKey

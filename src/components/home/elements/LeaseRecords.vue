@@ -44,7 +44,7 @@
              :key="record.id">
           <TransactionRecord :tx-record="record"
                              :fee-flag="feeFlag"
-                             :cold-pub-key="coldPubKey"
+                             :cold-public-key="coldPublicKey"
                              :trans-type="transType"
                              :address-index="addressIndex"
                              :address="address"
@@ -66,11 +66,11 @@
 
 <script>
 
-import { NODE_IP } from '@/constants'
+import { LEASE_TX } from '@/constants'
 import Vue from 'vue'
 import TransactionRecord from './TransactionRecord'
 import browser from '@/utils/browser'
-import JSONBigNumber from 'json-bignumber'
+import { mapState } from 'vuex'
 export default {
     name: 'LeaseRecords',
     components: {
@@ -111,7 +111,7 @@ export default {
             default: '',
             require: true
         },
-        coldPubKey: {
+        coldPublicKey: {
             type: String,
             default: '',
             require: true
@@ -152,6 +152,11 @@ export default {
             }
         }
     },
+    computed: {
+        ...mapState({
+            chain: 'chain'
+        })
+    },
     methods: {
         isMobile() {
             return browser.isMobile()
@@ -161,17 +166,12 @@ export default {
                 const addr = this.address
                 this.changeShowDisable = true
                 const recordLimit = this.showingNum
-                const url = NODE_IP + '/transactions/list?address=' + this.address + '&limit=' + recordLimit + '&txType=3'
-                this.$http.get(url).then(response => {
+                this.chain.getTxByType(this.address, recordLimit, LEASE_TX).then(response => {
                     if (addr === this.address && recordLimit === this.showingNum) {
-                        this.leaseRecords = response.body.transactions
-                        let tempResponse = JSONBigNumber.parse(response.bodyText).transactions
-                        for (let i = 0; i < this.leaseRecords.length; i++) {
-                            this.leaseRecords[i].amount = tempResponse[i].amount
-                        }
+                        this.leaseRecords = response.transactions
                         this.changeShowDisable = false
                     }
-                }, response => {
+                }, respErr => {
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.changeShowDisable = false
                     }

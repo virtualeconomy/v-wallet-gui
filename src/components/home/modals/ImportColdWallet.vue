@@ -144,8 +144,8 @@ export default {
             }
             return isValid
         },
-        isValidPubKey() {
-            if (!this.coldPubKey) {
+        isValidPublicKey() {
+            if (!this.coldPublicKey) {
                 return void 0
             }
         },
@@ -201,8 +201,8 @@ export default {
                 }
             }
         },
-        importCold(coldAddr, coldPubKey, jsonObj) {
-            this.$emit('import-cold', coldAddr, coldPubKey, jsonObj)
+        importCold(coldAddr, coldPublicKey, jsonObj) {
+            this.$emit('import-cold', coldAddr, coldPublicKey, jsonObj)
         },
         importCancel: function(evt) {
             if (this.qrInit) {
@@ -236,7 +236,7 @@ export default {
             try {
                 this.jsonObj = JSON.parse(decodeString)
                 this.coldAddress = this.jsonObj.address
-                this.coldPubKey = this.jsonObj.publicKey
+                this.coldPublicKey = this.jsonObj.publicKey
                 this.opc = this.jsonObj.opc
                 this.api = this.jsonObj.api
                 this.protocol = this.jsonObj.protocol
@@ -249,8 +249,8 @@ export default {
             } else if (this.api > API_VERSION || this.protocol !== PROTOCOL || this.opc !== OPC_ACCOUNT) {
                 this.coldAddress = 'invalid QR code'
                 this.paused = false
-            } else if (!this.isValidPubKey) {
-                this.coldPubKey = 'invalid public key'
+            } else if (!this.isValidPublicKey) {
+                this.coldPublicKey = 'invalid public key'
                 this.paused = false
             }
         },

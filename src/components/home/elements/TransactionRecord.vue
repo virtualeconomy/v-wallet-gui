@@ -157,7 +157,7 @@
                  :recipient="txRecipient"
                  :amount="txAmount"
                  :fee="txFee"
-                 :cold-public-key="coldPubKey"
+                 :cold-public-key="coldPublicKey"
                  :tx-timestamp="txRecord.timestamp"
                  :address-index="addressIndex"
                  @show-details="showDetails"
@@ -168,13 +168,14 @@
 
 <script>
 import TxInfoModal from './TxInfoModal'
-import transaction from '@/utils/transaction'
+import common from '@/js-v-sdk/src/utils/common'
 import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import CancelLease from '../modals/CancelLease'
-import { NODE_IP, PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '@/constants'
+import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '@/constants'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
+import { mapState } from 'vuex'
 
 export default {
     name: 'Record',
@@ -221,7 +222,7 @@ export default {
             default: 'payment',
             require: true
         },
-        coldPubKey: {
+        coldPublicKey: {
             type: String,
             default: ''
         },
@@ -235,6 +236,9 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            chain: 'chain'
+        }),
         selfSend() {
             if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === true) {
                 return 'selfSend'
@@ -402,10 +406,9 @@ export default {
             return oldHeight
         },
         getContractType() {
-            const contractUrl = NODE_IP + '/contract/info/' + this.txRecord.contractId
-            this.$http.get(contractUrl).then(response => {
-                this.contractType = response.body.type
-                this.tokenId = transaction.contractIDToTokenID(response.body.contractId)
+            this.chain.getContractInfo(this.txRecord.contractId).then(response => {
+                this.contractType = response.type
+                this.tokenId = common.contractIDToTokenID(response.contractId)
             }, respError => {
                 this.contractType = 'Failed to get contract type'
                 this.tokenId = 'Failed to get token id'

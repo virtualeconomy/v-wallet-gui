@@ -102,28 +102,22 @@
                             :is-split="isSplit"
                             @updateToken="updateToken">
     </WithdrawOrDepositToken>
-    <Supersede :issuer="issuer"
-               :token-id="tokenId"
-               :maker="maker"
-               :address="address"
-               :wallet-type="walletType"
-               :addresses="addresses"
-               :cold-addresses="coldAddresses"
-               :balance="balances[address]">
-    </Supersede>
-    <SplitToken :token-id="tokenId"
-                :issuer="issuer"
-                :address="address"
-                :wallet-type="walletType"
-                :addresses="addresses"
-                :cold-addresses="coldAddresses"
-                :token-balance="tokenBalance"
-                :balance="balances[address]"
-                :token-unity="unity"
-                :max-supply="maxSupply"
-                :is-split="isSplit"
-                @updateToken="updateToken">
-    </SplitToken>
+    <SplitTokenOrSupersede :issuer="issuer"
+                           :token-id="tokenId"
+                           :maker="maker"
+                           :address="address"
+                           :wallet-type="walletType"
+                           :addresses="addresses"
+                           :cold-addresses="coldAddresses"
+                           :balance="balances[address]"
+                           :token-unity="unity"
+                           :function-name="functionName"
+                           :max-supply="maxSupply"
+                           :is-split="isSplit"
+                           :issuer-or-maker="issuerOrMaker"
+                           :token-balance="tokenBalance"
+                           @updateToken="updateToken">
+    </SplitTokenOrSupersede>
     <SendToken :token-id="tokenId"
                :token-balances="tokenBalances"
                :balances="balances"
@@ -146,9 +140,8 @@ import TokenInfoModal from './TokenInfoModal'
 import SendToken from './SendToken'
 import BigNumber from 'bignumber.js'
 import IssueOrDestroyToken from './IssueOrDestroyToken'
-import Supersede from './Supersede'
-import SplitToken from './SplitToken'
 import WithdrawOrDepositToken from './WithdrawOrDepositToken'
+import SplitTokenOrSupersede from './SplitTokenOrSupersede'
 import { SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
 import Vue from 'vue'
 import browser from '@/utils/browser'
@@ -264,6 +257,9 @@ export default {
                 return BigNumber(this.tokens.max).dividedBy(this.unity)
             } else return ''
         },
+        issuerOrMaker() {
+            return this.functionName === 'Split Token' ? this.issuer : this.maker
+        },
         currentSupply() {
             if (this.tokens) {
                 return BigNumber(this.tokens.total).dividedBy(this.unity)
@@ -298,9 +294,6 @@ export default {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             Vue.set(userInfo, fieldName, value)
             window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
-        },
-        closeModal() {
-            this.$refs.infoModal.hide()
         },
         hoverIco() {
             this.hovered = true
@@ -375,16 +368,18 @@ export default {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {
+                this.functionName = 'Supersede'
                 this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'supersedeModal_' + this.tokenId)
+                this.$root.$emit('bv::show::modal', 'splitTokenOrSupersedeModal_' + this.tokenId)
             }
         },
         splitToken() {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {
+                this.functionName = 'Split Token'
                 this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'splitTokenModal_' + this.tokenId)
+                this.$root.$emit('bv::show::modal', 'splitTokenOrSupersedeModal_' + this.tokenId)
             }
         },
         issueToken() {
@@ -436,8 +431,8 @@ export default {
                 if (this.$store.state.eventPool) {
                     let eventPool = this.$store.state.eventPool
                     if (eventPool[this.tokenId] && eventPool[this.tokenId].newToken) {
-                        var stopArr = eventPool[this.tokenId].newToken
-                        for (var i in stopArr) {
+                        let stopArr = eventPool[this.tokenId].newToken
+                        for (let i in stopArr) {
                             clearTimeout(stopArr[i])
                         }
                         Vue.delete(eventPool, this.tokenId)

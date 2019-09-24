@@ -111,14 +111,14 @@
 </template>
 
 <script>
-import { NODE_IP, VSYS_PRECISION } from '@/constants'
+import { VSYS_PRECISION } from '@/constants'
 import TransactionRecord from './TransactionRecord'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
 import browser from '@/utils/browser'
 import base58 from '@/libs/base58'
 import crypto from '@/utils/crypto'
-import JSONBigNumber from 'json-bignumber'
+import { mapState } from 'vuex'
 export default {
     name: 'TransactionRecords',
     components: {
@@ -198,6 +198,9 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            chain: 'chain'
+        }),
         monthCounts() {
             return Object.keys(this.txRecords).length
         }
@@ -224,16 +227,12 @@ export default {
                 }
                 const recordLimit = this.showingNum
                 const txType = this.showingTypeValue
-                const url = this.showingTypeValue === 0 ? NODE_IP + '/transactions/list?address=' + addr + '&limit=' + recordLimit : NODE_IP + '/transactions/list?address=' + addr + '&limit=' + recordLimit + '&txType=' + txType
-                this.$http.get(url).then(response => {
+                const withoutType = this.showingTypeValue === 0
+                this.chain.getTxByType(addr, recordLimit, txType, withoutType).then(response => {
                     if (addr === this.address && recordLimit === this.showingNum && txType === this.showingTypeValue) {
-                        this.response = response.body.transactions
+                        this.response = response.transactions
                         let count = 0
-                        let tempResponse = JSONBigNumber.parse(response.bodyText).transactions
-                        for (let i = 0; i < this.response.length; i++) {
-                            this.response[i].amount = tempResponse[i].amount
-                        }
-                        this.txRecords = response.body.transactions.reduce((recList, recItem) => {
+                        this.txRecords = response.transactions.reduce((recList, recItem) => {
                             const month = this.getMonthYearStr(recItem['timestamp'])
                             if (!recList[month]) {
                                 Vue.set(recList, month, [])
@@ -252,7 +251,7 @@ export default {
                         this.changeTypeShowDisable = false
                         this.changeShowDisable = false
                     }
-                }, response => {
+                }, respErr => {
                     if (addr === this.address && recordLimit === this.showingNum && txType === this.showingTypeValue) {
                         this.changeTypeShowDisable = false
                         this.changeShowDisable = false

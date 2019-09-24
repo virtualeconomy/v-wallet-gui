@@ -414,7 +414,7 @@
 import Transaction from '@/js-v-sdk/src/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, NETWORK_BYTE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, API_VERSION, PROTOCOL, OPC_ACCOUNT } from '@/constants.js'
+import { NETWORK_BYTE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, API_VERSION, PROTOCOL, OPC_ACCOUNT } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import ColdSignature from './ColdSignature'
@@ -584,16 +584,15 @@ export default {
     methods: {
         ...mapActions(['updateBalance']),
         getSuperNodes() {
-            const slotsUrl = NODE_IP + '/consensus/allSlotsInfo'
-            this.$http.get(slotsUrl).then(response => {
-                let len = response.body.length
-                let slots = response.body
+            this.chain.getAllSlotsInfo().then(response => {
+                let len = response.length
+                let slots = response
                 for (let i = 1; i < len; i++) {
                     if (slots[i]['address'] !== 'None') {
                         this.superNodes.push(slots[i]['address'])
                     }
                 }
-            }, respError => {
+            }, respErr => {
             })
         },
         inputAmount(num) {
@@ -718,7 +717,6 @@ export default {
             this.paused = true
             try {
                 let jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
-                var recipient = jsonObj.address
                 let opc = jsonObj.opc
                 let api = jsonObj.api
                 let protocol = jsonObj.protocol
@@ -730,7 +728,7 @@ export default {
                 if (jsonObj.hasOwnProperty('invoice')) {
                     tempDescription = jsonObj.invoice
                 }
-                this.recipient = recipient
+                this.recipient = jsonObj.address
                 this.amount = tempAmount.dividedBy(VSYS_PRECISION).decimalPlaces(8).toString()
                 this.description = tempDescription
                 if (protocol !== PROTOCOL) {
@@ -742,7 +740,7 @@ export default {
                 } else if (opc !== OPC_ACCOUNT) {
                     this.paused = false
                     this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidRecipient || recipient === '') {
+                } else if (!this.isValidRecipient || this.recipient === '') {
                     this.paused = false
                     this.qrErrMsg = 'Invalid address of recipient.'
                 } else {
@@ -750,13 +748,10 @@ export default {
                 }
             } catch (e) {
                 this.recipient = decodeString
-                if (this.isValidRecipient) {
-                    recipient = decodeString
-                } else {
-                    recipient = 'please scan QR code of recipient'
+                if (!this.isValidRecipient) {
+                    this.recipient = 'please scan QR code of recipient'
                     this.paused = false
                 }
-                this.recipient = recipient
             }
         },
         getSignature(signature) {
