@@ -37,18 +37,18 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid">
+                          :state="isValidAmount">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="!isValidNumFormat">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision && ((!isExceededBalance(amount) && this.functionName === 'Deposit Token') || this.functionName === 'Withdraw Token')">
+                                     v-else-if="!checkPrecision && ((!isExceededBalance && this.functionName === 'Deposit Token') || this.functionName === 'Withdraw Token')">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededBalance(amount) && this.functionName === 'Deposit Token'">
+                                     v-else-if="isExceededBalance && this.functionName === 'Deposit Token'">
               Deposited token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -145,18 +145,18 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid">
+                          :state="isValidAmount">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-if="!isValidNumFormat">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision && ((!isExceededBalance(amount) && this.functionName === 'Deposit Token') || this.functionName === 'Withdraw Token')">
+                                     v-else-if="!checkPrecision && ((!isExceededBalance && this.functionName === 'Deposit Token') || this.functionName === 'Withdraw Token')">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededBalance(amount) && this.functionName === 'Deposit Token'">
+                                     v-else-if="isExceededBalance && this.functionName === 'Deposit Token'">
               Deposited token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -370,19 +370,16 @@ export default {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
         isSubmitDisabled() {
-            return !(!this.isInsufficient && this.isAmountValid && this.isValidContractId)
+            return !(!this.isInsufficient && this.isValidAmount && this.isValidContractId)
         },
-        isAmountValid() {
-            let amount = this.amount
-            if (BigNumber(amount).isEqualTo(0)) {
+        isValidAmount() {
+            if (BigNumber(this.amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision && this.isValidNumFormat && (this.functionName === 'Withdraw Token' ? this.isEnoughContractBalance : !this.isExceededBalance(amount)) && !this.isNegative
+            return this.checkPrecision && this.isValidNumFormat && (this.functionName === 'Withdraw Token' ? this.isEnoughContractBalance : !this.isExceededBalance) && !this.isNegative
         },
         isExceededBalance() {
-            return function(amount) {
-                return BigNumber(amount).isGreaterThan(this.tokenBalance)
-            }
+            return BigNumber(this.amount).isGreaterThan(this.tokenBalance)
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
@@ -492,7 +489,7 @@ export default {
             this.sendError = false
             let pageId = this.walletType === 'hotWallet' ? --this.pageId : --this.coldPageId
             if (pageId === 0) {
-                this.$refs.issueOrDestroyTokenModal.hide()
+                this.$refs.withdrawOrDepositTokenModal.hide()
             }
         },
         resetPage() {
