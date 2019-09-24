@@ -11,7 +11,7 @@
       <b-form-input id="pubKey-input"
                     class="recipient-input"
                     type="text"
-                    :state="isValidColdAddress(coldAddress)"
+                    :state="isValidColdAddress"
                     v-model="coldAddress"
                     aria-describedby="inputLiveFeedback"
                     placeholder="Please input cold wallet address">
@@ -25,7 +25,7 @@
       <b-form-input id="pubKey2-input"
                     class="recipient-input"
                     type="text"
-                    v-model="coldPubKey"
+                    v-model="coldPublicKey"
                     placeholder="Please input public key of cold wallet">
       </b-form-input>
     </b-form-group>
@@ -38,7 +38,7 @@
           class="btn-confirm"
           variant="warning"
           size="lg"
-          :disabled="!isValidColdAddress(coldAddress)"
+          :disabled="!isValidColdAddress"
           @click="sendData">Confirm
         </b-button>
       </b-col>
@@ -47,13 +47,13 @@
 </template>
 
 <script>
-import crypto from '@/utils/crypto'
+import { mapState } from 'vuex'
 export default {
     name: 'ManualInput',
     data: function() {
         return {
             coldAddress: '',
-            coldPubKey: '',
+            coldPublicKey: '',
             device: 'ManualInput'
         }
     },
@@ -63,24 +63,29 @@ export default {
             default: ''
         }
     },
-    methods: {
-        closeModal() {
-            this.$refs.manualInputModal.hide()
-        },
-        isValidColdAddress: function(addr) {
-            if (!addr) {
+    computed: {
+        ...mapState({
+            account: 'account'
+        }),
+        isValidColdAddress() {
+            if (!this.coldAddress) {
                 return void 0
             }
             let isValid = false
             try {
-                isValid = crypto.isValidAddress(addr)
+                isValid = this.account.checkAddress(this.coldAddress)
             } catch (e) {
                 console.log(e)
             }
             return isValid
+        }
+    },
+    methods: {
+        closeModal() {
+            this.$refs.manualInputModal.hide()
         },
         sendData() {
-            var obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPubKey, 'device': this.device}
+            let obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPublicKey, 'device': this.device}
             this.$emit('import-cold', this.coldAddress, this.coldPubKey, obj)
             this.$emit('close-btn')
         }

@@ -157,7 +157,7 @@
                  :recipient="txRecipient"
                  :amount="txAmount"
                  :fee="txFee"
-                 :cold-public-key="coldPubKey"
+                 :cold-public-key="coldPublicKey"
                  :tx-timestamp="txRecord.timestamp"
                  :address-index="addressIndex"
                  @show-details="showDetails"
@@ -221,7 +221,7 @@ export default {
             default: 'payment',
             require: true
         },
-        coldPubKey: {
+        coldPublicKey: {
             type: String,
             default: ''
         },

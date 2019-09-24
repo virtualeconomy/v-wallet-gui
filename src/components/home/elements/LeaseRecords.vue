@@ -44,7 +44,7 @@
              :key="record.id">
           <TransactionRecord :tx-record="record"
                              :fee-flag="feeFlag"
-                             :cold-pub-key="coldPubKey"
+                             :cold-public-key="coldPublicKey"
                              :trans-type="transType"
                              :address-index="addressIndex"
                              :address="address"
@@ -111,7 +111,7 @@ export default {
             default: '',
             require: true
         },
-        coldPubKey: {
+        coldPublicKey: {
             type: String,
             default: '',
             require: true

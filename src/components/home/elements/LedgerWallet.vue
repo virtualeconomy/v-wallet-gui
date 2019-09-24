@@ -43,7 +43,7 @@
       <b-form-input id="recipient-input"
                     class="recipient-input"
                     type="text"
-                    :state="isValidColdAddress(coldAddress)"
+                    :state="isValidColdAddress"
                     v-model="coldAddress"
                     aria-describedby="inputLiveFeedback"
                     placeholder="Retrieve cold wallet address from device">
@@ -57,8 +57,8 @@
       <b-form-input id="pubKey-input"
                     class="recipient-input"
                     type="text"
-                    v-model="coldPubKey"
-                    :state="isValidColdPubKey(coldPubKey)"
+                    v-model="coldPublicKey"
+                    :state="isValidColdPublicKey"
                     aria-describedby="inputLiveFeedback"
                     placeholder="Retrieve public key of cold wallet from device">
       </b-form-input>
@@ -75,7 +75,7 @@
           class="btn-confirm"
           variant="warning"
           size="lg"
-          :disabled="isSubmitDisabled()"
+          :disabled="isSubmitDisabled"
           @click="sendData">Confirm
         </b-button>
       </b-col>
@@ -86,17 +86,17 @@
 <script>
 import 'babel-polyfill'
 import { NETWORK_BYTE } from '@/constants.js'
-import crypto from '@/utils/crypto'
 import base58 from '@/libs/base58'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import VsysLedger from '@/utils/vsysLedger'
+import { mapState } from 'vuex'
 
 export default {
     name: 'LedgerWallet',
     data: function() {
         return {
             coldAddress: '',
-            coldPubKey: '',
+            coldPublicKey: '',
             addressIndex: 0,
             device: 'Ledger',
             alertMessage: '',
@@ -113,31 +113,36 @@ export default {
             default: ''
         }
     },
-    methods: {
-        closeModal() {
-            this.$refs.ledgerWalletModal.hide()
-        },
-        isValidColdAddress: function(addr) {
-            if (!addr) {
+    computed: {
+        ...mapState({
+            account: 'account'
+        }),
+        isValidColdAddress() {
+            if (!this.coldAddress) {
                 return void 0
             }
             let isValid = false
             try {
-                isValid = crypto.isValidAddress(addr)
+                isValid = this.account.checkAddress(this.coldAddress)
             } catch (e) {
                 console.log(e)
             }
             return isValid
         },
         isSubmitDisabled() {
-            return !(this.isValidColdAddress(this.coldAddress) && this.isValidColdPubKey(this.coldPubKey))
+            return !(this.isValidColdAddress && this.isValidColdPublicKey)
         },
-        isValidColdPubKey: function(pubKey) {
-            if (!pubKey) {
+        isValidColdPublicKey() {
+            if (!this.coldPublicKey) {
                 return void 0
             }
-            var pubKeyArr = base58.decode(pubKey)
+            let pubKeyArr = base58.decode(this.coldPublicKey)
             return pubKeyArr && pubKeyArr.length === 32
+        }
+    },
+    methods: {
+        closeModal() {
+            this.$refs.ledgerWalletModal.hide()
         },
         minus() {
             if (this.addressIndex > 0) {
@@ -154,15 +159,15 @@ export default {
             this.dismissCountDown = 3
             try {
                 const transport = await TransportU2F.create()
-                var ledger = new VsysLedger(transport, NETWORK_BYTE)
-                var path = '44\'/360\'/' + this.addressIndex + '\'/0/0'
+                let ledger = new VsysLedger(transport, NETWORK_BYTE)
+                let path = '44\'/360\'/' + this.addressIndex + '\'/0/0'
                 const result = await ledger.getWalletPublicKey(path, true)
                 if (!result || !result['publicKey']) {
                     this.alertMessage = 'Failed to get Public Key! Please make sure Ledger hardware device is connected and entered VSYS app.'
                     this.dismissCountDown = 5
                     return void 0
                 }
-                this.coldPubKey = result['publicKey']
+                this.coldPublicKey = result['publicKey']
                 this.coldAddress = result['address']
                 this.ledgerAddrPath = path
             } catch (err) {
@@ -175,8 +180,8 @@ export default {
             this.dismissCountDown = dismissCountDown
         },
         sendData() {
-            var obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPubKey, 'device': this.device, 'path': this.ledgerAddrPath}
-            this.$emit('import-cold', this.coldAddress, this.coldPubKey, obj)
+            let obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPublicKey, 'device': this.device, 'path': this.ledgerAddrPath}
+            this.$emit('import-cold', this.coldAddress, this.coldPublicKey, obj)
             this.$emit('close-btn')
         }
     }

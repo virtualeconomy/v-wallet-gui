@@ -43,7 +43,7 @@
             </span>
           </div>
           <Asset v-if="coldAddresses&&sortFlag===0"
-                 v-for="(coldPubkey, coldAddress) in coldAddresses"
+                 v-for="(coldPublicKey, coldAddress) in coldAddresses"
                  :address="coldAddress"
                  :key="coldAddress"
                  :balance="balance[coldAddress]"
@@ -52,7 +52,7 @@
                  @click.native="selectWallet(coldAddress, 'coldWallet')">
           </Asset>
           <Asset v-if="coldAddresses&&sortFlag===1"
-                 v-for="(coldPubkey, coldAddress) in sortedAddresses"
+                 v-for="(coldPublicKey, coldAddress) in sortedAddresses"
                  :address="coldAddress"
                  :key="coldAddress"
                  :balance="balance[coldAddress]"
@@ -150,7 +150,7 @@
                   <LeaseRecords :address="selectedAddress"
                                 :active-tab="activeTab"
                                 :wallet-type="walletType"
-                                :cold-pub-key="coldPubKey"
+                                :cold-public-key="coldPublicKey"
                                 :address-index="addresses[selectedAddress]"></LeaseRecords>
                 </div>
               </b-tab>
@@ -286,7 +286,7 @@ export default {
                     seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
             }
         },
-        coldPubKey() {
+        coldPublicKey() {
             if (this.walletType === 'coldWallet') {
                 if (this.coldAddresses[this.selectedAddress]) {
                     return this.coldAddresses[this.selectedAddress].publicKey
