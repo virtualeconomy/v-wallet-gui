@@ -131,7 +131,7 @@ export default {
     },
     data() {
         return {
-            networkType: '',
+            networkType: String.fromCharCode(NETWORK_BYTE),
             interval: 0,
             currentTime: '',
             showHeight: false,
@@ -139,7 +139,6 @@ export default {
         }
     },
     created() {
-        this.networkType = String.fromCharCode(NETWORK_BYTE)
         this.showHeight = this.getHeightStatus()
         if (this.showHeight) {
             this.childByValue(this.showHeight)

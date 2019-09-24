@@ -41,7 +41,8 @@
         @click="confirmPage">
         Continue to confirm {{ buttonTimeStr }}
       </b-button>
-      <div @click="gotoHomePage"
+      <div v-if="networkType === 'T'"
+           @click="gotoHomePage"
            class="footer-link">skip this step</div>
     </div>
   </div>
@@ -52,19 +53,20 @@
 import VTitle from '@/components/signup/elements/VTitle'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
+import { NETWORK_BYTE } from '@/constants.js'
 
 export default {
     name: 'SaveBackup',
 
     data: function() {
         return {
+            networkType: String.fromCharCode(NETWORK_BYTE),
             isContinueDisable: true,
             timeToContinue: 5,
             timeLeft: 5,
             isCpyDisable: false
         }
     },
-
     mounted() {
         const interval = setInterval(() => {
             this.timeLeft -= 1
