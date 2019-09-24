@@ -13,7 +13,7 @@
       @click="endSend">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
-    <b-tabs @input="hideQrScan">
+    <b-tabs>
       <b-tab title="Hot Wallet"
              :disabled="walletType === 'coldWallet'"
              :active="walletType==='hotWallet'">
@@ -26,7 +26,7 @@
                           class="address-input"
                           readonly
                           v-model="address"
-                          :state="isValidIssuer(address)"
+                          :state="isValidIssuer"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Cannot {{ functionName === 'Issue Token' ? 'issue' : 'destroy' }} token. You are not issuer of this token.
@@ -57,26 +57,26 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid">
+                          :state="isValidAmount">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!isNumFormatValid(amount)">
+                                     v-if="!isValidNumFormat">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount) && !isExceededMaxSupplyOrTokenSufficient(amount)">
+                                     v-else-if="!checkPrecision && !isExceededMaxSupplyOrTokenSufficient">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupplyOrTokenSufficient(amount) && functionName === 'Issue Token'">
+                                     v-else-if="isExceededMaxSupplyOrTokenSufficient && functionName === 'Issue Token'">
               The total supply can not larger than max supply.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupplyOrTokenSufficient(amount) && functionName === 'Destroy Token'">
+                                     v-else-if="isExceededMaxSupplyOrTokenSufficient && functionName === 'Destroy Token'">
               Insufficient token.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
+                                     v-else-if="isNegative">
               Negative number is not allowed
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -153,7 +153,7 @@
                           class="address-input"
                           readonly
                           v-model="address"
-                          :state="isValidIssuer(address)"
+                          :state="isValidIssuer"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Cannot {{ functionName === 'Issue Token' ? 'issue' : 'destroy' }} token. You are not issuer of this token.
@@ -184,26 +184,26 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid">
+                          :state="isValidAmount">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!isNumFormatValid(amount)">
+                                     v-if="!isValidNumFormat">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount) && !isExceededMaxSupplyOrTokenSufficient(amount)">
+                                     v-else-if="!checkPrecision && !isExceededMaxSupplyOrTokenSufficient">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupplyOrTokenSufficient(amount) && functionName === 'Issue Token'">
+                                     v-else-if="isExceededMaxSupplyOrTokenSufficient && functionName === 'Issue Token'">
               The total supply can not larger than max supply.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupplyOrTokenSufficient(amount) && functionName === 'Destroy Token'">
+                                     v-else-if="isExceededMaxSupplyOrTokenSufficient && functionName === 'Destroy Token'">
               Insufficient token.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
+                                     v-else-if="isNegative">
               Negative number is not allowed
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -429,20 +429,19 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer(this.address) && this.isAmountValid && !this.isInsufficient)
+            return !(BigNumber(this.amount).isGreaterThan(0) && this.isValidIssuer && this.isValidAmount && !this.isInsufficient)
         },
-        isAmountValid() {
-            let amount = this.amount
-            if (BigNumber(amount).isEqualTo(0)) {
+        isValidAmount() {
+            if (BigNumber(this.amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isExceededMaxSupplyOrTokenSufficient(amount) && !this.isNegative(amount)
+            return this.checkPrecision && this.isValidNumFormat && !this.isExceededMaxSupplyOrTokenSufficient && !this.isNegative
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         availableAmount() {
-            if (!this.isValidIssuer(this.address)) {
+            if (!this.isValidIssuer) {
                 return 0
             }
             if (this.functionName === 'Issue Token') {
@@ -465,6 +464,26 @@ export default {
                 return require('@/assets/imgs/icons/wallet/ic_token1.svg')
             }
         },
+        isValidNumFormat() {
+            return common.isNumFormatValid(this.amount)
+        },
+        isNegative() {
+            return BigNumber(this.amount).isLessThan(0)
+        },
+        checkPrecision() {
+            return common.checkPrecision(BigNumber(this.amount).multipliedBy(this.tokenUnity), 0)
+        },
+        isExceededMaxSupplyOrTokenSufficient() {
+            if (this.functionName === 'Issue Token') {
+                return BigNumber(this.amount).isGreaterThan(BigNumber(this.maxSupply - this.currentSupply))
+            }
+            if (this.functionName === 'Destroy Token') {
+                return BigNumber(this.amount).isGreaterThan(BigNumber(this.tokenBalance))
+            }
+        },
+        isValidIssuer() {
+            return this.address === this.issuer
+        },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.address].publicKey)
             return tra
@@ -474,9 +493,6 @@ export default {
         ...mapActions(['updateBalance']),
         inputAmount(num) {
             return BigNumber(num)
-        },
-        isValidIssuer(addr) {
-            return addr === this.issuer
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
@@ -557,34 +573,7 @@ export default {
         },
         getSignature(signature) {
             this.coldSignature = signature
-            this.dataObject.timestamp *= 1e6
             this.coldPageId++
-        },
-        hideQrScan(tabIndex) {
-            if (tabIndex === 0) {
-                this.resetPage()
-                this.pageId = 1
-            } else {
-                this.resetPage()
-                this.coldPageId = 1
-            }
-        },
-        isNumFormatValid(amount) {
-            return common.isNumFormatValid(amount)
-        },
-        isNegative(amount) {
-            return BigNumber(amount).isLessThan(0)
-        },
-        checkPrecision(amount) {
-            return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
-        },
-        isExceededMaxSupplyOrTokenSufficient(amount) {
-            if (this.functionName === 'Issue Token') {
-                return BigNumber(amount).isGreaterThan(BigNumber(this.maxSupply - this.currentSupply))
-            }
-            if (this.functionName === 'Destroy Token') {
-                return BigNumber(amount).isGreaterThan(BigNumber(this.tokenBalance))
-            }
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
