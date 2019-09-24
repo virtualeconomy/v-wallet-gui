@@ -2,7 +2,6 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VueResource from 'vue-resource'
 import BigNumber from 'bignumber.js'
-import JSONBigNumber from 'json-bignumber'
 import Blockchain from '@/js-v-sdk/src/blockchain'
 import Account from '@/js-v-sdk/src/account'
 import { NODE_IP, VSYS_PRECISION, NETWORK_BYTE } from '@/constants.js'
@@ -30,13 +29,11 @@ const store = new Vuex.Store({
             state.tokenManagementStatus = status['management']
         },
         updateBalance(state) {
-            const url = NODE_IP + '/addresses/balance/details/' + state.selectedAddress
-            Vue.http.get(url).then(response => {
-                let tempResponse = JSONBigNumber.parse(response.bodyText)
-                state.total = tempResponse.regular.dividedBy(VSYS_PRECISION)
-                state.available = tempResponse.available.dividedBy(VSYS_PRECISION)
-                state.leasedOut = tempResponse.regular.minus(tempResponse.available).dividedBy(VSYS_PRECISION)
-                state.leasedIn = tempResponse.effective.minus(tempResponse.available).dividedBy(VSYS_PRECISION)
+            state.chain.getBalanceDetail(state.selectedAddress).then(response => {
+                state.total = BigNumber(response.regular).dividedBy(VSYS_PRECISION)
+                state.available = BigNumber(response.available).dividedBy(VSYS_PRECISION)
+                state.leasedOut = BigNumber(response.regular).minus(response.available).dividedBy(VSYS_PRECISION)
+                state.leasedIn = BigNumber(response.effective).minus(response.available).dividedBy(VSYS_PRECISION)
             })
         },
         updateSelectedAddress(state, address) {

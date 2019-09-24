@@ -414,7 +414,7 @@
 import Transaction from '@/js-v-sdk/src/transaction'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, NETWORK_BYTE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, API_VERSION, PROTOCOL, OPC_ACCOUNT } from '@/constants.js'
+import { NETWORK_BYTE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TX_FEE, API_VERSION, PROTOCOL, OPC_ACCOUNT } from '@/constants.js'
 import Confirm from './Confirm'
 import Success from './Success'
 import ColdSignature from './ColdSignature'
@@ -584,16 +584,15 @@ export default {
     methods: {
         ...mapActions(['updateBalance']),
         getSuperNodes() {
-            const slotsUrl = NODE_IP + '/consensus/allSlotsInfo'
-            this.$http.get(slotsUrl).then(response => {
-                let len = response.body.length
-                let slots = response.body
+            this.chain.getAllSlotsInfo().then(response => {
+                let len = response.length
+                let slots = response
                 for (let i = 1; i < len; i++) {
                     if (slots[i]['address'] !== 'None') {
                         this.superNodes.push(slots[i]['address'])
                     }
                 }
-            }, respError => {
+            }, respErr => {
             })
         },
         inputAmount(num) {
