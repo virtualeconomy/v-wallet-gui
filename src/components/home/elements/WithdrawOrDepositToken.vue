@@ -182,7 +182,7 @@
                     block
                     size="lg"
                     :disabled="isSubmitDisabled"
-                    @click="coldNextPage">{{ functionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
+                    @click="nextPage">{{ functionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
@@ -199,7 +199,7 @@
                 block
                 variant="light"
                 size="lg"
-                @click="coldPrevPage">Back
+                @click="prevPage">Back
               </b-button>
             </b-col>
             <b-col class="col-rit">
@@ -208,7 +208,7 @@
                 class="btn-confirm"
                 variant="warning"
                 size="lg"
-                @click="coldNextPage">Confirm
+                @click="nextPage">Confirm
               </b-button>
             </b-col>
           </b-row>
@@ -219,8 +219,8 @@
                          :qr-total-page="1"
                          v-if="coldPageId===3"
                          @get-signature="getSignature"
-                         @next-page="coldNextPage"
-                         @prev-page="coldPrevPage"></ColdSignature>
+                         @next-page="nextPage"
+                         @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
           <TokenConfirm :address="address"
@@ -237,7 +237,7 @@
                 block
                 variant="light"
                 size="lg"
-                @click="coldPrevPage">Back
+                @click="prevPage">Back
               </b-button>
             </b-col>
             <b-col class="col-rit">
@@ -463,28 +463,20 @@ export default {
             })
         },
         nextPage() {
-            this.timeStamp = Date.now() * 1e6
-            this.hasConfirmed = false
-            this.pageId++
-        },
-        coldNextPage() {
             this.sendError = false
-            this.coldPageId++
+            this.hasConfirmed = false
+            if (this.walletType === 'hotWallet') {
+                this.pageId++
+                this.timeStamp = Date.now() * 1e6
+            } else {
+                this.coldPageId++
+            }
         },
         prevPage() {
             this.sendError = false
-            if (this.pageId === 1) {
-                this.$refs.sendModal.hide()
-            } else {
-                this.pageId--
-            }
-        },
-        coldPrevPage() {
-            this.sendError = false
-            if (this.coldPageId === 1) {
-                this.$refs.sendModal.hide()
-            } else {
-                this.coldPageId--
+            let pageId = this.walletType === 'hotWallet' ? --this.pageId : --this.coldPageId
+            if (pageId === 0) {
+                this.$refs.issueOrDestroyTokenModal.hide()
             }
         },
         resetPage() {
