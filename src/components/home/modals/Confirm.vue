@@ -55,7 +55,7 @@
                     label-for="attachment_confirm"
                     v-if="txType==='payment'">
         <b-form-input id="attachment_confirm"
-                      v-model="attachment"
+                      v-model="description"
                       class="des"
                       readonly
                       :plaintext="true">
@@ -107,7 +107,7 @@ export default {
                 return BigNumber(TX_FEE)
             }
         },
-        attachment: {
+        description: {
             type: String,
             default: ''
         },

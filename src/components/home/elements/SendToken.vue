@@ -143,7 +143,7 @@
                         :recipient="recipient"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :attachment="description"
+                        :description="description"
                         :tx-type="'Send Token'">
           </TokenConfirm>
           <p
@@ -177,6 +177,7 @@
                         :recipient="recipient"
                         :amount=inputAmount(amount)
                         :fee="fee"
+                        :description="description"
                         :tx-type="'Send Token'">
           </TokenSuccess>
           <b-button variant="warning"
@@ -313,7 +314,7 @@
                         :recipient="recipient"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :attachment="description"
+                        :description="description"
                         :tx-type="'Send Token'">
           </TokenConfirm>
           <b-row>
@@ -352,6 +353,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :recipient="recipient"
+                        :description="description"
                         :tx-type="'Send Token'">
           </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed! {{ errorMessage }}</p>
@@ -381,6 +383,7 @@
                         :address="coldAddress"
                         :recipient="recipient"
                         :amount=inputAmount(amount)
+                        :description="description"
                         :fee="fee"
                         :tx-type="'Send Token'">
           </TokenSuccess>

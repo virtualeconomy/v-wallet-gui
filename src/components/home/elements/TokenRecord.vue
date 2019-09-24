@@ -149,7 +149,7 @@ import certify from '@/utils/certify'
 import { mapState } from 'vuex'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, Supersede, SplitToken, WithdrawOrDepositToken, IssueOrDestroyToken },
+    components: { TokenInfoModal, SendToken, SplitTokenOrSupersede, WithdrawOrDepositToken, IssueOrDestroyToken },
     data: function() {
         return {
             isSplit: false,

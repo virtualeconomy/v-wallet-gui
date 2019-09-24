@@ -143,7 +143,7 @@
                    :recipient="recipient"
                    :amount=inputAmount(amount)
                    :fee="fee"
-                   :attachment="description"
+                   :description="description"
                    :tx-type="'payment'">
           </Confirm>
           <p
@@ -176,7 +176,7 @@
                    :recipient="recipient"
                    :amount=inputAmount(amount)
                    :fee="fee"
-                   :attachment="description">
+                   :description="description">
           </Success>
           <b-button variant="warning"
                     block
@@ -312,7 +312,7 @@
                    :recipient="recipient"
                    :amount=inputAmount(amount)
                    :fee="fee"
-                   :attachment="description"
+                   :description="description"
                    :tx-type="'payment'">
           </Confirm>
           <b-row>
@@ -367,7 +367,7 @@
                    :recipient="recipient"
                    :amount=inputAmount(amount)
                    :fee="fee"
-                   :attachment="description"
+                   :description="description"
                    :tx-type="'payment'">
           </Confirm>
           <p v-show="sendError">Sorry, transaction send failed! Failed reason: {{ errorMessage }}</p>
@@ -397,7 +397,7 @@
                    :recipient="recipient"
                    :amount=inputAmount(amount)
                    :fee="fee"
-                   :attachment="description">
+                   :description="description">
           </Success>
           <b-button variant="warning"
                     block

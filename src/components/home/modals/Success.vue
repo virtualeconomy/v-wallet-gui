@@ -40,7 +40,7 @@
                     label="Description"
                     label-for="attachment_success">
         <b-form-input id="attachment_success"
-                      v-model="attachment"
+                      v-model="description"
                       class="des"
                       readonly
                       :plaintext="true">
@@ -92,7 +92,7 @@ export default {
                 return BigNumber(TX_FEE)
             }
         },
-        attachment: {
+        description: {
             type: String,
             default: ''
         }

@@ -126,6 +126,18 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
+      <b-form-group v-if="txType==='Send Token' && description"
+                    label-cols
+                    class="form-line"
+                    label="Description"
+                    label-for="attachment_success">
+        <b-form-input id="attachment_success"
+                      v-model="description"
+                      class="des"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
       <b-form-group label-cols
                     class="form-line"
                     label="Fee"
@@ -181,6 +193,10 @@ export default {
             default: ''
         },
         recipient: {
+            type: String,
+            default: ''
+        },
+        description: {
             type: String,
             default: ''
         },
