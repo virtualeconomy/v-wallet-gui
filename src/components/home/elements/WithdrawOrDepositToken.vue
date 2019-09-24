@@ -1,11 +1,11 @@
 <template>
-  <b-modal :id="'withdrawTokenModal_' + tokenId"
+  <b-modal :id="'withdrawOrDepositTokenModal_' + tokenId"
            centered
            lazy
-           title="WithdrawToken"
+           title="WithdrawOrDepositToken"
            hide-footer
            hide-header
-           ref="withdrawTokenModal"
+           ref="withdrawOrDepositTokenModal"
            :busy="true"
            @hidden="resetPage">
     <button
@@ -25,7 +25,7 @@
             <b-form-input id=contract-input
                           class="contract-input"
                           v-model="contractId"
-                          :state="isValidContractId(contractId)"
+                          :state="isValidContractId"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid Contract ID
@@ -37,22 +37,26 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid">
+                          :state="isValidAmount">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!isNumFormatValid(amount)">
+                                     v-if="!isValidNumFormat">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount)">
+                                     v-else-if="!checkPrecision && ((!isExceededBalance && this.functionName === 'Deposit Token') || this.functionName === 'Withdraw Token')">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isEnoughContractBanlance(amount)">
+                                     v-else-if="isExceededBalance && this.functionName === 'Deposit Token'">
+              Deposited token is larger than balance
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="!isEnoughContractBalance && this.functionName === 'Withdraw Token'">
               Withdrawed token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
+                                     v-else-if="isNegative">
               Negative number is not allowed
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -70,7 +74,7 @@
                     size="lg"
                     block
                     :disabled="isSubmitDisabled"
-                    @click="nextPage">Withdraw
+                    @click="nextPage">{{ functionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
@@ -78,7 +82,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :contract-id="contractId"
-                        :tx-type="'Withdraw Token from Contract'">
+                        :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
           </TokenConfirm>
           <p
             v-show="sendError"
@@ -110,7 +114,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :contract-id="contractId"
-                        :tx-type="'Withdraw Token from Contract'">
+                        :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -120,7 +124,7 @@
         </b-container>
       </b-tab>
       <b-tab title="Cold Wallet"
-             :disabled="walletType === 'hotWallet'"
+             :disabled="!coldPageId || walletType === 'hotWallet'"
              :active="walletType === 'coldWallet'">
         <b-container v-if="coldPageId===1"
                      class="text-left">
@@ -129,7 +133,7 @@
             <b-form-input id=coldContract-input
                           class="contract-input"
                           v-model="contractId"
-                          :state="isValidContractId(contractId)"
+                          :state="isValidContractId"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid Contract ID
@@ -141,22 +145,26 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid">
+                          :state="isValidAmount">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!isNumFormatValid(amount)">
+                                     v-if="!isValidNumFormat">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount)">
+                                     v-else-if="!checkPrecision && ((!isExceededBalance && this.functionName === 'Deposit Token') || this.functionName === 'Withdraw Token')">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isEnoughContractBanlance(amount)">
+                                     v-else-if="isExceededBalance && this.functionName === 'Deposit Token'">
+              Deposited token is larger than balance
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="!isEnoughContractBalance && this.functionName === 'Withdraw Token'">
               Withdrawed token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
+                                     v-else-if="isNegative">
               Negative number is not allowed
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -174,7 +182,7 @@
                     block
                     size="lg"
                     :disabled="isSubmitDisabled"
-                    @click="coldNextPage">Withdraw
+                    @click="nextPage">{{ functionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
@@ -182,7 +190,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :contract-id="contractId"
-                        :tx-type="'Withdraw Token from Contract'">
+                        :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
           </TokenConfirm>
           <b-row>
             <b-col class="col-lef">
@@ -191,7 +199,7 @@
                 block
                 variant="light"
                 size="lg"
-                @click="coldPrevPage">Back
+                @click="prevPage">Back
               </b-button>
             </b-col>
             <b-col class="col-rit">
@@ -200,7 +208,7 @@
                 class="btn-confirm"
                 variant="warning"
                 size="lg"
-                @click="coldNextPage">Confirm
+                @click="nextPage">Confirm
               </b-button>
             </b-col>
           </b-row>
@@ -211,15 +219,15 @@
                          :qr-total-page="1"
                          v-if="coldPageId===3"
                          @get-signature="getSignature"
-                         @next-page="coldNextPage"
-                         @prev-page="coldPrevPage"></ColdSignature>
+                         @next-page="nextPage"
+                         @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
           <TokenConfirm :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :contract-id="contractId"
-                        :tx-type="'Withdraw Token from Contract'">
+                        :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
           </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed! {{ errorMessage }}</p>
           <b-row>
@@ -229,7 +237,7 @@
                 block
                 variant="light"
                 size="lg"
-                @click="coldPrevPage">Back
+                @click="prevPage">Back
               </b-button>
             </b-col>
             <b-col class="col-rit">
@@ -249,7 +257,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :contract-id="contractId"
-                        :tx-type="'Withdraw Token from Contract'">
+                        :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -265,7 +273,7 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT } from '@/constants.js'
+import { NODE_IP, CONTRACT_EXEC_FEE, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT } from '@/constants.js'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -340,6 +348,11 @@ export default {
         isSplit: {
             type: Boolean,
             default: false
+        },
+        functionName: {
+            type: String,
+            default: '',
+            require: true
         }
     },
     computed: {
@@ -357,17 +370,35 @@ export default {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
         isSubmitDisabled() {
-            return !(!this.isInsufficient && this.isAmountValid && this.isValidContractId(this.contractId))
+            return !(!this.isInsufficient && this.isValidAmount && this.isValidContractId)
         },
-        isAmountValid() {
-            let amount = this.amount
-            if (BigNumber(amount).isEqualTo(0)) {
+        isValidAmount() {
+            if (BigNumber(this.amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && this.isEnoughContractBanlance(amount) && !this.isNegative(amount)
+            return this.checkPrecision && this.isValidNumFormat && (this.functionName === 'Withdraw Token' ? this.isEnoughContractBalance : !this.isExceededBalance) && !this.isNegative
+        },
+        isExceededBalance() {
+            return BigNumber(this.amount).isGreaterThan(this.tokenBalance)
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
+        },
+        isValidNumFormat() {
+            return common.isNumFormatValid(this.amount)
+        },
+        isNegative() {
+            return BigNumber(this.amount).isLessThan(0)
+        },
+        checkPrecision() {
+            return common.checkPrecision(BigNumber(this.amount).multipliedBy(this.tokenUnity), 0)
+        },
+        isEnoughContractBalance() {
+            return true
+        },
+        isValidContractId() {
+            let contractArr = base58.decode(this.contractId)
+            return contractArr && contractArr.length === 26 && contractArr[0] === 6
         },
         dataObject() {
             return {
@@ -375,15 +406,15 @@ export default {
                 api: API_VERSION,
                 opc: OPC_FUNCTION,
                 address: this.address,
-                // senderPublicKey: this.coldAddresses[this.address].publicKey,
+                senderPublicKey: this.coldAddresses[this.address].publicKey,
                 fee: this.fee * VSYS_PRECISION,
                 feeScale: FEE_SCALE,
                 timestamp: Date.now(),
                 attachment: '',
                 contractId: this.contractId,
-                functionId: this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX,
-                function: transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                functionExplain: 'Withdraw ' + this.amount + ' token from ' + this.contractId
+                functionId: this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX),
+                function: this.functionName === 'Withdraw Token' ? transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)) : transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
+                functionExplain: (this.functionName === 'Withdraw Token' ? 'Withdraw ' : 'Deposit ') + this.amount + (this.functionName === 'Withdraw Token' ? ' token from ' : ' token to ') + this.contractId
             }
         }
     },
@@ -407,15 +438,15 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    functionIndex: this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX,
-                    functionData: transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX, transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    functionIndex: this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX),
+                    functionData: this.functionName === 'Withdraw Token' ? transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)) : transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
+                    signature: transaction.prepareExecContractSignature(this.contractId, this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX), this.functionName === 'Withdraw Token' ? transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)) : transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
                 const coldDataInfo = {
                     contractId: this.dataObject.contractId,
-                    // senderPublicKey: this.dataObject.senderPublicKey,
+                    senderPublicKey: this.dataObject.senderPublicKey,
                     fee: this.dataObject.fee,
                     feeScale: this.dataObject.feeScale,
                     timestamp: this.dataObject.timestamp,
@@ -445,28 +476,20 @@ export default {
             })
         },
         nextPage() {
-            this.timeStamp = Date.now() * 1e6
-            this.hasConfirmed = false
-            this.pageId++
-        },
-        coldNextPage() {
             this.sendError = false
-            this.coldPageId++
+            this.hasConfirmed = false
+            if (this.walletType === 'hotWallet') {
+                this.pageId++
+                this.timeStamp = Date.now() * 1e6
+            } else {
+                this.coldPageId++
+            }
         },
         prevPage() {
             this.sendError = false
-            if (this.pageId === 1) {
-                this.$refs.sendModal.hide()
-            } else {
-                this.pageId--
-            }
-        },
-        coldPrevPage() {
-            this.sendError = false
-            if (this.coldPageId === 1) {
-                this.$refs.sendModal.hide()
-            } else {
-                this.coldPageId--
+            let pageId = this.walletType === 'hotWallet' ? --this.pageId : --this.coldPageId
+            if (pageId === 0) {
+                this.$refs.withdrawOrDepositTokenModal.hide()
             }
         },
         resetPage() {
@@ -478,7 +501,7 @@ export default {
             this.contractId = ''
         },
         endSend() {
-            this.$refs.withdrawTokenModal.hide()
+            this.$refs.withdrawOrDepositTokenModal.hide()
         },
         sendBalanceChange() {
             this.$emit('updateToken', 'update')
@@ -487,22 +510,6 @@ export default {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
-        },
-        isNumFormatValid(amount) {
-            return common.isNumFormatValid(amount)
-        },
-        isNegative(amount) {
-            return BigNumber(amount).isLessThan(0)
-        },
-        checkPrecision(amount) {
-            return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
-        },
-        isEnoughContractBanlance(amount) {
-            return true
-        },
-        isValidContractId(contractId) {
-            let contractArr = base58.decode(contractId)
-            return contractArr && contractArr.length === 26 && contractArr[0] === 6
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

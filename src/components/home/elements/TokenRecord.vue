@@ -90,28 +90,18 @@
                          :function-name="functionName"
                          @updateToken="updateToken">
     </IssueOrDestroyToken>
-    <WithdrawToken :token-id="tokenId"
-                   :address="address"
-                   :wallet-type="walletType"
-                   :addresses="addresses"
-                   :cold-addresses="coldAddresses"
-                   :token-balance="tokenBalance"
-                   :balance="balances[address]"
-                   :token-unity="unity"
-                   :is-split="isSplit"
-                   @updateToken="updateToken">
-    </WithdrawToken>
-    <DepositToken :token-id="tokenId"
-                  :address="address"
-                  :wallet-type="walletType"
-                  :addresses="addresses"
-                  :cold-addresses="coldAddresses"
-                  :token-balance="tokenBalance"
-                  :balance="balances[address]"
-                  :token-unity="unity"
-                  :is-split="isSplit"
-                  @updateToken="updateToken">
-    </DepositToken>
+    <WithdrawOrDepositToken :token-id="tokenId"
+                            :address="address"
+                            :wallet-type="walletType"
+                            :addresses="addresses"
+                            :cold-addresses="coldAddresses"
+                            :token-balance="tokenBalance"
+                            :balance="balances[address]"
+                            :function-name="functionName"
+                            :token-unity="unity"
+                            :is-split="isSplit"
+                            @updateToken="updateToken">
+    </WithdrawOrDepositToken>
     <SplitTokenOrSupersede :issuer="issuer"
                            :token-id="tokenId"
                            :maker="maker"
@@ -148,11 +138,10 @@ import base58 from '@/libs/base58'
 import converters from '@/libs/converters'
 import TokenInfoModal from './TokenInfoModal'
 import SendToken from './SendToken'
-import WithdrawToken from './WithdrawToken'
 import BigNumber from 'bignumber.js'
 import IssueOrDestroyToken from './IssueOrDestroyToken'
+import WithdrawOrDepositToken from './WithdrawOrDepositToken'
 import SplitTokenOrSupersede from './SplitTokenOrSupersede'
-import DepositToken from './DepositToken'
 import { SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
 import Vue from 'vue'
 import browser from '@/utils/browser'
@@ -160,7 +149,7 @@ import certify from '@/utils/certify'
 import { mapState } from 'vuex'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, SplitTokenOrSupersede, WithdrawToken, DepositToken, IssueOrDestroyToken },
+    components: { TokenInfoModal, SendToken, Supersede, SplitToken, WithdrawOrDepositToken, IssueOrDestroyToken },
     data: function() {
         return {
             isSplit: false,
@@ -406,8 +395,9 @@ export default {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {
+                this.functionName = 'Withdraw Token'
                 this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'withdrawTokenModal_' + this.tokenId)
+                this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal_' + this.tokenId)
             }
         },
         destroyToken() {
@@ -423,8 +413,9 @@ export default {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {
+                this.functionName = 'Deposit Token'
                 this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'depositTokenModal_' + this.tokenId)
+                this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal_' + this.tokenId)
             }
         },
         removeToken() {
