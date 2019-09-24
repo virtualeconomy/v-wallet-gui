@@ -25,7 +25,7 @@
             <b-form-input id=contract-input
                           class="contract-input"
                           v-model="contractId"
-                          :state="isValidContractId(contractId)"
+                          :state="isValidContractId"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid Contract ID
@@ -40,11 +40,11 @@
                           :state="isAmountValid">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!isNumFormatValid(amount)">
+                                     v-if="!isValidNumFormat">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount) && ((!isExceededBalance(amount) && this.functionName === 'Deposit Token') || this.functionName === 'Withdraw Token')">
+                                     v-else-if="!checkPrecision && ((!isExceededBalance(amount) && this.functionName === 'Deposit Token') || this.functionName === 'Withdraw Token')">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -52,11 +52,11 @@
               Deposited token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isEnoughContractBanlance(amount) && this.functionName === 'Withdraw Token'">
+                                     v-else-if="!isEnoughContractBalance && this.functionName === 'Withdraw Token'">
               Withdrawed token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
+                                     v-else-if="isNegative">
               Negative number is not allowed
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -133,7 +133,7 @@
             <b-form-input id=coldContract-input
                           class="contract-input"
                           v-model="contractId"
-                          :state="isValidContractId(contractId)"
+                          :state="isValidContractId"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid Contract ID
@@ -148,11 +148,11 @@
                           :state="isAmountValid">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!isNumFormatValid(amount)">
+                                     v-if="!isValidNumFormat">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount) && ((!isExceededBalance(amount) && this.functionName === 'Deposit Token') || this.functionName === 'Withdraw Token')">
+                                     v-else-if="!checkPrecision && ((!isExceededBalance(amount) && this.functionName === 'Deposit Token') || this.functionName === 'Withdraw Token')">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -160,11 +160,11 @@
               Deposited token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isEnoughContractBanlance(amount) && this.functionName === 'Withdraw Token'">
+                                     v-else-if="!isEnoughContractBalance && this.functionName === 'Withdraw Token'">
               Withdrawed token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
+                                     v-else-if="isNegative">
               Negative number is not allowed
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -370,14 +370,14 @@ export default {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
         isSubmitDisabled() {
-            return !(!this.isInsufficient && this.isAmountValid && this.isValidContractId(this.contractId))
+            return !(!this.isInsufficient && this.isAmountValid && this.isValidContractId)
         },
         isAmountValid() {
             let amount = this.amount
             if (BigNumber(amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && (this.functionName === 'Withdraw Token' ? this.isEnoughContractBanlance(amount) : !this.isExceededBalance(amount)) && !this.isNegative(amount)
+            return this.checkPrecision && this.isValidNumFormat && (this.functionName === 'Withdraw Token' ? this.isEnoughContractBalance : !this.isExceededBalance(amount)) && !this.isNegative
         },
         isExceededBalance() {
             return function(amount) {
@@ -386,6 +386,22 @@ export default {
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
+        },
+        isValidNumFormat() {
+            return common.isNumFormatValid(this.amount)
+        },
+        isNegative() {
+            return BigNumber(this.amount).isLessThan(0)
+        },
+        checkPrecision() {
+            return common.checkPrecision(BigNumber(this.amount).multipliedBy(this.tokenUnity), 0)
+        },
+        isEnoughContractBalance() {
+            return true
+        },
+        isValidContractId() {
+            let contractArr = base58.decode(this.contractId)
+            return contractArr && contractArr.length === 26 && contractArr[0] === 6
         },
         dataObject() {
             return {
@@ -497,22 +513,6 @@ export default {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
-        },
-        isNumFormatValid(amount) {
-            return common.isNumFormatValid(amount)
-        },
-        isNegative(amount) {
-            return BigNumber(amount).isLessThan(0)
-        },
-        checkPrecision(amount) {
-            return common.checkPrecision(BigNumber(amount).multipliedBy(this.tokenUnity), 0)
-        },
-        isEnoughContractBanlance(amount) {
-            return true
-        },
-        isValidContractId(contractId) {
-            let contractArr = base58.decode(contractId)
-            return contractArr && contractArr.length === 26 && contractArr[0] === 6
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
