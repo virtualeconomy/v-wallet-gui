@@ -299,6 +299,7 @@
         <b-container v-if="coldPageId===3"
                      class="text-left">
           <ColdSignature :data-object="dataObject.toJsonForColdSignature()"
+                         :transaction-bytes="dataObject.toBytes()"
                          :qr-total-page="1"
                          v-if="coldPageId===3"
                          :cold-public-key = "coldAddresses[address].publicKey"
@@ -520,7 +521,7 @@ export default {
             return this.address === this.issuerOrMaker
         },
         isValidNumFormat() {
-            return common.isNumFormatValid(this.newUnity)
+            return common.isValidNumFormat(this.newUnity)
         },
         isNegative() {
             return BigNumber(this.newUnity).isLessThan(0)

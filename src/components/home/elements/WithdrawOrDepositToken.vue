@@ -385,7 +385,7 @@ export default {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         isValidNumFormat() {
-            return common.isNumFormatValid(this.amount)
+            return common.isValidNumFormat(this.amount)
         },
         isNegative() {
             return BigNumber(this.amount).isLessThan(0)

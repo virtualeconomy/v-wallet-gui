@@ -257,6 +257,7 @@
                          :qr-total-page="1"
                          v-if="coldPageId===3"
                          :cold-public-key = "coldAddresses[address].publicKey"
+                         :transaction-bytes="dataObject.toBytes()"
                          @get-signature="getSignature"
                          @next-page="nextPage"
                          @prev-page="prevPage"></ColdSignature>
@@ -465,7 +466,7 @@ export default {
             }
         },
         isValidNumFormat() {
-            return common.isNumFormatValid(this.amount)
+            return common.isValidNumFormat(this.amount)
         },
         isNegative() {
             return BigNumber(this.amount).isLessThan(0)

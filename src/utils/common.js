@@ -17,7 +17,7 @@ export default {
 
 
     },
-    isNumFormatValid(amount) {
+    isValidNumFormat(amount) {
         return !(/[eE]/.test(amount.toString()) || (/^[0+]/.test(amount.toString()) && !/^0\./.test(amount.toString()))|| BigNumber(amount).isNaN())
     }
 }

@@ -345,6 +345,7 @@
                          v-if="coldPageId===3"
                          @get-signature="getSignature"
                          :cold-public-key="coldAddresses[coldAddress].publicKey"
+                         :transaction-bytes="dataObject.toBytes()"
                          @next-page="nextPage"
                          @prev-page="prevPage"></ColdSignature>
         </b-container>
@@ -537,7 +538,7 @@ export default {
             return BigNumber(this.amount).isLessThan(0)
         },
         isValidNumFormat() {
-            return common.isNumFormatValid(this.amount)
+            return common.isValidNumFormat(this.amount)
         },
         checkPrecision() {
             return common.checkPrecision(BigNumber(this.amount).multipliedBy(this.tokenUnity), 0)

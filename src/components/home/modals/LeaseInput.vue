@@ -219,7 +219,7 @@ export default {
             return BigNumber(this.amount).isLessThan(0)
         },
         isValidNumFormat() {
-            return common.isNumFormatValid(this.amount)
+            return common.isValidNumFormat(this.amount)
         },
         checkPrecision() {
             return common.checkPrecision(this.amount, 8)

@@ -315,6 +315,7 @@
                          :qr-array="getArray"
                          v-if="coldPageId===3"
                          :cold-public-key="coldAddresses[coldAddress].publicKey"
+                         :transaction-bytes="dataObject.toBytes()"
                          @get-signature="getSignature"
                          @next-page="nextPage"
                          @prev-page="prevPage"></ColdSignature>
@@ -482,7 +483,7 @@ export default {
             return value.isGreaterThan(maxValue)
         },
         isValidNumFormat() {
-            return common.isNumFormatValid(this.amount)
+            return common.isValidNumFormat(this.amount)
         },
         checkPrecision() {
             return common.checkPrecision(this.amount, this.unity)

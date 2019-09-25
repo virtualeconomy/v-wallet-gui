@@ -357,6 +357,8 @@
         <b-container v-else-if="coldPageId===3"
                      class="text-left">
           <ColdSignature :data-object="dataObject.toJsonForColdSignature()"
+                         :transaction-bytes="dataObject.toBytes()"
+                         :cold-public-key="this.coldAddressInfo.publicKey"
                          v-if="coldPageId===3"
                          @get-signature="getSignature"
                          @next-page="nextPage"
@@ -539,7 +541,7 @@ export default {
             return BigNumber(this.amount).isLessThan(0)
         },
         isValidNumFormat() {
-            return common.isNumFormatValid(this.amount)
+            return common.isValidNumFormat(this.amount)
         },
         checkPrecision() {
             return common.checkPrecision(this.amount, 8)
@@ -642,9 +644,9 @@ export default {
         nextPage() {
             this.sendError = false
             this.hasConfirmed = false
+            this.timeStamp = Date.now() * 1e6
             if (this.selectedWalletType === 'hotWallet') {
                 this.pageId++
-                this.timeStamp = Date.now() * 1e6
             } else {
                 this.coldPageId++
             }
@@ -677,6 +679,7 @@ export default {
             this.qrErrMsg = void 0
             this.sendError = false
             this.coldSignature = ''
+            this.timeStamp = Date.now() * 1e6
             this.address = this.selectedWalletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },

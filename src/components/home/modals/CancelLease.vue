@@ -84,6 +84,8 @@
     <b-container v-else-if="page==='cold'"
                  class="text-left">
       <ColdSignature :data-object="dataObject.toJsonForColdSignature()"
+                     :cold-public-key="this.coldPublicKey"
+                     :transaction-bytes="dataObject.toBytes()"
                      @get-signature="getSignature"
                      @prev-page="prevPage"></ColdSignature>
     </b-container>

@@ -73,10 +73,8 @@
 
 <script>
 import jrQrcode from 'jr-qrcode'
-import crypto from '@/utils/crypto'
-import BigNumber from 'bignumber.js'
-import { API_VERSION, PROTOCOL, OPC_SIGNATURE, OPC_FUNCTION, OPC_CONTRACT, OPC_TRANSACTION } from '@/constants.js'
-import transaction from '@/utils/transaction'
+import crypto from '@/js-v-sdk/src/utils/crypto'
+import { API_VERSION, PROTOCOL, OPC_SIGNATURE } from '@/constants.js'
 export default {
     name: 'ColdSignature',
     data: function() {
@@ -112,7 +110,14 @@ export default {
         },
         coldPublicKey: {
             type: String,
+            require: true,
             default: ''
+        },
+        transactionBytes: {
+            type: Uint8Array,
+            require: true,
+            default: function() {
+            }
         }
     },
     computed: {
@@ -126,12 +131,9 @@ export default {
                 background: '#ffffff',
                 foreground: '#000000'
             }
-            let text = ''
+            let text
             if (this.qrTotalPage === 1) {
                 let data = JSON.parse(JSON.stringify(this.dataObject))
-                if (data.opc === OPC_FUNCTION) {
-                    delete data.senderPublicKey
-                }
                 text = JSON.stringify(data).replace(/"amount":"(\d+)"/g, '"amount":$1')
             } else {
                 let tempData = JSON.parse(JSON.stringify(this.dataObject))
@@ -209,25 +211,10 @@ export default {
                     this.sgError = true
                     this.qrError = true
                 } else {
-                    let data = JSON.parse(JSON.stringify(this.dataObject))
                     if (api > API_VERSION) this.apiError = true
                     if (protocol !== PROTOCOL) this.protocolError = true
                     if (opc !== OPC_SIGNATURE) this.opcError = true
-                    delete data.transactionType
-                    delete data.api
-                    let dataOpc = data.opc
-                    delete data.opc
-                    delete data.protocol
-                    if (dataOpc === OPC_FUNCTION || dataOpc === OPC_CONTRACT) {
-                        data.fee = BigNumber(data.fee)
-                        data.timestamp = BigNumber(data.timestamp *= 1e6)
-                        data['senderPublicKey'] = this.coldPublicKey
-                    } else {
-                        data.timestamp *= 1e6
-                    }
-                    if ((((dataOpc === OPC_TRANSACTION) && transaction.isValidSignature(data, signature, this.dataObject.senderPublicKey, this.dataObject.transactionType)) ||
-                        ((dataOpc === OPC_FUNCTION) && transaction.isValidContractExecSignature(data, signature, this.coldPublicKey)) ||
-                        ((dataOpc === OPC_CONTRACT) && transaction.isValidContractSignature(data, signature, this.coldPublicKey))) && !this.qrError) {
+                    if (crypto.isValidTransactionSignature(this.transactionBytes, signature, this.coldPublicKey) && !this.qrError) {
                         let _this = this
                         setTimeout(function() {
                             _this.$emit('get-signature', signature)

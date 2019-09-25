@@ -124,6 +124,8 @@
           <b-container v-else-if="coldPageId===3"
                        class="text-left">
             <ColdSignature :data-object="dataObject.toJsonForColdSignature()"
+                           :transaction-bytes="dataObject.toBytes()"
+                           :cold-public-key="this.coldAddresses[this.coldAddress].publicKey"
                            v-if="coldPageId===3"
                            @get-signature="getSignature"
                            @prev-page="prevColdPage"></ColdSignature>
