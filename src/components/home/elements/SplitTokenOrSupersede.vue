@@ -13,7 +13,7 @@
       @click="endSend">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
-    <b-tabs @input="hideQrScan">
+    <b-tabs>
       <b-tab title="Hot Wallet"
              :disabled="!pageId || walletType==='coldWallet'"
              :active="walletType==='hotWallet'">
@@ -356,7 +356,6 @@
 </template>
 
 <script>
-import crypto from '@/utils/crypto'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { NETWORK_BYTE, CONTRACT_EXEC_FEE, SPLIT_FUNCIDX, SUPERSEDE_FUNCIDX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT } from '@/constants.js'
@@ -511,7 +510,7 @@ export default {
             }
             let isValid = false
             try {
-                isValid = crypto.isValidAddress(issuer)
+                isValid = this.account.checkAddress(issuer)
             } catch (e) {
                 console.log(e)
             }
@@ -577,8 +576,8 @@ export default {
                         setTimeout(this.unityChange, delayTime)
                     }
                 }
-            }, response => {
-                this.errorMessage = response.body.message
+            }, respErr => {
+                this.errorMessage = respErr.body.message
                 if (this.errorMessage === undefined) {
                     this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
                 }
@@ -603,6 +602,8 @@ export default {
             }
         },
         resetPage() {
+            this.sendError = false
+            this.timeStamp = Date.now() * 1e6
             this.errorMessage = ''
             this.newUnity = 0
             this.newIssuer = ''
@@ -675,9 +676,7 @@ export default {
                 }
             } catch (e) {
                 this.newIssuer = decodeString
-                if (this.isValidIssuer) {
-                    this.newIssuer = decodeString
-                } else {
+                if (!this.isValidIssuer) {
                     this.newIssuer = 'please scan QR code of new issuer'
                     this.paused = false
                 }
@@ -685,7 +684,6 @@ export default {
         },
         getSignature(signature) {
             this.coldSignature = signature
-            this.dataObject.timestamp *= 1e6
             this.coldPageId++
         },
         repaintLocation(location, ctx) {
@@ -706,16 +704,6 @@ export default {
                 ctx.closePath()
                 ctx.stroke()
             }
-        },
-        hideQrScan(tabIndex) {
-            if (tabIndex === 0) {
-                this.resetPage()
-                this.pageId = 1
-            } else {
-                this.resetPage()
-                this.coldPageId = 1
-            }
-            this.scanShow = false
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair

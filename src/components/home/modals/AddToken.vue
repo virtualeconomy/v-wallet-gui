@@ -23,7 +23,7 @@
                           class="input-t"
                           v-model="tokenId"
                           aria-describedby="inputLiveFeedback"
-                          :state="isValidToken()">
+                          :state="isValidToken">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      style="font-size: 15px;margin-top: 10px">
@@ -79,6 +79,12 @@ export default {
         },
         isAddable() {
             return this.tokenId.length <= 0
+        },
+        isValidToken() {
+            if (!this.init || this.tokenId.length === 0 || this.responseErr === false) {
+                return void 0
+            }
+            return !this.responseErr
         }
     },
 
@@ -118,12 +124,6 @@ export default {
                     this.responseErr = true
                 })
             }
-        },
-        isValidToken() {
-            if (!this.init || this.tokenId.length === 0 || this.responseErr === false) {
-                return void 0
-            }
-            return !this.responseErr
         }
     }
 

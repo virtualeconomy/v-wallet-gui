@@ -543,9 +543,9 @@ export default {
         nextPage() {
             this.sendError = false
             this.hasConfirmed = false
+            this.timeStamp = Date.now() * 1e6
             if (this.walletType === 'hotWallet') {
                 this.pageId++
-                this.timeStamp = Date.now() * 1e6
             } else {
                 this.coldPageId++
             }
@@ -561,6 +561,7 @@ export default {
             this.amount = 0
             this.pageId = 1
             this.coldPageId = 1
+            this.timeStamp = Date.now() * 1e6
             this.sendError = false
             this.coldSignature = ''
             this.errorMessage = ''

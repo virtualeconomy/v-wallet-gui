@@ -2,17 +2,12 @@
   <b-modal id="importModal"
            centered
            lazy
-           @cancel="importCancel"
-           @hide="importClose"
-           @ok="importOk"
-           @show="showingUp"
-           :cancel-disabled="qrInit"
+           @hide="resetPage"
            title="Import Cold Wallet"
            hide-header
            hide-footer
            ref="importModal">
     <button
-      :disabled="qrInit"
       class="close btn-close"
       @click="closeModal">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
@@ -109,7 +104,7 @@
 import LedgerWallet from '../elements/LedgerWallet'
 import AppWallet from '../elements/AppWallet'
 import ManualInput from '../elements/ManualInput'
-import { API_VERSION, PROTOCOL, OPC_ACCOUNT } from '@/constants.js'
+import { mapState } from 'vuex'
 
 export default {
     name: 'ImportColdWallet',
@@ -124,34 +119,13 @@ export default {
     data: function() {
         return {
             method: 'appWallet',
-            pageId: 1,
-            qrInit: false
+            pageId: 1
         }
     },
     computed: {
-        isValidAddress() {
-            if (this.coldAddress === this.address) {
-                return false
-            }
-            if (!this.coldAddress) {
-                return void 0
-            }
-            let isValid = false
-            try {
-                isValid = crypto.isValidAddress(this.coldAddress)
-            } catch (e) {
-                console.log(e)
-            }
-            return isValid
-        },
-        isValidPublicKey() {
-            if (!this.coldPublicKey) {
-                return void 0
-            }
-        },
-        addressExisted() {
-            return this.coldAddress === this.address
-        }
+        ...mapState({
+            account: 'account'
+        })
     },
     methods: {
         classChoose(method) {
@@ -175,15 +149,7 @@ export default {
                 document.getElementById('appWallet').className = 'unselected'
             }
         },
-        showingUp() {
-            this.method = 'appWallet'
-        },
-        importClose(evt) {
-            if (this.qrInit) {
-                evt.preventDefault()
-            }
-        },
-        importOk(evt) {
+        importOk() {
             if (this.method === 'manualInput') {
                 this.pageId++
                 if (this.pageId > 2) {
@@ -204,64 +170,14 @@ export default {
         importCold(coldAddr, coldPublicKey, jsonObj) {
             this.$emit('import-cold', coldAddr, coldPublicKey, jsonObj)
         },
-        importCancel: function(evt) {
-            if (this.qrInit) {
-                evt.preventDefault()
-            }
-        },
-        async onInit(promise) {
-            try {
-                this.qrInit = true
-                await promise
-            } catch (error) {
-                if (error.name === 'NotAllowedError') {
-                    throw Error('user denied camera access permission')
-                } else if (error.name === 'NotFoundError') {
-                    throw Error('no suitable camera device installed')
-                } else if (error.name === 'NotSupportedError') {
-                    throw Error('page is not served over HTTPS (or localhost)')
-                } else if (error.name === 'NotReadableError') {
-                    throw Error('maybe camera is already in use')
-                } else if (error.name === 'OverconstarinedError') {
-                    throw Error('pass constraints do not match any camera')
-                } else {
-                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
-                }
-            } finally {
-                this.qrInit = false
-            }
-        },
-        onDecode(decodeString) {
-            this.paused = true
-            try {
-                this.jsonObj = JSON.parse(decodeString)
-                this.coldAddress = this.jsonObj.address
-                this.coldPublicKey = this.jsonObj.publicKey
-                this.opc = this.jsonObj.opc
-                this.api = this.jsonObj.api
-                this.protocol = this.jsonObj.protocol
-            } catch (e) {
-                this.paused = false
-            }
-            if (!this.isValidAddress) {
-                this.coldAddress = 'please scan QR code of cold wallet address'
-                this.paused = false
-            } else if (this.api > API_VERSION || this.protocol !== PROTOCOL || this.opc !== OPC_ACCOUNT) {
-                this.coldAddress = 'invalid QR code'
-                this.paused = false
-            } else if (!this.isValidPublicKey) {
-                this.coldPublicKey = 'invalid public key'
-                this.paused = false
-            }
-        },
-        scanAgain() {
-            this.paused = false
-            this.coldAddress = ''
+        resetPage() {
+            this.pageId = 1
+            this.method = 'appWallet'
         },
         closeModal() {
             this.$refs.importModal.hide()
         },
-        prevPage: function(method) {
+        prevPage(method) {
             this.pageId--
             this.method = method
         }

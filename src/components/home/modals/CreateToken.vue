@@ -609,9 +609,9 @@ export default {
         nextPage() {
             this.sendError = false
             this.hasConfirmed = false
+            this.timeStamp = Date.now() * 1e6
             if (this.selectedWalletType === 'hotWallet') {
                 this.pageId++
-                this.timeStamp = Date.now() * 1e6
             } else {
                 this.coldPageId++
             }
@@ -633,6 +633,7 @@ export default {
             this.sendError = false
             this.coldSignature = ''
             this.support = false
+            this.timeStamp = Date.now() * 1e6
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
             this.selectedWalletType = this.walletType

@@ -278,10 +278,9 @@ import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
 import browser from '@/utils/browser'
-import common from '@/utils/common'
+import common from '@/js-v-sdk/src/utils/common'
 import BigNumber from 'bignumber.js'
 import base58 from '@/libs/base58'
-import transaction from '@/utils/transaction'
 import { mapActions } from 'vuex'
 export default {
     name: 'WithdrawToken',
@@ -289,7 +288,7 @@ export default {
     data: function() {
         return {
             errorMessage: '',
-            amount: BigNumber(0),
+            amount: 0,
             attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
@@ -413,7 +412,7 @@ export default {
                 attachment: '',
                 contractId: this.contractId,
                 functionId: this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX),
-                function: this.functionName === 'Withdraw Token' ? transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)) : transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
+                // function: this.functionName === 'Withdraw Token' ? transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)) : transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
                 functionExplain: (this.functionName === 'Withdraw Token' ? 'Withdraw ' : 'Deposit ') + this.amount + (this.functionName === 'Withdraw Token' ? ' token from ' : ' token to ') + this.contractId
             }
         }
@@ -438,9 +437,9 @@ export default {
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
-                    functionIndex: this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX),
-                    functionData: this.functionName === 'Withdraw Token' ? transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)) : transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                    signature: transaction.prepareExecContractSignature(this.contractId, this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX), this.functionName === 'Withdraw Token' ? transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)) : transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
+                    functionIndex: this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX)
+                    // functionData: this.functionName === 'Withdraw Token' ? transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)) : transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
+                    // signature: transaction.prepareExecContractSignature(this.contractId, this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX), this.functionName === 'Withdraw Token' ? transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)) : transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
                 }
                 apiSchema = dataInfo
             } else if (walletType === 'coldWallet') {
@@ -467,8 +466,8 @@ export default {
                 for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
                     setTimeout(this.sendBalanceChange, delayTime)
                 }
-            }, response => {
-                this.errorMessage = response.body.message
+            }, respErr => {
+                this.errorMessage = respErr.body.message
                 if (this.errorMessage === undefined) {
                     this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
                 }
@@ -493,7 +492,7 @@ export default {
             }
         },
         resetPage() {
-            this.amount = BigNumber(0)
+            this.amount = 0
             this.pageId = 1
             this.coldPageId = 1
             this.sendError = false

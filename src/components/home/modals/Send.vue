@@ -339,6 +339,7 @@
         <b-container v-if="coldPageId===3 && getDevice === 'Ledger'"
                      class="text-left">
           <LedgerConfirm :tx-info="dataObject.toJsonForColdSignature()"
+                         :transaction-bytes="dataObject.toBytes()"
                          :address-info="coldAddressInfo"
                          @get-signature="getSignature"
                          @prev-page="prevPage"></LedgerConfirm>

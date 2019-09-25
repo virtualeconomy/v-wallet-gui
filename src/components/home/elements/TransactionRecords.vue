@@ -112,12 +112,11 @@
 
 <script>
 import { VSYS_PRECISION } from '@/constants'
+import BigNumber from 'bignumber.js'
 import TransactionRecord from './TransactionRecord'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
 import browser from '@/utils/browser'
-import base58 from '@/libs/base58'
-import crypto from '@/utils/crypto'
 import { mapState } from 'vuex'
 export default {
     name: 'TransactionRecords',
@@ -237,7 +236,7 @@ export default {
                             if (!recList[month]) {
                                 Vue.set(recList, month, [])
                             }
-                            let senderAddr = recItem['proofs'] ? crypto.buildRawAddress(base58.decode(recItem['proofs'][0]['publicKey'])) : 'no sender'
+                            let senderAddr = recItem['proofs'] ? recItem['proofs'][0]['address'] : 'no sender'
                             recItem['index'] = ++count
                             recList[month].push(recItem)
                             if (recItem['recipient'] === this.address && this.address === senderAddr) { // send to self
@@ -282,9 +281,10 @@ export default {
         exportRecords() {
             if (this.response) {
                 let tempResponse = JSON.parse(JSON.stringify(this.response))
+                console.log(tempResponse)
                 for (let i = 0; i < tempResponse.length; i++) {
                     if (tempResponse[i].amount) {
-                        tempResponse[i].amount = this.response[i].amount.dividedBy(VSYS_PRECISION)
+                        tempResponse[i].amount = BigNumber(this.response[i].amount).dividedBy(VSYS_PRECISION)
                     }
                     tempResponse[i].fee = tempResponse[i].fee / VSYS_PRECISION
                 }

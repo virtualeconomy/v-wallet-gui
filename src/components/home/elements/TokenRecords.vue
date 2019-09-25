@@ -74,16 +74,6 @@ export default {
         }
     },
     props: {
-        chain: {
-            type: Object,
-            default: function() {},
-            require: true
-        },
-        account: {
-            type: Object,
-            default: function() {},
-            require: true
-        },
         address: {
             type: String,
             default: ''

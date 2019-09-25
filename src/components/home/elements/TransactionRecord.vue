@@ -170,7 +170,7 @@
 import TxInfoModal from './TxInfoModal'
 import common from '@/js-v-sdk/src/utils/common'
 import base58 from '@/libs/base58'
-import converters from '@/libs/converters'
+import converters from '@/js-v-sdk/src/utils/converters'
 import CancelLease from '../modals/CancelLease'
 import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '@/constants'
 import browser from '@/utils/browser'

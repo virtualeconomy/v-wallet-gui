@@ -135,7 +135,7 @@
 <script>
 import common from '@/js-v-sdk/src/utils/common'
 import base58 from '@/libs/base58'
-import converters from '@/libs/converters'
+import converters from '@/js-v-sdk/src/utils/converters'
 import TokenInfoModal from './TokenInfoModal'
 import SendToken from './SendToken'
 import BigNumber from 'bignumber.js'

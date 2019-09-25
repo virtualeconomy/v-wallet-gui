@@ -81,12 +81,9 @@ export default {
         }
     },
     methods: {
-        closeModal() {
-            this.$refs.manualInputModal.hide()
-        },
         sendData() {
             let obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPublicKey, 'device': this.device}
-            this.$emit('import-cold', this.coldAddress, this.coldPubKey, obj)
+            this.$emit('import-cold', this.coldAddress, this.coldPublicKey, obj)
             this.$emit('close-btn')
         }
     }

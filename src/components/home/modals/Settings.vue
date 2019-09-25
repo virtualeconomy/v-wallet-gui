@@ -6,7 +6,7 @@
            hide-header
            hide-footer
            ok-only
-           @hide="resetSession">
+           @hide="resetSettings">
     <button
       class="close btn-close"
       @click="closeModal">
@@ -220,7 +220,7 @@ export default {
             this.changeSession()
             this.$refs.settingModal.hide()
         },
-        resetSession() {
+        resetSettings() {
             this.curSplitStatus = this.tokenSplitStatus
             this.curManagementStatus = this.tokenManagementStatus
             this.heightStatus = this.getHeightStatus()

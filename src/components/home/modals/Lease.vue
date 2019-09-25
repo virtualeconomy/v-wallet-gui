@@ -106,6 +106,7 @@
           <b-container v-if="coldPageId===3 && getDevice === 'Ledger'"
                        class="text-left">
             <LedgerConfirm :tx-info="dataObject.toJsonForColdSignature()"
+                           :transaction-bytes="dataObject.toBytes()"
                            :address-info="coldAddressInfo"
                            @get-signature="getSignature"
                            @prev-page="prevPage"></LedgerConfirm>
@@ -211,7 +212,7 @@ export default {
             txRecipient: '',
             txTimestamp: 0,
             txAmount: BigNumber(0),
-            timestamp: 0,
+            timestamp: Date.now() * 1e6,
             hasConfirmed: false,
             isRaisingLease: 'true',
             errorMessage: ''
@@ -267,6 +268,7 @@ export default {
         },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
+            console.log(tra.toJsonForColdSignature())
             return tra
         },
         noColdAddress() {
@@ -313,6 +315,7 @@ export default {
             this.pageId = 1
             this.coldPageId = 1
             this.fee = BigNumber(TX_FEE)
+            this.timestamp = Date.now() * 1e6
             this.sendError = false
             this.coldSignature = ''
             this.coldAddress = ''

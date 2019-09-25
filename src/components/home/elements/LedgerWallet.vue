@@ -141,9 +141,6 @@ export default {
         }
     },
     methods: {
-        closeModal() {
-            this.$refs.ledgerWalletModal.hide()
-        },
         minus() {
             if (this.addressIndex > 0) {
                 this.addressIndex--
