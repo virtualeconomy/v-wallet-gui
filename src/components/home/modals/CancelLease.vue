@@ -95,7 +95,8 @@
 
 <script>
 import Confirm from './Confirm'
-import { TX_FEE, NETWORK_BYTE } from '@/constants'
+import { TX_FEE } from '@/js-v-sdk/src/constants'
+import { NETWORK_BYTE } from '@/network'
 import ColdSignature from './ColdSignature'
 import CancelSuccess from './CancelSuccess'
 import TxInfoModal from '../elements/TxInfoModal'

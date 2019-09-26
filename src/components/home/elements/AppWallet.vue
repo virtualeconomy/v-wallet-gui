@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import { PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/constants.js'
+import { PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/js-v-sdk/src/constants'
 import { mapState } from 'vuex'
 export default {
     name: 'AppWallet',

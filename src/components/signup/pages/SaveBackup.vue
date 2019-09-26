@@ -53,7 +53,7 @@
 import VTitle from '@/components/signup/elements/VTitle'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NETWORK_BYTE } from '@/constants.js'
+import { NETWORK_BYTE } from '@/network'
 
 export default {
     name: 'SaveBackup',

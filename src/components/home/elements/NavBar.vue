@@ -62,7 +62,7 @@
 import Settings from '../modals/Settings'
 import Account from '../modals/Account'
 import About from '../modals/About'
-import { NETWORK_BYTE } from '@/constants.js'
+import { NETWORK_BYTE } from '@/network'
 import Vue from 'vue'
 import jdenticon from '@/libs/jdenticon-2.1.0'
 import { mapState } from 'vuex'

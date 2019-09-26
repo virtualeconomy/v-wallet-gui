@@ -9,7 +9,7 @@ var certifiedTokensList = {
         'TWtSxBEx7rmsQ34MyWzwBCYYwRJh4K9xsL9zPkMK8': 'DLL'
     },
 }
-import { NETWORK_BYTE } from '@/constants.js'
+import { NETWORK_BYTE } from '@/network'
 var certifiedTokens;
 if (String.fromCharCode(NETWORK_BYTE) === 'T') {
     certifiedTokens = certifiedTokensList['Testnet']

@@ -41,7 +41,8 @@
   </div>
 </template>
 <script>
-import { NETWORK_BYTE, PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '@/constants.js'
+import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '@/js-v-sdk/src/constants'
+import { NETWORK_BYTE } from '@/network'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import VsysLedger from '@/utils/vsysLedger'
 

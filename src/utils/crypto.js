@@ -10,8 +10,9 @@ var converters_1 = require("../libs/converters");
 var secure_random_1 = require("../libs/secure-random");
 var sha3_1 = require("../libs/sha3");
 var concat_1 = require("./concat");
-var constants = require("../constants");
-var NETWORK_BYTE = constants.NETWORK_BYTE
+var constants = require("../js-v-sdk/src/constants");
+var network = require("../network")
+var NETWORK_BYTE = network.NETWORK_BYTE
 
 function sha256(input) {
     let bytes;

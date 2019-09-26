@@ -1,7 +1,7 @@
 "use strict";
 // Derived from waves-api
 //
-var constants = require("../constants");
+var constants = require("../js-v-sdk/src/constants");
 export function normalizeAssetId(original) {
     if (!original || original === constants.WAVES) {
         return '';

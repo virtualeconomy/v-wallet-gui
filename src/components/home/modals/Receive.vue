@@ -96,7 +96,7 @@
 
 <script>
 import jrQrcode from 'jr-qrcode'
-import { PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION, TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants.js'
+import { PROTOCOL, OPC_ACCOUNT, VSYS_PRECISION, TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/js-v-sdk/src/constants'
 import BigNumber from 'bignumber.js'
 import common from '@/js-v-sdk/src/utils/common'
 export default {

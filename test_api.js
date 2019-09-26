@@ -1,6 +1,6 @@
 import tx_util from './src/js-v-sdk/src/utils/txUtil.js'
 import seed_lib from './src/libs/seed.js'
-import {VSYS_PRECISION, TX_FEE, FEE_SCALE} from './src/constants.js'
+import {VSYS_PRECISION, TX_FEE, FEE_SCALE} from './src/js-v-sdk/src/constants'
 var request = require('request')
 
 //your seed here

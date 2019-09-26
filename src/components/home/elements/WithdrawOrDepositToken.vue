@@ -273,7 +273,8 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, CONTRACT_EXEC_FEE, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT } from '@/constants.js'
+import { CONTRACT_EXEC_FEE, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT } from '@/js-v-sdk/src/constants'
+import { NODE_IP } from '@/network'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'

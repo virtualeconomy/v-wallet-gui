@@ -358,7 +358,8 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { NETWORK_BYTE, CONTRACT_EXEC_FEE, SPLIT_FUNCIDX, SUPERSEDE_FUNCIDX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT } from '@/constants.js'
+import { CONTRACT_EXEC_FEE, SPLIT_FUNCIDX, SUPERSEDE_FUNCIDX, FEE_SCALE, API_VERSION, PROTOCOL, OPC_ACCOUNT } from '@/js-v-sdk/src/constants'
+import { NETWORK_BYTE } from '@/network'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'

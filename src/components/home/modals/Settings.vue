@@ -77,7 +77,7 @@
 
 <script>
 import Vue from 'vue'
-import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
+import { INITIAL_SESSION_TIMEOUT } from '@/js-v-sdk/src/constants'
 import { mapState, mapActions } from 'vuex'
 export default {
     name: 'Settings',

@@ -146,7 +146,8 @@
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE, TX_TEST_EXPLORER, NETWORK_BYTE, TX_EXPLORER } from '@/constants'
+import { TX_FEE, TX_TEST_EXPLORER, TX_EXPLORER } from '@/js-v-sdk/src/constants'
+import { NETWORK_BYTE } from '@/network'
 import { mapActions, mapState } from 'vuex'
 export default {
     name: 'TxInfoModal',

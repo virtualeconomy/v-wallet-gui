@@ -6,7 +6,7 @@ var base58_1 = require("./base58");
 var crypto_1 = require("../utils/crypto");
 var logger_1 = require("../utils/logger");
 var seedDictionary_1 = require("./seedDictionary");
-var constant = require('../constants');
+var constant = require('../js-v-sdk/src/constants');
 function generateNewSeed(length) {
     var random = crypto_1.default.generateRandomUint32Array(length);
     var wordCount = seedDictionary_1.default.length;

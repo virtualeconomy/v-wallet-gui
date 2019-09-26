@@ -151,7 +151,8 @@
 
 <script>
 import Vue from 'vue'
-import { ADDRESS_LENGTH, NETWORK_BYTE } from '../constants.js'
+import { ADDRESS_LENGTH } from '@/js-v-sdk/src/constants'
+import { NETWORK_BYTE } from '@/network'
 import seedLib from '@/libs/seed.js'
 import jdenticon from '@/libs/jdenticon-2.1.0'
 

@@ -64,7 +64,7 @@
 <script>
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE } from '@/constants'
+import { TX_FEE } from '@/js-v-sdk/src/constants'
 export default {
     name: 'Confirm',
     props: {

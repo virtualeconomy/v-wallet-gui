@@ -74,7 +74,7 @@
 <script>
 import jrQrcode from 'jr-qrcode'
 import crypto from '@/js-v-sdk/src/utils/crypto'
-import { API_VERSION, PROTOCOL, OPC_SIGNATURE } from '@/constants.js'
+import { API_VERSION, PROTOCOL, OPC_SIGNATURE } from '@/js-v-sdk/src/constants'
 export default {
     name: 'ColdSignature',
     data: function() {

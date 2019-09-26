@@ -304,7 +304,8 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { CONTRACT_EXEC_FEE, ISSUE_FUNCIDX, BURN_FUNCIDX, NETWORK_BYTE } from '@/constants.js'
+import { CONTRACT_EXEC_FEE, ISSUE_FUNCIDX, DESTROY_FUNCIDX } from '@/js-v-sdk/src/constants'
+import { NETWORK_BYTE } from '@/network'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -489,7 +490,7 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            let functionIndex = this.functionName === 'Issue Token' ? ISSUE_FUNCIDX : BURN_FUNCIDX
+            let functionIndex = this.functionName === 'Issue Token' ? ISSUE_FUNCIDX : DESTROY_FUNCIDX
             let functionData = {amount: this.amount, unity: this.tokenUnity}
             tra.buildExecuteContractTx(publicKey, this.contractId, functionIndex, functionData, this.timeStamp)
             return tra

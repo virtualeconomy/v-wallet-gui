@@ -66,7 +66,7 @@
 
 <script>
 
-import { LEASE_TX } from '@/constants'
+import { LEASE_TX } from '@/js-v-sdk/src/constants'
 import Vue from 'vue'
 import TransactionRecord from './TransactionRecord'
 import browser from '@/utils/browser'

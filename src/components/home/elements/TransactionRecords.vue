@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import { VSYS_PRECISION } from '@/constants'
+import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
 import BigNumber from 'bignumber.js'
 import TransactionRecord from './TransactionRecord'
 import Vue from 'vue'

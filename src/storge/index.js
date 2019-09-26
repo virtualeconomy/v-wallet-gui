@@ -4,7 +4,8 @@ import VueResource from 'vue-resource'
 import BigNumber from 'bignumber.js'
 import Blockchain from '@/js-v-sdk/src/blockchain'
 import Account from '@/js-v-sdk/src/account'
-import { NODE_IP, VSYS_PRECISION, NETWORK_BYTE } from '@/constants.js'
+import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
+import { NODE_IP, NETWORK_BYTE } from '@/network'
 Vue.use(Vuex)
 Vue.use(VueResource)
 

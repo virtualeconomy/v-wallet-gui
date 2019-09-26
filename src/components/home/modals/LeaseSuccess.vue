@@ -12,7 +12,7 @@
 </template>
 <script>
 import TxInfoModal from '../elements/TxInfoModal'
-import { TX_FEE } from '@/constants'
+import { TX_FEE } from '@/js-v-sdk/src/constants'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 export default {

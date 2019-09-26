@@ -170,7 +170,7 @@ import common from '@/js-v-sdk/src/utils/common'
 import base58 from '@/libs/base58'
 import converters from '@/js-v-sdk/src/utils/converters'
 import CancelLease from '../modals/CancelLease'
-import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '@/constants'
+import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX } from '@/js-v-sdk/src/constants'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { mapState } from 'vuex'
@@ -262,9 +262,9 @@ export default {
                 } else {
                     return 'Leased Out Canceled'
                 }
-            } else if (this.txRecord['type'] === CONTRACT_CREATE_TX) {
+            } else if (this.txRecord['type'] === REGISTER_CONTRACT_TX) {
                 return 'Register Contract'
-            } else if (this.txRecord['type'] === CONTRACT_EXEC_TX) {
+            } else if (this.txRecord['type'] === EXECUTE_CONTRACT_TX) {
                 return 'Execute Contract Function'
             } else {
                 return 'Received'

@@ -160,7 +160,7 @@
 
 <script>
 import BigNumber from 'bignumber.js'
-import { CONTRACT_EXEC_FEE } from '@/constants'
+import { CONTRACT_EXEC_FEE } from '@/js-v-sdk/src/constants'
 export default {
     name: 'TokenConfirm',
     props: {

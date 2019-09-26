@@ -85,7 +85,7 @@
 
 <script>
 import 'babel-polyfill'
-import { NETWORK_BYTE } from '@/constants.js'
+import { NETWORK_BYTE } from '@/network'
 import base58 from '@/libs/base58'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import VsysLedger from '@/utils/vsysLedger'
