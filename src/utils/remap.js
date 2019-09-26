@@ -45,7 +45,7 @@ export function precisionCheck(precision) {
 export function createRemapper(rules) {
     return function (data) {
         return Object.keys(data).reduce(function (result, key) {
-            var rule = rules[key];
+            let rule = rules[key];
             if (typeof rule === 'function') {
                 // Process with a function
                 result[key] = rule(data[key]);

@@ -124,9 +124,8 @@
               readonly></textarea>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-icon="txIcon"
-                 :height-status="heightStatus"
                  :tx-type="txType"
-                 :difference-height="differenceHeight"
+                 :height-gap="heightGap"
                  :tx-address="txAddress"
                  :tx-time="txRecord.timestamp"
                  :tx-fee="txFee"
@@ -142,8 +141,7 @@
                  :v-if="transType==='payment'"></TxInfoModal>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-fee="txFee"
-                 :difference-height="differenceHeight"
-                 :height-status="heightStatus"
+                 :height-gap="heightGap"
                  :tx-time="cancelTime"
                  :tx-icon="'leased out canceled'"
                  :trans-type="'cancelLease'"
@@ -182,8 +180,7 @@ export default {
     components: { CancelLease, TxInfoModal },
     data: function() {
         return {
-            differenceHeight: 0,
-            heightStatus: false,
+            heightGap: 0,
             hovered: false,
             cancelTime: 0,
             showCancelDetails: false,
@@ -385,6 +382,14 @@ export default {
         txId() {
             return this.txRecord.id
         },
+        getLastHeight() {
+            let oldHeight = 0
+            try {
+                oldHeight = JSON.parse(window.localStorage.getItem('globalHeight'))
+            } catch (e) {
+            }
+            return oldHeight
+        },
         txAttachment() {
             let value = this.txRecord.attachment === void 0 ? '' : this.txRecord.attachment
             let bytes = base58.decode(value)
@@ -397,14 +402,6 @@ export default {
         }
     },
     methods: {
-        getLastHeight() {
-            let oldHeight = 0
-            try {
-                oldHeight = JSON.parse(window.localStorage.getItem('globalHeight'))
-            } catch (e) {
-            }
-            return oldHeight
-        },
         getContractType() {
             this.chain.getContractInfo(this.txRecord.contractId).then(response => {
                 this.contractType = response.type
@@ -413,14 +410,6 @@ export default {
                 this.contractType = 'Failed to get contract type'
                 this.tokenId = 'Failed to get token id'
             })
-        },
-        getHeightStatus: function() {
-            let oldHeightStatus = false
-            try {
-                oldHeightStatus = JSON.parse(window.localStorage.getItem('heightStatus'))
-            } catch (e) {
-            }
-            return oldHeightStatus
         },
         copyTxId() {
             this.$refs.tId.select()
@@ -436,8 +425,7 @@ export default {
             if (this.txType === 'Register Contract') {
                 this.getContractType()
             }
-            this.differenceHeight = this.getLastHeight() - this.txRecord.height
-            this.heightStatus = this.getHeightStatus()
+            this.heightGap = this.getLastHeight - this.txRecord.height
             this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.transType + this.txRecord.id + this.selfSend)
         },
         cancelLeasing() {

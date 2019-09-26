@@ -114,7 +114,6 @@ export default {
         }
     },
     methods: {
-
         checkSeed() {
             this.seedPhrase = this.seedInput.trim()
             if (!this.isValidSeed) {

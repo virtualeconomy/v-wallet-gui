@@ -14,6 +14,7 @@ const store = new Vuex.Store({
         chain: new Blockchain(NODE_IP, NETWORK_BYTE),
         tokenSplitStatus: JSON.parse(window.localStorage.getItem('tokenSplitStatus')),
         tokenManagementStatus: JSON.parse(window.localStorage.getItem('tokenManagementStatus')),
+        heightStatus: JSON.parse(window.localStorage.getItem('heightStatus')),
         eventPool: {},
         available: BigNumber(NaN),
         leasedIn: BigNumber(NaN),
@@ -27,6 +28,7 @@ const store = new Vuex.Store({
         changeSettingsStatus(state, status) {
             state.tokenSplitStatus = status['split']
             state.tokenManagementStatus = status['management']
+            state.heightStatus = status['height']
         },
         updateBalance(state) {
             state.chain.getBalanceDetail(state.selectedAddress).then(response => {
@@ -80,6 +82,7 @@ const store = new Vuex.Store({
         changeSettingsStatus(context, status) {
             context.commit('changeSettingsStatus', status)
             window.localStorage.setItem('tokenSplitStatus', status['split'])
+            window.localStorage.setItem('heightStatus', status['height'])
             window.localStorage.setItem('tokenManagementStatus', status['management'])
         }
     },

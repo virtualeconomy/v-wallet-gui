@@ -266,14 +266,14 @@ export default {
             require: true,
             default: function() {}
         },
-        getPubKey: {
+        getPublicKey: {
             type: Function,
             require: true,
             default: function() {
                 return ''
             }
         },
-        getPriKey: {
+        getPrivateKey: {
             type: Function,
             require: true,
             default: function() {
@@ -291,8 +291,8 @@ export default {
     data() {
         return {
             seed: this.getSeedPhrase,
-            privateKey: this.getPriKey(0),
-            publicKey: this.getPubKey(0),
+            privateKey: this.getPrivateKey(0),
+            publicKey: this.getPublicKey(0),
             seedHidden: true,
             privateKeyHidden: true,
             tagOfColdWallet: {},
@@ -331,8 +331,8 @@ export default {
     methods: {
         addressChange(tab) {
             this.currentAddress = tab
-            this.publicKey = this.getPubKey(tab)
-            this.privateKey = this.getPriKey(tab)
+            this.publicKey = this.getPublicKey(tab)
+            this.privateKey = this.getPrivateKey(tab)
             this.seed = this.getSeedPhrase()
             this.hidePriKey()
             this.hideSeed()
@@ -357,7 +357,7 @@ export default {
             if (this.prvKeyPwd === Vue.ls.get('pwd')) {
                 setTimeout(() => {
                     this.prvKeyPwdErr = false
-                    this.privateKey = this.getPriKey(this.currentAddress)
+                    this.privateKey = this.getPrivateKey(this.currentAddress)
                     this.privateKeyHidden = false
                     this.prvKeyPwd = ''
                 }, 400)
@@ -371,8 +371,8 @@ export default {
         },
         resetData() {
             this.seed = this.getSeedPhrase
-            this.publicKey = this.getPubKey(0)
-            this.privateKey = this.getPriKey(0)
+            this.publicKey = this.getPublicKey(0)
+            this.privateKey = this.getPrivateKey(0)
             this.seedHidden = true
             this.privateKeyHidden = true
             this.tagOfColdWallet = {}

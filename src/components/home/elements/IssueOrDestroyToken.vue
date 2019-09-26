@@ -68,12 +68,8 @@
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupplyOrTokenSufficient && functionName === 'Issue Token'">
-              The total supply can not larger than max supply.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupplyOrTokenSufficient && functionName === 'Destroy Token'">
-              Insufficient token.
+                                     v-else-if="isExceededMaxSupplyOrTokenSufficient">
+              {{ functionName === 'Issue Token' ? 'The total supply can not larger than max supply.' : "Insufficient token." }}
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative">
@@ -195,12 +191,8 @@
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupplyOrTokenSufficient && functionName === 'Issue Token'">
-              The total supply can not larger than max supply.
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededMaxSupplyOrTokenSufficient && functionName === 'Destroy Token'">
-              Insufficient token.
+                                     v-else-if="isExceededMaxSupplyOrTokenSufficient">
+              {{ functionName === 'Issue Token' ? 'The total supply can not larger than max supply.' : "Insufficient token." }}
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative">

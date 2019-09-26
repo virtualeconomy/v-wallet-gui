@@ -19,32 +19,11 @@ export const LEASE_TX = 3;
 export const CONTRACT_CREATE_TX = 8;
 export const CONTRACT_EXEC_TX =9;
 export const CANCEL_LEASE_TX = 4;
-export const INT_TYPE = 4;
-export const ACCOUNT_ADDR_TYPE = 2;
-export const CONTRACT_TYPE = 6;
-export const SHORTTEXT_TYPE = 5;
-export const AMOUNT_TYPE = 3;
-export const TRANSFER_TX = 12;
-export const MINT_TX = 5;
-export const PAYMENT_TX_NAME = 'payment';
-export const TRANSFER_TX_NAME = 'transfer';
-export const LEASE_TX_NAME = 'lease';
-export const CANCEL_LEASE_TX_NAME = 'cancelLeasing';
 export const PRIVATE_KEY_BYTE_LENGTH = 32;
 export const PUBLIC_KEY_BYTE_LENGTH = 32;
 export const PUBLIC_KEY_LENGTH = 44;
 export const PRIVATE_KEY_LENGTH = 44;
-export const MINIMUM_FEE = 100000;
 export const TRANSFER_ATTACHMENT_BYTE_LIMIT = 140;
-export const DEFAULT_MIN_SEED_LENGTH = 25;
-export const DEFAULT_ORDER_EXPIRATION_DAYS = 20;
-export const TRX_RECORD_LIMIT = 30;
-export const DEFAULT_BASIC_CONFIG = {
-    requestOffset: 0,
-    requestLimit: 100,
-    logLevel: 'warning',
-    timeDiff: 0
-};
 
 export const NODE_IP = '/api'
 export const ADDRESS_LENGTH = 35;

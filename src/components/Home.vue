@@ -7,8 +7,8 @@
              :cold-addresses="coldAddresses"
              :username="username"
              :avt-hash="avtHash"
-             :get-pub-key="getPubKey"
-             :get-pri-key="getPriKey"
+             :get-public-key="getPublicKey"
+             :get-private-key="getPrivateKey"
              :get-seed-phrase="getSeedPhrase"
              :set-usr-local-storage="setUsrLocalStorage"
              @delete-cold="deleteCold"></nav-bar>
@@ -100,8 +100,6 @@
                 <div class="f-records">
                   <TokenRecords :address="selectedAddress"
                                 :addresses="addresses"
-                                :chain="chain"
-                                :account="account"
                                 :cold-addresses="coldAddresses"
                                 :wallet-type="walletType"
                                 :balances="balance"
@@ -202,7 +200,6 @@ export default {
         if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
         } else {
-            this.account.buildFromSeed(this.getSeedPhrase(), 0)
             this.getBlockHeight()
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
@@ -252,8 +249,7 @@ export default {
     },
     computed: {
         ...mapState({
-            chain: 'chain',
-            account: 'account'
+            chain: 'chain'
         }),
         address() {
             if (Vue.ls.get('address')) {
@@ -383,12 +379,12 @@ export default {
                 return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
             }
         },
-        getPriKey(nonce) {
+        getPrivateKey(nonce) {
             if (this.secretInfo) {
                 return seedLib.fromExistingPhrasesWithIndex(this.getSeedPhrase(), nonce).keyPair.privateKey
             }
         },
-        getPubKey(nonce) {
+        getPublicKey(nonce) {
             if (this.secretInfo) {
                 return seedLib.fromExistingPhrasesWithIndex(this.getSeedPhrase(), nonce).keyPair.publicKey
             }

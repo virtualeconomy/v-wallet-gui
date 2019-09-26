@@ -3,8 +3,8 @@
 //
 Object.defineProperty(exports, "__esModule", { value: true });
 function concatUint8Arrays() {
-    var args = [];
-    for (var _i = 0; _i < arguments.length; _i++) {
+    let args = [];
+    for (let _i = 0; _i < arguments.length; _i++) {
         args[_i] = arguments[_i];
     }
     if (args.length < 2) {
@@ -13,11 +13,11 @@ function concatUint8Arrays() {
     if (!(args.every(function (arg) { return arg instanceof Uint8Array; }))) {
         throw new Error('One of arguments is not a Uint8Array');
     }
-    var count = args.length;
-    var sumLength = args.reduce(function (sum, arr) { return sum + arr.length; }, 0);
-    var result = new Uint8Array(sumLength);
-    var curLength = 0;
-    for (var i = 0; i < count; i++) {
+    let count = args.length;
+    let sumLength = args.reduce(function (sum, arr) { return sum + arr.length; }, 0);
+    let result = new Uint8Array(sumLength);
+    let curLength = 0;
+    for (let i = 0; i < count; i++) {
         result.set(args[i], curLength);
         curLength += args[i].length;
     }

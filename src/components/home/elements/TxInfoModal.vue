@@ -94,8 +94,8 @@
       <div v-if="heightStatus"
            class="tx-status">
         <label>Block Confirmation</label>
-        <span v-if="differenceHeight > 30">{{ differenceHeight }}(Confirmed)</span>
-        <span v-else-if="differenceHeight <= 30 && differenceHeight >= 0">{{ differenceHeight }}(Unconfirmed)</span>
+        <span v-if="heightGap > 30">{{ heightGap }}(Confirmed)</span>
+        <span v-else-if="heightGap <= 30 && heightGap >= 0">{{ heightGap }}(Unconfirmed)</span>
       </div>
       <div v-if="txStatus === 'Success'"
            class="tx-success">
@@ -147,7 +147,7 @@ import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { TX_FEE, TX_TEST_EXPLORER, NETWORK_BYTE, TX_EXPLORER } from '@/constants'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 export default {
     name: 'TxInfoModal',
     provide() {
@@ -156,13 +156,9 @@ export default {
         }
     },
     props: {
-        differenceHeight: {
+        heightGap: {
             type: Number,
             default: 0
-        },
-        heightStatus: {
-            type: Boolean,
-            default: false
         },
         modalId: {
             type: String,
@@ -236,6 +232,9 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            heightStatus: 'heightStatus'
+        }),
         defaultAddress() {
             return Vue.ls.get('address')
         },

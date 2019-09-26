@@ -2,9 +2,9 @@
 // Derived from waves-api
 //
 var __assign = (this && this.__assign) || Object.assign || function(t) {
-    for (var s, i = 1, n = arguments.length; i < n; i++) {
+    for (let s, i = 1, n = arguments.length; i < n; i++) {
         s = arguments[i];
-        for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+        for (let p in s) if (Object.prototype.hasOwnProperty.call(s, p))
             t[p] = s[p];
     }
     return t;
@@ -50,10 +50,10 @@ function handleError(url, data) {
     throw new WavesRequestError_1.default(url, data);
 }
 function createFetchWrapper(product, version, pipe) {
-    var resolveHost = hostResolvers[key(product, version)];
+    let resolveHost = hostResolvers[key(product, version)];
     return function (path, options) {
-        var url = resolveHost() + normalizePath(path);
-        var request = fetch_1.default(url, options);
+        let url = resolveHost() + normalizePath(path);
+        let request = fetch_1.default(url, options);
         if (pipe) {
             return request.then(pipe).catch(function (data) { return handleError(url, data); });
         }
@@ -66,7 +66,7 @@ exports.createFetchWrapper = createFetchWrapper;
 function wrapTransactionRequest(TransactionConstructor, preRemapAsync, postRemap, callback) {
     return function (data, keyPair) {
         return preRemapAsync(__assign({}, data, { senderPublicKey: keyPair.publicKey })).then(function (validatedData) {
-            var transaction = new TransactionConstructor(validatedData);
+            let transaction = new TransactionConstructor(validatedData);
             return transaction.prepareForAPI(keyPair.privateKey)
                 .then(postRemap)
                 .then(function (tx) {

@@ -15,7 +15,7 @@
       </b-navbar-brand>
       <b-navbar-nav class="ml-auto">
         <div class="block"
-             v-if="showHeight">Last Block: {{ currentTime }}
+             v-if="heightStatus">Last Block: {{ currentTime }}
           <span class="time-height">Height: {{ currentHeight }}</span>
         </div>
         <b-nav-item-dropdown right
@@ -45,11 +45,11 @@
     <Account :addresses="addresses"
              :address="address"
              :cold-addresses="coldAddresses"
-             :get-pub-key="getPubKey"
-             :get-pri-key="getPriKey"
+             :get-public-key="getPublicKey"
+             :get-private-key="getPrivateKey"
              :get-seed-phrase="getSeedPhrase"
              @delete-cold="deleteCold"></Account>
-    <Settings @passParamToParent="childByValue"
+    <Settings @passParamToParent="updateInterval"
               :set-usr-local-storage="setUsrLocalStorage"
               :address="address"></Settings>
     <About></About>
@@ -100,14 +100,14 @@ export default {
             require: true,
             default: function() {}
         },
-        getPubKey: {
+        getPublicKey: {
             type: Function,
             require: true,
             default: function() {
                 return ''
             }
         },
-        getPriKey: {
+        getPrivateKey: {
             type: Function,
             require: true,
             default: function() {
@@ -134,14 +134,12 @@ export default {
             networkType: String.fromCharCode(NETWORK_BYTE),
             interval: 0,
             currentTime: '',
-            showHeight: false,
             currentHeight: 0
         }
     },
     created() {
-        this.showHeight = this.getHeightStatus()
-        if (this.showHeight) {
-            this.childByValue(this.showHeight)
+        if (this.heightStatus) {
+            this.updateInterval()
         }
         this.getBlockHeight()
     },
@@ -150,7 +148,8 @@ export default {
     },
     computed: {
         ...mapState({
-            chain: 'chain'
+            chain: 'chain',
+            heightStatus: 'heightStatus'
         })
     },
     beforeDestroy() {
@@ -170,17 +169,8 @@ export default {
             }, respErr => {
             })
         },
-        getHeightStatus() {
-            let oldHeightStatus = false
-            try {
-                oldHeightStatus = JSON.parse(window.localStorage.getItem('heightStatus'))
-            } catch (e) {
-            }
-            return oldHeightStatus
-        },
-        childByValue(heightStatus) {
-            this.showHeight = heightStatus
-            if (this.showHeight) {
+        updateInterval() {
+            if (this.heightStatus) {
                 if (this.interval) {
                     clearInterval(this.interval)
                 }
