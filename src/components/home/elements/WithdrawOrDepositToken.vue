@@ -281,7 +281,7 @@ import ColdSignature from '../modals/ColdSignature'
 import browser from '@/utils/browser'
 import common from '@/js-v-sdk/src/utils/common'
 import BigNumber from 'bignumber.js'
-import base58 from '@/libs/base58'
+import base58 from 'base-58'
 import { mapActions } from 'vuex'
 export default {
     name: 'WithdrawToken',

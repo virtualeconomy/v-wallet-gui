@@ -86,7 +86,7 @@
 <script>
 import 'babel-polyfill'
 import { NETWORK_BYTE } from '@/network'
-import base58 from '@/libs/base58'
+import base58 from 'base-58'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import VsysLedger from '@/utils/vsysLedger'
 import { mapState } from 'vuex'

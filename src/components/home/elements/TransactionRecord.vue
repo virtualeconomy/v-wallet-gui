@@ -167,7 +167,7 @@
 <script>
 import TxInfoModal from './TxInfoModal'
 import common from '@/js-v-sdk/src/utils/common'
-import base58 from '@/libs/base58'
+import base58 from 'base-58'
 import converters from '@/js-v-sdk/src/utils/converters'
 import CancelLease from '../modals/CancelLease'
 import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX } from '@/js-v-sdk/src/constants'

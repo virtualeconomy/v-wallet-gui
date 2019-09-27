@@ -35,7 +35,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var base58_1 = require("../libs/base58");
+var base58_1 = require("base-58");
 var VSYS_CONFIG = {
     STATUS: {
         SW_OK: 0x9000,

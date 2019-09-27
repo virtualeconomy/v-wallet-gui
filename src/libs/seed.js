@@ -2,7 +2,7 @@
 // Derived from waves-api
 //
 // Object.defineProperty(exports, "__esModule", { value: true });
-var base58_1 = require("./base58");
+import Base58 from 'base-58';
 import crypto_1 from '@/js-v-sdk/src/utils/crypto'
 var logger_1 = require("../utils/logger");
 var seedDictionary_1 = require("./seedDictionary");
@@ -50,8 +50,8 @@ var Seed = /** @class */ (function () {
         let account = new Account()
         this.address = account.convertPublicKeyToAddress(keys.public_key, network.NETWORK_BYTE)
         this.keyPair = {
-            privateKey: base58_1.default.encode(keys.private_key),
-            publicKey: base58_1.default.encode(keys.public_key)
+            privateKey: Base58.encode(keys.private_key),
+            publicKey: Base58.encode(keys.public_key)
         };
         Object.freeze(this);
         Object.freeze(this.keyPair);
