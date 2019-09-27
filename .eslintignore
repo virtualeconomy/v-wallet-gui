@@ -7,3 +7,4 @@
 /src/utils/*.js
 /src/js-v-sdk/
 /src/network.js
+/src/constants.js

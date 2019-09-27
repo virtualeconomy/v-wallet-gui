@@ -226,12 +226,12 @@ export default {
                 }
                 const recordLimit = this.showingNum
                 const txType = this.showingTypeValue
-                const withoutType = this.showingTypeValue === 0
-                this.chain.getTxByType(addr, recordLimit, txType, withoutType).then(response => {
+                const getTransactions = () => { return this.showingTypeValue === 0 ? this.chain.getTxHistory(addr, recordLimit) : this.chain.getTxByType(addr, recordLimit, txType) }
+                getTransactions().then(response => {
                     if (addr === this.address && recordLimit === this.showingNum && txType === this.showingTypeValue) {
-                        this.response = response.transactions
+                        this.response = response = this.showingTypeValue === 0 ? response[0] : response.transactions
                         let count = 0
-                        this.txRecords = response.transactions.reduce((recList, recItem) => {
+                        this.txRecords = response.reduce((recList, recItem) => {
                             const month = this.getMonthYearStr(recItem['timestamp'])
                             if (!recList[month]) {
                                 Vue.set(recList, month, [])

@@ -100,7 +100,7 @@ import seedLib from '@/libs/seed.js'
 import converters from '@/js-v-sdk/src/utils/converters'
 import validator from 'vue-m-validator'
 import Vue from 'vue'
-import { INITIAL_SESSION_TIMEOUT } from '@/js-v-sdk/src/constants'
+import { INITIAL_SESSION_TIMEOUT } from '@/constants'
 import jdenticon from '@/libs/jdenticon-2.1.0'
 
 export default {

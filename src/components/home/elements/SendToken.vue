@@ -402,8 +402,9 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { CONTRACT_EXEC_FEE, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, API_VERSION, PROTOCOL, OPC_ACCOUNT, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/js-v-sdk/src/constants'
+import { CONTRACT_EXEC_FEE, VSYS_PRECISION, API_VERSION, PROTOCOL, OPC_ACCOUNT, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/js-v-sdk/src/constants'
 import { NETWORK_BYTE } from '@/network'
+import { TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'

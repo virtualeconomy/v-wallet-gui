@@ -28,7 +28,7 @@
   </b-modal>
 </template>
 <script>
-import { WALLET_VERSION } from '@/js-v-sdk/src/constants'
+import { WALLET_VERSION } from '@/constants'
 var initData = {
     vVersion: WALLET_VERSION
 }
