@@ -36,6 +36,7 @@
         "vue": "^2.5.2",
         "vue-apexcharts": "^1.2.8",
         "vue-json-excel": "^0.2.5",
+        "js-v-sdk": "./src/js-v-sdk",
         "vue-ls": "^3.0.5",
         "vue-m-validator": "^1.0.5",
         "vue-resource": "^1.5.1",
