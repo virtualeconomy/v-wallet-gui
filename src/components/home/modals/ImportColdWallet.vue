@@ -23,6 +23,7 @@
                 @click="select('appWallet')"
                 :class="classChoose('appWallet') ? 'selected' : 'unselected'">    Mobile Cold Wallet App</button>
         <button id="ledgerWallet"
+                v-if="supportLedger"
                 @click="select('ledgerWallet')"
                 :class="classChoose('ledgerWallet') ? 'selected' : 'unselected'">    Ledger Hardware Device</button>
         <button id="manualInput"
@@ -105,6 +106,7 @@ import LedgerWallet from '../elements/LedgerWallet'
 import AppWallet from '../elements/AppWallet'
 import ManualInput from '../elements/ManualInput'
 import { mapState } from 'vuex'
+import { SHOW_UNSUPPORTED_FUNCTION } from '@/constants'
 
 export default {
     name: 'ImportColdWallet',
@@ -119,7 +121,8 @@ export default {
     data: function() {
         return {
             method: 'appWallet',
-            pageId: 1
+            pageId: 1,
+            supportLedger: SHOW_UNSUPPORTED_FUNCTION
         }
     },
     computed: {
