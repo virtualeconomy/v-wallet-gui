@@ -9,13 +9,20 @@ var certifiedTokensList = {
         'TWtSxBEx7rmsQ34MyWzwBCYYwRJh4K9xsL9zPkMK8': 'DLL'
     },
 }
-
-import { NETWORK_BYTE } from '@/network'
+import Blockchain from '@/js-v-sdk/src/blockchain'
+import { NETWORK_BYTE, NODE_IP } from '@/network'
 var certifiedTokens;
+var certifiedTokensInfo = {};
+var chain = new Blockchain(NODE_IP, NETWORK_BYTE);
 if (String.fromCharCode(NETWORK_BYTE) === 'T') {
     certifiedTokens = certifiedTokensList['Testnet']
 } else {
     certifiedTokens = certifiedTokensList['Mainnet']
+}
+for (let token in certifiedTokens) {
+    chain.getTokenInfo(token).then(response => {
+        certifiedTokensInfo[token] = response.unity
+    })
 }
 export default {
     isCertified(tokenId) {
@@ -29,5 +36,11 @@ export default {
         } else {
             return tokenId
         }
+    },
+    getUnity(tokenId) {
+        return certifiedTokensInfo[tokenId]
+    },
+    updateUnity(tokenId, unity) {
+        certifiedTokensInfo[tokenId] = unity
     }
 }

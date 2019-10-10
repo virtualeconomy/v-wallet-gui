@@ -56,7 +56,7 @@
                height="60px">
         </div>
         <div v-if="txIcon!=='register contract'&& txIcon!=='execute contract function'"
-             :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
+             :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} {{ officialName }}</div>
       </div>
       <div class="tx-address"
            v-if="displayAddress!==''">
@@ -158,6 +158,10 @@ export default {
         }
     },
     props: {
+        officialName: {
+            type: String,
+            default: 'VSYS'
+        },
         heightGap: {
             type: Number,
             default: 0

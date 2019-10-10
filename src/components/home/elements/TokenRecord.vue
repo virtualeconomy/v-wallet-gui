@@ -331,11 +331,6 @@ export default {
         },
         getTokenInfo() {
             let contractId = common.tokenIDToContractID(this.tokenId)
-            this.chain.getTokenInfo(this.tokenId).then(response => {
-                this.tokens = response
-                this.unity = BigNumber(this.tokens.unity)
-            }, respError => {
-            })
             this.chain.getContractInfo(contractId).then(response => {
                 this.issuer = response.info[0].data
                 this.maker = response.info[1].data
@@ -345,6 +340,14 @@ export default {
                 this.contractId = contractId
                 this.issuer = 'Failed to get issuer'
                 this.maker = 'Failed to get maker'
+            })
+            this.chain.getTokenInfo(this.tokenId).then(response => {
+                this.tokens = response
+                this.unity = BigNumber(this.tokens.unity)
+                if (certify.isCertified(this.tokenId) && this.isSplit) {
+                    certify.updateUnity(this.tokenId, this.unity.toString())
+                }
+            }, respError => {
             })
             this.updateToken()
         },
