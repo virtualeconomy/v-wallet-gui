@@ -27,9 +27,7 @@ for (let token in certifiedTokens) {
 }
 export default {
     isCertified(tokenId) {
-        if (tokenId in certifiedTokens) {
-            return true
-        } else return false
+        return tokenId in certifiedTokens
     },
     officialName(tokenId) {
         if (certifiedTokens[tokenId]) {
