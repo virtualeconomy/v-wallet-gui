@@ -406,7 +406,6 @@ export default {
                 }, 0)
             }
             this.updateSelectedAddress({address: addr, balance: this.balance[addr]})
-            this.getBalance(addr)
         },
         deleteCold(addr) {
             Vue.delete(this.coldAddresses, addr)
