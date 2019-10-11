@@ -111,13 +111,17 @@
 </template>
 
 <script>
-import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
+import { VSYS_PRECISION, EXECUTE_CONTRACT_TX } from '@/js-v-sdk/src/constants'
 import BigNumber from 'bignumber.js'
 import TransactionRecord from './TransactionRecord'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
 import browser from '@/utils/browser'
 import { mapState } from 'vuex'
+import common from '@/js-v-sdk/src/utils/common'
+import certify from '@/utils/certify'
+import base58 from 'base-58'
+import convert from '@/js-v-sdk/src/utils/convert'
 export default {
     name: 'TransactionRecords',
     components: {
@@ -239,6 +243,16 @@ export default {
                             let senderAddr = recItem['proofs'] ? recItem['proofs'][0]['address'] : 'no sender'
                             recItem['index'] = ++count
                             recList[month].push(recItem)
+                            if (recItem['type'] === EXECUTE_CONTRACT_TX) {
+                                let tokenId = common.contractIDToTokenID(recItem['contractId'])
+                                if (certify.isCertified(tokenId) && (recItem['functionIndex'] === 4 || (recItem['functionIndex'] === 3 && base58.decode(recItem['functionData'])[1] === 2))) {
+                                    let functionData = convert.parseFunctionData(recItem['functionData'])
+                                    recItem['recipient'] = functionData[0]
+                                    recItem['amount'] = functionData[1]
+                                    recItem['sentToken'] = true
+                                    recItem['officialName'] = certify.officialName(tokenId)
+                                }
+                            }
                             if (recItem['recipient'] === this.address && this.address === senderAddr) { // send to self
                                 let recItemCopy = JSON.parse(JSON.stringify(recItem))
                                 recItemCopy['SelfSend'] = true

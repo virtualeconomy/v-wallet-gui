@@ -86,7 +86,7 @@
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span v-if="txIcon === 'sent' || txIcon === 'received' || txIcon === 'leased out' || txIcon === 'leased out canceled' || txIcon==='leased in' || txIcon==='leased in canceled'">{{ formatter(txAmount) }} VSYS</span>
+          <span v-if="txIcon === 'sent' || txIcon === 'received' || txIcon === 'leased out' || txIcon === 'leased out canceled' || txIcon==='leased in' || txIcon==='leased in canceled'">{{ formatter(txAmount) }} {{ officialName }}</span>
         </div>
         <div class="tx-fee"
              v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'register contract' || txIcon === 'execute contract function') && feeFlag">
@@ -138,6 +138,7 @@
                  :trans-type="transType"
                  :self-send="selfSend"
                  :tx-recipient="txRecipient"
+                 :official-name="officialName"
                  :v-if="transType==='payment'"></TxInfoModal>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-fee="txFee"
@@ -174,6 +175,7 @@ import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, REGISTER_CONTRAC
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { mapState } from 'vuex'
+import certify from '@/utils/certify'
 
 export default {
     name: 'Record',
@@ -243,6 +245,11 @@ export default {
                 return ''
             }
         },
+        officialName() {
+            if (this.isSentToken) {
+                return this.txRecord['officialName']
+            } else return 'VSYS'
+        },
         txType() {
             if (this.txRecord['type'] === PAYMENT_TX) {
                 if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined) {
@@ -265,7 +272,11 @@ export default {
             } else if (this.txRecord['type'] === REGISTER_CONTRACT_TX) {
                 return 'Register Contract'
             } else if (this.txRecord['type'] === EXECUTE_CONTRACT_TX) {
-                return 'Execute Contract Function'
+                if (this.isSentToken) {
+                    if (this.txRecord.recipient !== this.address) {
+                        return 'Sent'
+                    } else return 'Received'
+                } else return 'Execute Contract Function'
             } else {
                 return 'Received'
             }
@@ -359,6 +370,11 @@ export default {
             return date.toString()
         },
         txAmount() {
+            if (this.isSentToken) {
+                let tokenId = common.contractIDToTokenID(this.txRecord.contractId)
+                let unity = certify.getUnity(tokenId)
+                return BigNumber(this.txRecord.amount).dividedBy(unity)
+            }
             if (this.txRecord.lease) {
                 return BigNumber(this.txRecord.lease.amount).dividedBy(VSYS_PRECISION)
             }
@@ -389,6 +405,9 @@ export default {
             } catch (e) {
             }
             return oldHeight
+        },
+        isSentToken() {
+            return this.txRecord.sentToken === true
         },
         txAttachment() {
             let value = this.txRecord.attachment === void 0 ? '' : this.txRecord.attachment
