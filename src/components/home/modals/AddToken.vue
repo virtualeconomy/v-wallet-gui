@@ -23,6 +23,7 @@
                           class="input-t"
                           v-model="tokenId"
                           aria-describedby="inputLiveFeedback"
+                          placeholder="Please input Token ID or Name"
                           :state="isValidToken">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -47,6 +48,7 @@
 import Vue from 'vue'
 import common from '@/js-v-sdk/src/utils/common'
 import { mapActions, mapState } from 'vuex'
+import certify from '@/utils/certify'
 export default {
     name: 'AddToken',
     data() {
@@ -109,6 +111,8 @@ export default {
             if (tmpUserInfo && tmpUserInfo.tokens) {
                 tokens = JSON.parse(tmpUserInfo.tokens)
             }
+            let tokenId = certify.getTokenId(this.tokenId)
+            this.tokenId = tokenId === null ? this.tokenId : tokenId
             if (this.tokenId in tokens) {
                 this.$refs.addTokenModal.hide()
                 return
@@ -116,6 +120,10 @@ export default {
             if (this.tokenId) {
                 this.chain.getContractInfo(this.contractId).then(response => {
                     this.responseErr = false
+                    if (response.hasOwnProperty('error')) {
+                        this.responseErr = true
+                        return
+                    }
                     Vue.set(tokens, this.tokenId, response.info[1].data)
                     this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
                     this.changeAddTokenStatus()

@@ -29,5 +29,11 @@ export default {
         } else {
             return tokenId
         }
+    },
+    getTokenId(name) {
+        for (let tokenId in certifiedTokens) {
+            if (certifiedTokens[tokenId] === name ) return tokenId
+        }
+        return null
     }
 }
