@@ -41,5 +41,11 @@ export default {
     },
     updateUnity(tokenId, unity) {
         certifiedTokens[tokenId].unity = unity
+    },
+    getTokenId(name) {
+        for (let tokenId in certifiedTokens) {
+            if (certifiedTokens[tokenId].name === name ) return tokenId
+        }
+        return null
     }
 }
