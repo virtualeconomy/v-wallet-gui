@@ -16,7 +16,7 @@
       <b-tab title="Add Token">
         <b-container
           class="text-left">
-          <b-form-group label="Token ID"
+          <b-form-group label="Token ID or Name"
                         class="forms"
                         label-for="amountInput">
             <b-form-input id="amountInput"
