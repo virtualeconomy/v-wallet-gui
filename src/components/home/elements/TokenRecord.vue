@@ -309,7 +309,7 @@ export default {
                 this.unity = BigNumber(response.unity)
                 this.tokenBalance = BigNumber(response.balance).dividedBy(response.unity)
                 if (certify.isCertified(this.tokenId) && this.isSplit) {
-                    certify.updateUnity(this.tokenId, this.unity.toString())
+                    certify.updateUnity(this.tokenId, this.unity.toNumber())
                 }
             }, respError => {
             })
@@ -348,7 +348,7 @@ export default {
                 this.tokens = response
                 this.unity = BigNumber(this.tokens.unity)
                 if (certify.isCertified(this.tokenId) && this.isSplit) {
-                    certify.updateUnity(this.tokenId, this.unity.toString())
+                    certify.updateUnity(this.tokenId, this.unity.toNumber())
                 }
             }, respError => {
             })
