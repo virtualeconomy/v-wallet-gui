@@ -6,6 +6,7 @@ import Blockchain from '@/js-v-sdk/src/blockchain'
 import Account from '@/js-v-sdk/src/account'
 import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
 import { NODE_IP, NETWORK_BYTE } from '@/network'
+import common from '@/js-v-sdk/src/utils/common'
 Vue.use(Vuex)
 Vue.use(VueResource)
 
@@ -73,6 +74,60 @@ const store = new Vuex.Store({
                 updateTask(6000)
             }
             context.commit('updateBalance')
+        },
+        addTokenUpdateEventPool(context, tokenId) {
+            let defaultAddress = Vue.ls.get('address')
+            let seedaddress = ''
+            if (Vue.ls.get('address')) {
+                seedaddress = Vue.ls.get('address')
+            }
+            var timeId = -1
+            const updateTask = (interval) => {
+                timeId = setTimeout(() => {
+                    let userInfo = JSON.parse(window.localStorage.getItem(defaultAddress))
+                    let tokens = {}
+                    if (userInfo && userInfo.tokens) {
+                        tokens = JSON.parse(userInfo.tokens)
+                    }
+                    if (tokenId in tokens) {
+                        if (context.state['eventPool']) {
+                            let eventPool = context.state['eventPool']
+                            if (eventPool[tokenId] && eventPool[tokenId].timeId) {
+                                clearTimeout(eventPool[tokenId].timeId)
+                                Vue.delete(eventPool, tokenId)
+                            }
+                            context.commit('changeEventPool', eventPool)
+                        }
+                    } else {
+                        context.state['chain'].getContractInfo(common.tokenIDToContractID(tokenId)).then(response => {
+                            Vue.set(tokens, tokenId, response.info[1].data)
+                            let userInfo = JSON.parse(window.localStorage.getItem(defaultAddress))
+                            Vue.set(userInfo, 'tokens', JSON.stringify(tokens))
+                            window.localStorage.setItem(seedaddress, JSON.stringify(userInfo))
+                            context.commit('changeAddTokenStatus')
+                        }, respError => {
+                        })
+                    }
+                    if (interval <= 150000) {
+                        updateTask(interval * 5)
+                    }
+                }, interval)
+                let tmp = {'timeId': timeId}
+                let eventPool = context.state['eventPool']
+                Vue.set(eventPool, tokenId, tmp)
+                context.commit('changeEventPool', eventPool)
+            }
+            updateTask(6000)
+        },
+        removeTokenUpdateEventPool(context, tokenId) {
+            if (context.state['eventPool']) {
+                let eventPool = context.state['eventPool']
+                if (eventPool[tokenId] && eventPool[tokenId].timeId !== -1) {
+                    clearTimeout(eventPool[tokenId].timeId)
+                    Vue.delete(eventPool, tokenId)
+                }
+                context.commit('changeEventPool', eventPool)
+            }
         },
         changeEventPool(context, status) {
             context.commit('changeEventPool', status)
