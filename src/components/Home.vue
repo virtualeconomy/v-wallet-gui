@@ -204,8 +204,6 @@ export default {
             this.getBlockHeight()
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
-            this.updateSelectedAddress(this.selectedAddress)
-            this.updateBalance(false)
             this.walletType = 'hotWallet'
             let unsortedColdAddresses = {}
             let sortedColdAddresses = {}
@@ -224,6 +222,8 @@ export default {
             for (const addr in this.coldAddresses) {
                 this.getBalance(addr)
             }
+            this.updateSelectedAddress({address: this.selectedAddress, balance: this.balance[this.selectedAddress]})
+            this.updateBalance(false)
             let localChanging = false
             for (const addr in this.coldAddresses) {
                 if (!this.coldAddresses[addr].hasOwnProperty('api')) {
@@ -405,8 +405,7 @@ export default {
                     this.selectedAddress = addr
                 }, 0)
             }
-            this.updateSelectedAddress(addr)
-            this.getBalance(addr)
+            this.updateSelectedAddress({address: addr, balance: this.balance[addr]})
         },
         deleteCold(addr) {
             Vue.delete(this.coldAddresses, addr)

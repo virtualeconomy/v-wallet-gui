@@ -39,8 +39,9 @@ const store = new Vuex.Store({
                 state.leasedIn = BigNumber(response.effective).minus(response.available).dividedBy(VSYS_PRECISION)
             })
         },
-        updateSelectedAddress(state, address) {
-            state.selectedAddress = address
+        updateSelectedAddress(state, status) {
+            state.selectedAddress = status['address']
+            state.available = status['balance']
         },
         changeEventPool(state, status) {
             state.eventPool = status
@@ -50,12 +51,12 @@ const store = new Vuex.Store({
         }
     },
     actions: {
-        updateSelectedAddress(context, address) {
-            if (context.state['selectedAddress'] && context.state['selectedAddress'] !== address) {
-                context.commit('updateSelectedAddress', address)
+        updateSelectedAddress(context, status) {
+            if (context.state['selectedAddress'] && context.state['selectedAddress'] !== status['address']) {
+                context.commit('updateSelectedAddress', status)
                 context.commit('updateBalance')
             }
-            context.commit('updateSelectedAddress', address)
+            context.commit('updateSelectedAddress', status)
         },
         updateBalance(context, repeatable) {
             let randomIdentity = Math.floor(Math.random() * 100)
