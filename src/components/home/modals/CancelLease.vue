@@ -63,7 +63,7 @@
     <b-container v-else-if="page==='success'">
       <CancelSuccess @show-details="showDetails"></CancelSuccess>
     </b-container>
-    <b-container v-else-if="page==='cold' && getDevice==='Ledger'"
+    <b-container v-else-if="page==='cold' && (getDevice === 'Ledger' || getDevice === 'Trezor')"
                  class="text-left">
       <LedgerConfirm :tx-info="dataObject.toJsonForColdSignature()"
                      :transaction-bytes="dataObject.toBytes()"

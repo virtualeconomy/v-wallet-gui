@@ -18,7 +18,7 @@
       <b-container fluid
                    class="c-import">
         <p class="monitor">Select Monitor Method</p>
-        <p class="information">You can select three method to monitor cold wallet.</p>
+        <p class="information">You can select four methods to monitor cold wallet.</p>
         <button id="appWallet"
                 @click="select('appWallet')"
                 :class="classChoose('appWallet') ? 'selected' : 'unselected'">    Mobile Cold Wallet App</button>
@@ -26,6 +26,9 @@
                 v-if="supportLedger"
                 @click="select('ledgerWallet')"
                 :class="classChoose('ledgerWallet') ? 'selected' : 'unselected'">    Ledger Hardware Device</button>
+        <button id="trezorWallet"
+                @click="select('trezorWallet')"
+                :class="classChoose('trezorWallet') ? 'selected' : 'unselected'">    Trezor Hardware Device</button>
         <button id="manualInput"
                 @click="select('manualInput')"
                 :class="classChoose('manualInput') ? 'selected' : 'unselected'">    Manual Input Address</button>
@@ -54,8 +57,9 @@
     </b-container>
     <b-container
       class="ledger"
-      v-if="pageId===2 && method === 'ledgerWallet'">
+      v-if="pageId===2 && (method === 'ledgerWallet' || method === 'trezorWallet')">
       <LedgerWallet @import-cold="importCold"
+                    :method="method"
                     @close-btn="closeModal"></LedgerWallet>
       <b-row class="row">
         <b-col class="col-back">
@@ -64,7 +68,7 @@
             block
             variant="light"
             size="lg"
-            @click="prevPage('ledgerWallet')">Back
+            @click="prevPage">Back
           </b-button>
         </b-col>
       </b-row>
@@ -79,7 +83,7 @@
                     block
                     variant="light"
                     size="lg"
-                    @click="prevPage('appWallet')">Back
+                    @click="prevPage">Back
           </b-button>
         </b-col>
       </b-row>
@@ -94,7 +98,7 @@
                     block
                     variant="light"
                     size="lg"
-                    @click="prevPage('manualInput')">Back
+                    @click="prevPage">Back
           </b-button>
         </b-col>
       </b-row>
@@ -138,37 +142,32 @@ export default {
             if (type === 'appWallet') {
                 this.method = 'appWallet'
                 document.getElementById(type).className = 'selected'
-                document.getElementById('ledgerWallet').className = 'unselected'
                 document.getElementById('manualInput').className = 'unselected'
+                if (document.getElementById('ledgerWallet')) document.getElementById('ledgerWallet').className = 'unselected'
+                if (document.getElementById('trezorWallet')) document.getElementById('trezorWallet').className = 'unselected'
             } else if (type === 'ledgerWallet') {
                 this.method = 'ledgerWallet'
+                document.getElementById(type).className = 'selected'
                 document.getElementById('appWallet').className = 'unselected'
                 document.getElementById('manualInput').className = 'unselected'
-                document.getElementById(type).className = 'selected'
+                if (document.getElementById('trezorWallet')) document.getElementById('trezorWallet').className = 'unselected'
             } else if (type === 'manualInput') {
                 this.method = 'manualInput'
                 document.getElementById(type).className = 'selected'
-                document.getElementById('ledgerWallet').className = 'unselected'
                 document.getElementById('appWallet').className = 'unselected'
+                if (document.getElementById('ledgerWallet')) document.getElementById('ledgerWallet').className = 'unselected'
+                if (document.getElementById('trezorWallet')) document.getElementById('trezorWallet').className = 'unselected'
+            } else if (type === 'trezorWallet') {
+                this.method = 'trezorWallet'
+                document.getElementById(type).className = 'selected'
+                document.getElementById('appWallet').className = 'unselected'
+                document.getElementById('manualInput').className = 'unselected'
+                if (document.getElementById('ledgerWallet')) document.getElementById('ledgerWallet').className = 'unselected'
             }
         },
         importOk() {
-            if (this.method === 'manualInput') {
-                this.pageId++
-                if (this.pageId > 2) {
-                    this.closeModal()
-                }
-            } else if (this.method === 'ledgerWallet') {
-                this.pageId++
-                if (this.pageId > 2) {
-                    this.closeModal()
-                }
-            } else if (this.method === 'appWallet') {
-                this.pageId++
-                if (this.pageId > 2) {
-                    this.closeModal()
-                }
-            }
+            this.pageId++
+            if (this.pageId > 2) this.closeModal()
         },
         importCold(coldAddr, coldPublicKey, jsonObj) {
             this.$emit('import-cold', coldAddr, coldPublicKey, jsonObj)
@@ -180,9 +179,8 @@ export default {
         closeModal() {
             this.$refs.importModal.hide()
         },
-        prevPage(method) {
+        prevPage() {
             this.pageId--
-            this.method = method
         }
     }
 }

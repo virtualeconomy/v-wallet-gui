@@ -103,7 +103,7 @@
               </b-col>
             </b-row>
           </b-container>
-          <b-container v-if="coldPageId===3 && getDevice === 'Ledger'"
+          <b-container v-if="coldPageId===3 && (getDevice === 'Ledger' || getDevice === 'Trezor')"
                        class="text-left">
             <LedgerConfirm :tx-info="dataObject.toJsonForColdSignature()"
                            :transaction-bytes="dataObject.toBytes()"

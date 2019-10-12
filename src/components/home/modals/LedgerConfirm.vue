@@ -12,7 +12,8 @@
         {{ alertMessage }}
       </b-alert>
     </div>
-    <div class="text-input">
+    <div v-if="getDevice === 'Ledger'"
+         class="text-input">
       1.Connect Ledger hardware device with USB
       <br>
       2.Enter VSYS app in Ledger device
@@ -21,9 +22,18 @@
       <br>
       4.Confirm the transaction on Ledger device
     </div>
-    <div class="image">
+    <div v-if="getDevice === 'Trezor'"
+         class="text-input">
+      1.Connect Trezor hardware device with USB
+      <br>
+      2.Click "Send Request" on web
+      <br>
+      3.Confirm the transaction on Trezor device
+    </div>
+    <div class="image"
+         align="center">
       <img class="image-input"
-           src="@/assets/imgs/icons/wallet/img_ledger_device_transaction.png">
+           :src="imgUrl">
     </div>
     <b-row class="row">
       <b-col class="col-lef">
@@ -45,6 +55,8 @@ import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '@/js-v-sdk/src/constants'
 import { NETWORK_BYTE } from '@/network'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import VsysLedger from '@/utils/vsysLedger'
+import ledgerImg from '@/assets/imgs/icons/wallet/img_ledger_device.png'
+import trezorImg from '@/assets/imgs/icons/wallet/img_trezor_device.jpg'
 
 export default {
     name: 'LedgerConfirm',
@@ -70,6 +82,19 @@ export default {
             require: true,
             default: function() {
             }
+        }
+    },
+    computed: {
+        imgUrl() {
+            if (this.getDevice === 'Ledger') {
+                return ledgerImg
+            } else return trezorImg
+        },
+        getDevice() {
+            if (this.addressInfo.hasOwnProperty('device')) {
+                return this.addressInfo.device
+            }
+            return ''
         }
     },
     methods: {
@@ -114,7 +139,6 @@ export default {
 }
 .image-input {
     background: #FAFAFA;
-    margin-left: 70px;
 }
 .image {
     background: #FAFAFA;

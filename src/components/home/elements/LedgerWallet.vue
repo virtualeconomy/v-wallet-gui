@@ -3,13 +3,14 @@
        ref="ledgerWalletModal"
        class="ledgerWallet">
     <div class="black-title">
-      Monitor Ledger Hardware Device
+      Monitor {{ method === 'ledgerWallet' ? 'Ledger' : 'Trezor' }} Hardware Device
     </div>
-    <div class="small-title">Please connect Ledger hardware device with USB as shown in the picture blow and enter VSYS app
+    <div class="small-title"> {{ method === 'ledgerWallet' ? 'Please connect Ledger hardware device with USB as shown in the picture blow and enter VSYS app' : 'Please connect Trezor hardware device with USB' }}
     </div>
-    <div class="image">
+    <div class="image"
+         align="center">
       <img class="image-input"
-           src="@/assets/imgs/icons/wallet/img_ledger_device.png">
+           :src= "imgUrl">
     </div>
     <div class="account-form">
       <p class="account-input">Choose your account index and then click "Select"</p>
@@ -90,6 +91,8 @@ import base58 from 'base-58'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import VsysLedger from '@/utils/vsysLedger'
 import { mapState } from 'vuex'
+import ledgerImg from '@/assets/imgs/icons/wallet/img_ledger_device.png'
+import trezorImg from '@/assets/imgs/icons/wallet/img_trezor_device.jpg'
 
 export default {
     name: 'LedgerWallet',
@@ -98,12 +101,16 @@ export default {
             coldAddress: '',
             coldPublicKey: '',
             addressIndex: 0,
-            device: 'Ledger',
+            device: this.method === 'ledgerWallet' ? 'Ledger' : 'Trezor',
             alertMessage: '',
             dismissCountDown: 0
         }
     },
     props: {
+        method: {
+            type: String,
+            default: ''
+        },
         address: {
             type: String,
             default: ''
@@ -117,6 +124,11 @@ export default {
         ...mapState({
             account: 'account'
         }),
+        imgUrl() {
+            if (this.method === 'ledgerWallet') {
+                return ledgerImg
+            } else return trezorImg
+        },
         isValidColdAddress() {
             if (!this.coldAddress) {
                 return void 0
@@ -205,7 +217,6 @@ export default {
 }
 .image-input {
     background: #FAFAFA;
-    margin-left: 70px;
 }
 .image {
     background: #FAFAFA;
