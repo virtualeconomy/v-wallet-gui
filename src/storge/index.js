@@ -81,7 +81,7 @@ const store = new Vuex.Store({
             if (Vue.ls.get('address')) {
                 seedaddress = Vue.ls.get('address')
             }
-            var timeId = -1
+            let timeId = -1
             const updateTask = (interval) => {
                 timeId = setTimeout(() => {
                     let userInfo = JSON.parse(window.localStorage.getItem(defaultAddress))
