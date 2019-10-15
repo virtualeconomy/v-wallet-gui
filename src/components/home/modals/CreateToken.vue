@@ -520,7 +520,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['updateBalance', 'changeEventPool', 'changeAddTokenStatus']),
+        ...mapActions(['updateBalance', 'changeEventPool', 'changeAddTokenStatus', 'addTokenUpdateEventPool']),
         getQrArray() {
             const qrSize = 300
             let tempDataObject = JSON.parse(JSON.stringify(this.dataObject.toJsonForColdSignature()))
@@ -590,15 +590,7 @@ export default {
                     this.coldPageId++
                 }
                 let tokenId = common.contractIDToTokenID(response.contractId)
-                let stopParaArr = []
-                for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                    let stopPara = setTimeout(this.sendToAdd, delayTime, tokenId)
-                    stopParaArr.push(stopPara)
-                }
-                let tmp = {'newToken': stopParaArr}
-                let eventPool = this.$store.state.eventPool
-                Vue.set(eventPool, tokenId, tmp)
-                this.changeEventPool(eventPool)
+                this.addTokenUpdateEventPool(tokenId)
                 this.updateBalance(true)
             }, respErr => {
                 this.errorMessage = respErr.message
@@ -644,38 +636,6 @@ export default {
         },
         endSend() {
             this.$refs.createTokenModal.hide()
-        },
-        sendToAdd(tokenId) {
-            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            let tokens = {}
-            if (userInfo && userInfo.tokens) {
-                tokens = JSON.parse(userInfo.tokens)
-            }
-            if (tokenId in tokens) {
-                if (this.$store.state.eventPool) {
-                    let eventPool = this.$store.state.eventPool
-                    if (eventPool[tokenId] && eventPool[tokenId].newToken) {
-                        let stopArr = eventPool[tokenId].newToken
-                        for (let i in stopArr) {
-                            clearTimeout(stopArr[i])
-                        }
-                        Vue.delete(eventPool, tokenId)
-                    }
-                    this.changeEventPool(eventPool)
-                }
-            } else {
-                this.chain.getContractInfo(common.tokenIDToContractID(tokenId)).then(response => {
-                    Vue.set(tokens, tokenId, response.info[1].data)
-                    this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
-                    this.changeAddTokenStatus()
-                }, respError => {
-                })
-            }
-        },
-        setUsrLocalStorage(fieldName, value) {
-            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            Vue.set(userInfo, fieldName, value)
-            window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
         getSignature(signature) {
             this.coldSignature = signature
