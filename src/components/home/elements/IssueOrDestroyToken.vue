@@ -522,7 +522,7 @@ export default {
                     this.coldPageId++
                 }
                 this.updateBalance(true)
-                for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                for (let delayTime = 6000; delayTime <= 54000; delayTime *= 3) { //  Refresh interval will be 6s, 18s, 54s
                     setTimeout(this.sendBalanceChange, delayTime)
                 }
             }, respErr => {
@@ -536,9 +536,9 @@ export default {
         nextPage() {
             this.sendError = false
             this.hasConfirmed = false
-            this.timeStamp = Date.now() * 1e6
             if (this.walletType === 'hotWallet') {
                 this.pageId++
+                this.timeStamp = Date.now() * 1e6
             } else {
                 this.coldPageId++
             }

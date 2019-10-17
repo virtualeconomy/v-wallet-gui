@@ -573,7 +573,7 @@ export default {
                 }
                 this.updateBalance(true)
                 if (this.functionName === 'Split Token') {
-                    for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                    for (let delayTime = 6000; delayTime <= 54000; delayTime *= 3) { //  Refresh interval will be 6s, 18s, 54s
                         setTimeout(this.unityChange, delayTime)
                     }
                 }

@@ -42,13 +42,13 @@ $ git clone https://github.com/virtualeconomy/v-wallet-gui.git
   3. clone submodule
 
 ``` bash
-$ git submodule update --init
+  $ cd v-wallet-gui
+  $ git submodule update --init
 ```
 
   4. install packages
 
 ```bash
-  $ cd v-wallet-gui
   $ npm install
 ```
 

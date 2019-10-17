@@ -109,8 +109,8 @@ const store = new Vuex.Store({
                         }, respError => {
                         })
                     }
-                    if (interval <= 150000) {
-                        updateTask(interval * 5)
+                    if (interval <= 54000) {
+                        updateTask(interval * 3)
                     }
                 }, interval)
                 let tmp = {'timeId': timeId}
