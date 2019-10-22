@@ -18,7 +18,7 @@
       <b-container fluid
                    class="c-import">
         <p class="monitor">Select Monitor Method</p>
-        <p class="information">You can select four methods to monitor cold wallet.</p>
+        <p class="information">You can select {{ supportLedger ? 'four' : 'two' }} methods to monitor cold wallet.</p>
         <button id="appWallet"
                 @click="select('appWallet')"
                 :class="classChoose('appWallet') ? 'selected' : 'unselected'">    Mobile Cold Wallet App</button>
@@ -27,6 +27,7 @@
                 @click="select('ledgerWallet')"
                 :class="classChoose('ledgerWallet') ? 'selected' : 'unselected'">    Ledger Hardware Device</button>
         <button id="trezorWallet"
+                v-if="supportLedger"
                 @click="select('trezorWallet')"
                 :class="classChoose('trezorWallet') ? 'selected' : 'unselected'">    Trezor Hardware Device</button>
         <button id="manualInput"
