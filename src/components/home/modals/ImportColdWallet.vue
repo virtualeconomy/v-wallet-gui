@@ -18,7 +18,7 @@
       <b-container fluid
                    class="c-import">
         <p class="monitor">Select Monitor Method</p>
-        <p class="information">You can select three method to monitor cold wallet.</p>
+        <p class="information">You can select {{ supportLedger ? 'three' : 'two' }} methods to monitor cold wallet.</p>
         <button id="appWallet"
                 @click="select('appWallet')"
                 :class="classChoose('appWallet') ? 'selected' : 'unselected'">    Mobile Cold Wallet App</button>
@@ -138,8 +138,8 @@ export default {
             if (type === 'appWallet') {
                 this.method = 'appWallet'
                 document.getElementById(type).className = 'selected'
-                document.getElementById('ledgerWallet').className = 'unselected'
                 document.getElementById('manualInput').className = 'unselected'
+                if (document.getElementById('ledgerWallet')) document.getElementById('ledgerWallet').className = 'unselected'
             } else if (type === 'ledgerWallet') {
                 this.method = 'ledgerWallet'
                 document.getElementById('appWallet').className = 'unselected'
@@ -148,8 +148,8 @@ export default {
             } else if (type === 'manualInput') {
                 this.method = 'manualInput'
                 document.getElementById(type).className = 'selected'
-                document.getElementById('ledgerWallet').className = 'unselected'
                 document.getElementById('appWallet').className = 'unselected'
+                if (document.getElementById('ledgerWallet')) document.getElementById('ledgerWallet').className = 'unselected'
             }
         },
         importOk() {

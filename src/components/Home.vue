@@ -358,8 +358,9 @@ export default {
         },
         importCold(coldAddress, pubKey, jsonObj) {
             let coldAddrs = {}
-            if (this.userInfo && this.userInfo.coldAddresses) {
-                coldAddrs = JSON.parse(this.userInfo.coldAddresses)
+            let userInfo = JSON.parse(window.localStorage.getItem(this.address))
+            if (userInfo && userInfo.coldAddresses) {
+                coldAddrs = JSON.parse(userInfo.coldAddresses)
             }
             if (coldAddrs && coldAddrs[coldAddress]) {
                 alert('Address already exist')
