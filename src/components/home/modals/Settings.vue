@@ -6,7 +6,7 @@
            hide-header
            hide-footer
            ok-only
-           @hide="resetSession">
+           @hide="resetSettings">
     <button
       class="close btn-close"
       @click="closeModal">
@@ -33,7 +33,7 @@
       <div class="timeout-setting div-t">
         <input class="show-height"
                type="checkbox"
-               v-model="heightStatus"
+               v-model="curHeightStatus"
                @click="showHeight">
         <label class="label-st">Show Current Block Height</label>
       </div>
@@ -77,13 +77,14 @@
 
 <script>
 import Vue from 'vue'
-import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
+import { INITIAL_SESSION_TIMEOUT } from '@/constants'
 import { mapState, mapActions } from 'vuex'
 export default {
     name: 'Settings',
     created() {
         this.curManagementStatus = this.tokenManagementStatus
         this.curSplitStatus = this.tokenSplitStatus
+        this.curHeightStatus = this.heightStatus
     },
     props: {
         setUsrLocalStorage: {
@@ -101,7 +102,7 @@ export default {
     },
     data() {
         return {
-            heightStatus: this.getHeightStatus(),
+            curHeightStatus: this.heightStatus,
             curSplitStatus: this.tokenSplitStatus,
             curManagementStatus: this.tokenManagementStatus,
             selectedLang: 'en',
@@ -143,7 +144,8 @@ export default {
     computed: {
         ...mapState({
             tokenManagementStatus: 'tokenManagementStatus',
-            tokenSplitStatus: 'tokenSplitStatus'
+            tokenSplitStatus: 'tokenSplitStatus',
+            heightStatus: 'heightStatus'
         }),
         defaultAddress() {
             return Vue.ls.get('address')
@@ -168,30 +170,17 @@ export default {
                     this.curSplitStatus = value
                 })
         },
-        ...mapActions(['changeEnableStatus', 'changeSettingsStatus']),
+        ...mapActions(['changeSettingsStatus']),
         changeSession() {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             Vue.set(userInfo, 'sessionTimeout', this.selectedSession)
             window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
         showHeight() {
-            if (!this.heightStatus) this.heightStatus = true
-            else this.heightStatus = false
-        },
-        changeHeightStatus() {
-            window.localStorage.setItem('heightStatus', this.heightStatus)
-        },
-        getHeightStatus() {
-            let oldHeightStatus = false
-            try {
-                oldHeightStatus = JSON.parse(window.localStorage.getItem('heightStatus'))
-            } catch (e) {
-            }
-            return oldHeightStatus
+            this.curHeightStatus = !this.curHeightStatus
         },
         enableTokenManagement() {
-            if (!this.curManagementStatus) this.curManagementStatus = true
-            else this.curManagementStatus = false
+            this.curManagementStatus = !this.curManagementStatus
         },
         enableTokenSplit() {
             if (!this.curSplitStatus) {
@@ -212,18 +201,17 @@ export default {
             this.$refs.settingModal.hide()
         },
         passParamToParent() {
-            this.$emit('passParamToParent', this.heightStatus)
+            this.$emit('passParamToParent')
         },
         confirm() {
-            this.changeSettingsStatus({'split': this.curSplitStatus, 'management': this.curManagementStatus})
-            this.changeHeightStatus()
+            this.changeSettingsStatus({'split': this.curSplitStatus, 'management': this.curManagementStatus, 'height': this.curHeightStatus})
             this.changeSession()
             this.$refs.settingModal.hide()
         },
-        resetSession() {
+        resetSettings() {
             this.curSplitStatus = this.tokenSplitStatus
             this.curManagementStatus = this.tokenManagementStatus
-            this.heightStatus = this.getHeightStatus()
+            this.curHeightStatus = this.heightStatus
             this.selectedSession = this.getSelectedSession()
         }
     }

@@ -15,7 +15,7 @@
       </b-navbar-brand>
       <b-navbar-nav class="ml-auto">
         <div class="block"
-             v-if="showHeight">Last Block: {{ currentTime }}
+             v-if="heightStatus">Last Block: {{ currentTime }}
           <span class="time-height">Height: {{ currentHeight }}</span>
         </div>
         <b-nav-item-dropdown right
@@ -45,15 +45,14 @@
     <Account :addresses="addresses"
              :address="address"
              :cold-addresses="coldAddresses"
-             :get-pub-key="getPubKey"
-             :get-pri-key="getPriKey"
+             :get-public-key="getPublicKey"
+             :get-private-key="getPrivateKey"
              :get-seed-phrase="getSeedPhrase"
              @delete-cold="deleteCold"></Account>
-    <Settings @passParamToParent="childByValue"
+    <Settings @passParamToParent="updateInterval"
               :set-usr-local-storage="setUsrLocalStorage"
               :address="address"></Settings>
-    <About :set-usr-local-storage="setUsrLocalStorage"
-           :address="address"></About>
+    <About></About>
   </div>
 
 </template>
@@ -63,9 +62,10 @@
 import Settings from '../modals/Settings'
 import Account from '../modals/Account'
 import About from '../modals/About'
-import {NETWORK_BYTE, NODE_IP} from '@/constants.js'
+import { NETWORK_BYTE } from '@/network'
 import Vue from 'vue'
 import jdenticon from '@/libs/jdenticon-2.1.0'
+import { mapState } from 'vuex'
 
 export default {
     name: 'NavBar',
@@ -100,14 +100,14 @@ export default {
             require: true,
             default: function() {}
         },
-        getPubKey: {
+        getPublicKey: {
             type: Function,
             require: true,
             default: function() {
                 return ''
             }
         },
-        getPriKey: {
+        getPrivateKey: {
             type: Function,
             require: true,
             default: function() {
@@ -131,19 +131,15 @@ export default {
     },
     data() {
         return {
-            networkType: '',
+            networkType: String.fromCharCode(NETWORK_BYTE),
             interval: 0,
-            response: '',
             currentTime: '',
-            showHeight: false,
             currentHeight: 0
         }
     },
     created() {
-        this.networkType = String.fromCharCode(NETWORK_BYTE)
-        this.showHeight = this.getHeightStatus()
-        if (this.showHeight) {
-            this.childByValue(this.showHeight)
+        if (this.heightStatus) {
+            this.updateInterval()
         }
         this.getBlockHeight()
     },
@@ -151,6 +147,10 @@ export default {
         jdenticon()
     },
     computed: {
+        ...mapState({
+            chain: 'chain',
+            heightStatus: 'heightStatus'
+        })
     },
     beforeDestroy() {
         if (this.interval) {
@@ -160,28 +160,17 @@ export default {
     },
     methods: {
         getBlockHeight() {
-            const url = NODE_IP + '/blocks/last'
-            this.$http.get(url).then(response => {
-                this.response = response.body
-                let tempTime = new Date(this.response.timestamp / 1e6).toLocaleString()
-                window.localStorage.setItem('globalHeight', this.response.height)
+            this.chain.getLastBlock().then(response => {
+                let tempTime = new Date(response.timestamp / 1e6).toLocaleString()
+                window.localStorage.setItem('globalHeight', response.height)
                 window.localStorage.setItem('time', tempTime)
-                this.currentHeight = this.response.height
+                this.currentHeight = response.height
                 this.currentTime = tempTime
-            }, response => {
+            }, respErr => {
             })
         },
-        getHeightStatus() {
-            let oldHeightStatus = false
-            try {
-                oldHeightStatus = JSON.parse(window.localStorage.getItem('heightStatus'))
-            } catch (e) {
-            }
-            return oldHeightStatus
-        },
-        childByValue(heightStatus) {
-            this.showHeight = heightStatus
-            if (this.showHeight) {
+        updateInterval() {
+            if (this.heightStatus) {
                 if (this.interval) {
                     clearInterval(this.interval)
                 }

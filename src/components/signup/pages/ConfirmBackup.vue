@@ -66,9 +66,9 @@
         @click="clearWords">
         clear and try again
       </b-button>
-      <div
-        @click="$router.push('/')"
-        class="footer-link">
+      <div v-if="networkType === 'T'"
+           @click="$router.push('/')"
+           class="footer-link">
         skip this step</div>
     </div>
   </div>
@@ -79,12 +79,14 @@
 import VTitle from '@/components/signup/elements/VTitle'
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
+import { NETWORK_BYTE } from '@/network'
 
 export default {
     name: 'ConfirmBackup',
 
     data: function() {
         return {
+            networkType: String.fromCharCode(NETWORK_BYTE),
             isContinueDisable: true,
             selectedWords: [],
             tagFlag: [],

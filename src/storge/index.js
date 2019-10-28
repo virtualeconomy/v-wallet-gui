@@ -2,15 +2,21 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import VueResource from 'vue-resource'
 import BigNumber from 'bignumber.js'
-import JSONBigNumber from 'json-bignumber'
-import { NODE_IP, VSYS_PRECISION } from '@/constants.js'
+import Blockchain from '@/js-v-sdk/src/blockchain'
+import Account from '@/js-v-sdk/src/account'
+import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
+import { NODE_IP, NETWORK_BYTE } from '@/network'
+import common from '@/js-v-sdk/src/utils/common'
 Vue.use(Vuex)
 Vue.use(VueResource)
 
 const store = new Vuex.Store({
     state: {
+        account: new Account(NETWORK_BYTE),
+        chain: new Blockchain(NODE_IP, NETWORK_BYTE),
         tokenSplitStatus: JSON.parse(window.localStorage.getItem('tokenSplitStatus')),
         tokenManagementStatus: JSON.parse(window.localStorage.getItem('tokenManagementStatus')),
+        heightStatus: JSON.parse(window.localStorage.getItem('heightStatus')),
         eventPool: {},
         available: BigNumber(NaN),
         leasedIn: BigNumber(NaN),
@@ -24,19 +30,19 @@ const store = new Vuex.Store({
         changeSettingsStatus(state, status) {
             state.tokenSplitStatus = status['split']
             state.tokenManagementStatus = status['management']
+            state.heightStatus = status['height']
         },
         updateBalance(state) {
-            const url = NODE_IP + '/addresses/balance/details/' + state.selectedAddress
-            Vue.http.get(url).then(response => {
-                let tempResponse = JSONBigNumber.parse(response.bodyText)
-                state.total = tempResponse.regular.dividedBy(VSYS_PRECISION)
-                state.available = tempResponse.available.dividedBy(VSYS_PRECISION)
-                state.leasedOut = tempResponse.regular.minus(tempResponse.available).dividedBy(VSYS_PRECISION)
-                state.leasedIn = tempResponse.effective.minus(tempResponse.available).dividedBy(VSYS_PRECISION)
+            state.chain.getBalanceDetail(state.selectedAddress).then(response => {
+                state.total = BigNumber(response.regular).dividedBy(VSYS_PRECISION)
+                state.available = BigNumber(response.available).dividedBy(VSYS_PRECISION)
+                state.leasedOut = BigNumber(response.regular).minus(response.available).dividedBy(VSYS_PRECISION)
+                state.leasedIn = BigNumber(response.effective).minus(response.available).dividedBy(VSYS_PRECISION)
             })
         },
-        updateSelectedAddress(state, address) {
-            state.selectedAddress = address
+        updateSelectedAddress(state, status) {
+            state.selectedAddress = status['address']
+            state.available = status['balance']
         },
         changeEventPool(state, status) {
             state.eventPool = status
@@ -46,12 +52,12 @@ const store = new Vuex.Store({
         }
     },
     actions: {
-        updateSelectedAddress(context, address) {
-            if (context.state['selectedAddress'] && context.state['selectedAddress'] !== address) {
-                context.commit('updateSelectedAddress', address)
+        updateSelectedAddress(context, status) {
+            if (context.state['selectedAddress'] && context.state['selectedAddress'] !== status['address']) {
+                context.commit('updateSelectedAddress', status)
                 context.commit('updateBalance')
             }
-            context.commit('updateSelectedAddress', address)
+            context.commit('updateSelectedAddress', status)
         },
         updateBalance(context, repeatable) {
             let randomIdentity = Math.floor(Math.random() * 100)
@@ -70,6 +76,60 @@ const store = new Vuex.Store({
             }
             context.commit('updateBalance')
         },
+        addTokenUpdateEventPool(context, tokenId) {
+            let defaultAddress = Vue.ls.get('address')
+            let seedaddress = ''
+            if (Vue.ls.get('address')) {
+                seedaddress = Vue.ls.get('address')
+            }
+            let timeId = -1
+            const updateTask = (interval) => {
+                timeId = setTimeout(() => {
+                    let userInfo = JSON.parse(window.localStorage.getItem(defaultAddress))
+                    let tokens = {}
+                    if (userInfo && userInfo.tokens) {
+                        tokens = JSON.parse(userInfo.tokens)
+                    }
+                    if (tokenId in tokens) {
+                        if (context.state['eventPool']) {
+                            let eventPool = context.state['eventPool']
+                            if (eventPool[tokenId] && eventPool[tokenId].timeId) {
+                                clearTimeout(eventPool[tokenId].timeId)
+                                Vue.delete(eventPool, tokenId)
+                            }
+                            context.commit('changeEventPool', eventPool)
+                        }
+                    } else {
+                        context.state['chain'].getContractInfo(common.tokenIDToContractID(tokenId)).then(response => {
+                            Vue.set(tokens, tokenId, response.info[1].data)
+                            let userInfo = JSON.parse(window.localStorage.getItem(defaultAddress))
+                            Vue.set(userInfo, 'tokens', JSON.stringify(tokens))
+                            window.localStorage.setItem(seedaddress, JSON.stringify(userInfo))
+                            context.commit('changeAddTokenStatus')
+                        }, respError => {
+                        })
+                    }
+                    if (interval <= 54000) {
+                        updateTask(interval * 3)
+                    }
+                }, interval)
+                let tmp = {'timeId': timeId}
+                let eventPool = context.state['eventPool']
+                Vue.set(eventPool, tokenId, tmp)
+                context.commit('changeEventPool', eventPool)
+            }
+            updateTask(6000)
+        },
+        removeTokenUpdateEventPool(context, tokenId) {
+            if (context.state['eventPool']) {
+                let eventPool = context.state['eventPool']
+                if (eventPool[tokenId] && eventPool[tokenId].timeId !== -1) {
+                    clearTimeout(eventPool[tokenId].timeId)
+                    Vue.delete(eventPool, tokenId)
+                }
+                context.commit('changeEventPool', eventPool)
+            }
+        },
         changeEventPool(context, status) {
             context.commit('changeEventPool', status)
         },
@@ -79,6 +139,7 @@ const store = new Vuex.Store({
         changeSettingsStatus(context, status) {
             context.commit('changeSettingsStatus', status)
             window.localStorage.setItem('tokenSplitStatus', status['split'])
+            window.localStorage.setItem('heightStatus', status['height'])
             window.localStorage.setItem('tokenManagementStatus', status['management'])
         }
     },

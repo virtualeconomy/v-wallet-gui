@@ -2,13 +2,13 @@
   <b-container class="text-left">
     <b-form-group label="Wallet Address"
                   label-for="address-input">
-      <b-form-select v-if="walletType==='hot'"
+      <b-form-select v-if="walletType==='hotWallet'"
                      id="address-input"
                      class="addr-input"
                      v-model="address"
                      :options="options(addresses)">
       </b-form-select>
-      <b-form-select v-else-if="walletType==='cold'"
+      <b-form-select v-else-if="walletType==='coldWallet'"
                      id="address-input"
                      class="addr-input"
                      v-model="coldAddress"
@@ -25,27 +25,27 @@
                width="20"
                height="20">
         </span>
-        <span class="balance">{{ formatter(walletType === 'hot' ? balances[address] : balances[coldAddress]) }} VSYS</span>
+        <span class="balance">{{ formatter(walletType === 'hotWallet' ? balances[address] : balances[coldAddress]) }} VSYS</span>
       </b-btn>
     </b-form-group>
     <b-form-group label="Recipient"
                   :label-for="'recipient-input' + walletType">
-      <b-form-input v-if="walletType==='hot'"
+      <b-form-input v-if="walletType==='hotWallet'"
                     :id="'lease-recipient-input' + walletType"
                     class="recipient-input"
                     type="text"
                     v-model="recipient"
-                    :state="isValidRecipient(recipient)"
+                    :state="isValidRecipient"
                     list="showHotRecipientList"
                     aria-describedby="inputLiveFeedBack"
                     placeholder="Paste or scan an address.">
       </b-form-input>
-      <b-form-input v-else-if="walletType==='cold'"
+      <b-form-input v-else-if="walletType==='coldWallet'"
                     :id="'lease-recipient-input' + walletType"
                     class="recipient-input"
                     type="text"
                     v-model="recipient"
-                    :state="isValidRecipient(recipient)"
+                    :state="isValidRecipient"
                     list="showColdRecipientList"
                     aria-describedby="inputLiveFeedBack"
                     placeholder="Paste or scan an address.">
@@ -88,28 +88,28 @@
       </div>
     </b-form-group>
     <b-form-group label="Amount"
-                  :abel-for="'amount-input' + walletType">
+                  :label-for="'amount-input' + walletType">
       <b-form-input :id="'amount-input' + walletType"
                     class="amount-input"
                     v-model="amount"
                     aria-describedby="inputLiveFeedback"
-                    :state="isAmountValid(walletType)"
+                    :state="isValidAmount"
                     onfocus="this.select()">
       </b-form-input>
       <b-form-invalid-feedback id="inputLiveFeedback"
-                               v-if="!checkPrecision(amount)">
+                               v-if="!checkPrecision">
         The number in this field is invalid. It can include a maximum of 8 digits after the decimal point.
       </b-form-invalid-feedback>
       <b-form-invalid-feedback id="inputLiveFeedback"
-                               v-else-if="isInsufficient(amount, walletType)">
+                               v-else-if="isInsufficient">
         Insufficient funds
       </b-form-invalid-feedback>
       <b-form-invalid-feedback id="inputLiveFeedback"
-                               v-else-if="isNegative(amount)">
+                               v-else-if="isNegative">
         Negative number is not allowed.
       </b-form-invalid-feedback>
       <b-form-invalid-feedback id="inputLiveFeedback"
-                               v-else-if="!isNumFormatValid(amount)">
+                               v-else-if="!isValidNumFormat">
         Invalid format.
       </b-form-invalid-feedback>
       <b-form-invalid-feedback id="inputLiveFeedback"
@@ -131,12 +131,12 @@
 </template>
 
 <script>
-import { TX_FEE, VSYS_PRECISION, PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/constants'
-import crypto from '@/utils/crypto'
+import { TX_FEE, VSYS_PRECISION, PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/js-v-sdk/src/constants'
 import browser from '@/utils/browser'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
-import common from '@/utils/common'
+import common from '@/js-v-sdk/src/utils/common'
+import { mapState } from 'vuex'
 
 export default {
     name: 'LeaseInput',
@@ -206,27 +206,50 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            account: 'account'
+        }),
+        isValidAmount() {
+            if (BigNumber(this.amount).isEqualTo(0)) {
+                return void 0
+            }
+            return this.checkPrecision && this.isValidNumFormat && !this.isInsufficient && !this.isNegative
+        },
+        isNegative() {
+            return BigNumber(this.amount).isLessThan(0)
+        },
+        isValidNumFormat() {
+            return common.isValidNumFormat(this.amount)
+        },
+        checkPrecision() {
+            return common.checkPrecision(this.amount, 8)
+        },
+        isInsufficient() {
+            let balance = this.walletType === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
+            return BigNumber(this.amount).isGreaterThan(BigNumber(balance).minus(TX_FEE))
+        },
         isSubmitDisabled() {
-            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient(this.recipient) && this.isAmountValid(this.walletType))
+            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && this.isValidAmount)
         },
         isSameWithSender() {
-            var thisAddr = this.walletType === 'hot' ? this.address : this.coldAddress
-            return thisAddr === this.recipient
-        }
-    },
-    methods: {
-        isValidRecipient: function(recipient) {
+            let address = this.walletType === 'hotWallet' ? this.address : this.coldAddress
+            return address === this.recipient
+        },
+        isValidRecipient() {
+            let recipient = this.recipient
             if (!recipient) {
                 return void 0
             }
             let isValid = false
             try {
-                isValid = crypto.isValidAddress(recipient)
+                isValid = this.account.checkAddress(recipient)
             } catch (e) {
                 console.log(e)
             }
             return isValid && !this.isSameWithSender
-        },
+        }
+    },
+    methods: {
         scanChange() {
             if (!this.qrInit) {
                 this.scanShow = !this.scanShow
@@ -262,11 +285,11 @@ export default {
             this.qrErrMsg = void 0
             this.paused = true
             try {
-                var jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
+                let jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
                 this.recipient = jsonObj.address
-                var opc = jsonObj.opc
-                var api = jsonObj.api
-                var protocol = jsonObj.protocol
+                let opc = jsonObj.opc
+                let api = jsonObj.api
+                let protocol = jsonObj.protocol
                 if (jsonObj.hasOwnProperty('amount')) {
                     this.amount = BigNumber(jsonObj.amount).dividedBy(VSYS_PRECISION).decimalPlaces(8).toString()
                 }
@@ -279,12 +302,13 @@ export default {
                 } else if (opc !== OPC_ACCOUNT) {
                     this.paused = false
                     this.qrErrMsg = 'Wrong operation code in QR code.'
-                } else if (!this.isValidRecipient(this.recipient) || this.recipient === '') {
+                } else if (!this.isValidRecipient || this.recipient === '') {
                     this.paused = false
                     this.qrErrMsg = 'Invalid recipient address in QR code.'
                 }
             } catch (e) {
-                if (this.isValidRecipient(decodeString)) {
+                this.recipient = decodeString
+                if (this.isValidRecipient) {
                     this.recipient = decodeString
                 } else {
                     this.paused = false
@@ -292,35 +316,11 @@ export default {
                 }
             }
         },
-        isAmountValid(type) {
-            var amount = this.amount
-            if (BigNumber(amount).isEqualTo(0)) {
-                return void 0
-            }
-            return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isInsufficient(amount, type) && !this.isNegative(amount)
-        },
-        isNegative(amount) {
-            return BigNumber(amount).isLessThan(0)
-        },
-        isNumFormatValid(amount) {
-            return common.isNumFormatValid(amount)
-        },
-        checkPrecision(amount) {
-            return common.checkPrecision(amount, 8)
-        },
-        isInsufficient(amount, type) {
-            var balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return BigNumber(amount).isGreaterThan(BigNumber(balance).minus(TX_FEE))
-        },
         nextPage() {
-            if (this.walletType === 'hot') {
-                this.$emit('get-data', this.recipient, this.amount, this.address)
-            } else if (this.walletType === 'cold') {
-                this.$emit('get-cold-data', this.recipient, this.amount, this.coldAddress)
-            }
+            this.$emit('get-data', this.recipient, this.amount, this.walletType === 'hotWallet' ? this.address : this.coldAddress, this.walletType)
         },
         options(addrs) {
-            var res = Object.keys(addrs).reduce((options, addr) => {
+            let res = Object.keys(addrs).reduce((options, addr) => {
                 options.push({value: addr, text: addr})
                 return options
             }, [{value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true}])
@@ -340,7 +340,7 @@ export default {
             return browser.bigNumberFormatter(num)
         },
         addRecipientList() {
-            if (this.walletType === 'hot') {
+            if (this.walletType === 'hotWallet') {
                 this.hotRecipientAddressList.set(this.recipient, '1')
                 window.localStorage.setItem('Hot ' + this.defaultAddress + ' leaseRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
             } else {

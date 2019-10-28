@@ -1,23 +1,22 @@
 <template>
-  <b-modal id="newTokenModal"
+  <b-modal id="createTokenModal"
            centered
            lazy
-           title="Send"
+           title="Create Token"
            hide-footer
            hide-header
-           ref="newTokenModal"
+           ref="createTokenModal"
            :busy="true"
            style="padding-left: 0px;"
            @hidden="resetPage">
     <button
-      :disabled="qrInit"
       class="close btn-close"
       @click="endSend">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
     <b-tabs @input="hideQrScan">
       <b-tab title="Hot Wallet"
-             :disabled="qrInit && !pageId"
+             :disabled="!pageId"
              :active="walletType==='hotWallet'">
         <b-container
           style="text-align: left;"
@@ -47,7 +46,7 @@
                              :rows="2"
                              :no-resize="true"
                              placeholder="Max 140 characters. When you have done, this content can not be revised"
-                             :state="isValidAttachment(contractDescription)">
+                             :state="isValidDescription(contractDescription)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Token Description"
@@ -57,7 +56,7 @@
                              :rows="2"
                              :no-resize="true"
                              placeholder="Max 140 characters. When you have done, this content can not be revised"
-                             :state="isValidAttachment(tokenDescription)">
+                             :state="isValidDescription(tokenDescription)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Max Supply"
@@ -66,27 +65,23 @@
                           class="amount-input"
                           v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('hot')"
+                          :state="isValidAmount"
                           onfocus="this.select()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!isNumFormatValid(amount)">
+                                     v-if="!isValidNumFormat">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(amount)">
+                                     v-else-if="!checkPrecision">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isInsufficient('hot')">
-              Insufficient VSYS balance
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(amount)">
+                                     v-else-if="isNegative">
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isBiggerThanMax(amount)">
+                                     v-else-if="isBiggerThanMax">
               Please reduce Unity scale.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -121,13 +116,15 @@
           </div>
           <b-form-group style="margin-top: 10px;">
             <label class="fee-remark">Transaction Fee {{ Number(fee) }} VSYS</label>
+            <span v-if="isInsufficient"
+                  class="vsys-check">Insufficient VSYS balance.</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
                     size="lg"
                     block
                     :disabled="isSubmitDisabled"
-                    @click="nextPage()">Continue
+                    @click="nextPage">Continue
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
@@ -175,7 +172,7 @@
         </b-container>
       </b-tab>
       <b-tab title="Cold Wallet"
-             :disabled="noColdAddress || (qrInit && !coldPageId)"
+             :disabled="noColdAddress || !coldPageId"
              :active="walletType==='coldWallet'">
         <b-container v-if="coldPageId===1"
                      class="text-left">
@@ -199,50 +196,46 @@
           <b-form-group label="Contract Description"
                         label-for="descriptionInput">
             <b-form-textarea id="descriptionInput"
-                             v-model="coldContractDescription"
+                             v-model="contractDescription"
                              :rows="2"
                              :no-resize="true"
                              placeholder="Max 140 characters. When you have done, this content can not be revised"
-                             :state="isValidAttachment(coldContractDescription)">
+                             :state="isValidDescription(contractDescription)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Token Description"
                         label-for="descriptionInput">
             <b-form-textarea id="descriptionInput"
-                             v-model="coldTokenDescription"
+                             v-model="tokenDescription"
                              :rows="2"
                              :no-resize="true"
                              placeholder="Max 140 characters. When you have done, this content can not be revised"
-                             :state="isValidAttachment(coldTokenDescription)">
+                             :state="isValidDescription(tokenDescription)">
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Max Supply"
                         label-for="cold-amount-input">
             <b-form-input id="cold-amount-input"
                           class="amount-input"
-                          v-model="coldAmount"
+                          v-model="amount"
                           aria-describedby="inputLiveFeedback"
-                          :state="isAmountValid('cold')"
+                          :state="isValidAmount"
                           onfocus="this.select()">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-if="!isNumFormatValid(coldAmount)">
+                                     v-if="!isValidNumFormat">
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision(coldAmount)">
+                                     v-else-if="!checkPrecision">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isInsufficient('cold')">
-              Insufficient VSYS balance
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isNegative(coldAmount)">
+                                     v-else-if="isNegative">
               Negative number is not allowed.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isBiggerThanMax(coldAmount)">
+                                     v-else-if="isBiggerThanMax">
               Please reduce Unity scale.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -270,26 +263,28 @@
                style="margin-top: 10px;">
             <span>
               <img id="img_read_cold"
-                   @click="changeColdIcon"
+                   @click="changeIcon"
                    style="font-size: 15px;z-index: 100;"
                    src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after created)</span>
             </span>
           </div>
           <b-form-group>
-            <label class="fee-remark">Transaction Fee {{ Number(coldFee) }} VSYS</label>
+            <label class="fee-remark">Transaction Fee {{ Number(fee) }} VSYS</label>
+            <span v-if="isInsufficient"
+                  class="vsys-check">Insufficient VSYS balance.</span>
           </b-form-group>
           <b-button variant="warning"
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isColdSubmitDisabled"
-                    @click="coldNextPage()">Continue
+                    :disabled="isSubmitDisabled"
+                    @click="nextPage">Continue
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
           <TokenConfirm :address="coldAddress"
-                        :amount=inputAmount(coldAmount)
-                        :fee="coldFee"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
                         :tx-type="'Register New Token'">
           </TokenConfirm>
           <b-row>
@@ -299,7 +294,7 @@
                 block
                 variant="light"
                 size="lg"
-                @click="coldPrevPage">Back
+                @click="prevPage">Back
               </b-button>
             </b-col>
             <b-col class="col-rit">
@@ -308,25 +303,27 @@
                 class="btn-confirm"
                 variant="warning"
                 size="lg"
-                @click=" getQrArray(); coldNextPage()">Confirm
+                @click=" getQrArray(); nextPage()">Confirm
               </b-button>
             </b-col>
           </b-row>
         </b-container>
         <b-container v-if="coldPageId===3"
                      class="text-left">
-          <ColdSignature :data-object="dataObject"
+          <ColdSignature :data-object="dataObject.toJsonForColdSignature()"
                          :qr-total-page="qrPage"
                          :qr-array="getArray"
                          v-if="coldPageId===3"
+                         :cold-public-key="coldAddresses[coldAddress].publicKey"
+                         :transaction-bytes="dataObject.toBytes()"
                          @get-signature="getSignature"
-                         @next-page="coldNextPage"
-                         @prev-page="coldPrevPage"></ColdSignature>
+                         @next-page="nextPage"
+                         @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
           <TokenConfirm :address="coldAddress"
-                        :amount=inputAmount(coldAmount)
-                        :fee="coldFee"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
                         :tx-type="'Register New Token'">
           </TokenConfirm>
           <p v-show="sendError">Sorry, transaction send failed! {{ errorMessage }}</p>
@@ -337,7 +334,7 @@
                 block
                 variant="light"
                 size="lg"
-                @click="coldPrevPage">Back
+                @click="prevPage">Back
               </b-button>
             </b-col>
             <b-col class="col-rit">
@@ -353,8 +350,8 @@
         </b-container>
         <b-container v-show="coldPageId===5">
           <TokenSuccess :address="coldAddress"
-                        :amount=inputAmount(coldAmount)
-                        :fee="coldFee"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
                         :tx-type="'Register New Token'">
           </TokenSuccess>
           <b-button variant="warning"
@@ -369,42 +366,33 @@
 </template>
 
 <script>
-import transaction from '@/utils/transaction'
 import Vue from 'vue'
-import { CONTRACT, CONTRACT_WITH_SPLIT } from '@/contract'
+import { TOKEN_CONTRACT, TOKEN_CONTRACT_WITH_SPLIT } from '@/js-v-sdk/src/contract'
 import seedLib from '@/libs/seed.js'
-import { NODE_IP, OPC_CONTRACT, TRANSFER_ATTACHMENT_BYTE_LIMIT, VSYS_PRECISION, TOKEN_FEE, FEE_SCALE, API_VERSION, PROTOCOL } from '@/constants.js'
+import { CONTRACT_REGISTER_FEE } from '@/js-v-sdk/src/constants'
+import { TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants'
+import { NETWORK_BYTE } from '@/network'
 import TokenConfirm from './TokenConfirm'
 import TokenSuccess from './TokenSuccess'
 import ColdSignature from './ColdSignature'
 import browser from '@/utils/browser'
+import Transaction from '@/js-v-sdk/src/transaction'
 import BigNumber from 'bignumber.js'
 import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
-import base58 from '@/libs/base58'
-import common from '@/utils/common'
+import common from '@/js-v-sdk/src/utils/common'
 import { mapActions, mapState } from 'vuex'
 var initData = {
     errorMessage: '',
-    opc: '',
     qrArray: new Array(0),
     support: false,
-    recipient: '',
     amount: 0,
-    attachment: '',
     qrTotalPage: 1,
     pageId: 1,
-    fee: BigNumber(TOKEN_FEE),
-    coldRecipient: '',
-    coldAmount: 0,
+    fee: BigNumber(CONTRACT_REGISTER_FEE),
     coldPageId: 1,
-    coldFee: BigNumber(TOKEN_FEE),
     address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
     coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
-    scanShow: false,
-    qrInit: false,
-    qrErrMsg: void 0,
-    paused: false,
     unity: 8,
     sendError: false,
     coldSignature: '',
@@ -412,14 +400,12 @@ var initData = {
     timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     tokenId: '',
-    tokens: {},
+    selectedWalletType: this ? this.walletType : 'hotWallet',
     contractDescription: '',
-    tokenDescription: '',
-    coldContractDescription: '',
-    coldTokenDescription: ''
+    tokenDescription: ''
 }
 export default {
-    name: 'NewToken',
+    name: 'CreateToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     props: {
         balances: {
@@ -454,13 +440,10 @@ export default {
     },
     computed: {
         ...mapState({
+            chain: 'chain',
+            account: 'account',
             tokenSplitStatus: 'tokenSplitStatus'
         }),
-        contractId() {
-            return function(tokenId) {
-                return transaction.tokenIDToContractID(tokenId)
-            }
-        },
         defaultAddress() {
             return Vue.ls.get('address')
         },
@@ -487,45 +470,47 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(!this.isInsufficient('hot') && (this.isValidAttachment(this.contractDescription) || !this.contractDescription) && (this.isValidAttachment(this.tokenDescription) || !this.tokenDescription) && this.isAmountValid('hot') && this.address !== '')
-        },
-        isColdSubmitDisabled() {
-            return !((this.isValidAttachment(this.coldContractDescription) || !this.coldContractDescription) && (this.isValidAttachment(this.coldTokenDescription) || !this.coldTokenDescription) && this.isAmountValid('cold') && this.coldAddress !== '')
+            return !(!this.isInsufficient && (this.isValidDescription(this.contractDescription) || !this.contractDescription) && (this.isValidDescription(this.tokenDescription) || !this.tokenDescription) && this.isValidAmount)
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
-        isAmountValid() {
-            return function(type) {
-                let amount = type === 'hot' ? this.amount : this.coldAmount
-                if (BigNumber(amount).isEqualTo(0) && !this.isInsufficient(type)) {
+        isNegative() {
+            return BigNumber(this.amount).isLessThan(0)
+        },
+        isBiggerThanMax() {
+            let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
+            let unityValue = BigNumber(10).exponentiatedBy(this.unity)
+            let value = BigNumber(this.amount).multipliedBy(unityValue)
+            return value.isGreaterThan(maxValue)
+        },
+        isValidNumFormat() {
+            return common.isValidNumFormat(this.amount)
+        },
+        checkPrecision() {
+            return common.checkPrecision(this.amount, this.unity)
+        },
+        isValidAmount() {
+            if (BigNumber(this.amount).isEqualTo(0) || this.isInsufficient) {
+                return void 0
+            }
+            return this.checkPrecision && this.isValidNumFormat && !this.isBiggerThanMax && !this.isNegative
+        },
+        isValidDescription() {
+            return function(description) {
+                if (!description) {
                     return void 0
                 }
-                return this.checkPrecision(amount) && this.isNumFormatValid(amount) && !this.isBiggerThanMax(amount) && !this.isNegative(amount)
+                return common.getLength(description) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
             }
         },
         isInsufficient() {
-            return function(type) {
-                let balance = type === 'hot' ? this.balances[this.address] : this.balances[this.coldAddress]
-                return BigNumber(balance).isLessThan(BigNumber(TOKEN_FEE))
-            }
+            let balance = this.selectedWalletType === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
+            return BigNumber(balance).isLessThan(BigNumber(CONTRACT_REGISTER_FEE))
         },
         dataObject() {
-            return {
-                protocol: PROTOCOL,
-                api: API_VERSION,
-                opc: OPC_CONTRACT,
-                address: this.coldAddress,
-                senderPublicKey: this.coldAddresses[this.coldAddress].publicKey,
-                fee: this.coldFee * VSYS_PRECISION,
-                feeScale: FEE_SCALE,
-                timestamp: Date.now(),
-                contract: this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT,
-                description: this.coldContractDescription,
-                contractInit: base58.encode(transaction.prepareCreate(BigNumber(this.coldAmount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.coldTokenDescription)[0]),
-                contractInitTextual: 'init(max=' + BigNumber(this.coldAmount) + ',unity=' + BigNumber(Math.pow(10, this.unity)) + ',tokenDescription=\'' + this.coldTokenDescription + '\')',
-                contractInitExplain: 'Create token ' + (this.support === false ? '' : '(support split)') + ' with max supply ' + BigNumber(this.coldAmount)
-            }
+            let tra = this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
+            return tra
         },
         qrPage() {
             return this.qrTotalPage
@@ -535,43 +520,26 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['updateBalance', 'changeEventPool', 'changeAddTokenStatus']),
-        isValidAttachment(attachment) {
-            if (!attachment) {
-                return void 0
-            }
-            return common.getLength(attachment) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
-        },
+        ...mapActions(['updateBalance', 'changeEventPool', 'changeAddTokenStatus', 'addTokenUpdateEventPool']),
         getQrArray() {
             const qrSize = 300
-            let tempDataObject = JSON.parse(JSON.stringify(this.dataObject))
-            delete tempDataObject.senderPublicKey
+            let tempDataObject = JSON.parse(JSON.stringify(this.dataObject.toJsonForColdSignature()))
             const text = JSON.stringify(tempDataObject)
             let page = Math.ceil(text.length / qrSize)
             let textArray = Array(page)
-            if (tempDataObject.opc === 'contract') {
-                this.qrTotalPage = page
-                for (var i = 0; i < this.qrTotalPage; i++) {
-                    textArray[i] = text.slice(i * qrSize, (i + 1) * qrSize)
-                }
+            this.qrTotalPage = page
+            for (let i = 0; i < this.qrTotalPage; i++) {
+                textArray[i] = text.slice(i * qrSize, (i + 1) * qrSize)
             }
             this.qrArray = textArray
         },
         changeIcon() {
+            let imgId = this.selectedWalletType === 'hotWallet' ? 'img_read' : 'img_read_cold'
             if (this.support === false) {
-                document.getElementById('img_read').src = imgread2
+                document.getElementById(imgId).src = imgread2
                 this.support = true
             } else {
-                document.getElementById('img_read').src = imgread1
-                this.support = false
-            }
-        },
-        changeColdIcon() {
-            if (this.support === false) {
-                document.getElementById('img_read_cold').src = imgread2
-                this.support = true
-            } else {
-                document.getElementById('img_read_cold').src = imgread1
+                document.getElementById(imgId).src = imgread1
                 this.support = false
             }
         },
@@ -588,58 +556,44 @@ export default {
                 this.unity++
             }
         },
+        buildTransaction(publicKey) {
+            let tra = new Transaction(NETWORK_BYTE)
+            let initData = {amount: this.amount, unity: BigNumber(Math.pow(10, this.unity)), token_description: this.tokenDescription}
+            let contract = this.support === false ? TOKEN_CONTRACT : TOKEN_CONTRACT_WITH_SPLIT
+            tra.buildRegisterContractTx(publicKey, contract, initData, this.contractDescription, this.timeStamp)
+            return tra
+        },
         sendData(walletType) {
-            let apiSchema
+            let sendTx
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
                     return
                 }
                 this.hasConfirmed = true
-                this.feeScale = FEE_SCALE
-                const dataInfo = {
-                    contract: this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT,
-                    senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
-                    fee: TOKEN_FEE * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
-                    timestamp: this.timeStamp,
-                    initData: base58.encode(transaction.prepareCreate(BigNumber(this.amount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.tokenDescription)[0]),
-                    description: this.contractDescription,
-                    signature: transaction.prepareRegContractSignature(this.support === false ? CONTRACT : CONTRACT_WITH_SPLIT, transaction.prepareCreate(BigNumber(this.amount).multipliedBy(BigNumber(Math.pow(10, this.unity))), BigNumber(Math.pow(10, this.unity)), this.tokenDescription), this.contractDescription, BigNumber(this.fee * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
-                }
-                apiSchema = dataInfo
+                let builtTransaction = this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey)
+                this.account.buildFromPrivateKey(this.getKeypair(this.addresses[this.address]).privateKey)
+                let signature = this.account.getSignature(builtTransaction.toBytes())
+                sendTx = builtTransaction.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
-                const coldDataInfo = {
-                    contract: this.dataObject.contract,
-                    senderPublicKey: this.dataObject.senderPublicKey,
-                    fee: this.dataObject.fee,
-                    feeScale: this.dataObject.feeScale,
-                    timestamp: this.dataObject.timestamp,
-                    initData: this.dataObject.contractInit,
-                    description: this.dataObject.description,
-                    signature: this.coldSignature
-                }
-                apiSchema = coldDataInfo
+                let signature = this.coldSignature
+                sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
-            const url = NODE_IP + '/contract/broadcast/register'
-            this.$http.post(url, apiSchema).then(response => {
+            this.chain.sendRegisterContractTx(sendTx).then(response => {
+                if (response.hasOwnProperty('error')) {
+                    this.errorMessage = response.message
+                    this.sendError = true
+                    return
+                }
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
                     this.coldPageId++
                 }
-                let tokenId = transaction.contractIDToTokenID(response.body.contractId)
-                let stopParaArr = []
-                for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                    let stopPara = setTimeout(this.sendToAdd, delayTime, tokenId)
-                    stopParaArr.push(stopPara)
-                }
-                let tmp = {'newToken': stopParaArr}
-                let eventPool = this.$store.state.eventPool
-                Vue.set(eventPool, tokenId, tmp)
-                this.changeEventPool(eventPool)
+                let tokenId = common.contractIDToTokenID(response.contractId)
+                this.addTokenUpdateEventPool(tokenId)
                 this.updateBalance(true)
-            }, response => {
-                this.errorMessage = response.body.message
+            }, respErr => {
+                this.errorMessage = respErr.message
                 if (this.errorMessage === undefined) {
                     this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
                 }
@@ -648,173 +602,54 @@ export default {
         },
         nextPage() {
             this.sendError = false
-            this.timeStamp = Date.now() * 1e6
             this.hasConfirmed = false
-            this.pageId++
-        },
-        coldNextPage() {
-            this.sendError = false
-            this.coldPageId++
+            if (this.selectedWalletType === 'hotWallet') {
+                this.pageId++
+                this.timeStamp = Date.now() * 1e6
+            } else {
+                this.coldPageId++
+            }
         },
         prevPage() {
             this.sendError = false
-            if (this.pageId === 1) {
-                this.$refs.newTokenModal.hide()
-            } else {
-                this.pageId--
-            }
-        },
-        coldPrevPage() {
-            this.sendError = false
-            if (this.coldPageId === 1) {
-                this.$refs.newTokenModal.hide()
-            } else {
-                this.coldPageId--
+            let pageId = this.selectedWalletType === 'hotWallet' ? --this.pageId : --this.coldPageId
+            if (pageId === 0) {
+                this.$refs.createTokenModal.hide()
             }
         },
         resetPage() {
-            this.opc = ''
             this.unity = 8
             this.qrTotalPage = 1
             this.qrArray = new Array(0)
-            this.recipient = ''
             this.amount = 0
             this.pageId = 1
-            this.coldRecipient = ''
-            this.coldAmount = 0
             this.coldPageId = 1
-            this.scanShow = false
-            this.qrInit = false
-            this.paused = false
-            this.qrErrMsg = void 0
             this.sendError = false
             this.coldSignature = ''
             this.support = false
+            this.timeStamp = Date.now() * 1e6
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
+            this.selectedWalletType = this.walletType
             this.contractDescription = ''
             this.tokenDescription = ''
-            this.coldContractDescription = ''
-            this.coldTokenDescription = ''
         },
         endSend() {
-            this.$refs.newTokenModal.hide()
-        },
-        sendToAdd(tokenId) {
-            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            let tokens = {}
-            if (userInfo && userInfo.tokens) {
-                tokens = JSON.parse(userInfo.tokens)
-            }
-            if (tokenId in tokens) {
-                if (this.$store.state.eventPool) {
-                    let eventPool = this.$store.state.eventPool
-                    if (eventPool[tokenId] && eventPool[tokenId].newToken) {
-                        let stopArr = eventPool[tokenId].newToken
-                        for (let i in stopArr) {
-                            clearTimeout(stopArr[i])
-                        }
-                        Vue.delete(eventPool, tokenId)
-                    }
-                    this.changeEventPool(eventPool)
-                }
-            } else {
-                const url = NODE_IP + '/contract/info/' + this.contractId(tokenId)
-                this.$http.get(url).then(response => {
-                    Vue.set(tokens, tokenId, response.body.info[1].data)
-                    this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
-                    this.changeAddTokenStatus()
-                }, respError => {
-                })
-            }
-        },
-        setUsrLocalStorage(fieldName, value) {
-            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            Vue.set(userInfo, fieldName, value)
-            window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
-        },
-        scanChange(evt) {
-            if (!this.qrInit) {
-                this.scanShow = !this.scanShow
-            }
-            if (this.scanShow) {
-                this.paused = false
-            }
-        },
-        async onInit(promise) {
-            try {
-                this.qrInit = true
-                await promise
-            } catch (error) {
-                if (error.name === 'NotAllowedError') {
-                    throw Error('user denied camera access permission')
-                } else if (error.name === 'NotFoundError') {
-                    throw Error('no suitable camera device installed')
-                } else if (error.name === 'NotSupportedError') {
-                    throw Error('page is not served over HTTPS (or localhost)')
-                } else if (error.name === 'NotReadableError') {
-                    throw Error('maybe camera is already in use')
-                } else if (error.name === 'OverconstarinedError') {
-                    throw Error('pass constraints do not match any camera')
-                } else {
-                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
-                }
-            } finally {
-                this.qrInit = false
-            }
+            this.$refs.createTokenModal.hide()
         },
         getSignature(signature) {
             this.coldSignature = signature
-            this.dataObject.timestamp *= 1e6
             this.coldPageId++
         },
-        repaintLocation(location, ctx) {
-            if (location !== null) {
-                const {
-                    topLeftCorner,
-                    topRightCorner,
-                    bottomLeftCorner,
-                    bottomRightCorner
-                } = location
-                ctx.strokeStyle = 'orange' // instead of red
-                ctx.beginPath()
-                ctx.moveTo(topLeftCorner.x, topLeftCorner.y)
-                ctx.lineTo(bottomLeftCorner.x, bottomLeftCorner.y)
-                ctx.lineTo(bottomRightCorner.x, bottomRightCorner.y)
-                ctx.lineTo(topRightCorner.x, topRightCorner.y)
-                ctx.lineTo(topLeftCorner.x, topLeftCorner.y)
-                ctx.closePath()
-                ctx.stroke()
-            }
-        },
         hideQrScan(tabIndex) {
+            this.resetPage()
             if (tabIndex === 0) {
-                this.resetPage()
+                this.selectedWalletType = 'hotWallet'
                 this.pageId = 1
             } else {
-                this.resetPage()
+                this.selectedWalletType = 'coldWallet'
                 this.coldPageId = 1
             }
-            this.scanShow = false
-        },
-        isNegative(amount) {
-            return BigNumber(amount).isLessThan(0)
-        },
-        isBiggerThanMax(amount) {
-            let maxValue = BigNumber(2).exponentiatedBy(63).minus(1)
-            let unityValue = BigNumber(10).exponentiatedBy(this.unity)
-            let value = BigNumber(amount).multipliedBy(unityValue)
-            if (value.isGreaterThan(maxValue)) {
-                return true
-            } else {
-                return false
-            }
-        },
-        isNumFormatValid(amount) {
-            return common.isNumFormatValid(amount)
-        },
-        checkPrecision(amount) {
-            return common.checkPrecision(amount, this.unity)
         },
         options(addrs) {
             return Object.keys(addrs).reduce((options, addr) => {
@@ -998,5 +833,11 @@ textarea::-webkit-input-placeholder {
     font-size: 15px;
     color: #181B3A;
     letter-spacing: 0;
+}
+.vsys-check {
+    display: block;
+    margin-top: -10px;
+    font-size: 80%;
+    color: #dc3545;
 }
 </style>

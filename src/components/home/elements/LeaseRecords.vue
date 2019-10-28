@@ -1,9 +1,9 @@
 <template>
-  <div v-if="leaseRecords.length > 0"
-       class="records">
+  <div class="records">
     <div class="title-records">
       <span>Leasing Records</span>
-      <div class="show-fee"
+      <div v-if="leaseRecords.length > 0"
+           class="show-fee"
            @click="showFee">
         <span class="show-position"> ShowTxFee </span>
         <input class="show-fee2"
@@ -36,14 +36,15 @@
         </b-dropdown-item>
       </b-dropdown>
     </div>
-    <div class="inherit-height">
+    <div v-if="leaseRecords.length > 0"
+         class="inherit-height">
       <div class="scroll"
            :style="{height: myHeight}">
         <div v-for="record in leaseRecords"
              :key="record.id">
           <TransactionRecord :tx-record="record"
                              :fee-flag="feeFlag"
-                             :cold-pub-key="coldPubKey"
+                             :cold-public-key="coldPublicKey"
                              :trans-type="transType"
                              :address-index="addressIndex"
                              :address="address"
@@ -52,40 +53,11 @@
         </div>
       </div>
     </div>
-  </div>
-  <div v-else
-       class="records">
-    <div class="title-records">
-      <span>Leasing Records</span>
-      <b-dropdown class="pd-select"
-                  router-tag="div"
-                  no-caret
-                  :disable="changeShowDisable"
-                  variant="light">
-        <template slot="button-content">
-          <div style="display: inline-block; margin-right: 10px">
-            <img v-if="!changeShowDisable"
-                 src="@/assets/imgs/icons/wallet/ic_filter.svg">
-            <img v-if="changeShowDisable"
-                 width="16"
-                 height="16"
-                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
-            <span class="m-1">Latest {{ showingNum }} Records </span>
-          </div>
-          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
-        </template>
-        <b-dropdown-item class="selection"
-                         @click="changeShowNum(num)"
-                         v-for="num in showNums"
-                         :key="num">Show {{ num }} records
-        </b-dropdown-item>
-      </b-dropdown>
-    </div>
     <img height="50"
          width="50"
-         v-if="changeShowDisable"
+         v-if="changeShowDisable && leaseRecords.length === 0"
          src="@/assets/imgs/icons/wallet/ic_wait.svg">
-    <div v-if="!changeShowDisable"
+    <div v-if="!changeShowDisable && leaseRecords.length === 0"
          class="empty">
       There is no transaction record.
     </div>
@@ -94,11 +66,11 @@
 
 <script>
 
-import { NODE_IP } from '@/constants'
+import { LEASE_TX } from '@/js-v-sdk/src/constants'
 import Vue from 'vue'
 import TransactionRecord from './TransactionRecord'
 import browser from '@/utils/browser'
-import JSONBigNumber from 'json-bignumber'
+import { mapState } from 'vuex'
 export default {
     name: 'LeaseRecords',
     components: {
@@ -139,7 +111,7 @@ export default {
             default: '',
             require: true
         },
-        coldPubKey: {
+        coldPublicKey: {
             type: String,
             default: '',
             require: true
@@ -180,6 +152,11 @@ export default {
             }
         }
     },
+    computed: {
+        ...mapState({
+            chain: 'chain'
+        })
+    },
     methods: {
         isMobile() {
             return browser.isMobile()
@@ -189,17 +166,12 @@ export default {
                 const addr = this.address
                 this.changeShowDisable = true
                 const recordLimit = this.showingNum
-                const url = NODE_IP + '/transactions/list?address=' + this.address + '&limit=' + recordLimit + '&txType=3'
-                this.$http.get(url).then(response => {
+                this.chain.getTxByType(this.address, recordLimit, LEASE_TX).then(response => {
                     if (addr === this.address && recordLimit === this.showingNum) {
-                        this.leaseRecords = response.body.transactions
-                        let tempResponse = JSONBigNumber.parse(response.bodyText).transactions
-                        for (let i = 0; i < this.leaseRecords.length; i++) {
-                            this.leaseRecords[i].amount = tempResponse[i].amount
-                        }
+                        this.leaseRecords = response.transactions
                         this.changeShowDisable = false
                     }
-                }, response => {
+                }, respErr => {
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.changeShowDisable = false
                     }

@@ -7,8 +7,8 @@
              :cold-addresses="coldAddresses"
              :username="username"
              :avt-hash="avtHash"
-             :get-pub-key="getPubKey"
-             :get-pri-key="getPriKey"
+             :get-public-key="getPublicKey"
+             :get-private-key="getPrivateKey"
              :get-seed-phrase="getSeedPhrase"
              :set-usr-local-storage="setUsrLocalStorage"
              @delete-cold="deleteCold"></nav-bar>
@@ -43,7 +43,7 @@
             </span>
           </div>
           <Asset v-if="coldAddresses&&sortFlag===0"
-                 v-for="(coldPubkey, coldAddress) in coldAddresses"
+                 v-for="(coldPublicKey, coldAddress) in coldAddresses"
                  :address="coldAddress"
                  :key="coldAddress"
                  :balance="balance[coldAddress]"
@@ -52,7 +52,7 @@
                  @click.native="selectWallet(coldAddress, 'coldWallet')">
           </Asset>
           <Asset v-if="coldAddresses&&sortFlag===1"
-                 v-for="(coldPubkey, coldAddress) in sortedAddresses"
+                 v-for="(coldPublicKey, coldAddress) in sortedAddresses"
                  :address="coldAddress"
                  :key="coldAddress"
                  :balance="balance[coldAddress]"
@@ -148,7 +148,7 @@
                   <LeaseRecords :address="selectedAddress"
                                 :active-tab="activeTab"
                                 :wallet-type="walletType"
-                                :cold-pub-key="coldPubKey"
+                                :cold-public-key="coldPublicKey"
                                 :address-index="addresses[selectedAddress]"></LeaseRecords>
                 </div>
               </b-tab>
@@ -165,7 +165,8 @@ import NavBar from './home/elements/NavBar'
 import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
-import { INITIAL_SESSION_TIMEOUT, NODE_IP, VSYS_PRECISION } from '@/constants.js'
+import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
+import { INITIAL_SESSION_TIMEOUT } from '@/constants'
 import seedLib from '@/libs/seed.js'
 import TransactionRecords from './home/elements/TransactionRecords'
 import LeasePane from './home/elements/LeasePane'
@@ -174,8 +175,7 @@ import TokenPane from './home/elements/TokenPane'
 import TokenRecords from './home/elements/TokenRecords'
 import AddToken from './home/modals/AddToken'
 import BigNumber from 'bignumber.js'
-import JSONBigNumber from 'json-bignumber'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 
 export default {
     name: 'Home',
@@ -204,8 +204,6 @@ export default {
             this.getBlockHeight()
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
-            this.updateSelectedAddress(this.selectedAddress)
-            this.updateBalance(false)
             this.walletType = 'hotWallet'
             let unsortedColdAddresses = {}
             let sortedColdAddresses = {}
@@ -224,12 +222,18 @@ export default {
             for (const addr in this.coldAddresses) {
                 this.getBalance(addr)
             }
+            this.updateSelectedAddress({address: this.selectedAddress, balance: this.balance[this.selectedAddress]})
+            this.updateBalance(false)
             let localChanging = false
             for (const addr in this.coldAddresses) {
                 if (!this.coldAddresses[addr].hasOwnProperty('api')) {
                     localChanging = true
                     let tempObj = {'protocol': 'v.systems', 'opc': 'account', 'address': addr, 'api': 1, 'publicKey': this.coldAddresses[addr]}
                     Vue.set(this.coldAddresses, addr, JSON.parse(JSON.stringify(tempObj)))
+                }
+                if (!this.coldAddresses[addr].hasOwnProperty('device')) {
+                    localChanging = true
+                    Vue.set(this.coldAddresses[addr], 'device', 'MobileApp')
                 }
             }
             if (localChanging) {
@@ -245,6 +249,9 @@ export default {
         clearTimeout(this.sessionClearTimeout)
     },
     computed: {
+        ...mapState({
+            chain: 'chain'
+        }),
         address() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
@@ -276,7 +283,7 @@ export default {
                     seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
             }
         },
-        coldPubKey() {
+        coldPublicKey() {
             if (this.walletType === 'coldWallet') {
                 if (this.coldAddresses[this.selectedAddress]) {
                     return this.coldAddresses[this.selectedAddress].publicKey
@@ -323,14 +330,12 @@ export default {
             this.setSessionClearTimeout()
         },
         getBalance: function(address) {
-            const url = NODE_IP + '/addresses/balance/details/' + address
-            this.$http.get(url).then(response => {
-                let tempResponse = JSONBigNumber.parse(response.bodyText)
-                let value = tempResponse.available.dividedBy(VSYS_PRECISION)
-                let changestatus = value === this.balance[address]
+            this.chain.getBalanceDetail(address).then(response => {
+                let value = BigNumber(response.available).dividedBy(VSYS_PRECISION)
+                let changeStatus = value === this.balance[address]
                 Vue.set(this.balance, address, value)
                 if (address === this.selectedAddress) {
-                    if (changestatus) {
+                    if (changeStatus) {
                         let addrtmp = this.selectedAddress
                         this.selectedAddress = ''
                         setTimeout(() => {
@@ -343,37 +348,45 @@ export default {
             })
         },
         getBlockHeight() {
-            const url = NODE_IP + '/blocks/last'
-            this.$http.get(url).then(response => {
-                let tempTime = new Date(response.body.timestamp / 1e6).toLocaleString()
-                window.localStorage.setItem('globalHeight', response.body.height)
+            this.chain.getLastBlock().then(response => {
+                let tempTime = new Date(response.timestamp / 1e6).toLocaleString()
+                window.localStorage.setItem('globalHeight', response.height)
                 window.localStorage.setItem('time', tempTime)
             }, respError => {
                 this.$router.push('/warning')
             })
         },
         importCold(coldAddress, pubKey, jsonObj) {
-            Vue.set(this.coldAddresses, coldAddress, !pubKey ? '' : jsonObj)
-            let unsortedColdAddresses = this.coldAddresses
-            let sortedColdAddresses = {}
-            Object.keys(unsortedColdAddresses).sort().forEach(function(key) {
-                sortedColdAddresses[key] = unsortedColdAddresses[key]
-            })
-            this.sortedAddresses = sortedColdAddresses
-            this.getBalance(coldAddress)
-            this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
+            let coldAddrs = {}
+            let userInfo = JSON.parse(window.localStorage.getItem(this.address))
+            if (userInfo && userInfo.coldAddresses) {
+                coldAddrs = JSON.parse(userInfo.coldAddresses)
+            }
+            if (coldAddrs && coldAddrs[coldAddress]) {
+                alert('Address already exist')
+            } else {
+                Vue.set(this.coldAddresses, coldAddress, jsonObj)
+                let unsortedColdAddresses = this.coldAddresses
+                let sortedColdAddresses = {}
+                Object.keys(unsortedColdAddresses).sort().forEach(function(key) {
+                    sortedColdAddresses[key] = unsortedColdAddresses[key]
+                })
+                this.sortedAddresses = sortedColdAddresses
+                this.getBalance(coldAddress)
+                this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
+            }
         },
         getSeedPhrase() {
             if (this.secretInfo) {
                 return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
             }
         },
-        getPriKey(nonce) {
+        getPrivateKey(nonce) {
             if (this.secretInfo) {
                 return seedLib.fromExistingPhrasesWithIndex(this.getSeedPhrase(), nonce).keyPair.privateKey
             }
         },
-        getPubKey(nonce) {
+        getPublicKey(nonce) {
             if (this.secretInfo) {
                 return seedLib.fromExistingPhrasesWithIndex(this.getSeedPhrase(), nonce).keyPair.publicKey
             }
@@ -393,8 +406,7 @@ export default {
                     this.selectedAddress = addr
                 }, 0)
             }
-            this.updateSelectedAddress(addr)
-            this.getBalance(addr)
+            this.updateSelectedAddress({address: addr, balance: this.balance[addr]})
         },
         deleteCold(addr) {
             Vue.delete(this.coldAddresses, addr)
@@ -402,10 +414,10 @@ export default {
             this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
         },
         getAddresses() {
-            var addresses = []
-            var seedPhrase = this.getSeedPhrase()
-            for (var index = 0; index < this.walletAmount; index++) {
-                var seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index)
+            let addresses = []
+            let seedPhrase = this.getSeedPhrase()
+            for (let index = 0; index < this.walletAmount; index++) {
+                let seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index)
                 Vue.set(this.addresses, seed.address, index)
             }
             return addresses
@@ -417,7 +429,6 @@ export default {
     },
     components: {
         ImportColdWallet,
-        // TransPane,
         NavBar,
         Asset,
         TransactionRecords,

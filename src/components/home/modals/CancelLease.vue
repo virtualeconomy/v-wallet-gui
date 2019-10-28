@@ -63,19 +63,40 @@
     <b-container v-else-if="page==='success'">
       <CancelSuccess @show-details="showDetails"></CancelSuccess>
     </b-container>
-    <b-container v-else-if="page==='cold'">
-      <ColdSignature :data-object="dataObject"
+    <b-container v-else-if="page==='cold' && getDevice==='Ledger'"
+                 class="text-left">
+      <LedgerConfirm :tx-info="dataObject.toJsonForColdSignature()"
+                     :transaction-bytes="dataObject.toBytes()"
+                     :address-info="coldAddressInfo"
                      @get-signature="getSignature"
-                     @prev-page="prevPage"
-                     :tx-type="txType"></ColdSignature>
+                     @prev-page="prevPage"></LedgerConfirm>
+      <b-row class="row">
+        <b-col class="col-back">
+          <b-button
+            class="btn-back"
+            block
+            variant="light"
+            size="lg"
+            @click="prevPage">Back
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-container>
+    <b-container v-else-if="page==='cold'"
+                 class="text-left">
+      <ColdSignature :data-object="dataObject.toJsonForColdSignature()"
+                     :cold-public-key="this.coldPublicKey"
+                     :transaction-bytes="dataObject.toBytes()"
+                     @get-signature="getSignature"
+                     @prev-page="prevPage"></ColdSignature>
     </b-container>
   </b-modal>
 </template>
 
 <script>
 import Confirm from './Confirm'
-import { CANCEL_LEASE_TX, VSYS_PRECISION, NODE_IP, TX_FEE, FEE_SCALE, PROTOCOL, OPC_TRANSACTION } from '@/constants'
-import transaction from '@/utils/transaction'
+import { TX_FEE } from '@/js-v-sdk/src/constants'
+import { NETWORK_BYTE } from '@/network'
 import ColdSignature from './ColdSignature'
 import CancelSuccess from './CancelSuccess'
 import TxInfoModal from '../elements/TxInfoModal'
@@ -83,19 +104,20 @@ import seedLib from '@/libs/seed'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { mapActions } from 'vuex'
+import LedgerConfirm from './LedgerConfirm'
+import Transaction from '@/js-v-sdk/src/transaction'
+import { mapActions, mapState } from 'vuex'
 export default {
     name: 'CancelLease',
-    components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm },
+    components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm, LedgerConfirm },
     data: function() {
         return {
             errorMessage: '',
             page: 'confirm',
-            timestamp: 0,
+            timestamp: Date.now() * 1e6,
             coldSignature: '',
             sendError: false,
             signed: false,
-            txType: CANCEL_LEASE_TX,
             hasConfirmed: false
         }
     },
@@ -106,11 +128,6 @@ export default {
             require: true
         },
         address: {
-            type: String,
-            default: '',
-            require: true
-        },
-        fromAddress: {
             type: String,
             default: '',
             require: true
@@ -132,7 +149,7 @@ export default {
         recipient: {
             type: String,
             default: '',
-            requrie: true
+            require: true
         },
         modalId: {
             type: String,
@@ -143,14 +160,9 @@ export default {
             type: Boolean,
             default: false
         },
-        coldPubKey: {
+        coldPublicKey: {
             type: String,
             default: ''
-        },
-        txTimestamp: {
-            type: Number,
-            default: 0,
-            require: true
         },
         addressIndex: {
             type: Number,
@@ -159,21 +171,16 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            chain: 'chain',
+            account: 'account'
+        }),
         defaultAddress() {
             return Vue.ls.get('address')
         },
         dataObject() {
-            return {
-                protocol: PROTOCOL,
-                opc: OPC_TRANSACTION,
-                transactionType: CANCEL_LEASE_TX,
-                senderPublicKey: this.coldPubKey,
-                fee: this.fee * VSYS_PRECISION,
-                feeScale: FEE_SCALE,
-                txId: this.modalId,
-                timestamp: Date.now(),
-                api: this.coldApi()
-            }
+            let tra = this.buildTransaction(this.coldPublicKey)
+            return tra
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
@@ -184,52 +191,67 @@ export default {
         },
         seedPhrase() {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+        },
+        getDevice() {
+            if (this.coldAddressInfo.hasOwnProperty('device')) {
+                return this.coldAddressInfo.device
+            }
+            return ''
+        },
+        coldAddressInfo() {
+            let addrInfo = {'api': 1, 'publicKey': '', 'device': 'unknown'}
+            if (this.userInfo && this.userInfo.hasOwnProperty('coldAddresses')) {
+                let object = JSON.parse(this.userInfo.coldAddresses)
+                if (object.hasOwnProperty(this.address)) {
+                    addrInfo = object[this.address]
+                }
+            }
+            return addrInfo
         }
     },
     methods: {
         ...mapActions(['updateBalance']),
         resetPage() {
             this.page = 'confirm'
+            this.timestamp = Date.now() * 1e6
             this.signed = false
             this.sendError = false
             this.coldSignature = ''
             this.hasConfirmed = false
         },
-        coldApi() {
-            return 1
-        },
         closeModal() {
             this.$refs.cancelLeaseModal.hide()
         },
+        buildTransaction(publicKey) {
+            let tra = new Transaction(NETWORK_BYTE)
+            tra.buildCancelLeasingTx(publicKey, this.modalId, this.timeStamp)
+            return tra
+        },
         sendCancelLease() {
-            var apiSchema
+            let sendTx
             if (this.walletType === 'coldWallet') {
                 if (!this.signed) {
                     this.page = 'cold'
                     return
                 } else {
-                    apiSchema = transaction.prepareColdForAPI(this.dataObject, this.coldSignature, this.coldPubKey, CANCEL_LEASE_TX)
+                    let signature = this.coldSignature
+                    sendTx = this.dataObject.toJsonForSendingTx(signature)
                 }
             } else {
                 if (this.hasConfirmed) {
                     return
                 }
                 this.hasConfirmed = true
-                const dataInfo = {
-                    txId: this.modalId,
-                    fee: this.fee * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
-                    timestamp: Date.now() * 1e6
-                }
-                this.timestamp = dataInfo.timestamp
-                apiSchema = transaction.prepareForAPI(dataInfo, this.getKeypair(), CANCEL_LEASE_TX)
+                let builtTransaction = this.buildTransaction(this.getKeypair(this.address).publicKey)
+                this.account.buildFromPrivateKey(this.getKeypair(this.address).privateKey)
+                let signature = this.account.getSignature(builtTransaction.toBytes())
+                sendTx = builtTransaction.toJsonForSendingTx(signature)
             }
-            const url = NODE_IP + '/leasing/broadcast/cancel'
-            this.$http.post(url, JSON.stringify(apiSchema)).then(response => {
+            this.chain.sendCancelLeasingTx(sendTx).then(response => {
                 this.page = 'success'
                 this.updateBalance(true)
-            }, response => {
-                this.errorMessage = response.body.message
+            }, respErr => {
+                this.errorMessage = respErr.message
                 if (this.errorMessage === undefined) {
                     this.errorMessage = 'Unknown. Please check network connection!'
                 }
@@ -241,7 +263,6 @@ export default {
         },
         getSignature(signature) {
             this.coldSignature = signature
-            this.dataObject.timestamp *= 1e6
             this.signed = true
             this.page = 'confirm'
         },
@@ -342,5 +363,15 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.col-back {
+    padding-left: 10px;
+    margin-top: -70px;
+    margin-right: 230px;
+    margin-left: 5px;
+}
+.row {
+    margin-top: 26px;
+    margin-bottom: 10px;
 }
 </style>

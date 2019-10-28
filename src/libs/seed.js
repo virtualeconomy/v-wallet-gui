@@ -2,17 +2,19 @@
 // Derived from waves-api
 //
 // Object.defineProperty(exports, "__esModule", { value: true });
-var base58_1 = require("./base58");
-var crypto_1 = require("../utils/crypto");
+import Base58 from 'base-58';
+import crypto_1 from '@/js-v-sdk/src/utils/crypto'
 var logger_1 = require("../utils/logger");
 var seedDictionary_1 = require("./seedDictionary");
-var constant = require('../constants');
+var wallet_constant = require('../constants')
+import Account from '@/js-v-sdk/src/account'
+var network = require('../network')
 function generateNewSeed(length) {
-    var random = crypto_1.default.generateRandomUint32Array(length);
-    var wordCount = seedDictionary_1.default.length;
-    var phrase = [];
-    for (var i = 0; i < length; i++) {
-        var wordIndex = random[i] % wordCount;
+    let random = crypto_1.generateRandomUint32Array(length);
+    let wordCount = seedDictionary_1.default.length;
+    let phrase = [];
+    for (let i = 0; i < length; i++) {
+        let wordIndex = random[i] % wordCount;
         phrase.push(seedDictionary_1.default[wordIndex]);
     }
     random.set(new Uint8Array(random.length));
@@ -26,14 +28,14 @@ function encryptSeedPhrase(seedPhrase, password, encryptionRounds) {
     if (encryptionRounds < 1000) {
         logger_1.default.warn('Encryption rounds may be too few');
     }
-    return crypto_1.default.encryptSeed(seedPhrase, password, encryptionRounds);
+    return crypto_1.encryptSeed(seedPhrase, password, encryptionRounds);
 }
 function decryptSeedPhrase(encryptedSeedPhrase, password, encryptionRounds) {
     if (encryptionRounds === void 0) { encryptionRounds = 5000; }
-    var wrongPasswordMessage = 'The password is wrong';
-    var phrase;
+    let wrongPasswordMessage = 'The password is wrong';
+    let phrase;
     try {
-        phrase = crypto_1.default.decryptSeed(encryptedSeedPhrase, password, encryptionRounds);
+        phrase = crypto_1.decryptSeed(encryptedSeedPhrase, password, encryptionRounds);
     }
     catch (e) {
         throw new Error(wrongPasswordMessage);
@@ -43,12 +45,13 @@ function decryptSeedPhrase(encryptedSeedPhrase, password, encryptionRounds) {
 var Seed = /** @class */ (function () {
     function Seed(phrase, nonce) {
         this.phrase = phrase;
-        this.nonce = nonce || constant.INITIAL_NONCE;
-        var keys = crypto_1.default.buildKeyPair(phrase, this.nonce)
-        this.address = crypto_1.default.buildRawAddress(keys.publicKey)
+        this.nonce = nonce || wallet_constant.INITIAL_NONCE;
+        let keys = crypto_1.buildKeyPair(phrase, this.nonce)
+        let account = new Account()
+        this.address = account.convertPublicKeyToAddress(keys.public_key, network.NETWORK_BYTE)
         this.keyPair = {
-            privateKey: base58_1.default.encode(keys.privateKey),
-            publicKey: base58_1.default.encode(keys.publicKey)
+            privateKey: Base58.encode(keys.private_key),
+            publicKey: Base58.encode(keys.public_key)
         };
         Object.freeze(this);
         Object.freeze(this.keyPair);
@@ -61,7 +64,7 @@ var Seed = /** @class */ (function () {
 export default {
     create: function (words, nonce) {
         if (words === void 0 || typeof words === 'number') { words = 15; }
-        var phrase = generateNewSeed(words);
+        let phrase = generateNewSeed(words);
         return new Seed(phrase, nonce);
     },
     fromExistingPhrase: function (phrase) {

@@ -56,7 +56,7 @@
           <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
                            @click="issueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
-                           @click="burnToken">Destroy Token</b-dropdown-item>
+                           @click="destroyToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenSplitStatus"
                            @click="splitToken">Split Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenManagementStatus && showUnsupportedFunction"
@@ -76,65 +76,48 @@
                     :current-supply="formatter(currentSupply)"
                     :token-description="tokenDescription">
     </TokenInfoModal>
-    <IssueAndBurnToken :token-id="tokenId"
-                       :issuer="issuer"
-                       :address="address"
-                       :wallet-type="walletType"
-                       :addresses="addresses"
-                       :cold-addresses="coldAddresses"
-                       :token-balance="tokenBalance"
-                       :balance="balances[address]"
-                       :max-supply="maxSupply"
-                       :current-supply="currentSupply"
-                       :token-unity="unity"
-                       :function-name="functionName"
-                       @updateTokenBalance="updateTokenBalance">
-    </IssueAndBurnToken>
-    <WithdrawToken :token-id="tokenId"
-                   :address="address"
-                   :wallet-type="walletType"
-                   :addresses="addresses"
-                   :cold-addresses="coldAddresses"
-                   :token-balance="tokenBalance"
-                   :balance="balances[address]"
-                   :token-unity="unity"
-                   :is-split="isSplit"
-                   @updateTokenBalance="updateTokenBalance">
-    </WithdrawToken>
-    <DepositToken :token-id="tokenId"
-                  :address="address"
-                  :wallet-type="walletType"
-                  :addresses="addresses"
-                  :cold-addresses="coldAddresses"
-                  :token-balance="tokenBalance"
-                  :balance="balances[address]"
-                  :token-unity="unity"
-                  :is-split="isSplit"
-                  @updateTokenBalance="updateTokenBalance">
-    </DepositToken>
-    <Supersede :issuer="issuer"
-               :token-id="tokenId"
-               :maker="maker"
-               :address="address"
-               :wallet-type="walletType"
-               :addresses="addresses"
-               :cold-addresses="coldAddresses"
-               :balance="balances[address]"
-               @updateTokenBalance="updateTokenBalance">
-    </Supersede>
-    <SplitToken :token-id="tokenId"
-                :issuer="issuer"
-                :address="address"
-                :wallet-type="walletType"
-                :addresses="addresses"
-                :cold-addresses="coldAddresses"
-                :token-balance="tokenBalance"
-                :balance="balances[address]"
-                :token-unity="unity"
-                :max-supply="maxSupply"
-                :is-split="isSplit"
-                @updateUnity="updateUnity">
-    </SplitToken>
+    <IssueOrDestroyToken :token-id="tokenId"
+                         :issuer="issuer"
+                         :address="address"
+                         :wallet-type="walletType"
+                         :addresses="addresses"
+                         :cold-addresses="coldAddresses"
+                         :token-balance="tokenBalance"
+                         :balance="balances[address]"
+                         :max-supply="maxSupply"
+                         :current-supply="currentSupply"
+                         :token-unity="unity"
+                         :function-name="functionName"
+                         @updateToken="updateToken">
+    </IssueOrDestroyToken>
+    <WithdrawOrDepositToken :token-id="tokenId"
+                            :address="address"
+                            :wallet-type="walletType"
+                            :addresses="addresses"
+                            :cold-addresses="coldAddresses"
+                            :token-balance="tokenBalance"
+                            :balance="balances[address]"
+                            :function-name="functionName"
+                            :token-unity="unity"
+                            :is-split="isSplit"
+                            @updateToken="updateToken">
+    </WithdrawOrDepositToken>
+    <SplitTokenOrSupersede :issuer="issuer"
+                           :token-id="tokenId"
+                           :maker="maker"
+                           :address="address"
+                           :wallet-type="walletType"
+                           :addresses="addresses"
+                           :cold-addresses="coldAddresses"
+                           :balance="balances[address]"
+                           :token-unity="unity"
+                           :function-name="functionName"
+                           :max-supply="maxSupply"
+                           :is-split="isSplit"
+                           :issuer-or-maker="issuerOrMaker"
+                           :token-balance="tokenBalance"
+                           @updateToken="updateToken">
+    </SplitTokenOrSupersede>
     <SendToken :token-id="tokenId"
                :token-balances="tokenBalances"
                :balances="balances"
@@ -144,33 +127,29 @@
                :wallet-type="walletType"
                :is-split="isSplit"
                :token-unity="unity"
-               @updateTokenBalance="updateTokenBalance">
+               @updateToken="updateToken">
     </SendToken>
   </b-container>
 </template>
 
 <script>
-import transaction from '@/utils/transaction'
-import base58 from '@/libs/base58'
-import converters from '@/libs/converters'
+import common from '@/js-v-sdk/src/utils/common'
+import base58 from 'base-58'
+import converters from '@/js-v-sdk/src/utils/converters'
 import TokenInfoModal from './TokenInfoModal'
 import SendToken from './SendToken'
-import WithdrawToken from './WithdrawToken'
 import BigNumber from 'bignumber.js'
-import IssueAndBurnToken from './IssueAndBurnToken'
-import Supersede from './Supersede'
-import SplitToken from './SplitToken'
-import DepositToken from './DepositToken'
-import { NODE_IP, SHOW_UNSUPPORTED_FUNCTION } from '@/constants.js'
-import { CONTRACT_WITH_SPLIT_DESCRIPTOR } from '@/contract'
+import IssueOrDestroyToken from './IssueOrDestroyToken'
+import WithdrawOrDepositToken from './WithdrawOrDepositToken'
+import SplitTokenOrSupersede from './SplitTokenOrSupersede'
+import { SHOW_UNSUPPORTED_FUNCTION } from '@/constants'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import certify from '@/utils/certify'
-import { mapState } from 'vuex'
-import JSONBigNumber from 'json-bignumber'
+import { mapActions, mapState } from 'vuex'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, Supersede, SplitToken, WithdrawToken, DepositToken, IssueAndBurnToken },
+    components: { TokenInfoModal, SendToken, SplitTokenOrSupersede, WithdrawOrDepositToken, IssueOrDestroyToken },
     data: function() {
         return {
             isSplit: false,
@@ -240,26 +219,33 @@ export default {
             if (newAddr === '' || this.activeTab !== 'token') {
                 return
             }
-            this.updateTokenBalance()
+            this.updateToken()
         },
         activeTab(newTab, oldTab) {
             if (newTab === 'token') {
-                this.updateTokenBalance()
+                this.updateToken()
             }
         }
     },
     created() {
         this.getTokenInfo()
-        this.updateTokenBalance()
+        this.updateToken()
     },
 
     computed: {
         ...mapState({
+            chain: 'chain',
             tokenManagementStatus: 'tokenManagementStatus',
             tokenSplitStatus: 'tokenSplitStatus'
         }),
         defaultAddress() {
             return Vue.ls.get('address')
+        },
+        getDevice() {
+            if (this.coldAddresses && this.coldAddresses[this.address] && this.coldAddresses[this.address].hasOwnProperty('device')) {
+                return this.coldAddresses[this.address].device
+            }
+            return ''
         },
         seedAddress() {
             if (Vue.ls.get('address')) {
@@ -270,6 +256,9 @@ export default {
             if (this.tokens) {
                 return BigNumber(this.tokens.max).dividedBy(this.unity)
             } else return ''
+        },
+        issuerOrMaker() {
+            return this.functionName === 'Split Token' ? this.issuer : this.maker
         },
         currentSupply() {
             if (this.tokens) {
@@ -301,13 +290,11 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['removeTokenUpdateEventPool']),
         setUsrLocalStorage(fieldName, value) {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             Vue.set(userInfo, fieldName, value)
             window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
-        },
-        closeModal() {
-            this.$refs.infoModal.hide()
         },
         hoverIco() {
             this.hovered = true
@@ -318,73 +305,55 @@ export default {
         formatter(num) {
             return browser.bigNumberFormatter(num)
         },
-        updateTokenBalance() {
-            const url = NODE_IP + '/contract/balance/' + this.address + '/' + this.tokenId
-            this.$http.get(url).then(response => {
-                let tempResponse = JSONBigNumber.parse(response.bodyText)
-                this.tokenBalance = BigNumber(tempResponse.balance).dividedBy(tempResponse.unity)
-            }, respError => {
-            })
-        },
-        updateUnity() {
-            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
-            this.$http.get(tokenUrl).then(response => {
-                let tempResponse = JSONBigNumber.parse(response.bodyText)
-                this.tokens = tempResponse
-                this.unity = BigNumber(this.tokens.unity)
-                this.updateTokenBalance()
+        updateToken() {
+            this.chain.getTokenBalance(this.address, this.tokenId).then(response => {
+                this.unity = BigNumber(response.unity)
+                this.tokenBalance = BigNumber(response.balance).dividedBy(response.unity)
+                if (certify.isCertified(this.tokenId) && this.isSplit) {
+                    certify.updateUnity(this.tokenId, this.unity.toNumber())
+                }
             }, respError => {
             })
         },
         getTokenBalances() {
             for (const addr in this.addresses) {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
-                let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
-                this.$http.get(turl).then(response => {
-                    let tempResponse = JSONBigNumber.parse(response.bodyText)
-                    let value = BigNumber(tempResponse.balance).dividedBy(tempResponse.unity)
+                this.chain.getTokenBalance(addr, this.tokenId).then(response => {
+                    let value = BigNumber(response.balance).dividedBy(response.unity)
                     Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
             }
             for (const addr in this.coldAddresses) {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
-                let turl = NODE_IP + '/contract/balance/' + addr + '/' + this.tokenId
-                this.$http.get(turl).then(response => {
-                    let tempResponse = JSONBigNumber.parse(response.bodyText)
-                    let value = BigNumber(tempResponse.balance).dividedBy(tempResponse.unity)
+                this.chain.getTokenBalance(addr, this.tokenId).then(response => {
+                    let value = BigNumber(response.balance).dividedBy(response.unity)
                     Vue.set(this.tokenBalances, addr, value)
                 }, respError => {
                 })
             }
         },
         getTokenInfo() {
-            let contractId = transaction.tokenIDToContractID(this.tokenId)
-            const tokenUrl = NODE_IP + '/contract/tokenInfo/' + this.tokenId
-            this.$http.get(tokenUrl).then(response => {
-                let tempResponse = JSONBigNumber.parse(response.bodyText)
-                this.tokens = tempResponse
-                this.unity = BigNumber(this.tokens.unity)
+            let contractId = common.tokenIDToContractID(this.tokenId)
+            this.chain.getContractInfo(contractId).then(response => {
+                this.issuer = response.info[0].data
+                this.maker = response.info[1].data
+                this.contractId = response.contractId
+                this.isSplit = response.type === 'TokenContractWithSplit'
             }, respError => {
-            })
-
-            const url = NODE_IP + '/contract/info/' + contractId
-            this.$http.get(url).then(response => {
-                this.issuer = response.body.info[0].data
-                this.maker = response.body.info[1].data
-                this.contractId = response.body.contractId
-            }, respError => {
+                this.contractId = contractId
                 this.issuer = 'Failed to get issuer'
+                this.maker = 'Failed to get maker'
             })
-
-            const url2 = NODE_IP + '/contract/content/' + contractId
-            this.$http.get(url2).then(response => {
-                var tokentype = response.body.textual.descriptors
-                this.isSplit = (tokentype === CONTRACT_WITH_SPLIT_DESCRIPTOR)
+            this.chain.getTokenInfo(this.tokenId).then(response => {
+                this.tokens = response
+                this.unity = BigNumber(this.tokens.unity)
+                if (certify.isCertified(this.tokenId) && this.isSplit) {
+                    certify.updateUnity(this.tokenId, this.unity.toNumber())
+                }
             }, respError => {
-                console.log('failed to load tokentype ')
             })
-            this.updateTokenBalance()
+            this.updateToken()
         },
         showModal() {
             this.getTokenInfo()
@@ -394,35 +363,67 @@ export default {
             window.open('https://docs.google.com/forms/d/e/1FAIpQLSer2SHC0qLi5l_4q-8zXcQG_nAraUBkMB9LPDI0MLuSB_03vg/viewform')
         },
         sendToken() {
-            this.getTokenBalances()
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId)
+            if (this.getDevice === 'Ledger') {
+                alert('This feature is not supported')
+            } else {
+                this.getTokenBalances()
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId)
+            }
         },
         supersede() {
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'supersedeModal_' + this.tokenId)
+            if (this.getDevice === 'Ledger') {
+                alert('This feature is not supported')
+            } else {
+                this.functionName = 'Supersede'
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'splitTokenOrSupersedeModal_' + this.tokenId)
+            }
         },
         splitToken() {
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'splitTokenModal_' + this.tokenId)
+            if (this.getDevice === 'Ledger') {
+                alert('This feature is not supported')
+            } else {
+                this.functionName = 'Split Token'
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'splitTokenOrSupersedeModal_' + this.tokenId)
+            }
         },
         issueToken() {
-            this.functionName = 'Issue Token'
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'issueAndBurnTokenModal_' + this.tokenId)
+            if (this.getDevice === 'Ledger') {
+                alert('This feature is not supported')
+            } else {
+                this.functionName = 'Issue Token'
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'issueOrDestroyTokenModal_' + this.tokenId)
+            }
         },
         withdrawToken() {
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'withdrawTokenModal_' + this.tokenId)
+            if (this.getDevice === 'Ledger') {
+                alert('This feature is not supported')
+            } else {
+                this.functionName = 'Withdraw Token'
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal_' + this.tokenId)
+            }
         },
-        burnToken() {
-            this.functionName = 'Destroy Token'
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'issueAndBurnTokenModal_' + this.tokenId)
+        destroyToken() {
+            if (this.getDevice === 'Ledger') {
+                alert('This feature is not supported')
+            } else {
+                this.functionName = 'Destroy Token'
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'issueOrDestroyTokenModal_' + this.tokenId)
+            }
         },
         depositToken() {
-            this.getTokenInfo()
-            this.$root.$emit('bv::show::modal', 'depositTokenModal_' + this.tokenId)
+            if (this.getDevice === 'Ledger') {
+                alert('This feature is not supported')
+            } else {
+                this.functionName = 'Deposit Token'
+                this.getTokenInfo()
+                this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal_' + this.tokenId)
+            }
         },
         removeToken() {
             let isRemove = confirm('Are you sure to remove this token?')
@@ -434,17 +435,7 @@ export default {
                 this.removeFlag = true
                 this.$emit('removeFlag', this.removeFlag)
                 this.removeFlag = false
-                if (this.$store.state.eventPool) {
-                    let eventPool = this.$store.state.eventPool
-                    if (eventPool[this.tokenId] && eventPool[this.tokenId].newToken) {
-                        var stopArr = eventPool[this.tokenId].newToken
-                        for (var i in stopArr) {
-                            clearTimeout(stopArr[i])
-                        }
-                        Vue.delete(eventPool, this.tokenId)
-                    }
-                    this.$store.commit('changeEventPool', eventPool)
-                }
+                this.removeTokenUpdateEventPool(this.tokenId)
             }
         }
     }

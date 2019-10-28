@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import {NODE_IP} from '../constants'
+import { mapState } from 'vuex'
 export default {
     name: 'Warning',
     data() {
@@ -38,10 +38,14 @@ export default {
             }
         }
     },
+    computed: {
+        ...mapState({
+            chain: 'chain'
+        })
+    },
     created() {
-        const url = NODE_IP + '/blocks/last'
-        this.$http.get(url).then(response => {
-            if (response.body.height) {
+        this.chain.getLastBlock().then(response => {
+            if (response.height) {
                 this.$router.push('/login')
             }
         }, respError => {

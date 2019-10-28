@@ -86,7 +86,7 @@
              cols="auto">
         <div>
           <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span v-if="txIcon === 'sent' || txIcon === 'received' || txIcon === 'leased out' || txIcon === 'leased out canceled' || txIcon==='leased in' || txIcon==='leased in canceled'">{{ formatter(txAmount) }} VSYS</span>
+          <span v-if="txIcon === 'sent' || txIcon === 'received' || txIcon === 'leased out' || txIcon === 'leased out canceled' || txIcon==='leased in' || txIcon==='leased in canceled'">{{ formatter(txAmount) }} {{ officialName }}</span>
         </div>
         <div class="tx-fee"
              v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'register contract' || txIcon === 'execute contract function') && feeFlag">
@@ -124,9 +124,8 @@
               readonly></textarea>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-icon="txIcon"
-                 :height-status="heightStatus"
                  :tx-type="txType"
-                 :difference-height="differenceHeight"
+                 :height-gap="heightGap"
                  :tx-address="txAddress"
                  :tx-time="txRecord.timestamp"
                  :tx-fee="txFee"
@@ -139,11 +138,11 @@
                  :trans-type="transType"
                  :self-send="selfSend"
                  :tx-recipient="txRecipient"
+                 :official-name="officialName"
                  :v-if="transType==='payment'"></TxInfoModal>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-fee="txFee"
-                 :difference-height="differenceHeight"
-                 :height-status="heightStatus"
+                 :height-gap="heightGap"
                  :tx-time="cancelTime"
                  :tx-icon="'leased out canceled'"
                  :trans-type="'cancelLease'"
@@ -156,9 +155,8 @@
                  :address="txAddress"
                  :recipient="txRecipient"
                  :amount="txAmount"
-                 :from-address="address"
                  :fee="txFee"
-                 :cold-pub-key="coldPubKey"
+                 :cold-public-key="coldPublicKey"
                  :tx-timestamp="txRecord.timestamp"
                  :address-index="addressIndex"
                  @show-details="showDetails"
@@ -169,21 +167,22 @@
 
 <script>
 import TxInfoModal from './TxInfoModal'
-import transaction from '@/utils/transaction'
-import base58 from '@/libs/base58'
-import converters from '@/libs/converters'
+import common from '@/js-v-sdk/src/utils/common'
+import base58 from 'base-58'
+import converters from '@/js-v-sdk/src/utils/converters'
 import CancelLease from '../modals/CancelLease'
-import { NODE_IP, PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, CONTRACT_CREATE_TX, CONTRACT_EXEC_TX } from '@/constants'
+import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX } from '@/js-v-sdk/src/constants'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
+import { mapState } from 'vuex'
+import certify from '@/utils/certify'
 
 export default {
     name: 'Record',
     components: { CancelLease, TxInfoModal },
     data: function() {
         return {
-            differenceHeight: 0,
-            heightStatus: false,
+            heightGap: 0,
             hovered: false,
             cancelTime: 0,
             showCancelDetails: false,
@@ -222,7 +221,7 @@ export default {
             default: 'payment',
             require: true
         },
-        coldPubKey: {
+        coldPublicKey: {
             type: String,
             default: ''
         },
@@ -236,12 +235,20 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            chain: 'chain'
+        }),
         selfSend() {
             if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === true) {
                 return 'selfSend'
             } else {
                 return ''
             }
+        },
+        officialName() {
+            if (this.isSentToken) {
+                return this.txRecord['officialName']
+            } else return 'VSYS'
         },
         txType() {
             if (this.txRecord['type'] === PAYMENT_TX) {
@@ -262,10 +269,14 @@ export default {
                 } else {
                     return 'Leased Out Canceled'
                 }
-            } else if (this.txRecord['type'] === CONTRACT_CREATE_TX) {
+            } else if (this.txRecord['type'] === REGISTER_CONTRACT_TX) {
                 return 'Register Contract'
-            } else if (this.txRecord['type'] === CONTRACT_EXEC_TX) {
-                return 'Execute Contract Function'
+            } else if (this.txRecord['type'] === EXECUTE_CONTRACT_TX) {
+                if (this.isSentToken) {
+                    if (this.txRecord.recipient !== this.address) {
+                        return 'Sent'
+                    } else return 'Received'
+                } else return 'Execute Contract Function'
             } else {
                 return 'Received'
             }
@@ -359,6 +370,11 @@ export default {
             return date.toString()
         },
         txAmount() {
+            if (this.isSentToken) {
+                let tokenId = common.contractIDToTokenID(this.txRecord.contractId)
+                let unity = certify.getUnity(tokenId)
+                return BigNumber(this.txRecord.amount).dividedBy(unity)
+            }
             if (this.txRecord.lease) {
                 return BigNumber(this.txRecord.lease.amount).dividedBy(VSYS_PRECISION)
             }
@@ -382,6 +398,17 @@ export default {
         txId() {
             return this.txRecord.id
         },
+        getLastHeight() {
+            let oldHeight = 0
+            try {
+                oldHeight = JSON.parse(window.localStorage.getItem('globalHeight'))
+            } catch (e) {
+            }
+            return oldHeight
+        },
+        isSentToken() {
+            return this.txRecord.sentToken === true
+        },
         txAttachment() {
             let value = this.txRecord.attachment === void 0 ? '' : this.txRecord.attachment
             let bytes = base58.decode(value)
@@ -394,31 +421,14 @@ export default {
         }
     },
     methods: {
-        getLastHeight() {
-            let oldHeight = 0
-            try {
-                oldHeight = JSON.parse(window.localStorage.getItem('globalHeight'))
-            } catch (e) {
-            }
-            return oldHeight
-        },
         getContractType() {
-            const contractUrl = NODE_IP + '/contract/info/' + this.txRecord.contractId
-            this.$http.get(contractUrl).then(response => {
-                this.contractType = response.body.type
-                this.tokenId = transaction.contractIDToTokenID(response.body.contractId)
+            this.chain.getContractInfo(this.txRecord.contractId).then(response => {
+                this.contractType = response.type
+                this.tokenId = common.contractIDToTokenID(response.contractId)
             }, respError => {
                 this.contractType = 'Failed to get contract type'
                 this.tokenId = 'Failed to get token id'
             })
-        },
-        getHeightStatus: function() {
-            let oldHeightStatus = false
-            try {
-                oldHeightStatus = JSON.parse(window.localStorage.getItem('heightStatus'))
-            } catch (e) {
-            }
-            return oldHeightStatus
         },
         copyTxId() {
             this.$refs.tId.select()
@@ -434,8 +444,7 @@ export default {
             if (this.txType === 'Register Contract') {
                 this.getContractType()
             }
-            this.differenceHeight = this.getLastHeight() - this.txRecord.height
-            this.heightStatus = this.getHeightStatus()
+            this.heightGap = this.getLastHeight - this.txRecord.height
             this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.transType + this.txRecord.id + this.selfSend)
         },
         cancelLeasing() {

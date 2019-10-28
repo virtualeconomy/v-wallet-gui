@@ -55,7 +55,7 @@
                     label-for="attachment_confirm"
                     v-if="txType==='payment'">
         <b-form-input id="attachment_confirm"
-                      v-model="attachment"
+                      v-model="description"
                       class="des"
                       readonly
                       :plaintext="true">
@@ -79,7 +79,7 @@
 <script>
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE } from '@/constants'
+import { TX_FEE } from '@/js-v-sdk/src/constants'
 export default {
     name: 'Confirm',
     props: {
@@ -107,7 +107,7 @@ export default {
                 return BigNumber(TX_FEE)
             }
         },
-        attachment: {
+        description: {
             type: String,
             default: ''
         },

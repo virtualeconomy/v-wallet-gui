@@ -16,14 +16,15 @@
       <b-tab title="Add Token">
         <b-container
           class="text-left">
-          <b-form-group label="Token ID"
+          <b-form-group label="Token ID or Name"
                         class="forms"
                         label-for="amountInput">
             <b-form-input id="amountInput"
                           class="input-t"
                           v-model="tokenId"
                           aria-describedby="inputLiveFeedback"
-                          :state="isValidToken()">
+                          placeholder="Please input Token ID or Name"
+                          :state="isValidToken">
             </b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      style="font-size: 15px;margin-top: 10px">
@@ -45,9 +46,9 @@
 
 <script>
 import Vue from 'vue'
-import { NODE_IP } from '@/constants.js'
-import transaction from '@/utils/transaction'
-import { mapActions } from 'vuex'
+import common from '@/js-v-sdk/src/utils/common'
+import { mapActions, mapState } from 'vuex'
+import certify from '@/utils/certify'
 export default {
     name: 'AddToken',
     data() {
@@ -64,8 +65,11 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            chain: 'chain'
+        }),
         contractId() {
-            return transaction.tokenIDToContractID(this.tokenId)
+            return common.tokenIDToContractID(this.tokenId)
         },
         seedAddress() {
             if (Vue.ls.get('address')) {
@@ -77,6 +81,12 @@ export default {
         },
         isAddable() {
             return this.tokenId.length <= 0
+        },
+        isValidToken() {
+            if (!this.init || this.tokenId.length === 0 || this.responseErr === false) {
+                return void 0
+            }
+            return !this.responseErr
         }
     },
 
@@ -101,15 +111,20 @@ export default {
             if (tmpUserInfo && tmpUserInfo.tokens) {
                 tokens = JSON.parse(tmpUserInfo.tokens)
             }
+            let tokenId = certify.getTokenId(this.tokenId)
+            this.tokenId = tokenId === null ? this.tokenId : tokenId
             if (this.tokenId in tokens) {
                 this.$refs.addTokenModal.hide()
                 return
             }
             if (this.tokenId) {
-                const url = NODE_IP + '/contract/info/' + this.contractId
-                this.$http.get(url).then(response => {
+                this.chain.getContractInfo(this.contractId).then(response => {
                     this.responseErr = false
-                    Vue.set(tokens, this.tokenId, response.body.info[1].data)
+                    if (response.hasOwnProperty('error')) {
+                        this.responseErr = true
+                        return
+                    }
+                    Vue.set(tokens, this.tokenId, response.info[1].data)
                     this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
                     this.changeAddTokenStatus()
                     this.$refs.addTokenModal.hide()
@@ -117,12 +132,6 @@ export default {
                     this.responseErr = true
                 })
             }
-        },
-        isValidToken() {
-            if (!this.init || this.tokenId.length === 0 || this.responseErr === false) {
-                return void 0
-            }
-            return !this.responseErr
         }
     }
 

@@ -2,96 +2,115 @@
   <b-modal id="importModal"
            centered
            lazy
-           @cancel="importCancel"
-           @hide="importClose"
-           @ok="importOk"
-           @show="showingUp"
-           :ok-disabled="!coldAddress || !isValidAddress"
-           :cancel-disabled="qrInit"
+           @hide="resetPage"
            title="Import Cold Wallet"
            hide-header
            hide-footer
            ref="importModal">
     <button
-      :disabled="qrInit"
       class="close btn-close"
       @click="closeModal">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
-    <b-container fluid
-                 class="c-import">
-      <b-form-group label="Cold Wallet Address"
-                    label-for="coldAddress">
-        <b-form-input id="coldAddress"
-                      type="text"
-                      v-model="coldAddress"
-                      :state="isValidAddress"
-                      aria-describedby="inputLiveHelp inputLiveFeedback"
-                      placeholder="Please input cold wallet address.">
-        </b-form-input>
-        <b-form-invalid-feedback id="inputLiveFeedback">
-          Invalid cold wallet address. <span v-if="addressExisted">The address has existed.</span>
-        </b-form-invalid-feedback>
-      </b-form-group>
-      <b-form-group label="Cold Wallet Public Key"
-                    label-for="coldPubKey">
-        <b-form-input id="coldPubKey"
-                      type="text"
-                      v-model="coldPubKey"
-                      :state="isValidPubKey"
-                      aria-describedby="inputLiveHelp inputLiveFeedback"
-                      placeholder="Please input public key of cold wallet.">
-        </b-form-input>
-        <b-form-invalid-feedback id="inputLiveFeedback">
-          Invalid cold wallet public key.
-        </b-form-invalid-feedback>
-      </b-form-group>
-      <p class="qrInfo">Tips: Please confirm if your browser's camera is available.</p>
-      <div class="scan-pane">
-        <qrcode-reader @init="onInit"
-                       @decode="onDecode"
-                       :paused="paused">
-          <img v-if="qrInit"
-               class="qrcode-waiting"
-               height="100"
-               width="100"
-               src="@/assets/imgs/icons/wallet/ic_wait.svg">
-        </qrcode-reader>
-        <b-btn class="scan-again-btn"
-               variant="warning"
-               @click="scanAgain"
-               centered>Scan again</b-btn>
-      </div>
+    <b-container
+      class="text-left"
+      v-if="pageId===1">
+      <b-container fluid
+                   class="c-import">
+        <p class="monitor">Select Monitor Method</p>
+        <p class="information">You can select {{ supportLedger ? 'three' : 'two' }} methods to monitor cold wallet.</p>
+        <button id="appWallet"
+                @click="select('appWallet')"
+                :class="classChoose('appWallet') ? 'selected' : 'unselected'">    Mobile Cold Wallet App</button>
+        <button id="ledgerWallet"
+                v-if="supportLedger"
+                @click="select('ledgerWallet')"
+                :class="classChoose('ledgerWallet') ? 'selected' : 'unselected'">    Ledger Hardware Device</button>
+        <button id="manualInput"
+                @click="select('manualInput')"
+                :class="classChoose('manualInput') ? 'selected' : 'unselected'">    Manual Input Address</button>
+      </b-container>
+      <b-row class="btn-bottom">
+        <b-col class="col-lef">
+          <b-button
+            class="btn-back"
+            block
+            variant="light"
+            size="lg"
+            @click="closeModal">Cancel
+          </b-button>
+        </b-col>
+        <b-col class="col-rit">
+          <b-button
+            block
+            class="btn-confirm"
+            :style="{background:'#FFBE96'}"
+            variant="warning"
+            size="lg"
+            @click="importOk">Confirm
+          </b-button>
+        </b-col>
+      </b-row>
     </b-container>
-    <b-row class="btn-bottom">
-      <b-col class="col-lef">
-        <b-button
-          class="btn-back"
-          block
-          variant="light"
-          size="lg"
-          @click="closeModal">Cancel
-        </b-button>
-      </b-col>
-      <b-col class="col-rit">
-        <b-button
-          block
-          class="btn-confirm"
-          :style="{background:(isValidAddress && isValidPubKey ? '' : '#FFBE96')}"
-          variant="warning"
-          size="lg"
-          @click="importOk">Confirm
-        </b-button>
-      </b-col>
-    </b-row>
+    <b-container
+      class="ledger"
+      v-if="pageId===2 && method === 'ledgerWallet'">
+      <LedgerWallet @import-cold="importCold"
+                    @close-btn="closeModal"></LedgerWallet>
+      <b-row class="row">
+        <b-col class="col-back">
+          <b-button
+            class="btn-back"
+            block
+            variant="light"
+            size="lg"
+            @click="prevPage('ledgerWallet')">Back
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-container>
+    <b-container class="ledger"
+                 v-if="pageId===2 && method === 'appWallet'">
+      <AppWallet @import-cold="importCold"
+                 @close-btn="closeModal"></AppWallet>
+      <b-row class="row">
+        <b-col class="col-back">
+          <b-button class="btn-back"
+                    block
+                    variant="light"
+                    size="lg"
+                    @click="prevPage('appWallet')">Back
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-container>
+    <b-container class="ledger"
+                 v-if="pageId===2 && method === 'manualInput'">
+      <ManualInput @import-cold="importCold"
+                   @close-btn="closeModal"></ManualInput>
+      <b-row class="row">
+        <b-col class="col-back">
+          <b-button class="btn-back"
+                    block
+                    variant="light"
+                    size="lg"
+                    @click="prevPage('manualInput')">Back
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-container>
   </b-modal>
 </template>
-
 <script>
-import crypto from '@/utils/crypto'
-import { PUBLIC_KEY_LENGTH, PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/constants.js'
+import LedgerWallet from '../elements/LedgerWallet'
+import AppWallet from '../elements/AppWallet'
+import ManualInput from '../elements/ManualInput'
+import { mapState } from 'vuex'
+import { SHOW_UNSUPPORTED_FUNCTION } from '@/constants'
+
 export default {
     name: 'ImportColdWallet',
+    components: { LedgerWallet, AppWallet, ManualInput },
     props: {
         address: {
             type: String,
@@ -101,117 +120,69 @@ export default {
     },
     data: function() {
         return {
-            jsonObj: '',
-            qrInit: false,
-            paused: false,
-            coldAddress: '',
-            coldPubKey: '',
-            opc: '',
-            api: '',
-            protocol: ''
+            method: 'appWallet',
+            pageId: 1,
+            supportLedger: SHOW_UNSUPPORTED_FUNCTION
         }
     },
     computed: {
-        isValidAddress() {
-            if (this.coldAddress === this.address) {
-                return false
-            }
-            if (!this.coldAddress) {
-                return void 0
-            }
-            let isValid = false
-            try {
-                isValid = crypto.isValidAddress(this.coldAddress)
-            } catch (e) {
-                console.log(e)
-            }
-            return isValid
-        },
-        isValidPubKey() {
-            if (!this.coldPubKey) {
-                return void 0
-            }
-            return this.coldPubKey.length <= PUBLIC_KEY_LENGTH
-        },
-        addressExisted() {
-            return this.coldAddress === this.address
-        }
+        ...mapState({
+            account: 'account'
+        })
     },
     methods: {
-        showingUp() {
-            this.coldAddress = ''
-            this.coldPubKey = ''
-            this.paused = false
+        classChoose(method) {
+            return this.method === method
         },
-        importClose(evt) {
-            if (this.qrInit) {
-                evt.preventDefault()
+        select(type) {
+            if (type === 'appWallet') {
+                this.method = 'appWallet'
+                document.getElementById(type).className = 'selected'
+                document.getElementById('manualInput').className = 'unselected'
+                if (document.getElementById('ledgerWallet')) document.getElementById('ledgerWallet').className = 'unselected'
+            } else if (type === 'ledgerWallet') {
+                this.method = 'ledgerWallet'
+                document.getElementById('appWallet').className = 'unselected'
+                document.getElementById('manualInput').className = 'unselected'
+                document.getElementById(type).className = 'selected'
+            } else if (type === 'manualInput') {
+                this.method = 'manualInput'
+                document.getElementById(type).className = 'selected'
+                document.getElementById('appWallet').className = 'unselected'
+                if (document.getElementById('ledgerWallet')) document.getElementById('ledgerWallet').className = 'unselected'
             }
         },
-        importOk(evt) {
-            if (this.qrInit || !this.coldAddress || !this.isValidAddress || !this.coldPubKey || !this.isValidPubKey) {
-                evt.preventDefault()
-            } else {
-                this.$emit('import-cold', this.coldAddress, this.coldPubKey, this.jsonObj)
-                this.closeModal()
-            }
-        },
-        importCancel(evt) {
-            if (this.qrInit) {
-                evt.preventDefault()
-            }
-        },
-        async onInit(promise) {
-            try {
-                this.qrInit = true
-                await promise
-            } catch (error) {
-                if (error.name === 'NotAllowedError') {
-                    throw Error('user denied camera access permission')
-                } else if (error.name === 'NotFoundError') {
-                    throw Error('no suitable camera device installed')
-                } else if (error.name === 'NotSupportedError') {
-                    throw Error('page is not served over HTTPS (or localhost)')
-                } else if (error.name === 'NotReadableError') {
-                    throw Error('maybe camera is already in use')
-                } else if (error.name === 'OverconstarinedError') {
-                    throw Error('pass constraints do not match any camera')
-                } else {
-                    throw Error('browser is probably lacking features(WebRTC, Canvas)')
+        importOk() {
+            if (this.method === 'manualInput') {
+                this.pageId++
+                if (this.pageId > 2) {
+                    this.closeModal()
                 }
-            } finally {
-                this.qrInit = false
+            } else if (this.method === 'ledgerWallet') {
+                this.pageId++
+                if (this.pageId > 2) {
+                    this.closeModal()
+                }
+            } else if (this.method === 'appWallet') {
+                this.pageId++
+                if (this.pageId > 2) {
+                    this.closeModal()
+                }
             }
         },
-        onDecode(decodeString) {
-            this.paused = true
-            try {
-                this.jsonObj = JSON.parse(decodeString)
-                this.coldAddress = this.jsonObj.address
-                this.coldPubKey = this.jsonObj.publicKey
-                this.opc = this.jsonObj.opc
-                this.api = this.jsonObj.api
-                this.protocol = this.jsonObj.protocol
-            } catch (e) {
-                this.paused = false
-            }
-            if (!this.isValidAddress) {
-                this.coldAddress = 'please scan QR code of cold wallet address'
-                this.paused = false
-            } else if (this.api > API_VERSION || this.protocol !== PROTOCOL || this.opc !== OPC_ACCOUNT) {
-                this.coldAddress = 'invalid QR code'
-                this.paused = false
-            } else if (!this.isValidPubKey) {
-                this.coldPubKey = 'invalid public key'
-                this.paused = false
-            }
+        importCold(coldAddr, coldPublicKey, jsonObj) {
+            this.$emit('import-cold', coldAddr, coldPublicKey, jsonObj)
         },
-        scanAgain() {
-            this.paused = false
-            this.coldAddress = ''
+        resetPage() {
+            this.pageId = 1
+            this.method = 'appWallet'
         },
         closeModal() {
             this.$refs.importModal.hide()
+        },
+        prevPage(method) {
+            this.pageId--
+            this.method = method
         }
     }
 }
@@ -228,6 +199,21 @@ export default {
 .qrInfo {
     margin-bottom: 20px;
     color: #9091a3;
+}
+.monitor {
+    font-family: Roboto-Regular;
+    font-size: 26px;
+    color: #181B3A;
+    letter-spacing: 0;
+    text-align: center;
+}
+.information {
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    color: #9091A3;
+    letter-spacing: 0;
+    text-align: center;
+    margin-bottom: 40px;
 }
 .scan-again-btn {
     margin-top: 10px;
@@ -272,10 +258,52 @@ export default {
     letter-spacing: 0;
     text-align: center;
 }
+.selected {
+    padding-left: 30px;
+    width: 360px;
+    height: 60px;
+    display: block;
+    margin:0 auto ;
+    background: #FFFFFF;
+    border: 1px solid #FF8737;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    text-align: left;
+    color: #FF8737;
+    letter-spacing: 0;
+}
+.unselected {
+    padding-left: 30px;
+    width: 360px;
+    height: 60px;
+    display: block;
+    margin:0 auto ;
+    background: #FFFFFF;
+    border: 1px solid #E8E9ED;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    text-align: left;
+    color: #181B3A;
+    letter-spacing: 0;
+}
 .col-lef {
     padding-right: 10px;
 }
 .col-rit {
     padding-left: 10px;
+}
+.col-back {
+    padding-left: 10px;
+    margin-top: -70px;
+    margin-right: 230px;
+    margin-left: 5px;
+}
+.row {
+    margin-top: 25px;
+    margin-bottom: 15px;
 }
 </style>

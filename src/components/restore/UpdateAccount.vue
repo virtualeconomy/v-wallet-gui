@@ -97,10 +97,10 @@
 import VTitle from '@/components/signup/elements/VTitle'
 
 import seedLib from '@/libs/seed.js'
-import converters from '@/libs/converters.js'
+import converters from '@/js-v-sdk/src/utils/converters'
 import validator from 'vue-m-validator'
 import Vue from 'vue'
-import { INITIAL_SESSION_TIMEOUT } from '@/constants.js'
+import { INITIAL_SESSION_TIMEOUT } from '@/constants'
 import jdenticon from '@/libs/jdenticon-2.1.0'
 
 export default {

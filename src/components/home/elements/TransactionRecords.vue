@@ -1,10 +1,10 @@
 <template>
-  <div v-if="Object.keys(txRecords).length > 0"
-       class="records">
+  <div class="records">
     <div
       class="title-records">
       <span>Transaction Records</span>
-      <div class="show-fee"
+      <div v-if="Object.keys(txRecords).length > 0"
+           class="show-fee"
            @click="showFee">
         <span class="show-position"> ShowTxFee </span>
         <input class="show-fee2"
@@ -77,7 +77,8 @@
       </json-excel>
     </div>
     <div class="inherit-height">
-      <div class="scroll"
+      <div v-if="Object.keys(txRecords).length > 0"
+           class="scroll"
            :style="{height: myHeight}">
         <template v-for="(records, monthYear, idx) in txRecords">
           <div :key="monthYear"
@@ -97,91 +98,30 @@
           </div>
         </template>
       </div>
-    </div>
-  </div>
-  <div v-else
-       class="records">
-    <div class="title-records">
-      <span>Transaction Records</span>
-      <b-dropdown
-        class="type-select"
-        router-tag="div"
-        no-caret
-        :disabled="changeShowDisable || changeTypeShowDisable"
-        variant="light">
-        <template
-          slot="button-content">
-          <div style="display:inline-block; margin-right: 10px;">
-            <img v-if="!changeTypeShowDisable"
-                 src="@/assets/imgs/icons/wallet/ic_filter.svg">
-            <img height="16"
-                 width="16"
-                 v-if="changeTypeShowDisable"
-                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
-            <span class="m-1"> Type </span>
-          </div>
-          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
-        </template>
-        <b-dropdown-item
-          class="selection"
-          v-for="(typeValue, type) in showTypes"
-          :key="type"
-          @click="changeType(type)"> {{ type }} </b-dropdown-item>
-      </b-dropdown>
-      <b-dropdown class="pd-select"
-                  router-tag="div"
-                  no-caret
-                  :disabled="changeShowDisable || changeTypeShowDisable"
-                  variant="light">
-        <template slot="button-content">
-          <div style="display:inline-block; margin-right: 10px;">
-            <img v-if="!changeShowDisable"
-                 src="@/assets/imgs/icons/wallet/ic_filter.svg">
-            <img height="16"
-                 width="16"
-                 v-if="changeShowDisable"
-                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
-            <span class="m-1">Latest {{ showingNum }} Records </span>
-          </div>
-          <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
-        </template>
-        <b-dropdown-item class="selection"
-                         v-for="num in showNums"
-                         :key="num"
-                         @click="changeShowNum(num)">Show {{ num }} records</b-dropdown-item>
-      </b-dropdown>
-      <json-excel class="csv-export"
-                  :data="response ? [] : response"
-                  :fields="resFields"
-                  :type="downloadFileType"
-                  :name="'txs_' + address + '.' + downloadFileType">
-        <b-btn class="btn-export"
-               :disabled="changeShowDisable || changeTypeShowDisable"
-               variant="light"><img src="@/assets/imgs/icons/wallet/ic_export.svg"> Export</b-btn>
-      </json-excel>
-    </div>
-    <img
-      height="50"
-      width="50"
-      v-if="changeShowDisable || changeTypeShowDisable"
-      src="@/assets/imgs/icons/wallet/ic_wait.svg">
-    <div
-      v-if="!(changeShowDisable && changeTypeShowDisable)"
-      class="empty">
-      There is no transaction record.
+      <img height="50"
+           width="50"
+           v-if="Object.keys(txRecords).length === 0 && (changeShowDisable || changeTypeShowDisable)"
+           src="@/assets/imgs/icons/wallet/ic_wait.svg">
+      <div v-if="Object.keys(txRecords).length === 0 && !(changeShowDisable || changeTypeShowDisable)"
+           class="empty">
+        There is no transaction record.
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { NODE_IP, VSYS_PRECISION } from '@/constants'
+import { VSYS_PRECISION, EXECUTE_CONTRACT_TX } from '@/js-v-sdk/src/constants'
+import BigNumber from 'bignumber.js'
 import TransactionRecord from './TransactionRecord'
 import Vue from 'vue'
 import JsonExcel from 'vue-json-excel'
 import browser from '@/utils/browser'
-import base58 from '@/libs/base58'
-import crypto from '@/utils/crypto'
-import JSONBigNumber from 'json-bignumber'
+import { mapState } from 'vuex'
+import common from '@/js-v-sdk/src/utils/common'
+import certify from '@/utils/certify'
+import base58 from 'base-58'
+import convert from '@/js-v-sdk/src/utils/convert'
 export default {
     name: 'TransactionRecords',
     components: {
@@ -261,6 +201,9 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            chain: 'chain'
+        }),
         monthCounts() {
             return Object.keys(this.txRecords).length
         }
@@ -287,23 +230,29 @@ export default {
                 }
                 const recordLimit = this.showingNum
                 const txType = this.showingTypeValue
-                const url = this.showingTypeValue === 0 ? NODE_IP + '/transactions/list?address=' + addr + '&limit=' + recordLimit : NODE_IP + '/transactions/list?address=' + addr + '&limit=' + recordLimit + '&txType=' + txType
-                this.$http.get(url).then(response => {
+                const getTransactions = () => { return this.showingTypeValue === 0 ? this.chain.getTxHistory(addr, recordLimit) : this.chain.getTxByType(addr, recordLimit, txType) }
+                getTransactions().then(response => {
                     if (addr === this.address && recordLimit === this.showingNum && txType === this.showingTypeValue) {
-                        this.response = response.body.transactions
+                        this.response = response = this.showingTypeValue === 0 ? response[0] : response.transactions
                         let count = 0
-                        let tempResponse = JSONBigNumber.parse(response.bodyText).transactions
-                        for (let i = 0; i < this.response.length; i++) {
-                            this.response[i].amount = tempResponse[i].amount
-                        }
-                        this.txRecords = response.body.transactions.reduce((recList, recItem) => {
+                        this.txRecords = response.reduce((recList, recItem) => {
                             const month = this.getMonthYearStr(recItem['timestamp'])
                             if (!recList[month]) {
                                 Vue.set(recList, month, [])
                             }
-                            let senderAddr = recItem['proofs'] ? crypto.buildRawAddress(base58.decode(recItem['proofs'][0]['publicKey'])) : 'no sender'
+                            let senderAddr = recItem['proofs'] ? recItem['proofs'][0]['address'] : 'no sender'
                             recItem['index'] = ++count
                             recList[month].push(recItem)
+                            if (recItem['type'] === EXECUTE_CONTRACT_TX) {
+                                let tokenId = common.contractIDToTokenID(recItem['contractId'])
+                                if (certify.isCertified(tokenId) && (recItem['functionIndex'] === 4 || (recItem['functionIndex'] === 3 && base58.decode(recItem['functionData'])[1] === 2))) {
+                                    let functionData = convert.parseFunctionData(recItem['functionData'])
+                                    recItem['recipient'] = functionData[0]
+                                    recItem['amount'] = functionData[1]
+                                    recItem['sentToken'] = true
+                                    recItem['officialName'] = certify.officialName(tokenId)
+                                }
+                            }
                             if (recItem['recipient'] === this.address && this.address === senderAddr) { // send to self
                                 let recItemCopy = JSON.parse(JSON.stringify(recItem))
                                 recItemCopy['SelfSend'] = true
@@ -315,7 +264,7 @@ export default {
                         this.changeTypeShowDisable = false
                         this.changeShowDisable = false
                     }
-                }, response => {
+                }, respErr => {
                     if (addr === this.address && recordLimit === this.showingNum && txType === this.showingTypeValue) {
                         this.changeTypeShowDisable = false
                         this.changeShowDisable = false
@@ -346,9 +295,10 @@ export default {
         exportRecords() {
             if (this.response) {
                 let tempResponse = JSON.parse(JSON.stringify(this.response))
+                console.log(tempResponse)
                 for (let i = 0; i < tempResponse.length; i++) {
                     if (tempResponse[i].amount) {
-                        tempResponse[i].amount = this.response[i].amount.dividedBy(VSYS_PRECISION)
+                        tempResponse[i].amount = BigNumber(this.response[i].amount).dividedBy(VSYS_PRECISION)
                     }
                     tempResponse[i].fee = tempResponse[i].fee / VSYS_PRECISION
                 }

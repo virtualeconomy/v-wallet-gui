@@ -56,7 +56,7 @@
                height="60px">
         </div>
         <div v-if="txIcon!=='register contract'&& txIcon!=='execute contract function'"
-             :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} VSYS</div>
+             :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} {{ officialName }}</div>
       </div>
       <div class="tx-address"
            v-if="displayAddress!==''">
@@ -94,8 +94,8 @@
       <div v-if="heightStatus"
            class="tx-status">
         <label>Block Confirmation</label>
-        <span v-if="differenceHeight > 30">{{ differenceHeight }}(Confirmed)</span>
-        <span v-else-if="differenceHeight <= 30 && differenceHeight >= 0">{{ differenceHeight }}(Unconfirmed)</span>
+        <span v-if="heightGap > 30">{{ heightGap }}(Confirmed)</span>
+        <span v-else-if="heightGap <= 30 && heightGap >= 0">{{ heightGap }}(Unconfirmed)</span>
       </div>
       <div v-if="txStatus === 'Success'"
            class="tx-success">
@@ -146,8 +146,10 @@
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE, TX_TEST_EXPLORER, NETWORK_BYTE, TX_EXPLORER } from '@/constants'
-import { mapActions } from 'vuex'
+import { TX_FEE } from '@/js-v-sdk/src/constants'
+import { TX_TEST_EXPLORER, TX_EXPLORER } from '@/constants'
+import { NETWORK_BYTE } from '@/network'
+import { mapActions, mapState } from 'vuex'
 export default {
     name: 'TxInfoModal',
     provide() {
@@ -156,13 +158,13 @@ export default {
         }
     },
     props: {
-        differenceHeight: {
+        officialName: {
+            type: String,
+            default: 'VSYS'
+        },
+        heightGap: {
             type: Number,
             default: 0
-        },
-        heightStatus: {
-            type: Boolean,
-            default: false
         },
         modalId: {
             type: String,
@@ -236,6 +238,9 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            heightStatus: 'heightStatus'
+        }),
         defaultAddress() {
             return Vue.ls.get('address')
         },

@@ -16,7 +16,7 @@
       <b-form-group v-if="txType==='Destroy Token'"
                     label-cols
                     class="form-line"
-                    label="Burn Amount"
+                    label="Destroy Amount"
                     label-for="amount_confirm">
         <b-form-input id="amount_confirm"
                       :value="formatter(amount)"
@@ -131,6 +131,18 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
+      <b-form-group v-if="txType==='Send Token' && description"
+                    label-cols
+                    class="form-line"
+                    label="Description"
+                    label-for="attachment_confirm">
+        <b-form-input id="attachment_confirm"
+                      v-model="description"
+                      class="des"
+                      readonly
+                      :plaintext="true">
+        </b-form-input>
+      </b-form-group>
       <b-form-group label-cols
                     class="form-line"
                     label="Fee"
@@ -148,7 +160,7 @@
 
 <script>
 import BigNumber from 'bignumber.js'
-import { TOKEN_FEE } from '@/constants'
+import { CONTRACT_EXEC_FEE } from '@/js-v-sdk/src/constants'
 export default {
     name: 'TokenConfirm',
     props: {
@@ -176,7 +188,7 @@ export default {
             type: BigNumber,
             require: true,
             default: function() {
-                return BigNumber(TOKEN_FEE)
+                return BigNumber(CONTRACT_EXEC_FEE)
             }
         },
         txType: {
@@ -185,6 +197,10 @@ export default {
             default: ''
         },
         recipient: {
+            type: String,
+            default: ''
+        },
+        description: {
             type: String,
             default: ''
         },
