@@ -273,9 +273,9 @@ export default {
                 return 'Register Contract'
             } else if (this.txRecord['type'] === EXECUTE_CONTRACT_TX) {
                 if (this.isSentToken) {
-                    if (this.txRecord.recipient !== this.address) {
-                        return 'Sent'
-                    } else return 'Received'
+                    if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined) {
+                        return 'Received'
+                    } else return 'Sent'
                 } else return 'Execute Contract Function'
             } else {
                 return 'Received'
