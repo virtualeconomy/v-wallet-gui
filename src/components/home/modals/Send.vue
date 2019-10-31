@@ -146,9 +146,8 @@
                    :description="description"
                    :tx-type="'payment'">
           </Confirm>
-          <p
-            v-show="sendError"
-            class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
+          <p v-show="sendError"
+             class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -373,7 +372,8 @@
                    :description="description"
                    :tx-type="'payment'">
           </Confirm>
-          <p v-show="sendError">Sorry, transaction send failed! Failed reason: {{ errorMessage }}</p>
+          <p v-show="sendError"
+             class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
             <b-col class="col-lef">
               <b-button
