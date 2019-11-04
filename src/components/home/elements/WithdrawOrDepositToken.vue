@@ -84,9 +84,8 @@
                         :contract-id="contractId"
                         :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
           </TokenConfirm>
-          <p
-            v-show="sendError"
-            class="text-danger"><small>Sorry, transaction send failed! {{ errorMessage }}</small></p>
+          <p v-show="sendError"
+             class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -229,7 +228,8 @@
                         :contract-id="contractId"
                         :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
           </TokenConfirm>
-          <p v-show="sendError">Sorry, transaction send failed! {{ errorMessage }}</p>
+          <p v-show="sendError"
+             class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small>}</p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -458,6 +458,11 @@ export default {
             }
             const url = NODE_IP + '/contract/broadcast/execute'
             this.$http.post(url, apiSchema).then(response => {
+                if (response.hasOwnProperty('error')) {
+                    this.errorMessage = response.message
+                    this.sendError = true
+                    return
+                }
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {

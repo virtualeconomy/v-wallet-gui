@@ -146,9 +146,8 @@
                         :description="description"
                         :tx-type="'Send Token'">
           </TokenConfirm>
-          <p
-            v-show="sendError"
-            class="text-danger"><small>Sorry, transaction send failed! {{ errorMessage }}</small></p>
+          <p v-show="sendError"
+             class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -357,7 +356,8 @@
                         :description="description"
                         :tx-type="'Send Token'">
           </TokenConfirm>
-          <p v-show="sendError">Sorry, transaction send failed! {{ errorMessage }}</p>
+          <p v-show="sendError"
+             class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -609,6 +609,11 @@ export default {
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
             this.chain.sendExecuteContractTx(sendTx).then(response => {
+                if (response.hasOwnProperty('error')) {
+                    this.errorMessage = response.message
+                    this.sendError = true
+                    return
+                }
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
