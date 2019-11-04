@@ -56,8 +56,9 @@ const store = new Vuex.Store({
             if (context.state['selectedAddress'] && context.state['selectedAddress'] !== status['address']) {
                 context.commit('updateSelectedAddress', status)
                 context.commit('updateBalance')
+            } else {
+                context.commit('updateSelectedAddress', status)
             }
-            context.commit('updateSelectedAddress', status)
         },
         updateBalance(context, repeatable) {
             let randomIdentity = Math.floor(Math.random() * 100)

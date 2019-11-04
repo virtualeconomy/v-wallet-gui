@@ -400,13 +400,14 @@ export default {
             this.walletType = type
             if (this.selectedAddress !== addr) {
                 this.selectedAddress = addr
+                this.updateSelectedAddress({address: addr, balance: this.balance[addr]})
             } else {
                 this.selectedAddress = ''
                 setTimeout(() => {
                     this.selectedAddress = addr
                 }, 0)
             }
-            this.updateSelectedAddress({address: addr, balance: this.balance[addr]})
+            this.getBalance(addr)
         },
         deleteCold(addr) {
             Vue.delete(this.coldAddresses, addr)
