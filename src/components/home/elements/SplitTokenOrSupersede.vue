@@ -72,7 +72,23 @@
               <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
             </div>
           </b-form-group>
-          <b-form-group v-if="functionName === 'Split Token'"
+          <b-form-group v-if="functionName === 'Split Token' && unityInputMode === 0">
+            <span style="font-size: 15px !important;color: #9091A3;">New Unity: 10<sup>{{ barUnity }}</sup> (The minimum amount will be {{ formatter(1/Math.pow(10, barUnity)) }} Token)</span>
+            <div style="margin-top: 10px;">
+              <span class="unity-number">10<sup>0</sup></span>
+              <button class="bar-minus"
+                      @click="minus">-</button>
+              <b-progress :value="barUnity"
+                          :max="maxUnity"
+                          variant="warning"
+                          show-value
+                          class="pg-bar"></b-progress>
+              <button class="bar-plus"
+                      @click="plus">+</button>
+              <span class="unity-number-second">10<sup>16</sup></span>
+            </div>
+          </b-form-group>
+          <b-form-group v-if="functionName === 'Split Token' && unityInputMode === 1"
                         label="New Unity"
                         label-for="amount-input">
             <b-form-input id="recipient-input"
@@ -102,7 +118,12 @@
                                      v-else>
               Invalid Unity.
             </b-form-invalid-feedback>
+            <p v-show="!isMultipleOfTwoOrFive && isValidUnity"
+               class="text-danger"><small>Warnning: If the Unity is not a multiple of 2 or 5, the amount display issue would be occurred. And you might not pay in fully precision.</small></p>
           </b-form-group>
+          <button v-if="functionName === 'Split Token'"
+                  class="unity-mode-btn"
+                  @click="changeUnityMode">{{ unityInputMode === 0 ? 'Free Input Mode' : 'Slider Bar Mode' }}</button>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
             <span v-if="isInsufficient"
@@ -220,7 +241,23 @@
               <div class="text-danger text-center"><small>{{ qrErrMsg }}</small></div>
             </div>
           </b-form-group>
-          <b-form-group v-if="functionName === 'Split Token'"
+          <b-form-group v-if="functionName === 'Split Token' && unityInputMode === 0">
+            <span style="font-size: 15px !important;color: #9091A3;">New Unity: 10<sup>{{ barUnity }}</sup> (The minimum amount will be {{ formatter(1/Math.pow(10, barUnity)) }} Token)</span>
+            <div style="margin-top: 10px;">
+              <span class="unity-number">10<sup>0</sup></span>
+              <button class="bar-minus"
+                      @click="minus">-</button>
+              <b-progress :value="barUnity"
+                          :max="maxUnity"
+                          variant="warning"
+                          show-value
+                          class="pg-bar"></b-progress>
+              <button class="bar-plus"
+                      @click="plus">+</button>
+              <span class="unity-number-second">10<sup>16</sup></span>
+            </div>
+          </b-form-group>
+          <b-form-group v-if="functionName === 'Split Token' && unityInputMode === 1"
                         label="New Unity"
                         label-for="cold-amount-input">
             <b-form-input id="cold-recipient-input"
@@ -252,6 +289,11 @@
               Invalid Unity.
             </b-form-invalid-feedback>
           </b-form-group>
+          <p v-show="!isMultipleOfTwoOrFive && isValidUnity && unityInputMode === 1"
+             class="text-danger"><small>Warnning: If the Unity is not a multiple of 2 or 5, the amount display issue would be occurred. And you might not pay in fully precision.</small></p>
+          <button v-if="functionName === 'Split Token'"
+                  class="unity-mode-btn"
+                  @click="changeUnityMode">{{ unityInputMode === 0 ? 'Free Input Mode' : 'Slider Bar Mode' }}</button>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
             <span v-if="isInsufficient"
@@ -374,6 +416,7 @@ export default {
     data: function() {
         return {
             errorMessage: '',
+            barUnity: 8,
             newUnity: 0,
             newIssuer: '',
             pageId: 1,
@@ -382,11 +425,13 @@ export default {
             scanShow: false,
             qrInit: false,
             qrErrMsg: void 0,
+            maxUnity: 16,
             paused: false,
             sendError: false,
             coldSignature: '',
             timeStamp: Date.now() * 1e6,
-            hasConfirmed: false
+            hasConfirmed: false,
+            unityInputMode: 0
         }
     },
     props: {
@@ -470,6 +515,9 @@ export default {
             chain: 'chain',
             account: 'account'
         }),
+        newFinalUnity() {
+            return this.unityInputMode === 0 ? Math.pow(10, this.barUnity) : this.newUnity
+        },
         contractId() {
             return common.tokenIDToContractID(this.tokenId)
         },
@@ -487,13 +535,17 @@ export default {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
         isSubmitDisabled() {
-            return !(this.isValidMakerOrIssuer && !this.isInsufficient && (this.functionName === 'Split Token' ? (this.isSplit && this.isValidUnity) : this.isValidIssuer))
+            if (this.unityInputMode === 0 && this.functionName === 'Split Token') {
+                return false
+            } else {
+                return !(this.isValidMakerOrIssuer && !this.isInsufficient && (this.functionName === 'Split Token' ? (this.isSplit && this.isValidUnity) : this.isValidIssuer))
+            }
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
         },
         inputUnity() {
-            return BigNumber(this.newUnity)
+            return this.unityInputMode === 0 ? BigNumber(Math.pow(10, this.barUnity)) : BigNumber(this.newUnity)
         },
         isValidUnity() {
             if (BigNumber(this.newUnity).isEqualTo(0)) {
@@ -531,6 +583,9 @@ export default {
             let unityValue = BigNumber(this.newUnity)
             return unityValue.isGreaterThan(maxValue)
         },
+        isMultipleOfTwoOrFive() {
+            return this.newUnity % 2 === 0 || this.newUnity % 5 === 0
+        },
         isInteger() {
             return BigNumber(this.newUnity).isInteger()
         },
@@ -544,7 +599,7 @@ export default {
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
             let functionIndex = this.functionName === 'Split Token' ? SPLIT_FUNCIDX : SUPERSEDE_FUNCIDX
-            let functionData = this.functionName === 'Split Token' ? {'new_unity': BigNumber(this.newUnity)} : {'new_issuer': (this.newIssuer)}
+            let functionData = this.functionName === 'Split Token' ? {'new_unity': BigNumber(this.newFinalUnity)} : {'new_issuer': (this.newIssuer)}
             tra.buildExecuteContractTx(publicKey, this.contractId, functionIndex, functionData, this.timeStamp)
             return tra
         },
@@ -612,6 +667,7 @@ export default {
             this.timeStamp = Date.now() * 1e6
             this.errorMessage = ''
             this.newUnity = 0
+            this.barUnity = 8
             this.newIssuer = ''
             this.pageId = 1
             this.coldPageId = 1
@@ -619,6 +675,7 @@ export default {
             this.qrInit = false
             this.qrErrMsg = void 0
             this.paused = false
+            this.unityInputMode = 0
             this.coldSignature = ''
         },
         endSend() {
@@ -626,6 +683,19 @@ export default {
         },
         unityChange() {
             this.$emit('updateToken', 'update')
+        },
+        changeUnityMode() {
+            this.unityInputMode = this.unityInputMode === 0 ? 1 : 0
+        },
+        minus() {
+            if (this.barUnity > 0) {
+                this.barUnity--
+            }
+        },
+        plus() {
+            if (this.barUnity < 16) {
+                this.barUnity++
+            }
         },
         scanChange(evt) {
             if (!this.qrInit) {
@@ -829,6 +899,60 @@ export default {
 }
 .tokenSucced {
     text-align: center;
+}
+.unity-mode-btn {
+    margin-bottom: 6px;
+    border: none;
+    color: #FF8837;
+    margin-right: 15px;
+    font-size: 16px;
+    font-weight: lighter;
+    height: 25px;
+}
+.unity-number {
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    color: #181B3A;
+    letter-spacing: 0;
+}
+.unity-number-second {
+    position:absolute;
+    margin-left: 332px;
+    margin-top: 2px;
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    color: #181B3A;
+    letter-spacing: 0;
+}
+.bar-minus {
+    position: absolute;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    margin-left: 2px;
+    color: #fff !important;
+    background-color: #FF8737 !important;
+    border-color: #FF8737 !important;
+    border-radius: 50%;
+}
+.bar-plus {
+    position: absolute;
+    margin-left: 307px;
+    margin-right: 2px;
+    color: #fff !important;
+    background-color: #FF8737 !important;
+    border-color: #FF8737 !important;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+.pg-bar {
+    position: absolute;
+    margin-top: -18px;
+    margin-left: 55px;
+    padding-top: 0px;
+    width: 271px;
+    height: 16px;
 }
 .vsys-check {
     display: block;
