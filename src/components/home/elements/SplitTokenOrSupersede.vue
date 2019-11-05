@@ -123,7 +123,7 @@
           </b-form-group>
           <button v-if="functionName === 'Split Token'"
                   class="unity-mode-btn"
-                  @click="changeUnityMode">{{ unityInputMode === 0 ? 'Free Input Mode' : 'Bar Input Mode' }}</button>
+                  @click="changeUnityMode">{{ unityInputMode === 0 ? 'Free Input Mode' : 'Slider Bar Mode' }}</button>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
             <span v-if="isInsufficient"
@@ -293,7 +293,7 @@
              class="text-danger"><small>Warnning: If the Unity is not a multiple of 2 or 5, the amount display issue would be occurred. And you might not pay in fully precision.</small></p>
           <button v-if="functionName === 'Split Token'"
                   class="unity-mode-btn"
-                  @click="changeUnityMode">{{ unityInputMode === 0 ? 'Free Input Mode' : 'Bar Input Mode' }}</button>
+                  @click="changeUnityMode">{{ unityInputMode === 0 ? 'Free Input Mode' : 'Slider Bar Mode' }}</button>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
             <span v-if="isInsufficient"
