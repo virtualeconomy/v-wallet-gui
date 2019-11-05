@@ -47,6 +47,7 @@
                           class="recipient-input"
                           type="text"
                           v-model="recipient"
+                          :readonly="from3rdParty"
                           :state="isValidRecipient"
                           list="showHotRecipientList"
                           aria-describedby="inputLiveFeedback"
@@ -56,7 +57,8 @@
               <option v-for="addr in hotRecipientAddressList.keys()"
                       :key="addr">{{ addr }}</option>
             </datalist>
-            <img src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
+            <img v-if="!from3rdParty"
+                 src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
                  class="qr-code"
                  @click="scanChange"
@@ -66,7 +68,7 @@
             </b-form-invalid-feedback>
             <p v-if="superNodes.indexOf(recipient) > -1"
                class="super-node">Attention: You are doing PAYMENT, not LEASE, to super node address. You cannot get coins back once sent. Please confirm your action!</p>
-            <div v-if="scanShow">
+            <div v-if="scanShow && !from3rdParty">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
               <div class="qr-window">
                 <qrcode-reader @init="onInit"
@@ -88,6 +90,7 @@
             <b-form-input id="amount-input"
                           class="amount-input"
                           v-model="amount"
+                          :readonly="from3rdParty"
                           aria-describedby="inputLiveFeedback"
                           :state="isValidAmount"
                           onfocus="this.select()">
@@ -118,6 +121,7 @@
             <b-form-textarea id="descriptionInput"
                              v-model="description"
                              :rows="3"
+                             :readonly="from3rdParty"
                              :no-resize="true"
                              aria-describedby="inputDescriptionLiveFeedback"
                              :state="isValidDescription">
@@ -215,6 +219,7 @@
                           class="recipient-input"
                           type="text"
                           v-model="recipient"
+                          :readonly="from3rdParty"
                           :state="isValidRecipient"
                           list="showColdRecipientList"
                           aria-describedby="inputLiveFeedback"
@@ -224,7 +229,8 @@
               <option v-for="addr in coldRecipientAddressList.keys()"
                       :key="addr">{{ addr }}</option>
             </datalist>
-            <img src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
+            <img v-if="!from3rdParty"
+                 src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
                  class="qr-code"
                  title="scan qr-code"
@@ -234,7 +240,7 @@
             </b-form-invalid-feedback>
             <p v-if="superNodes.indexOf(recipient) > -1"
                class="super-node">Attention: You are doing PAYMENT, not LEASE, to super node address. You cannot get coins back once sent. Please confirm your action!</p>
-            <div v-if="scanShow">
+            <div v-if="scanShow && !from3rdParty">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
               <div class="qr-window">
                 <qrcode-reader @init="onInit"
@@ -256,6 +262,7 @@
             <b-form-input id="cold-amount-input"
                           class="amount-input"
                           v-model="amount"
+                          :readonly="from3rdParty"
                           aria-describedby="inputLiveFeedback"
                           :state="isValidAmount"
                           onfocus="this.select()">
@@ -286,6 +293,7 @@
             <b-form-textarea id="coldDescriptionInput"
                              v-model="description"
                              :rows="3"
+                             :readonly="from3rdParty"
                              :no-resize="true"
                              aria-describedby="inputDescriptionLiveFeedback"
                              :state="isValidDescription">
@@ -456,6 +464,22 @@ export default {
     name: 'Send',
     components: {ColdSignature, Success, Confirm, LedgerConfirm},
     props: {
+        from3rdParty: {
+            type: Boolean,
+            default: false
+        },
+        inheritedAmount: {
+            type: String,
+            default: ''
+        },
+        inheritedRecipient: {
+            type: String,
+            default: ''
+        },
+        inheritedDescription: {
+            type: String,
+            default: ''
+        },
         balances: {
             type: Object,
             default: function() {
@@ -502,7 +526,8 @@ export default {
     computed: {
         ...mapState({
             chain: 'chain',
-            account: 'account'
+            account: 'account',
+            paymentRedirect: 'paymentRedirect'
         }),
         defaultAddress() {
             return Vue.ls.get('address')
@@ -587,7 +612,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['updateBalance']),
+        ...mapActions(['updateBalance', 'updatePaymentRedirect']),
         getSuperNodes() {
             this.chain.getAllSlotsInfo().then(response => {
                 let len = response.length
@@ -634,6 +659,20 @@ export default {
                 } else {
                     this.coldPageId++
                 }
+                if (this.from3rdParty) {
+                    if (this.paymentRedirect.hasOwnProperty('callback')) {
+                        let url = this.paymentRedirect['callback']
+                        if (url.indexOf('?') !== -1) {
+                            url += '&tx_id=' + response.id
+                        } else {
+                            url += '?tx_id=' + response.id
+                        }
+                        this.$http.post(url).then(response => {
+                        })
+                    }
+                    this.updatePaymentRedirect({})
+                    this.$router.push('/')
+                }
                 this.updateBalance(true)
             }, respErr => {
                 this.errorMessage = respErr.message
@@ -671,9 +710,9 @@ export default {
             }
         },
         resetPage() {
-            this.recipient = ''
-            this.amount = 0
-            this.description = ''
+            this.recipient = this.from3rdParty ? this.inheritedRecipient : ''
+            this.amount = this.from3rdParty ? this.inheritedAmount : 0
+            this.description = this.from3rdParty ? this.inheritedDescription : ''
             this.pageId = 1
             this.coldPageId = 1
             this.scanShow = false

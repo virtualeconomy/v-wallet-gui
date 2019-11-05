@@ -241,7 +241,6 @@ export default {
             }
         }
     },
-
     mounted() {
         this.setSessionClearTimeout()
     },
@@ -300,7 +299,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['updateSelectedAddress', 'updateBalance']),
+        ...mapActions(['updateSelectedAddress', 'updateBalance', 'updatePaymentRedirect']),
         setSessionClearTimeout() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT
             try {
@@ -311,6 +310,7 @@ export default {
             }
             this.sessionClearTimeout = setTimeout(() => {
                 Vue.ls.clear()
+                this.updatePaymentRedirect({})
                 this.$router.push('/login')
             }, oldTimeout * 60 * 1000)
         },
