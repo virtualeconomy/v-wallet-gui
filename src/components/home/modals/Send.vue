@@ -667,8 +667,19 @@ export default {
                         } else {
                             url += '?tx_id=' + response.id
                         }
-                        this.$http.post(url).then(response => {
-                        })
+                        let times = 1
+                        const updateTask = (interval) => {
+                            setTimeout(() => {
+                                this.$http.post(url).then(response => {
+                                }, respErr => {
+                                    times++
+                                    if (times <= 5) {
+                                        updateTask(interval)
+                                    }
+                                })
+                            }, interval)
+                        }
+                        updateTask(5000)
                     }
                     this.updatePaymentRedirect({})
                     this.$router.push('/')

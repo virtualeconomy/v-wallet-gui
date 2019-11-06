@@ -112,7 +112,7 @@ export default {
             return ''
         },
         from3rdParty() {
-            return JSON.stringify(this.paymentRedirect) !== '{}' && this.$route.query.hasOwnProperty('redirect')
+            return JSON.stringify(this.paymentRedirect) !== '{}' && this.$route.query.hasOwnProperty('redirect') && !this.paymentRedirect.hasOwnProperty('token')
         }
     },
     props: {
