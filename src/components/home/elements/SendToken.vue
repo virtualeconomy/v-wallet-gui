@@ -659,12 +659,12 @@ export default {
                                 }, respErr => {
                                     times++
                                     if (times <= 5) {
-                                        updateTask(interval)
+                                        updateTask(10000)
                                     }
                                 })
                             }, interval)
                         }
-                        updateTask(5000)
+                        updateTask(500)
                     }
                     this.updatePaymentRedirect({})
                     this.$router.push('/')
