@@ -337,6 +337,24 @@ export default {
     },
     methods: {
         ...mapActions(['updateSelectedAddress', 'updateBalance', 'updatePaymentRedirect']),
+        showErrorMsgBox(errorMessage) {
+            const h = this.$createElement
+            const titleVNode = h('div', { domProps: { innerHTML: 'Error' }, class: ['error-title'] })
+            this.$bvModal.msgBoxOk(errorMessage, {
+                title: [titleVNode],
+                size: 'sm',
+                buttonSize: 'sm',
+                headerTextVariant: 'warning',
+                okVariant: 'warning',
+                headerClass: 'p-2 border-bottom-0',
+                footerClass: 'p-2 border-top-0',
+                centered: true
+            })
+                .then(value => {
+                    this.updatePaymentRedirect({})
+                    this.$router.push('/')
+                })
+        },
         getTokenBalances() {
             for (const addr in this.addresses) {
                 Vue.set(this.tokenBalances, addr, BigNumber(0))
@@ -362,10 +380,14 @@ export default {
             }, respError => {
             })
             this.chain.getTokenInfo(this.tokenId).then(response => {
-                this.tokens = response
-                this.unity = BigNumber(this.tokens.unity)
-                this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId + 'true')
+                if (!response.hasOwnProperty('error')) {
+                    this.unity = BigNumber(response.unity)
+                    this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId + 'true')
+                } else {
+                    this.showErrorMsgBox(response.message)
+                }
             }, respError => {
+                this.showErrorMsgBox('Unknown.Please check network connection!')
             })
         },
         setSessionClearTimeout() {
@@ -582,6 +604,9 @@ export default {
 }
 .tab-title {
     margin-left: 8px;
+}
+.error-title {
+    color: #FF8737;
 }
 
 .contents {
