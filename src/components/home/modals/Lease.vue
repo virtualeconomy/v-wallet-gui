@@ -269,7 +269,6 @@ export default {
         },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
-            console.log(tra.toJsonForColdSignature())
             return tra
         },
         noColdAddress() {

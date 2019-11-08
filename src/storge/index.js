@@ -24,7 +24,8 @@ const store = new Vuex.Store({
         selectedAddress: '',
         total: BigNumber(NaN),
         intervalStatus: '',
-        addTokenStatus: 0
+        addTokenStatus: 0,
+        paymentRedirect: {}
     },
     mutations: {
         changeSettingsStatus(state, status) {
@@ -49,9 +50,15 @@ const store = new Vuex.Store({
         },
         changeAddTokenStatus(state) {
             state.addTokenStatus = state.addTokenStatus === 0 ? 1 : 0
+        },
+        updatePaymentRedirect(state, status) {
+            state.paymentRedirect = status
         }
     },
     actions: {
+        updatePaymentRedirect(context, status) {
+            context.commit('updatePaymentRedirect', status)
+        },
         updateSelectedAddress(context, status) {
             if (context.state['selectedAddress'] && context.state['selectedAddress'] !== status['address']) {
                 context.commit('updateSelectedAddress', status)

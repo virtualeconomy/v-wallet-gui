@@ -295,7 +295,6 @@ export default {
         exportRecords() {
             if (this.response) {
                 let tempResponse = JSON.parse(JSON.stringify(this.response))
-                console.log(tempResponse)
                 for (let i = 0; i < tempResponse.length; i++) {
                     if (tempResponse[i].amount) {
                         tempResponse[i].amount = BigNumber(this.response[i].amount).dividedBy(VSYS_PRECISION)

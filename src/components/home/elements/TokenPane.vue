@@ -43,8 +43,11 @@
              class="icon-btn"
              src="@/assets/imgs/icons/wallet/ic_receive.svg"><b> {{ !isMobile ? 'Receive':'Recv' }} </b></b-button>
     </div>
-    <Send show="false"
-          :balances="balances"
+    <Send :balances="balances"
+          :inherited-amount="inheritedAmount"
+          :inherited-description="inheritedDescription"
+          :inherited-recipient="inheritedRecipient"
+          :from3rd-party="from3rdParty"
           :cold-addresses="coldAddresses"
           :addresses="addresses"
           :selected-address="address"
@@ -75,14 +78,30 @@ export default {
     },
     data() {
         return {
+            inheritedAmount: '',
+            inheritedRecipient: '',
+            inheritedDescription: '',
             isMobile: false
         }
     },
     created() {
+        if (this.from3rdParty) {
+            if (this.paymentRedirect.hasOwnProperty('invoice')) {
+                this.inheritedDescription = this.paymentRedirect['invoice']
+            }
+            this.inheritedAmount = this.paymentRedirect['amount']
+            this.inheritedRecipient = this.paymentRedirect['recipient']
+        }
         this.isMobile = browser.isMobile()
+    },
+    mounted() {
+        if (this.from3rdParty) {
+            this.$root.$emit('bv::show::modal', 'sendModal')
+        }
     },
     computed: {
         ...mapState({
+            paymentRedirect: 'paymentRedirect',
             available: 'available',
             total: 'total'
         }),
@@ -91,6 +110,9 @@ export default {
                 return this.coldAddresses[this.address].device
             }
             return ''
+        },
+        from3rdParty() {
+            return JSON.stringify(this.paymentRedirect) !== '{}' && this.$route.query.hasOwnProperty('redirect') && !this.paymentRedirect.hasOwnProperty('token')
         }
     },
     props: {

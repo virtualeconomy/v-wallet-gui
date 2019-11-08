@@ -330,7 +330,12 @@ export default {
             }
             Vue.ls.set('pwd', this.password)
             Vue.ls.set('address', this.mutableValue.addr)
-            this.$router.push('/')
+            if (this.$route.query.hasOwnProperty('redirect')) {
+                this.$router.push({ path: '/',
+                    query: {redirect: this.$route.query.redirect}})
+            } else {
+                this.$router.push('/')
+            }
         },
 
         hideErrMsg() {
