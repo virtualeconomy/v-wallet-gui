@@ -7,6 +7,7 @@
 
 <script>
 import browser from '../src/utils/browser'
+import { mapActions } from 'vuex'
 export default {
     name: 'App',
     data() {
@@ -14,7 +15,20 @@ export default {
             isMobile: false
         }
     },
+    methods: {
+        ...mapActions(['updatePaymentRedirect'])
+    },
     created() {
+        let params = this.$route.query
+        let path = this.$route.path
+        if (path === '/payment' && params.hasOwnProperty('recipient') && params.hasOwnProperty('amount')) {
+            this.updatePaymentRedirect(params)
+            this.$router.push({
+                name: 'login',
+                query: {
+                    redirect: encodeURIComponent(window.location.href)
+                }})
+        }
         this.isMobile = browser.isMobile()
     }
 }

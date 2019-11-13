@@ -139,7 +139,7 @@
                      :fee="fee"></Confirm>
             <p v-show="sendError"
                class="text-danger">
-              <small>Sorry, transaction send failed ! Failed reason: {{ errorMessage }}</small>
+              <small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small>
             </p>
             <b-row>
               <b-col class="col-lef">
@@ -269,7 +269,6 @@ export default {
         },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
-            console.log(tra.toJsonForColdSignature())
             return tra
         },
         noColdAddress() {
@@ -354,6 +353,11 @@ export default {
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
             this.chain.sendLeasingTx(sendTx).then(response => {
+                if (response.hasOwnProperty('error')) {
+                    this.errorMessage = response.message
+                    this.sendError = true
+                    return
+                }
                 this.txId = response.id
                 this.txAddress = response.proofs[0].address
                 this.txRecipient = response.recipient

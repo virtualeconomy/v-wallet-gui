@@ -18,7 +18,7 @@
       <b-container fluid
                    class="c-import">
         <p class="monitor">Select Monitor Method</p>
-        <p class="information">You can select {{ supportLedger ? 'four' : 'two' }} methods to monitor cold wallet.</p>
+        <p class="information">You can select these methods to monitor cold wallet.</p>
         <button id="appWallet"
                 @click="select('appWallet')"
                 :class="classChoose('appWallet') ? 'selected' : 'unselected'">    Mobile Cold Wallet App</button>

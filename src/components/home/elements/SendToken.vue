@@ -1,5 +1,5 @@
 <template>
-  <b-modal :id="'sendTokenModal_' + tokenId"
+  <b-modal :id="'sendTokenModal_' + tokenId + from3rdParty"
            centered
            lazy
            title="SendToken"
@@ -47,6 +47,7 @@
                           class="recipient-input"
                           type="text"
                           v-model="recipient"
+                          :readonly="from3rdParty"
                           :state="isValidRecipient"
                           list="showHotRecipientList"
                           aria-describedby="inputLiveFeedback"
@@ -56,7 +57,8 @@
               <option v-for="addr in hotRecipientAddressList.keys()"
                       :key="addr">{{ addr }}</option>
             </datalist>
-            <img src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
+            <img v-if="!from3rdParty"
+                 src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
                  class="qr-code"
                  @click="scanChange"
@@ -64,7 +66,7 @@
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
-            <div v-if="scanShow">
+            <div v-if="scanShow && !from3rdParty">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
               <div class="qr-window">
                 <qrcode-reader @init="onInit"
@@ -86,6 +88,7 @@
             <b-form-input id="amount-input"
                           class="amount-input"
                           v-model="amount"
+                          :readonly="from3rdParty"
                           aria-describedby="inputLiveFeedback"
                           :state="isValidAmount"
                           onfocus="this.select()">
@@ -116,6 +119,7 @@
             <b-form-textarea id="descriptionInput"
                              v-model="description"
                              :rows="3"
+                             :readonly="from3rdParty"
                              :no-resize="true"
                              aria-describedby="inputDescriptionLiveFeedback"
                              :state="isValidDescription">
@@ -146,9 +150,8 @@
                         :description="description"
                         :tx-type="'Send Token'">
           </TokenConfirm>
-          <p
-            v-show="sendError"
-            class="text-danger"><small>Sorry, transaction send failed! {{ errorMessage }}</small></p>
+          <p v-show="sendError"
+             class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -218,6 +221,7 @@
                           class="recipient-input"
                           type="text"
                           v-model="recipient"
+                          :readonly="from3rdParty"
                           :state="isValidRecipient"
                           list="showColdRecipientList"
                           aria-describedby="inputLiveFeedback"
@@ -227,7 +231,8 @@
               <option v-for="addr in coldRecipientAddressList.keys()"
                       :key="addr"> {{ addr }}</option>
             </datalist>
-            <img src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
+            <img v-if="!from3rdParty"
+                 src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
                  v-b-tooltip.hover
                  class="qr-code"
                  title="scan qr-code"
@@ -235,7 +240,7 @@
             <b-form-invalid-feedback id="inputLiveFeedback">
               Invalid recipient address (if using QR code scanner, make sure QR code is correct).
             </b-form-invalid-feedback>
-            <div v-if="scanShow">
+            <div v-if="scanShow && !from3rdParty">
               <div class="qr-info">Please confirm your browser's camera is available.</div>
               <div class="qr-window">
                 <qrcode-reader @init="onInit"
@@ -257,6 +262,7 @@
             <b-form-input id="cold-amount-input"
                           class="amount-input"
                           v-model="amount"
+                          :readonly="from3rdParty"
                           aria-describedby="inputLiveFeedback"
                           :state="isValidAmount"
                           onfocus="this.select()">
@@ -288,6 +294,7 @@
                              v-model="description"
                              :rows="3"
                              :no-resize="true"
+                             :readonly="from3rdParty"
                              aria-describedby="inputDescriptionLiveFeedback"
                              :state="isValidDescription">
             </b-form-textarea>
@@ -357,7 +364,8 @@
                         :description="description"
                         :tx-type="'Send Token'">
           </TokenConfirm>
-          <p v-show="sendError">Sorry, transaction send failed! {{ errorMessage }}</p>
+          <p v-show="sendError"
+             class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -416,9 +424,9 @@ import Transaction from '@/js-v-sdk/src/transaction'
 import { mapActions, mapState } from 'vuex'
 var initData = {
     errorMessage: '',
-    recipient: '',
-    amount: 0,
-    description: '',
+    recipient: this ? (this.from3rdParty ? this.inheritedRecipient : '') : '',
+    amount: this ? (this.from3rdParty ? this.inheritedAmount : 0) : 0,
+    description: this ? (this.from3rdParty ? this.inheritedDescription : '') : '',
     pageId: 1,
     fee: BigNumber(CONTRACT_EXEC_FEE),
     coldPageId: 1,
@@ -441,6 +449,22 @@ export default {
     name: 'SendToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
     props: {
+        from3rdParty: {
+            type: Boolean,
+            default: false
+        },
+        inheritedAmount: {
+            type: String,
+            default: ''
+        },
+        inheritedRecipient: {
+            type: String,
+            default: ''
+        },
+        inheritedDescription: {
+            type: String,
+            default: ''
+        },
         coldAddresses: {
             type: Object,
             default: function() {},
@@ -508,7 +532,8 @@ export default {
     computed: {
         ...mapState({
             chain: 'chain',
-            account: 'account'
+            account: 'account',
+            paymentRedirect: 'paymentRedirect'
         }),
         defaultAddress() {
             return Vue.ls.get('address')
@@ -584,7 +609,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['updateBalance']),
+        ...mapActions(['updateBalance', 'updatePaymentRedirect']),
         inputAmount(num) {
             return BigNumber(num)
         },
@@ -609,15 +634,46 @@ export default {
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
             this.chain.sendExecuteContractTx(sendTx).then(response => {
+                if (response.hasOwnProperty('error')) {
+                    this.errorMessage = response.message
+                    this.sendError = true
+                    return
+                }
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
                     this.coldPageId++
                 }
-                this.updateBalance(true)
-                for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
-                    setTimeout(this.sendBalanceChange, delayTime)
+                if (this.from3rdParty) {
+                    if (this.paymentRedirect.hasOwnProperty('callback')) {
+                        let url = this.paymentRedirect['callback']
+                        if (url.indexOf('?') !== -1) {
+                            url += '&tx_id=' + response.id
+                        } else {
+                            url += '?tx_id=' + response.id
+                        }
+                        let times = 1
+                        const updateTask = (interval) => {
+                            setTimeout(() => {
+                                this.$http.post(url).then(response => {
+                                }, respErr => {
+                                    times++
+                                    if (times <= 5) {
+                                        updateTask(10000)
+                                    }
+                                })
+                            }, interval)
+                        }
+                        updateTask(500)
+                    }
+                    this.updatePaymentRedirect({})
+                    this.$router.push('/')
+                } else {
+                    for (let delayTime = 6000; delayTime <= 54000; delayTime *= 3) { //  Refresh interval will be 6s, 18s, 54s
+                        setTimeout(this.sendBalanceChange, delayTime)
+                    }
                 }
+                this.updateBalance(true)
             }, respErr => {
                 this.errorMessage = respErr.message
                 if (this.errorMessage === undefined) {
@@ -639,9 +695,9 @@ export default {
         nextPage() {
             this.sendError = false
             this.hasConfirmed = false
-            this.timeStamp = Date.now() * 1e6
             if (this.selectedWalletType === 'hotWallet') {
                 this.pageId++
+                this.timeStamp = Date.now() * 1e6
             } else {
                 this.coldPageId++
             }
@@ -654,9 +710,9 @@ export default {
             }
         },
         resetPage() {
-            this.recipient = ''
-            this.amount = 0
-            this.description = ''
+            this.recipient = this.from3rdParty ? this.inheritedRecipient : ''
+            this.amount = this.from3rdParty ? this.inheritedAmount : 0
+            this.description = this.from3rdParty ? this.inheritedDescription : ''
             this.pageId = 1
             this.coldPageId = 1
             this.coldAddress = ''

@@ -2,6 +2,8 @@
 FROM node:9.11.1-alpine as build-stage
 WORKDIR /app
 COPY package*.json ./
+RUN mkdir -p src/js-v-sdk/
+COPY src/js-v-sdk/package*.json src/js-v-sdk/
 RUN apk add --no-cache git
 RUN npm i -f
 COPY . .

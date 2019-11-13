@@ -39,23 +39,29 @@ v wallet gui based on the basic wallet and cold wallet.
 $ git clone https://github.com/virtualeconomy/v-wallet-gui.git
 ```
 
-  3. install packages
+  3. clone submodule
+
+``` bash
+  $ cd v-wallet-gui
+  $ git submodule update --init
+```
+
+  4. install packages
 
 ```bash
-  $ cd v-wallet-gui
   $ npm install
 ```
 
-  4. run
+  5. run
 
 ```
 $ npm run dev
 ```
-  5. open the website on ```localhost:8080```
+  6. open the website on ```localhost:8080```
 
-  6. if you want the wallet to access data from a different address, edit ```config/nginx.default.conf```
+  7. if you want the wallet to access data from a different address, edit ```config/nginx.default.conf```
 
 ```bash
-  proxy_pass http://wallet.v.systems:9922 
+  proxy_pass http://wallet.v.systems:9922
 ```
 to a particular address

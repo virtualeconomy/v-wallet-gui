@@ -151,6 +151,20 @@
                                 :cold-public-key="coldPublicKey"
                                 :address-index="addresses[selectedAddress]"></LeaseRecords>
                 </div>
+                <SendToken :from3rd-party="from3rdParty"
+                           :token-id="tokenId"
+                           :token-balances="tokenBalances"
+                           :balances="balance"
+                           :inherited-recipient="inheritedRecipient"
+                           :inherited-amount="inheritedAmount"
+                           :inherited-description="inheritedDescription"
+                           :cold-addresses="coldAddresses"
+                           :addresses="addresses"
+                           :selected-address="address"
+                           :wallet-type="walletType"
+                           :is-split="isSplit"
+                           :token-unity="unity">
+                </SendToken>
               </b-tab>
             </b-tabs>
           </div>
@@ -176,11 +190,14 @@ import TokenRecords from './home/elements/TokenRecords'
 import AddToken from './home/modals/AddToken'
 import BigNumber from 'bignumber.js'
 import { mapActions, mapState } from 'vuex'
+import SendToken from './home/elements/SendToken'
+import common from '@/js-v-sdk/src/utils/common'
 
 export default {
     name: 'Home',
     data: function() {
         return {
+            tokenBalances: {},
             balance: {},
             selectedAddress: '',
             sessionClearTimeout: void 0,
@@ -193,7 +210,13 @@ export default {
             available: BigNumber(0),
             leasedIn: BigNumber(0),
             leasedOut: BigNumber(0),
-            total: BigNumber(0)
+            total: BigNumber(0),
+            tokenId: '',
+            isSplit: false,
+            unity: BigNumber(1),
+            inheritedAmount: '',
+            inheritedRecipient: '',
+            inheritedDescription: ''
         }
     },
 
@@ -239,9 +262,18 @@ export default {
             if (localChanging) {
                 this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
             }
+            if (this.from3rdParty) {
+                if (this.paymentRedirect.hasOwnProperty('invoice')) {
+                    this.inheritedDescription = this.paymentRedirect['invoice']
+                }
+                this.inheritedAmount = this.paymentRedirect['amount']
+                this.inheritedRecipient = this.paymentRedirect['recipient']
+                this.tokenId = this.paymentRedirect['token']
+                this.getTokenBalances()
+                this.getTokenInfo()
+            }
         }
     },
-
     mounted() {
         this.setSessionClearTimeout()
     },
@@ -250,8 +282,12 @@ export default {
     },
     computed: {
         ...mapState({
-            chain: 'chain'
+            chain: 'chain',
+            paymentRedirect: 'paymentRedirect'
         }),
+        from3rdParty() {
+            return JSON.stringify(this.paymentRedirect) !== '{}' && this.$route.query.hasOwnProperty('redirect') && this.paymentRedirect.hasOwnProperty('token')
+        },
         address() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
@@ -300,7 +336,60 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['updateSelectedAddress', 'updateBalance']),
+        ...mapActions(['updateSelectedAddress', 'updateBalance', 'updatePaymentRedirect']),
+        showErrorMsgBox(errorMessage) {
+            const h = this.$createElement
+            const titleVNode = h('div', { domProps: { innerHTML: 'Error' }, class: ['error-title'] })
+            this.$bvModal.msgBoxOk(errorMessage, {
+                title: [titleVNode],
+                size: 'sm',
+                buttonSize: 'sm',
+                headerTextVariant: 'warning',
+                okVariant: 'warning',
+                headerClass: 'p-2 border-bottom-0',
+                footerClass: 'p-2 border-top-0',
+                centered: true
+            })
+                .then(value => {
+                    this.updatePaymentRedirect({})
+                    this.$router.push('/')
+                })
+        },
+        getTokenBalances() {
+            for (const addr in this.addresses) {
+                Vue.set(this.tokenBalances, addr, BigNumber(0))
+                this.chain.getTokenBalance(addr, this.tokenId).then(response => {
+                    let value = BigNumber(response.balance).dividedBy(response.unity)
+                    Vue.set(this.tokenBalances, addr, value)
+                }, respError => {
+                })
+            }
+            for (const addr in this.coldAddresses) {
+                Vue.set(this.tokenBalances, addr, BigNumber(0))
+                this.chain.getTokenBalance(addr, this.tokenId).then(response => {
+                    let value = BigNumber(response.balance).dividedBy(response.unity)
+                    Vue.set(this.tokenBalances, addr, value)
+                }, respError => {
+                })
+            }
+        },
+        getTokenInfo() {
+            let contractId = common.tokenIDToContractID(this.tokenId)
+            this.chain.getContractInfo(contractId).then(response => {
+                this.isSplit = response.type === 'TokenContractWithSplit'
+            }, respError => {
+            })
+            this.chain.getTokenInfo(this.tokenId).then(response => {
+                if (!response.hasOwnProperty('error')) {
+                    this.unity = BigNumber(response.unity)
+                    this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId + 'true')
+                } else {
+                    this.showErrorMsgBox(response.message)
+                }
+            }, respError => {
+                this.showErrorMsgBox('Unknown.Please check network connection!')
+            })
+        },
         setSessionClearTimeout() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT
             try {
@@ -311,6 +400,7 @@ export default {
             }
             this.sessionClearTimeout = setTimeout(() => {
                 Vue.ls.clear()
+                this.updatePaymentRedirect({})
                 this.$router.push('/login')
             }, oldTimeout * 60 * 1000)
         },
@@ -400,13 +490,14 @@ export default {
             this.walletType = type
             if (this.selectedAddress !== addr) {
                 this.selectedAddress = addr
+                this.updateSelectedAddress({address: addr, balance: this.balance[addr]})
             } else {
                 this.selectedAddress = ''
                 setTimeout(() => {
                     this.selectedAddress = addr
                 }, 0)
             }
-            this.updateSelectedAddress({address: addr, balance: this.balance[addr]})
+            this.getBalance(addr)
         },
         deleteCold(addr) {
             Vue.delete(this.coldAddresses, addr)
@@ -436,7 +527,8 @@ export default {
         LeasePane,
         TokenPane,
         TokenRecords,
-        AddToken
+        AddToken,
+        SendToken
     }
 }
 </script>
@@ -512,6 +604,9 @@ export default {
 }
 .tab-title {
     margin-left: 8px;
+}
+.error-title {
+    color: #FF8737;
 }
 
 .contents {

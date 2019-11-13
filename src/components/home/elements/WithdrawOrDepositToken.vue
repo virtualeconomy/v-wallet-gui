@@ -84,9 +84,8 @@
                         :contract-id="contractId"
                         :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
           </TokenConfirm>
-          <p
-            v-show="sendError"
-            class="text-danger"><small>Sorry, transaction send failed! {{ errorMessage }}</small></p>
+          <p v-show="sendError"
+             class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -229,7 +228,8 @@
                         :contract-id="contractId"
                         :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
           </TokenConfirm>
-          <p v-show="sendError">Sorry, transaction send failed! {{ errorMessage }}</p>
+          <p v-show="sendError"
+             class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small>}</p>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -458,13 +458,18 @@ export default {
             }
             const url = NODE_IP + '/contract/broadcast/execute'
             this.$http.post(url, apiSchema).then(response => {
+                if (response.hasOwnProperty('error')) {
+                    this.errorMessage = response.message
+                    this.sendError = true
+                    return
+                }
                 if (walletType === 'hotWallet') {
                     this.pageId++
                 } else {
                     this.coldPageId++
                 }
                 this.updateBalance(true)
-                for (let delayTime = 6000; delayTime <= 150000; delayTime *= 5) { //  Refresh interval will be 6s, 30s, 150s
+                for (let delayTime = 6000; delayTime <= 54000; delayTime *= 3) { //  Refresh interval will be 6s, 18s, 54s
                     setTimeout(this.sendBalanceChange, delayTime)
                 }
             }, respErr => {

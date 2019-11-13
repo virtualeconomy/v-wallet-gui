@@ -57,7 +57,7 @@
                            @click="issueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
                            @click="destroyToken">Destroy Token</b-dropdown-item>
-          <b-dropdown-item v-if="tokenSplitStatus"
+          <b-dropdown-item v-if="tokenSplitStatus && isSplit"
                            @click="splitToken">Split Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenManagementStatus && showUnsupportedFunction"
                            @click="depositToken">Deposit to Contract </b-dropdown-item>
@@ -146,7 +146,7 @@ import { SHOW_UNSUPPORTED_FUNCTION } from '@/constants'
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import certify from '@/utils/certify'
-import { mapState } from 'vuex'
+import { mapActions, mapState } from 'vuex'
 export default {
     name: 'TokenRecord',
     components: { TokenInfoModal, SendToken, SplitTokenOrSupersede, WithdrawOrDepositToken, IssueOrDestroyToken },
@@ -290,6 +290,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['removeTokenUpdateEventPool']),
         setUsrLocalStorage(fieldName, value) {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             Vue.set(userInfo, fieldName, value)
@@ -367,7 +368,7 @@ export default {
             } else {
                 this.getTokenBalances()
                 this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId)
+                this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId + 'false')
             }
         },
         supersede() {
@@ -434,17 +435,7 @@ export default {
                 this.removeFlag = true
                 this.$emit('removeFlag', this.removeFlag)
                 this.removeFlag = false
-                if (this.$store.state.eventPool) {
-                    let eventPool = this.$store.state.eventPool
-                    if (eventPool[this.tokenId] && eventPool[this.tokenId].newToken) {
-                        let stopArr = eventPool[this.tokenId].newToken
-                        for (let i in stopArr) {
-                            clearTimeout(stopArr[i])
-                        }
-                        Vue.delete(eventPool, this.tokenId)
-                    }
-                    this.$store.commit('changeEventPool', eventPool)
-                }
+                this.removeTokenUpdateEventPool(this.tokenId)
             }
         }
     }
