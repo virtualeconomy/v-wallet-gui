@@ -37,6 +37,9 @@
        class="records">
     <div class="title-records">
       <span>Token Watch List</span>
+      <b-button class="add-token-button text-decoration-none"
+                variant="link"
+                v-b-modal.addTokenModal>&oplus;</b-button>
     </div>
     <div class="empty">
       There is no token in watch list.
