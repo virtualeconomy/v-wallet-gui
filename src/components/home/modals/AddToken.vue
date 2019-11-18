@@ -111,6 +111,7 @@ export default {
             if (tmpUserInfo && tmpUserInfo.tokens) {
                 tokens = JSON.parse(tmpUserInfo.tokens)
             }
+            this.tokenId = this.tokenId.replace(/\s*/g, '')
             let tokenId = certify.getTokenId(this.tokenId)
             this.tokenId = tokenId === null ? this.tokenId : tokenId
             if (this.tokenId in tokens) {
