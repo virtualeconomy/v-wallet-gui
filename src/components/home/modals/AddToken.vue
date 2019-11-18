@@ -69,7 +69,11 @@ export default {
             chain: 'chain'
         }),
         contractId() {
-            return common.tokenIDToContractID(this.tokenId)
+            try {
+                return common.tokenIDToContractID(this.tokenId)
+            } catch (e) {
+                return null
+            }
         },
         seedAddress() {
             if (Vue.ls.get('address')) {
@@ -111,7 +115,6 @@ export default {
             if (tmpUserInfo && tmpUserInfo.tokens) {
                 tokens = JSON.parse(tmpUserInfo.tokens)
             }
-            this.tokenId = this.tokenId.replace(/\s*/g, '')
             let tokenId = certify.getTokenId(this.tokenId)
             this.tokenId = tokenId === null ? this.tokenId : tokenId
             if (this.tokenId in tokens) {

@@ -47,7 +47,7 @@ export default {
         let upperName = name.toUpperCase()
         let index = upperName.indexOf('TOKEN')
         if (index !==-1) {
-            upperName = upperName.slice(0,index)
+            upperName = upperName.slice(0,index).trim()
         }
         for (let tokenId in certifiedTokens) {
             if (certifiedTokens[tokenId].name === upperName) return tokenId
