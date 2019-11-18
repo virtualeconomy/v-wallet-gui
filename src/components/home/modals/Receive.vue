@@ -1,5 +1,5 @@
 <template>
-  <b-modal id="receiveModal"
+  <b-modal :id="'receiveModal' + address + tokenId"
            ref="receiveModal"
            centered
            hide-footer
@@ -104,6 +104,10 @@ export default {
     name: 'Receive',
     props: {
         address: {
+            type: String,
+            default: ''
+        },
+        tokenId: {
             type: String,
             default: ''
         }

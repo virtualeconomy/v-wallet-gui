@@ -3,6 +3,9 @@
        class="records">
     <div class="title-records">
       <span>Token Watch List</span>
+      <b-button class="add-token-button text-decoration-none"
+                variant="link"
+                v-b-modal.addTokenModal>&oplus;</b-button>
     </div>
     <div class="inherit-height">
       <div class="scroll"
@@ -248,6 +251,11 @@ export default {
     color: #010102;
     letter-spacing: 0;
     text-align: left;
+}
+.add-token-button {
+    z-index: 200;
+    font-size: 20px;
+    margin-left: -10px;
 }
 .add-token-input-second
 {

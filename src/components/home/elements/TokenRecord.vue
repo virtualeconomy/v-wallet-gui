@@ -26,10 +26,14 @@
           <span>{{ formatter(tokenBalance) }} </span>
         </div>
       </b-col>
-      <button class="btn-sendToken"
-              @click="sendToken">
-        <b>Send</b>
-      </button>
+      <b-button class="btn-sendToken"
+                @click="sendToken">
+        <p>Send</p>
+      </b-button>
+      <b-button class="btn-receive"
+                v-b-modal="'receiveModal' + address + tokenId">
+        <p>Receive</p>
+      </b-button>
       <b-col class="record-action"
              cols="auto">
         <b-dropdown no-caret
@@ -129,6 +133,9 @@
                :token-unity="unity"
                @updateToken="updateToken">
     </SendToken>
+    <Receive show="false"
+             :address="address"
+             :token-id="tokenId"></Receive>
   </b-container>
 </template>
 
@@ -147,9 +154,10 @@ import Vue from 'vue'
 import browser from '@/utils/browser'
 import certify from '@/utils/certify'
 import { mapActions, mapState } from 'vuex'
+import Receive from '../modals/Receive'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, SplitTokenOrSupersede, WithdrawOrDepositToken, IssueOrDestroyToken },
+    components: { TokenInfoModal, SendToken, SplitTokenOrSupersede, WithdrawOrDepositToken, IssueOrDestroyToken, Receive },
     data: function() {
         return {
             isSplit: false,
@@ -498,6 +506,25 @@ export default {
         font-size: 17px;
         font-weight:lighter;
         background:#fafafa;
+        height: 30px;
+        p {
+            position: relative;
+            top: -4px;
+        }
+    }
+    .btn-receive {
+        text-align: center;
+        border-color: #FF8837;
+        color: #FF8837;
+        font-size: 17px;
+        font-weight:lighter;
+        height: 30px;
+        background:#fafafa;
+        margin-left: 10px;
+        p {
+            position: relative;
+            top: -4px;
+        }
     }
     .amount-sent {
         font-size: 17px;
