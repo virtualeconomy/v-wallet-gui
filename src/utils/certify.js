@@ -44,10 +44,11 @@ export default {
         certifiedTokens[tokenId].unity = unity
     },
     getTokenId(name) {
-        let upperName = name.toUpperCase()
-        let index = upperName.indexOf('TOKEN')
-        if (index !==-1) {
-            upperName = upperName.slice(0,index)
+        let upperName = name.toUpperCase().trim()
+        let len = upperName.length
+        let endName = len > 6 ? upperName.substring(len - 6, len) : ''
+        if (endName === ' TOKEN') {
+            upperName = upperName.substring(0, len - 6).trim()
         }
         for (let tokenId in certifiedTokens) {
             if (certifiedTokens[tokenId].name === upperName) return tokenId

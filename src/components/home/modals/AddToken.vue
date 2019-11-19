@@ -69,7 +69,11 @@ export default {
             chain: 'chain'
         }),
         contractId() {
-            return common.tokenIDToContractID(this.tokenId)
+            try {
+                return common.tokenIDToContractID(this.tokenId)
+            } catch (e) {
+                return null
+            }
         },
         seedAddress() {
             if (Vue.ls.get('address')) {
