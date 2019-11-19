@@ -38,7 +38,7 @@
              src="@/assets/imgs/icons/wallet/ic_send.svg"><b>Send</b></b-button>
       <b-button variant="dark"
                 class="btn-receive"
-                v-b-modal="'receiveModal' + address">
+                v-b-modal.receiveModal>
         <img v-if="!isMobile"
              class="icon-btn"
              src="@/assets/imgs/icons/wallet/ic_receive.svg"><b> {{ !isMobile ? 'Receive':'Recv' }} </b></b-button>
