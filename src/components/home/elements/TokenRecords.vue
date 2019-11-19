@@ -1,11 +1,14 @@
 <template>
-  <div v-if="Object.keys(tokenRecords).length > 0 && Object.keys(tokenRecords) !== undefined"
-       class="records">
+  <div class="records">
     <div class="title-records">
-      <span>Token Watch List</span>
+      <span>Token watch list</span>
+      <b-button class="add-token-button text-decoration-none"
+                variant="link"
+                v-b-modal.addTokenModal>&oplus;</b-button>
     </div>
     <div class="inherit-height">
-      <div class="scroll"
+      <div v-if="Object.keys(tokenRecords).length > 0 && Object.keys(tokenRecords) !== undefined"
+           class="scroll"
            :style="{height: myHeight}">
         <TokenRecord v-for="(tokenMaker,tokenId) in tokenRecords"
                      :key="tokenId"
@@ -18,33 +21,20 @@
                      :balances="balances"
                      :active-tab="activeTab"
                      @removeFlag="removeToken"></TokenRecord>
-        <div class="add-token"
-             :style="{height:1}">
-          <span class="add-token-input-first">Don't see your tokens?</span>
-          <br>
-          <span class="add-token-input-second">Click on <b-button class="add-button"
-                                                                  v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
-          <AddToken show="false"></AddToken>
-        </div>
+      </div>
+      <div v-else
+           class="empty">
+        There is no token in watch list.
+      </div>
+      <div class="add-token">
+        <span class="add-token-input-first">Don't see your tokens?</span>
+        <br>
+        <span class="add-token-input-second">Click on <b-button class="add-button"
+                                                                v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
+        <AddToken show="false"></AddToken>
       </div>
     </div>
 
-  </div>
-  <div v-else
-       class="records">
-    <div class="title-records">
-      <span>Token Watch List</span>
-    </div>
-    <div class="empty">
-      There is no token in watch list.
-    </div>
-    <div class="add-token">
-      <span class="add-token-input-first">Don't see your tokens?</span>
-      <br>
-      <span class="add-token-input-second">Click on <b-button class="add-button"
-                                                              v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
-      <AddToken show="false"></AddToken>
-    </div>
   </div>
 </template>
 
@@ -60,7 +50,7 @@ export default {
         TokenRecord, AddToken
     },
     created() {
-        this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
+        this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 400) + 'px'
         if (this.address && Vue.ls.get('pwd')) {
             this.getTokenRecords()
         }
@@ -248,6 +238,11 @@ export default {
     color: #010102;
     letter-spacing: 0;
     text-align: left;
+}
+.add-token-button {
+    z-index: 200;
+    font-size: 23px;
+    margin-left: -5px;
 }
 .add-token-input-second
 {
