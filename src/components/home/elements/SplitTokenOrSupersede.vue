@@ -901,6 +901,7 @@ export default {
     text-align: center;
 }
 .unity-mode-btn {
+    background: transparent;
     margin-bottom: 6px;
     border: none;
     color: #FF8837;

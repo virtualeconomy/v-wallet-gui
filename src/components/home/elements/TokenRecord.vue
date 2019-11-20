@@ -31,7 +31,7 @@
         <p>Send</p>
       </b-button>
       <b-button class="btn-receive"
-                v-b-modal="'receiveModal' + address + tokenId">
+                v-b-modal="'receiveModal' + tokenId">
         <p>Receive</p>
       </b-button>
       <b-col class="record-action"
@@ -376,7 +376,7 @@ export default {
             } else {
                 this.getTokenBalances()
                 this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId + 'false')
+                this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId + 'false', '#btnShow')
             }
         },
         supersede() {
