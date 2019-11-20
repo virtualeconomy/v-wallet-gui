@@ -1,5 +1,5 @@
 <template>
-  <b-modal :id="'receiveModal' + address + tokenId"
+  <b-modal :id="'receiveModal' + tokenId"
            ref="receiveModal"
            centered
            hide-footer
