@@ -376,7 +376,7 @@ export default {
             } else {
                 this.getTokenBalances()
                 this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId + 'false')
+                this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId + 'false', '#btnShow')
             }
         },
         supersede() {

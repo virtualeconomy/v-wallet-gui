@@ -156,7 +156,7 @@ export default {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {
-                this.$root.$emit('bv::show::modal', 'createTokenModal')
+                this.$root.$emit('bv::show::modal', 'createTokenModal', '#btnShow')
             }
         }
     }
