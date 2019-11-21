@@ -446,8 +446,6 @@ var initData = {
     pageId: 1,
     fee: BigNumber(TX_FEE),
     coldPageId: 1,
-    address: this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
-    coldAddress: this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
     selectedWalletType: this ? this.walletType : 'hotWallet',
     scanShow: false,
     qrInit: false,
@@ -529,6 +527,20 @@ export default {
             account: 'account',
             paymentRedirect: 'paymentRedirect'
         }),
+        coldAddress: {
+            get: function() {
+                return this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : ''
+            },
+            set: function(newValue) {
+            }
+        },
+        address: {
+            get: function() {
+                return this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : ''
+            },
+            set: function(newValue) {
+            }
+        },
         defaultAddress() {
             return Vue.ls.get('address')
         },
