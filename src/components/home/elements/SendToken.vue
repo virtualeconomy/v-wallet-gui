@@ -7,6 +7,7 @@
            hide-header
            ref="sendTokenModal"
            :busy="true"
+           @show="showPage"
            @hidden="resetPage">
     <button
       :disabled="qrInit"
@@ -843,6 +844,11 @@ export default {
                 options.push({ value: addr, text: addr })
                 return options
             }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
+        },
+        showPage() {
+            this.selectedWalletType = this ? this.walletType : 'hotWallet'
+            this.address = this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : ''
+            this.coldAddress = this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : ''
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
