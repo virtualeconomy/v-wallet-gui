@@ -272,7 +272,7 @@ export default {
             } else if (this.txRecord['type'] === REGISTER_CONTRACT_TX) {
                 return 'Register Contract'
             } else if (this.txRecord['type'] === EXECUTE_CONTRACT_TX) {
-                if (this.isSentToken) {
+                if (this.isSentToken && this.txStatus === 'Success') {
                     if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined) {
                         return 'Received'
                     } else return 'Sent'
