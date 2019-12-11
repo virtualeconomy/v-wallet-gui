@@ -124,8 +124,8 @@ export default {
         getBaseQrCodeImg() {
             const options = {
                 padding: 10,
-                width: 256,
-                height: 256,
+                width: 400,
+                height: 400,
                 correctLevel: 2,
                 reverse: false,
                 background: '#ffffff',
@@ -274,7 +274,7 @@ export default {
 
 <style scoped>
 #address-qrcode {
-    margin-top: 30px;
+    margin-top: 25px;
     text-align: center;
     margin-bottom: 40px;
 }
