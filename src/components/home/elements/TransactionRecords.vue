@@ -180,6 +180,7 @@ export default {
             if (newAddr === '' || this.activeTab !== 'trans') {
                 return
             }
+            this.txRecords = {}
             this.changeShowDisable = false
             this.showingNum = 10
             this.showingTypeValue = 0
@@ -194,6 +195,7 @@ export default {
                 this.changeTypeShowDisable = false
                 this.showingNum = 10
                 this.showingTypeValue = 0
+                this.txRecords = {}
                 if (this.address && Vue.ls.get('pwd')) {
                     this.getTxRecords('all')
                 }

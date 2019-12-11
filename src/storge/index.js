@@ -44,6 +44,9 @@ const store = new Vuex.Store({
         updateSelectedAddress(state, status) {
             state.selectedAddress = status['address']
             state.available = status['balance']
+            state.total = BigNumber(0)
+            state.leasedIn = BigNumber(0)
+            state.leasedOut = BigNumber(0)
         },
         changeEventPool(state, status) {
             state.eventPool = status
