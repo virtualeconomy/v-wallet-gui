@@ -644,7 +644,9 @@ export default {
 }
 .add-token-button {
     z-index: 200;
-    font-size: 33px;
-    margin-left: 60px;
+    font-size: 23px;
+    float: right;
+    margin-top: -5px;
+    padding: 0;
 }
 </style>
