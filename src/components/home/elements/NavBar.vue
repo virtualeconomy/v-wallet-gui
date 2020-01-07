@@ -35,6 +35,8 @@
                            v-b-modal.accountModal>Account</b-dropdown-item>
           <b-dropdown-item class="drop-down-item"
                            v-b-modal.settingsModal>Settings</b-dropdown-item>
+          <b-dropdown-item @click="feedbackIssue"
+                           class="drop-down-item">Issue & Help</b-dropdown-item>
           <b-dropdown-item class="drop-down-item"
                            v-b-modal.aboutModal>About</b-dropdown-item>
           <b-dropdown-divider></b-dropdown-divider><b-dropdown-item @click="logout"
@@ -62,6 +64,7 @@
 import Settings from '../modals/Settings'
 import Account from '../modals/Account'
 import About from '../modals/About'
+import { FEEDBACK_URL } from '@/constants'
 import { NETWORK_BYTE } from '@/network'
 import Vue from 'vue'
 import jdenticon from '@/libs/jdenticon-2.1.0'
@@ -190,6 +193,9 @@ export default {
         },
         deleteCold(addr) {
             this.$emit('delete-cold', addr)
+        },
+        feedbackIssue() {
+            window.open(FEEDBACK_URL)
         }
     }
 }
