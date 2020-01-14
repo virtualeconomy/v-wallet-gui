@@ -144,6 +144,7 @@ export default {
         },
         activeTab(newTab, oldTab) {
             if (newTab === 'lease') {
+                this.leaseRecords = []
                 this.changeShowDisable = false
                 this.showingNum = 10
                 if (this.address && Vue.ls.get('pwd')) {

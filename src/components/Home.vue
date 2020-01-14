@@ -18,6 +18,11 @@
           <div class="asset-title">
             <img
               src="../assets/imgs/icons/wallet/ic_assets_line.svg"><b class="title-assets">Accounts</b>
+            <b-button class="add-token-button text-decoration-none"
+                      variant="link"
+                      v-b-modal.addAccountModal>&oplus;</b-button>
+            <AddAccount show="false"
+                        @refreshAccount="refreshAccount"></AddAccount>
           </div>
           <Asset v-if="addresses"
                  v-for="(index, address) in addresses"
@@ -188,6 +193,7 @@ import LeaseRecords from './home/elements/LeaseRecords'
 import TokenPane from './home/elements/TokenPane'
 import TokenRecords from './home/elements/TokenRecords'
 import AddToken from './home/modals/AddToken'
+import AddAccount from './home/modals/AddAccount'
 import BigNumber from 'bignumber.js'
 import { mapActions, mapState } from 'vuex'
 import SendToken from './home/elements/SendToken'
@@ -219,7 +225,6 @@ export default {
             inheritedDescription: ''
         }
     },
-
     created() {
         if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
@@ -299,13 +304,6 @@ export default {
         username() {
             if (this.userInfo) {
                 return this.userInfo.username
-            }
-        },
-        walletAmount() {
-            if (this.userInfo && this.userInfo.walletAmount) {
-                return this.userInfo.walletAmount
-            } else {
-                return 1
             }
         },
         avtHash() {
@@ -505,17 +503,23 @@ export default {
             this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
         },
         getAddresses() {
-            let addresses = []
             let seedPhrase = this.getSeedPhrase()
-            for (let index = 0; index < this.walletAmount; index++) {
+            let walletAmount = 1
+            let userInfo = JSON.parse(window.localStorage.getItem(this.address))
+            if (userInfo && userInfo.walletAmount) {
+                walletAmount = userInfo.walletAmount
+            }
+            for (let index = 0; index < walletAmount; index++) {
                 let seed = seedLib.fromExistingPhrasesWithIndex(seedPhrase, index)
                 Vue.set(this.addresses, seed.address, index)
             }
-            return addresses
         },
         sortStatus() {
             if (this.sortFlag === 0) this.sortFlag = 1
             else this.sortFlag = 0
+        },
+        refreshAccount() {
+            this.getAddresses()
         }
     },
     components: {
@@ -528,7 +532,8 @@ export default {
         TokenPane,
         TokenRecords,
         AddToken,
-        SendToken
+        SendToken,
+        AddAccount
     }
 }
 </script>
@@ -636,5 +641,12 @@ export default {
 }
 .test {
     z-index: 100;
+}
+.add-token-button {
+    z-index: 200;
+    font-size: 23px;
+    float: right;
+    margin-top: -5px;
+    padding: 0;
 }
 </style>

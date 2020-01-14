@@ -7,6 +7,7 @@
            hide-header
            ref="sendModal"
            :busy="true"
+           @show="showPage"
            @hidden="resetPage">
     <button
       :disabled="qrInit"
@@ -853,6 +854,11 @@ export default {
         },
         getKeypair(index) {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
+        },
+        showPage() {
+            this.selectedWalletType = this ? this.walletType : 'hotWallet'
+            this.address = this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : ''
+            this.coldAddress = this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : ''
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
