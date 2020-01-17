@@ -260,17 +260,19 @@ export default {
             }
         },
         displayAddress() {
+            let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
             if (this.isMobile() && this.txAddress.length > 24) {
-                return this.txAddress.substring(0, 23) + '...'
+                return alias[this.txAddress] != null ? alias[this.txAddress] + ' (' + this.txAddress.substring(0, 23) + '...' + ')' : this.txAddress.substring(0, 23) + '...'
             } else {
-                return this.txAddress
+                return alias[this.txAddress] != null ? alias[this.txAddress] + ' (' + this.txAddress + ')' : this.txAddress
             }
         },
         displayRecipient() {
+            let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
             if (this.isMobile() && this.txRecipient.length > 24) {
-                return this.txRecipient.substring(0, 23) + '...'
+                return alias[this.txRecipient] != null ? alias[this.txRecipient] + ' (' + this.txRecipient.substring(0, 23) + '...' + ')' : this.txRecipient.substring(0, 23) + '...'
             } else {
-                return this.txRecipient
+                return alias[this.txRecipient] != null ? alias[this.txRecipient] + ' (' + this.txRecipient + ')' : this.txRecipient
             }
         }
     },

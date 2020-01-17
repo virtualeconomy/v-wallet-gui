@@ -23,6 +23,7 @@
 </template>
 
 <script>
+import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { mapState } from 'vuex'
@@ -52,10 +53,15 @@ export default {
     },
     computed: {
         ...mapState({ available: 'available' }),
+        defaultAddress() {
+            return Vue.ls.get('address')
+        },
         addrShow() {
+            let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
             const addrChars = this.address.split('')
             addrChars.splice(6, 23, '******')
-            return addrChars.join('')
+            let name = alias[this.address] != null ? alias[this.address] + ' (' + addrChars.join('') + ')' : addrChars.join('')
+            return name
         },
         classes() {
             if (!this.selected) {
