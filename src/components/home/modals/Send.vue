@@ -587,6 +587,14 @@ export default {
                 return void 0
             }
             let isValid = false
+            let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            for (let key in alias) {
+                if (recipient === alias[key]) {
+                    this.changeAliasToAddress(key)
+                    recipient = key
+                    break
+                }
+            }
             try {
                 isValid = this.account.checkAddress(recipient)
             } catch (e) {
@@ -625,6 +633,9 @@ export default {
                 }
             }, respErr => {
             })
+        },
+        changeAliasToAddress(address) {
+            this.recipient = address
         },
         inputAmount(num) {
             return BigNumber(num)

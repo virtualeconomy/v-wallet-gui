@@ -78,7 +78,7 @@
                       onfocus="this.select()">
         </b-form-input>
         <b-form-invalid-feedback id="inputLiveFeedback"
-                                 v-if="!isValidAddress">
+                                 v-if="!isExistedAddress">
           Please input your valid address!
         </b-form-invalid-feedback>
       </b-form-group>
@@ -93,8 +93,12 @@
                       onfocus="this.select()">
         </b-form-input>
         <b-form-invalid-feedback id="inputLiveFeedback"
-                                 v-if="!isValidAlias">
-          Invalid alias.
+                                 v-if="!isAliasLessEight">
+          Please enter an alias no more than 8 characters.
+        </b-form-invalid-feedback>
+        <b-form-invalid-feedback id="inputLiveFeedback"
+                                 v-if="isExistedAlias">
+          You have set this alias to another address, please change it to another！
         </b-form-invalid-feedback>
       </b-form-group>
       <b-row>
@@ -153,13 +157,31 @@ export default {
             if (!this.curAddress) {
                 return void 0
             }
+            return this.isExistedAddress
+        },
+        isExistedAddress() {
             return this.curAddress in this.addresses
+        },
+        isExistedAlias() {
+            let alias = JSON.parse(window.localStorage.getItem(this.address)).alias
+            for (let key in alias) {
+                if (this.curAlias === alias[key]) {
+                    return true
+                }
+            }
+            return false
+        },
+        isAliasLessEight() {
+            return this.curAlias.length < 9
         },
         isValidAlias() {
             if (!this.curAlias) {
                 return void 0
             }
-            return true
+            return this.isAliasLessEight && !this.isExistedAlias
+        },
+        from3rdParty() {
+            return false
         }
     },
     methods: {
@@ -175,7 +197,6 @@ export default {
             this.$refs.aliasAddressModal.hide()
         },
         copyText(buttonId, addrToCopy, index) {
-            console.log(this.$refs[addrToCopy][index].value)
             this.$refs[addrToCopy][index].select()
             window.document.execCommand('copy')
             this.$root.$emit('bv::show::popover', buttonId)
@@ -185,7 +206,6 @@ export default {
         },
         addAlias() {
             let userInfo = JSON.parse(window.localStorage.getItem(this.address))
-            console.log(userInfo)
             Vue.set(userInfo.alias, this.curAddress, this.curAlias)
             window.localStorage.setItem(this.address, JSON.stringify(userInfo))
             this.aliasAddresses = JSON.parse(window.localStorage.getItem(this.address)).alias
