@@ -57,10 +57,13 @@ export default {
             return Vue.ls.get('address')
         },
         addrShow() {
-            let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            let alias = null
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            }
             const addrChars = this.address.split('')
             addrChars.splice(6, 23, '******')
-            let name = alias[this.address] != null ? alias[this.address] + ' (' + addrChars.join('') + ')' : addrChars.join('')
+            let name = alias && alias[this.address] != null ? alias[this.address] + ' (' + addrChars.join('') + ')' : addrChars.join('')
             return name
         },
         classes() {

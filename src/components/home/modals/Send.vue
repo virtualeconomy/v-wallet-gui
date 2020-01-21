@@ -144,8 +144,8 @@
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
-          <Confirm :address="address"
-                   :recipient="recipient"
+          <Confirm :address=showAddress()
+                   :recipient=showRecipient()
                    :amount=inputAmount(amount)
                    :fee="fee"
                    :description="description"
@@ -176,8 +176,8 @@
           </b-row>
         </b-container>
         <b-container v-if="pageId===3">
-          <Success :address="address"
-                   :recipient="recipient"
+          <Success :address=showAddress()
+                   :recipient=showRecipient()
                    :amount=inputAmount(amount)
                    :fee="fee"
                    :description="description">
@@ -316,8 +316,8 @@
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
-          <Confirm :address="coldAddress"
-                   :recipient="recipient"
+          <Confirm :address=showAddress()
+                   :recipient=showRecipient()
                    :amount=inputAmount(amount)
                    :fee="fee"
                    :description="description"
@@ -374,8 +374,8 @@
                          @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
-          <Confirm :address="coldAddress"
-                   :recipient="recipient"
+          <Confirm :address=showAddress()
+                   :recipient=showRecipient()
                    :amount=inputAmount(amount)
                    :fee="fee"
                    :description="description"
@@ -405,8 +405,8 @@
           </b-row>
         </b-container>
         <b-container v-show="coldPageId===5">
-          <Success :address="coldAddress"
-                   :recipient="recipient"
+          <Success :address=showAddress()
+                   :recipient=showRecipient()
                    :amount=inputAmount(amount)
                    :fee="fee"
                    :description="description">
@@ -459,7 +459,8 @@ var initData = {
     timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     coldRecipientAddressList: {},
-    hotRecipientAddressList: {}
+    hotRecipientAddressList: {},
+    tmpRecipient: ''
 }
 export default {
     name: 'Send',
@@ -587,12 +588,14 @@ export default {
                 return void 0
             }
             let isValid = false
+            this.recordTmpRecipient(recipient)
             let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-            for (let key in alias) {
-                if (recipient === alias[key]) {
-                    this.changeAliasToAddress(key)
-                    recipient = key
-                    break
+            if (recipient.length < 9 && alias) {
+                for (let key in alias) {
+                    if (recipient.toLowerCase() === alias[key].toLowerCase()) {
+                        recipient = key
+                        break
+                    }
                 }
             }
             try {
@@ -634,15 +637,67 @@ export default {
             }, respErr => {
             })
         },
-        changeAliasToAddress(address) {
-            this.recipient = address
+        recordTmpRecipient(recipient) {
+            let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            if (recipient.length < 9 && alias) {
+                for (let key in alias) {
+                    if (recipient.toLowerCase() === alias[key].toLowerCase()) {
+                        this.tmpRecipient = key
+                        break
+                    }
+                }
+            } else {
+                this.tmpRecipient = recipient
+            }
         },
         inputAmount(num) {
             return BigNumber(num)
         },
+        showRecipient() {
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                if (this.recipient.length < 9 && alias) {
+                    for (let key in alias) {
+                        if (this.recipient.toLowerCase() === alias[key].toLowerCase()) {
+                            return this.recipient + ' (' + key + ')'
+                        }
+                    }
+                } else {
+                    for (let key in alias) {
+                        if (this.recipient === key) {
+                            return alias[key] + ' (' + key + ')'
+                        }
+                    }
+                    return this.recipient
+                }
+            }
+        },
+        showAddress() {
+            if (this.selectedWalletType === 'hotWallet') {
+                if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                    let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                    for (let key in alias) {
+                        if (this.address === key) {
+                            return alias[key] + ' (' + key + ')'
+                        }
+                    }
+                }
+                return this.address
+            } else {
+                if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                    let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                    for (let key in alias) {
+                        if (this.coldAddress === key) {
+                            return alias[key] + ' (' + key + ')'
+                        }
+                    }
+                }
+                return this.coldAddress
+            }
+        },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            tra.buildPaymentTx(publicKey, this.recipient, this.amount, this.description, this.timeStamp)
+            tra.buildPaymentTx(publicKey, this.tmpRecipient, this.amount, this.description, this.timeStamp)
             return tra
         },
         sendData(walletType) {
@@ -707,6 +762,7 @@ export default {
             this.$emit('endSendSignal')
         },
         nextPage() {
+            // this.changeAliasToAddress()
             this.sendError = false
             this.hasConfirmed = false
             if (this.selectedWalletType === 'hotWallet') {
@@ -736,6 +792,7 @@ export default {
             this.recipient = this.from3rdParty ? this.inheritedRecipient : ''
             this.amount = this.from3rdParty ? this.inheritedAmount : 0
             this.description = this.from3rdParty ? this.inheritedDescription : ''
+            this.tmpRecipient = ''
             this.pageId = 1
             this.coldPageId = 1
             this.scanShow = false

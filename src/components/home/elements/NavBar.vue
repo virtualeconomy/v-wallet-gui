@@ -54,6 +54,7 @@
              :get-seed-phrase="getSeedPhrase"
              @delete-cold="deleteCold"></Account>
     <AliasAddress :addresses="addresses"
+                  :cold-addresses="coldAddresses"
                   :address="address"></AliasAddress>
     <Settings @passParamToParent="updateInterval"
               :set-usr-local-storage="setUsrLocalStorage"

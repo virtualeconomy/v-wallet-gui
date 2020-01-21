@@ -260,19 +260,25 @@ export default {
             }
         },
         displayAddress() {
-            let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            let alias = null
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            }
             if (this.isMobile() && this.txAddress.length > 24) {
-                return alias[this.txAddress] != null ? alias[this.txAddress] + ' (' + this.txAddress.substring(0, 23) + '...' + ')' : this.txAddress.substring(0, 23) + '...'
+                return alias && alias[this.txAddress] != null ? alias[this.txAddress] + ' (' + this.txAddress.substring(0, 23) + '...' + ')' : this.txAddress.substring(0, 23) + '...'
             } else {
-                return alias[this.txAddress] != null ? alias[this.txAddress] + ' (' + this.txAddress + ')' : this.txAddress
+                return alias && alias[this.txAddress] != null ? alias[this.txAddress] + ' (' + this.txAddress + ')' : this.txAddress
             }
         },
         displayRecipient() {
-            let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            let alias = null
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            }
             if (this.isMobile() && this.txRecipient.length > 24) {
-                return alias[this.txRecipient] != null ? alias[this.txRecipient] + ' (' + this.txRecipient.substring(0, 23) + '...' + ')' : this.txRecipient.substring(0, 23) + '...'
+                return alias && alias[this.txRecipient] != null ? alias[this.txRecipient] + ' (' + this.txRecipient.substring(0, 23) + '...' + ')' : this.txRecipient.substring(0, 23) + '...'
             } else {
-                return alias[this.txRecipient] != null ? alias[this.txRecipient] + ' (' + this.txRecipient + ')' : this.txRecipient
+                return alias && alias[this.txRecipient] != null ? alias[this.txRecipient] + ' (' + this.txRecipient + ')' : this.txRecipient
             }
         }
     },

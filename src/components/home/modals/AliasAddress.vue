@@ -135,6 +135,11 @@ export default {
             require: true,
             default: function() {}
         },
+        coldAddresses: {
+            type: Object,
+            require: true,
+            default: function() {}
+        },
         address: {
             type: String,
             require: true,
@@ -150,7 +155,9 @@ export default {
         }
     },
     created() {
-        this.aliasAddresses = JSON.parse(window.localStorage.getItem(this.address)).alias
+        if (JSON.parse(window.localStorage.getItem(this.address)) != null) {
+            this.aliasAddresses = JSON.parse(window.localStorage.getItem(this.address)).alias
+        }
     },
     computed: {
         isValidAddress() {
@@ -160,13 +167,17 @@ export default {
             return this.isExistedAddress
         },
         isExistedAddress() {
-            return this.curAddress in this.addresses
+            return this.curAddress in this.addresses || this.curAddress in this.coldAddresses
         },
         isExistedAlias() {
-            let alias = JSON.parse(window.localStorage.getItem(this.address)).alias
-            for (let key in alias) {
-                if (this.curAlias === alias[key]) {
-                    return true
+            if (JSON.parse(window.localStorage.getItem(this.address)) != null) {
+                let alias = JSON.parse(window.localStorage.getItem(this.address)).alias
+                if (alias) {
+                    for (let key in alias) {
+                        if (this.curAlias === alias[key]) {
+                            return true
+                        }
+                    }
                 }
             }
             return false
@@ -209,7 +220,6 @@ export default {
             Vue.set(userInfo.alias, this.curAddress, this.curAlias)
             window.localStorage.setItem(this.address, JSON.stringify(userInfo))
             this.aliasAddresses = JSON.parse(window.localStorage.getItem(this.address)).alias
-            this.$refs.aliasAddressModal.hide()
             this.curAddress = ''
             this.curAlias = ''
         }
