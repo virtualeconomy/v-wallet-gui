@@ -428,7 +428,7 @@ import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { VSYS_PRECISION, TX_FEE, API_VERSION, PROTOCOL, OPC_ACCOUNT } from '@/js-v-sdk/src/constants'
 import { NETWORK_BYTE } from '@/network'
-import { TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants'
+import { TRANSFER_ATTACHMENT_BYTE_LIMIT, MAX_ALIAS_LENGTH } from '@/constants'
 import Confirm from './Confirm'
 import Success from './Success'
 import ColdSignature from './ColdSignature'
@@ -590,7 +590,7 @@ export default {
             let isValid = false
             this.recordTmpRecipient(recipient)
             let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-            if (recipient.length < 9 && alias) {
+            if (recipient.length < MAX_ALIAS_LENGTH && alias) {
                 for (let key in alias) {
                     if (recipient.toLowerCase() === alias[key].toLowerCase()) {
                         recipient = key
@@ -639,7 +639,7 @@ export default {
         },
         recordTmpRecipient(recipient) {
             let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-            if (recipient.length < 9 && alias) {
+            if (recipient.length < MAX_ALIAS_LENGTH && alias) {
                 for (let key in alias) {
                     if (recipient.toLowerCase() === alias[key].toLowerCase()) {
                         this.tmpRecipient = key
@@ -656,10 +656,10 @@ export default {
         showRecipient() {
             if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
                 let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-                if (this.recipient.length < 9 && alias) {
+                if (this.recipient.length < MAX_ALIAS_LENGTH && alias) {
                     for (let key in alias) {
                         if (this.recipient.toLowerCase() === alias[key].toLowerCase()) {
-                            return this.recipient + ' (' + key + ')'
+                            return alias[key] + ' (' + key + ')'
                         }
                     }
                 } else {

@@ -127,6 +127,7 @@
 
 <script>
 import Vue from 'vue'
+import { MAX_ALIAS_LENGTH } from '@/constants'
 export default {
     name: 'AliasAddress',
     props: {
@@ -155,11 +156,14 @@ export default {
         }
     },
     created() {
-        if (JSON.parse(window.localStorage.getItem(this.address)) != null) {
-            this.aliasAddresses = JSON.parse(window.localStorage.getItem(this.address)).alias
+        if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+            this.aliasAddresses = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
         }
     },
     computed: {
+        defaultAddress() {
+            return Vue.ls.get('address')
+        },
         isValidAddress() {
             if (!this.curAddress) {
                 return void 0
@@ -170,11 +174,11 @@ export default {
             return this.curAddress in this.addresses || this.curAddress in this.coldAddresses
         },
         isExistedAlias() {
-            if (JSON.parse(window.localStorage.getItem(this.address)) != null) {
-                let alias = JSON.parse(window.localStorage.getItem(this.address)).alias
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
                 if (alias) {
                     for (let key in alias) {
-                        if (this.curAlias === alias[key]) {
+                        if (this.curAlias.toLowerCase() === alias[key].toLowerCase()) {
                             return true
                         }
                     }
@@ -183,7 +187,7 @@ export default {
             return false
         },
         isAliasLessEight() {
-            return this.curAlias.length < 9
+            return this.curAlias.length < MAX_ALIAS_LENGTH
         },
         isValidAlias() {
             if (!this.curAlias) {
@@ -197,14 +201,18 @@ export default {
     },
     methods: {
         resetData() {
+            this.aliasAddresses = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            this.curAddress = ''
+            this.curAlias = ''
         },
         deleteAlias(addr) {
-            let userInfo = JSON.parse(window.localStorage.getItem(this.address))
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             delete userInfo.alias[addr]
-            window.localStorage.setItem(this.address, JSON.stringify(userInfo))
+            window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
             this.aliasAddresses = userInfo.alias
         },
         closeModal() {
+            this.resetData()
             this.$refs.aliasAddressModal.hide()
         },
         copyText(buttonId, addrToCopy, index) {
@@ -216,12 +224,10 @@ export default {
             }, 400)
         },
         addAlias() {
-            let userInfo = JSON.parse(window.localStorage.getItem(this.address))
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             Vue.set(userInfo.alias, this.curAddress, this.curAlias)
-            window.localStorage.setItem(this.address, JSON.stringify(userInfo))
-            this.aliasAddresses = JSON.parse(window.localStorage.getItem(this.address)).alias
-            this.curAddress = ''
-            this.curAlias = ''
+            window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
+            this.resetData()
         }
     }
 }
