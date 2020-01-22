@@ -187,7 +187,7 @@ export default {
             return false
         },
         isAliasLessEight() {
-            return this.curAlias.length < MAX_ALIAS_LENGTH
+            return this.curAlias.length <= MAX_ALIAS_LENGTH
         },
         isValidAlias() {
             if (!this.curAlias) {
