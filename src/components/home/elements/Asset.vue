@@ -3,7 +3,7 @@
     :class="classes">
     <div class="card-body card-asset text-left">
       <div class="card-text mb-2">
-        <p class="mb-0 show-number addr"><b>{{ addrShow }}</b></p>
+        <p class="mb-0 show-number addr"><b>{{ addressShow }}</b></p>
         <p class="mb-0 asset-title">Wallet Address</p>
       </div>
       <div class="card-text">
@@ -26,7 +26,7 @@
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 export default {
     name: 'Asset',
     props: {
@@ -51,20 +51,31 @@ export default {
             required: true
         }
     },
+    data() {
+        return {
+            addressShow: ''
+        }
+    },
+    created() {
+        this.addrShow()
+    },
+    watch: {
+        getAssetStatus: {
+            handler(newValue, oldValue) {
+                this.addrShow()
+            }
+        }
+    },
     computed: {
-        ...mapState({ available: 'available' }),
+        ...mapState({
+            available: 'available',
+            assetStatus: 'assetStatus'
+        }),
         defaultAddress() {
             return Vue.ls.get('address')
         },
-        addrShow() {
-            let alias = null
-            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-                alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-            }
-            const addrChars = this.address.split('')
-            addrChars.splice(6, 23, '******')
-            let name = alias && alias[this.address] != null ? alias[this.address] + ' (' + addrChars.join('') + ')' : addrChars.join('')
-            return name
+        getAssetStatus() {
+            return this.assetStatus
         },
         classes() {
             if (!this.selected) {
@@ -74,8 +85,18 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateAssetStatus']),
         formatter(num) {
             return browser.bigNumberFormatter(num)
+        },
+        addrShow() {
+            let alias = null
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            }
+            const addrChars = this.address.split('')
+            addrChars.splice(6, 23, '******')
+            this.addressShow = alias && alias[this.address] != null ? alias[this.address] + ' (' + addrChars.join('') + ')' : addrChars.join('')
         }
     }
 }

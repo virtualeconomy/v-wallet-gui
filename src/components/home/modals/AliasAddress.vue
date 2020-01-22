@@ -128,6 +128,7 @@
 <script>
 import Vue from 'vue'
 import { MAX_ALIAS_LENGTH } from '@/constants'
+import { mapState, mapActions } from 'vuex'
 export default {
     name: 'AliasAddress',
     props: {
@@ -161,6 +162,9 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            assetStatus: 'assetStatus'
+        }),
         defaultAddress() {
             return Vue.ls.get('address')
         },
@@ -200,6 +204,7 @@ export default {
         }
     },
     methods: {
+        ...mapActions(['updateAssetStatus']),
         resetData() {
             this.aliasAddresses = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
             this.curAddress = ''
@@ -213,6 +218,7 @@ export default {
         },
         closeModal() {
             this.resetData()
+            this.updateAssetStatus(!this.assetStatus)
             this.$refs.aliasAddressModal.hide()
         },
         copyText(buttonId, addrToCopy, index) {
