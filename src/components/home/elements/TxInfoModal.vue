@@ -260,17 +260,25 @@ export default {
             }
         },
         displayAddress() {
+            let alias = null
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            }
             if (this.isMobile() && this.txAddress.length > 24) {
-                return this.txAddress.substring(0, 23) + '...'
+                return alias && alias[this.txAddress] != null ? alias[this.txAddress] + ' (' + this.txAddress.substring(0, 23) + '...' + ')' : this.txAddress.substring(0, 23) + '...'
             } else {
-                return this.txAddress
+                return alias && alias[this.txAddress] != null ? alias[this.txAddress] + ' (' + this.txAddress + ')' : this.txAddress
             }
         },
         displayRecipient() {
+            let alias = null
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            }
             if (this.isMobile() && this.txRecipient.length > 24) {
-                return this.txRecipient.substring(0, 23) + '...'
+                return alias && alias[this.txRecipient] != null ? alias[this.txRecipient] + ' (' + this.txRecipient.substring(0, 23) + '...' + ')' : this.txRecipient.substring(0, 23) + '...'
             } else {
-                return this.txRecipient
+                return alias && alias[this.txRecipient] != null ? alias[this.txRecipient] + ' (' + this.txRecipient + ')' : this.txRecipient
             }
         }
     },
