@@ -3,9 +3,9 @@
        ref="ledgerWalletModal"
        class="ledgerWallet">
     <div class="black-title">
-      Monitor {{ method === 'ledgerWallet' ? 'Ledger' : 'Trezor' }} Hardware Device
+      Monitor {{ device }} Hardware Device
     </div>
-    <div class="small-title"> {{ method === 'ledgerWallet' ? 'Please connect Ledger hardware device with USB as shown in the picture blow and enter VSYS app' : 'Please connect Trezor hardware device with USB' }}
+    <div class="small-title"> {{ method === 'ledgerWallet' ? 'Please connect ' + device + ' hardware device with USB as shown in the picture blow and enter VSYS app' : 'Please connect ' + device + ' hardware device with USB' }}
     </div>
     <div class="image"
          align="center">
@@ -90,9 +90,11 @@ import { NETWORK_BYTE } from '@/network'
 import base58 from 'base-58'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import VsysLedger from '@/utils/vsysLedger'
+import TrezorConnect from '@/utils/vsysTrezor'
 import { mapState } from 'vuex'
 import ledgerImg from '@/assets/imgs/icons/wallet/img_ledger_device.png'
 import trezorImg from '@/assets/imgs/icons/wallet/img_trezor_device.jpg'
+import defaultImg from '@/assets/imgs/icons/wallet/ic_illustration_wallet.svg'
 
 export default {
     name: 'LedgerWallet',
@@ -101,9 +103,9 @@ export default {
             coldAddress: '',
             coldPublicKey: '',
             addressIndex: 0,
-            device: this.method === 'ledgerWallet' ? 'Ledger' : 'Trezor',
             alertMessage: '',
-            dismissCountDown: 0
+            dismissCountDown: 0,
+            addrPath: ''
         }
     },
     props: {
@@ -114,20 +116,30 @@ export default {
         address: {
             type: String,
             default: ''
-        },
-        ledgerAddrPath: {
-            type: String,
-            default: ''
         }
     },
     computed: {
         ...mapState({
             account: 'account'
         }),
-        imgUrl() {
+        device() {
             if (this.method === 'ledgerWallet') {
+                return 'Ledger'
+            } else if (this.method === 'trezorWallet') {
+                return 'Trezor'
+            } else {
+                console.error('Unknown device!')
+                return ''
+            }
+        },
+        imgUrl() {
+            if (this.device === 'Ledger') {
                 return ledgerImg
-            } else return trezorImg
+            } else if (this.device === 'Trezor') {
+                return trezorImg
+            } else {
+                return defaultImg
+            }
         },
         isValidColdAddress() {
             if (!this.coldAddress) {
@@ -164,32 +176,62 @@ export default {
             }
         },
         async selectAddress() {
-            this.alertMessage = 'Please confirm address on Ledger device!'
+            this.alertMessage = 'Please confirm address on ' + this.device + ' device!'
             this.dismissCountDown = 3
             try {
-                const transport = await TransportU2F.create()
-                let ledger = new VsysLedger(transport, NETWORK_BYTE)
-                let path = '44\'/360\'/' + this.addressIndex + '\'/0/0'
-                const result = await ledger.getWalletPublicKey(path, true)
-                if (!result || !result['publicKey']) {
-                    this.alertMessage = 'Failed to get Public Key! Please make sure Ledger hardware device is connected and entered VSYS app.'
-                    this.dismissCountDown = 5
-                    return void 0
+                if (this.device === 'Ledger') {
+                    this.selectAddressWithLedger()
+                } else if (this.device === 'Trezor') {
+                    this.selectAddressWithTrezor()
                 }
-                this.coldPublicKey = result['publicKey']
-                this.coldAddress = result['address']
-                this.ledgerAddrPath = path
             } catch (err) {
                 this.alertMessage = err.hasOwnProperty('message') ? err.message : err
                 this.dismissCountDown = 10
                 return void 0
             }
         },
+        async selectAddressWithLedger() {
+            const transport = await TransportU2F.create()
+            let ledger = new VsysLedger(transport, NETWORK_BYTE)
+            let path = '44\'/360\'/' + this.addressIndex + '\'/0/0'
+            const result = await ledger.getWalletPublicKey(path, true)
+            if (!result || !result['publicKey']) {
+                this.alertMessage = 'Failed to get Public Key! Please make sure Ledger hardware device is connected and entered VSYS app.'
+                this.dismissCountDown = 5
+                return void 0
+            }
+            this.coldPublicKey = result['publicKey']
+            this.coldAddress = result['address']
+            this.addrPath = path
+        },
+        async selectAddressWithTrezor() {
+            let coinIndex = 1
+            if (NETWORK_BYTE === 'M') {
+                coinIndex = 360
+            }
+            let path = 'm/44\'/' + coinIndex + '\'/' + this.addressIndex + '\''
+            const result = await TrezorConnect.vsysGetPublicKey({
+                path: path,
+                showOnTrezor: false
+            })
+            if (!result || !result['payload'] || !result['success']) {
+                if (result['payload'] && result['payload']['error']) {
+                    this.alertMessage = result['payload']['error']
+                } else {
+                    this.alertMessage = 'Failed to get Public Key! Please make sure Trezor hardware device is connected.'
+                }
+                this.dismissCountDown = 5
+                return void 0
+            }
+            this.coldPublicKey = result['payload']['publicKey']
+            this.coldAddress = result['payload']['address']
+            this.addrPath = path
+        },
         countDownChanged(dismissCountDown) {
             this.dismissCountDown = dismissCountDown
         },
         sendData() {
-            let obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPublicKey, 'device': this.device, 'path': this.ledgerAddrPath}
+            let obj = {'protocol': 'v.systems', 'opc': 'account', 'address': this.coldAddress, 'api': 1, 'publicKey': this.coldPublicKey, 'device': this.device, 'path': this.addrPath}
             this.$emit('import-cold', this.coldAddress, this.coldPublicKey, obj)
             this.$emit('close-btn')
         }

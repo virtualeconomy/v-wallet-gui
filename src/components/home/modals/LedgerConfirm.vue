@@ -55,6 +55,7 @@ import { PAYMENT_TX, LEASE_TX, CANCEL_LEASE_TX } from '@/js-v-sdk/src/constants'
 import { NETWORK_BYTE } from '@/network'
 import TransportU2F from '@ledgerhq/hw-transport-u2f'
 import VsysLedger from '@/utils/vsysLedger'
+import TrezorConnect from '@/utils/vsysTrezor'
 import ledgerImg from '@/assets/imgs/icons/wallet/img_ledger_device.png'
 import trezorImg from '@/assets/imgs/icons/wallet/img_trezor_device.jpg'
 
@@ -105,23 +106,56 @@ export default {
                 return void 0
             }
             if (!this.addressInfo || !this.addressInfo['path']) {
-                this.alertMessage = 'Invalid Ledger address data! Please remove the address and monitor it again.'
+                this.alertMessage = 'Invalid ' + this.getDevice + ' address data! Please remove the address and monitor it again.'
                 this.dismissCountDown = 10
                 return void 0
             }
             let path = this.addressInfo['path']
-            this.alertMessage = 'Please confirm transaction on Ledger device!'
+            this.alertMessage = 'Please confirm transaction on ' + this.getDevice + ' device!'
             this.dismissCountDown = 3
             try {
-                const transport = await TransportU2F.create()
-                let ledger = new VsysLedger(transport, NETWORK_BYTE)
-                let signature = await ledger.signTransaction(path, this.transactionBytes)
-                this.$emit('get-signature', signature)
+                let signature
+                if (this.getDevice === 'Ledger') {
+                    signature = await this.getSignatureFromLedger(path)
+                } else if (this.getDevice === 'Trezor') {
+                    signature = await this.getSignatureFromTrezor(path)
+                } else {
+                    this.alertMessage = 'Unknown device for this address'
+                }
+                if (signature) {
+                    this.$emit('get-signature', signature)
+                } else if (this.dismissCountDown <= 0) {
+                    this.alertMessage = 'Failed to get signature from ' + this.getDevice + ' device!'
+                    this.dismissCountDown = 10
+                }
             } catch (err) {
                 this.alertMessage = err.hasOwnProperty('message') ? err.message : err
                 this.dismissCountDown = 10
                 return void 0
             }
+        },
+        async getSignatureFromLedger(path) {
+            const transport = await TransportU2F.create()
+            let ledger = new VsysLedger(transport, NETWORK_BYTE)
+            let signature = await ledger.signTransaction(path, this.transactionBytes)
+            return signature
+        },
+        async getSignatureFromTrezor(path) {
+            this.txInfo['path'] = path
+            const result = await TrezorConnect.vsysSignTx(this.txInfo)
+            if (!result || !result['payload'] || !result['success']) {
+                if (result['payload'] && result['payload']['error']) {
+                    this.alertMessage = result['payload']['error']
+                } else {
+                    this.alertMessage = 'Failed to get signature! Please make sure Trezor hardware device is connected.'
+                }
+                this.dismissCountDown = 5
+                return void 0
+            }
+            return result['payload']['signature']
+        },
+        countDownChanged(dismissCountDown) {
+            this.dismissCountDown = dismissCountDown
         },
         supportedTxType(type) {
             return type === PAYMENT_TX || type === LEASE_TX || type === CANCEL_LEASE_TX

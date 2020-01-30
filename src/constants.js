@@ -9,3 +9,4 @@ export const TX_EXPLORER = 'https://explorer.v.systems/transactions/'
 export const FEEDBACK_URL = 'https://github.com/virtualeconomy/v-wallet-gui/issues/new'
 export const SHOW_UNSUPPORTED_FUNCTION = false
 export const MAX_ALIAS_LENGTH = 8
+export const TREZOR_CONNECT = "https://localhost/trezor-connect"

@@ -22,14 +22,14 @@
         <button id="appWallet"
                 @click="select('appWallet')"
                 :class="classChoose('appWallet') ? 'selected' : 'unselected'">    Mobile Cold Wallet App</button>
+        <button id="trezorWallet"
+                v-if="supportTrezor"
+                @click="select('trezorWallet')"
+                :class="classChoose('trezorWallet') ? 'selected' : 'unselected'">    Trezor Hardware Device</button>
         <button id="ledgerWallet"
                 v-if="supportLedger"
                 @click="select('ledgerWallet')"
                 :class="classChoose('ledgerWallet') ? 'selected' : 'unselected'">    Ledger Hardware Device</button>
-        <button id="trezorWallet"
-                v-if="supportLedger"
-                @click="select('trezorWallet')"
-                :class="classChoose('trezorWallet') ? 'selected' : 'unselected'">    Trezor Hardware Device</button>
         <button id="manualInput"
                 @click="select('manualInput')"
                 :class="classChoose('manualInput') ? 'selected' : 'unselected'">    Manual Input Address</button>
@@ -108,10 +108,11 @@
 </template>
 <script>
 import LedgerWallet from '../elements/LedgerWallet'
+import TrezorConnect from '@/utils/vsysTrezor'
 import AppWallet from '../elements/AppWallet'
 import ManualInput from '../elements/ManualInput'
 import { mapState } from 'vuex'
-import { SHOW_UNSUPPORTED_FUNCTION } from '@/constants'
+import { SHOW_UNSUPPORTED_FUNCTION, TREZOR_CONNECT } from '@/constants'
 
 export default {
     name: 'ImportColdWallet',
@@ -127,13 +128,30 @@ export default {
         return {
             method: 'appWallet',
             pageId: 1,
-            supportLedger: SHOW_UNSUPPORTED_FUNCTION
+            supportLedger: SHOW_UNSUPPORTED_FUNCTION,
+            supportTrezor: SHOW_UNSUPPORTED_FUNCTION
         }
     },
     computed: {
         ...mapState({
             account: 'account'
         })
+    },
+    created: function() {
+        if (this.supportTrezor) {
+            try {
+                TrezorConnect.init({
+                    connectSrc: TREZOR_CONNECT,
+                    lazyLoad: true,
+                    manifest: {
+                        email: 'developer@v.systems',
+                        appUrl: 'https://wallet.v.systems'
+                    }
+                })
+            } catch (error) {
+                console.log('Trezor is already connected.')
+            }
+        }
     },
     methods: {
         classChoose(method) {
