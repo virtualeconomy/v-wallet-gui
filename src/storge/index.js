@@ -25,13 +25,17 @@ const store = new Vuex.Store({
         total: BigNumber(NaN),
         intervalStatus: '',
         addTokenStatus: 0,
-        paymentRedirect: {}
+        paymentRedirect: {},
+        assetStatus: false
     },
     mutations: {
         changeSettingsStatus(state, status) {
             state.tokenSplitStatus = status['split']
             state.tokenManagementStatus = status['management']
             state.heightStatus = status['height']
+        },
+        updateAssetStatus(state, status) {
+            state.assetStatus = status
         },
         updateBalance(state) {
             state.chain.getBalanceDetail(state.selectedAddress).then(response => {
@@ -61,6 +65,9 @@ const store = new Vuex.Store({
     actions: {
         updatePaymentRedirect(context, status) {
             context.commit('updatePaymentRedirect', status)
+        },
+        updateAssetStatus(context, status) {
+            context.commit('updateAssetStatus', status)
         },
         updateSelectedAddress(context, status) {
             if (context.state['selectedAddress'] && context.state['selectedAddress'] !== status['address']) {

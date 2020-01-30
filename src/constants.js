@@ -8,3 +8,4 @@ export const TX_TEST_EXPLORER = 'https://testexplorer.v.systems/transactions/'
 export const TX_EXPLORER = 'https://explorer.v.systems/transactions/'
 export const FEEDBACK_URL = 'https://github.com/virtualeconomy/v-wallet-gui/issues/new'
 export const SHOW_UNSUPPORTED_FUNCTION = false
+export const MAX_ALIAS_LENGTH = 8

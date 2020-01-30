@@ -330,6 +330,11 @@ export default {
             }
             Vue.ls.set('pwd', this.password)
             Vue.ls.set('address', this.mutableValue.addr)
+            let saveInfo = JSON.parse(window.localStorage.getItem(this.mutableValue.addr))
+            if (!saveInfo.hasOwnProperty('alias')) {
+                saveInfo['alias'] = {}
+                window.localStorage.setItem(this.mutableValue.addr, JSON.stringify(saveInfo))
+            }
             if (this.$route.query.hasOwnProperty('redirect')) {
                 this.$router.push({ path: '/',
                     query: {redirect: this.$route.query.redirect}})

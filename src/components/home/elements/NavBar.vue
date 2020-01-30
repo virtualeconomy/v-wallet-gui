@@ -35,6 +35,8 @@
                            v-b-modal.accountModal>Account</b-dropdown-item>
           <b-dropdown-item class="drop-down-item"
                            v-b-modal.settingsModal>Settings</b-dropdown-item>
+          <b-dropdown-item class="drop-down-item"
+                           v-b-modal.aliasAddressModal>Alias Address</b-dropdown-item>
           <b-dropdown-item @click="feedbackIssue"
                            class="drop-down-item">Issue & Help</b-dropdown-item>
           <b-dropdown-item class="drop-down-item"
@@ -51,6 +53,9 @@
              :get-private-key="getPrivateKey"
              :get-seed-phrase="getSeedPhrase"
              @delete-cold="deleteCold"></Account>
+    <AliasAddress :addresses="addresses"
+                  :cold-addresses="coldAddresses"
+                  :address="address"></AliasAddress>
     <Settings @passParamToParent="updateInterval"
               :set-usr-local-storage="setUsrLocalStorage"
               :address="address"></Settings>
@@ -63,6 +68,7 @@
 
 import Settings from '../modals/Settings'
 import Account from '../modals/Account'
+import AliasAddress from '../modals/AliasAddress'
 import About from '../modals/About'
 import { FEEDBACK_URL } from '@/constants'
 import { NETWORK_BYTE } from '@/network'
@@ -75,7 +81,8 @@ export default {
     components: {
         Settings,
         Account,
-        About
+        About,
+        AliasAddress
     },
     props: {
         username: {
