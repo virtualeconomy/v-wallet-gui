@@ -35,6 +35,20 @@
           Show {{ num }} records
         </b-dropdown-item>
       </b-dropdown>
+      <b-button class="btn-lease"
+                v-b-modal.leaseModal>
+        <b>Start Lease</b>
+      </b-button>
+      <b-button class="btn-cancel"
+                @click="cancelLease()">
+        <b>Cancel Lease</b>
+      </b-button>
+      <Lease show="false"
+             :balances="balance"
+             :cold-addresses="coldAddresses"
+             :addresses="addresses"
+             :selected-address="address"
+             :selected-wallet-type="walletType"></Lease>
     </div>
     <div v-if="leaseRecords.length > 0"
          class="inherit-height">
@@ -71,10 +85,12 @@ import Vue from 'vue'
 import TransactionRecord from './TransactionRecord'
 import browser from '@/utils/browser'
 import { mapState } from 'vuex'
+import Lease from '../modals/Lease'
 export default {
     name: 'LeaseRecords',
     components: {
-        TransactionRecord
+        TransactionRecord,
+        Lease
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
@@ -128,6 +144,21 @@ export default {
         activeTab: {
             type: String,
             default: 'trans'
+        },
+        addresses: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        coldAddresses: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        balance: {
+            type: Object,
+            default: function() {},
+            require: true
         }
     },
     watch: {
@@ -190,6 +221,8 @@ export default {
                     this.getLeaseRecords()
                 }
             }
+        },
+        cancelLease() {
         }
     }
 }
@@ -256,7 +289,7 @@ export default {
 }
 .pd-select {
     position: absolute;
-    right: 40px;
+    right: 350px;
     display: flex;
     height: 36px;
     z-index: 100;
@@ -276,7 +309,7 @@ export default {
 }
 .show-fee {
     position: absolute;
-    right:250px;
+    right:560px;
     width: 116px;
     height: 36px;
     border-color: #E8E9ED;
@@ -296,5 +329,43 @@ export default {
     z-index: 100;
     cursor:pointer;
     background-color: #FFF;
+}
+.btn-lease {
+    z-index: 100;
+    position: absolute;
+    right:185px;
+    margin-bottom: 6px;
+    background: #FF8737;
+    border-radius: 4px;
+    border: 1px solid #FF8737;
+    font-size: 17px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    width: 130px;
+    height: 36px;
+    margin-left: 8px;
+}
+.btn-lease:active, .btn-lease:hover {
+    background-color: #EB7D34 !important;
+    border: 1px solid #EB7D34 !important;
+}
+.btn-cancel{
+    z-index: 100;
+    position: absolute;
+    right:35px;
+    margin-bottom: 6px;
+    background: #FFFFFF;
+    border-radius: 4px;
+    border: 1px solid #E8E9ED;
+    font-size: 17px;
+    color: #FF8737;
+    letter-spacing: 0;
+    width: 140px;
+    height: 36px;
+    margin-left: 8px;
+}
+.btn-cancel:active {
+    background-color: #EB7D34 !important;
+    border: 1px solid #EB7D34 !important;
 }
 </style>

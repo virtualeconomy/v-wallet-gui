@@ -154,7 +154,10 @@
                                 :active-tab="activeTab"
                                 :wallet-type="walletType"
                                 :cold-public-key="coldPublicKey"
-                                :address-index="addresses[selectedAddress]"></LeaseRecords>
+                                :address-index="addresses[selectedAddress]"
+                                :cold-addresses="coldAddresses"
+                                :addresses="addresses"
+                                :balance="balance"></LeaseRecords>
                 </div>
                 <SendToken :from3rd-party="from3rdParty"
                            :token-id="tokenId"
