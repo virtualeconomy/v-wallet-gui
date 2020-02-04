@@ -40,15 +40,15 @@
         <b>Start Lease</b>
       </b-button>
       <b-button class="btn-cancel"
+                v-if="!startCancelLease"
                 @click="cancelLease()">
         <b>Cancel Lease</b>
       </b-button>
-      <Lease show="false"
-             :balances="balance"
-             :cold-addresses="coldAddresses"
-             :addresses="addresses"
-             :selected-address="address"
-             :selected-wallet-type="walletType"></Lease>
+      <b-button class="btn-cancel"
+                v-if="startCancelLease"
+                @click="confirmCancel()">
+        <b>Confirm Cancel</b>
+      </b-button>
     </div>
     <div v-if="leaseRecords.length > 0"
          class="inherit-height">
@@ -63,6 +63,7 @@
                              :address-index="addressIndex"
                              :address="address"
                              :wallet-type="walletType"
+                             :start-cancel-lease="startCancelLease"
                              :lease-status="record.leaseStatus"></TransactionRecord>
         </div>
       </div>
@@ -75,6 +76,12 @@
          class="empty">
       There is no transaction record.
     </div>
+    <Lease show="false"
+           :balances="balance"
+           :cold-addresses="coldAddresses"
+           :addresses="addresses"
+           :selected-address="address"
+           :selected-wallet-type="walletType"></Lease>
   </div>
 </template>
 
@@ -118,7 +125,8 @@ export default {
                 attachment: 'attachment'
             },
             transType: 'lease',
-            myHeight: '0'
+            myHeight: '0',
+            startCancelLease: false
         }
     },
     props: {
@@ -223,6 +231,10 @@ export default {
             }
         },
         cancelLease() {
+            this.startCancelLease = true
+        },
+        confirmCancel() {
+            this.startCancelLease = false
         }
     }
 }
@@ -338,7 +350,7 @@ export default {
     background: #FF8737;
     border-radius: 4px;
     border: 1px solid #FF8737;
-    font-size: 17px;
+    font-size: 15px;
     color: #FFFFFF;
     letter-spacing: 0;
     width: 130px;
@@ -357,10 +369,10 @@ export default {
     background: #FFFFFF;
     border-radius: 4px;
     border: 1px solid #E8E9ED;
-    font-size: 17px;
+    font-size: 15px;
     color: #FF8737;
     letter-spacing: 0;
-    width: 140px;
+    width: 130px;
     height: 36px;
     margin-left: 8px;
 }

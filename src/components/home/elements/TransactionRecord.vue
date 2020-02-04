@@ -2,6 +2,13 @@
   <b-container class="record-unit"
                fluid>
     <b-row align-v="center">
+      <b-col class="select-cancel-lease"
+             v-if="startCancelLease && txIcon==='leased out' && leaseStatus !== 'canceled'"
+             cols="auto">
+        <input class="select-lease-out"
+               type="checkbox"
+               @click="selectLeaseOut">
+      </b-col>
       <b-col class="record-icon"
              cols="auto">
         <img v-if="txIcon==='sent'"
@@ -232,6 +239,10 @@ export default {
         leaseStatus: {
             type: String,
             default: 'active'
+        },
+        startCancelLease: {
+            type: Boolean,
+            default: false
         }
     },
     computed: {
@@ -457,6 +468,8 @@ export default {
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
+        },
+        selectLeaseOut() {
         }
     }
 }
@@ -471,6 +484,19 @@ export default {
     border-bottom: 1px solid #EDEDF0;
     border-left: 2px solid white;
     padding: 12px 0;
+    .select-cancel-lease {
+        .select-lease-out {
+            width: 15px;
+            height: 30px;
+            display: flex;
+            z-index: 100;
+            cursor:pointer;
+            background-color: #FFF;
+        }
+        margin-left: 30px;
+        margin-right: -30px;
+        text-align: right;
+    }
     .record-icon {
         margin-left: 20px;
         text-align: right;
