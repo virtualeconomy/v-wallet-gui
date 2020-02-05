@@ -2,6 +2,10 @@
   <div class="records">
     <div class="title-records">
       <span>Leasing Records</span>
+      <div>
+        <span v-if="walletType === 'coldWallet' && coldRecordNum > 1"
+              class="cold-lease-tip">(Cold Wallet does not support batch cancel lease)</span>
+      </div>
       <div v-if="leaseRecords.length > 0"
            class="show-fee"
            @click="showFee">
@@ -46,6 +50,7 @@
       </b-button>
       <b-button class="btn-cancel"
                 v-if="startCancelLease"
+                :disabled="walletType === 'coldWallet' && coldRecordNum > 1"
                 @click="confirmCancel()">
         <b>Confirm Cancel</b>
       </b-button>
@@ -64,6 +69,8 @@
                              :address="address"
                              :wallet-type="walletType"
                              :start-cancel-lease="startCancelLease"
+                             :cancel-lease-records="cancelLeaseRecords"
+                             @updateCancelLeaseRecords="updateCancelLeaseRecords"
                              :lease-status="record.leaseStatus"></TransactionRecord>
         </div>
       </div>
@@ -82,28 +89,38 @@
            :addresses="addresses"
            :selected-address="address"
            :selected-wallet-type="walletType"></Lease>
+    <BatchCancelLease :cancel-lease-records="cancelLeaseRecords"
+                      :wallet-type="walletType"
+                      :cold-lease-record="coldLeaseRecord"
+                      @confirmBack="confirmBack"
+                      :insufficient-flag="insufficientFlag"></BatchCancelLease>
   </div>
 </template>
 
 <script>
 
-import { LEASE_TX } from '@/js-v-sdk/src/constants'
+import { LEASE_TX, TX_FEE } from '@/js-v-sdk/src/constants'
+import BigNumber from 'bignumber.js'
 import Vue from 'vue'
 import TransactionRecord from './TransactionRecord'
 import browser from '@/utils/browser'
 import { mapState } from 'vuex'
 import Lease from '../modals/Lease'
+import BatchCancelLease from '../modals/BatchCancelLease'
 export default {
     name: 'LeaseRecords',
     components: {
         TransactionRecord,
-        Lease
+        Lease,
+        BatchCancelLease
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
         if (this.address && Vue.ls.get('pwd') && this.activeTab === 'lease') {
             this.getLeaseRecords()
         }
+        this.cancelLeaseRecords = {}
+        this.coldLeaseRecord = {}
     },
     data() {
         return {
@@ -126,7 +143,11 @@ export default {
             },
             transType: 'lease',
             myHeight: '0',
-            startCancelLease: false
+            startCancelLease: false,
+            cancelLeaseRecords: {},
+            insufficientFlag: false,
+            coldRecordNum: 0,
+            coldLeaseRecord: {}
         }
     },
     props: {
@@ -167,6 +188,10 @@ export default {
             type: Object,
             default: function() {},
             require: true
+        },
+        updateLeaseRecordsFlag: {
+            type: Boolean,
+            default: false
         }
     },
     watch: {
@@ -190,11 +215,18 @@ export default {
                     this.getLeaseRecords()
                 }
             }
+        },
+        leaseRecords() {
+            if (this.updateLeaseRecordsFlag === true) {
+                this.cancelLeaseRecords = {}
+                this.coldRecordNum = Object.keys(this.cancelLeaseRecords).length
+            }
         }
     },
     computed: {
         ...mapState({
-            chain: 'chain'
+            chain: 'chain',
+            total: 'total'
         })
     },
     methods: {
@@ -233,8 +265,26 @@ export default {
         cancelLease() {
             this.startCancelLease = true
         },
-        confirmCancel() {
+        confirmBack() {
             this.startCancelLease = false
+        },
+        confirmCancel() {
+            this.$root.$emit('bv::show::modal', 'batchCancelLeaseModal')
+            if (this.walletType === 'coldWallet') {
+                let coldRecord
+                for (let eachLeaseCancelRecord in this.cancelLeaseRecords) {
+                    coldRecord = JSON.parse(this.cancelLeaseRecords[eachLeaseCancelRecord])
+                    break
+                }
+                this.coldLeaseRecord = coldRecord
+            } else {
+                this.coldLeaseRecord = {}
+            }
+        },
+        updateCancelLeaseRecords(data) {
+            this.cancelLeaseRecords = data
+            this.coldRecordNum = Object.keys(this.cancelLeaseRecords).length
+            this.insufficientFlag = this.total.minus(BigNumber(TX_FEE).times(Object.keys(this.cancelLeaseRecords).length)).isLessThan(BigNumber(0))
         }
     }
 }
@@ -379,5 +429,10 @@ export default {
 .btn-cancel:active {
     background-color: #EB7D34 !important;
     border: 1px solid #EB7D34 !important;
+}
+.cold-lease-tip {
+    color: red;
+    font-size: 15px;
+    margin-left: 10px;
 }
 </style>
