@@ -268,11 +268,9 @@ export default {
                 this.setUsrLocalStorage('coldAddresses', JSON.stringify(this.coldAddresses))
             }
             if (this.from3rdParty) {
-                if (this.paymentRedirect.hasOwnProperty('invoice')) {
-                    this.inheritedDescription = this.paymentRedirect['invoice']
-                }
-                this.inheritedAmount = this.paymentRedirect['amount']
-                this.inheritedRecipient = this.paymentRedirect['recipient']
+                this.inheritedDescription = this.paymentRedirect.hasOwnProperty('invoice') ? this.paymentRedirect['invoice'] : this.inheritedDescription
+                this.inheritedAmount = this.paymentRedirect.hasOwnProperty('amount') ? this.paymentRedirect['amount'] : this.inheritedAmount
+                this.inheritedRecipient = this.paymentRedirect.hasOwnProperty('recipient') ? this.paymentRedirect['recipient'] : this.inheritedRecipient
                 this.tokenId = this.paymentRedirect['token']
                 this.getTokenBalances()
                 this.getTokenInfo()

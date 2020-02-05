@@ -48,13 +48,14 @@
                           class="recipient-input"
                           type="text"
                           v-model="recipient"
-                          :readonly="from3rdParty"
+                          :readonly="inheritedRecipient !== '' && from3rdParty"
                           :state="isValidRecipient"
                           list="showHotRecipientList"
                           aria-describedby="inputLiveFeedback"
                           placeholder="Paste or scan an address.">
             </b-form-input>
-            <datalist id="showHotRecipientList">
+            <datalist v-if="!from3rdParty"
+                      id="showHotRecipientList">
               <option v-for="addr in hotRecipientAddressList.keys()"
                       :key="addr">{{ addr }}</option>
             </datalist>
@@ -91,7 +92,7 @@
             <b-form-input id="amount-input"
                           class="amount-input"
                           v-model="amount"
-                          :readonly="from3rdParty"
+                          :readonly="inheritedAmount !== '' && from3rdParty"
                           aria-describedby="inputLiveFeedback"
                           :state="isValidAmount"
                           onfocus="this.select()">
@@ -122,7 +123,7 @@
             <b-form-textarea id="descriptionInput"
                              v-model="description"
                              :rows="3"
-                             :readonly="from3rdParty"
+                             :readonly="inheritedDescription !== '' && from3rdParty"
                              :no-resize="true"
                              aria-describedby="inputDescriptionLiveFeedback"
                              :state="isValidDescription">
@@ -220,13 +221,14 @@
                           class="recipient-input"
                           type="text"
                           v-model="recipient"
-                          :readonly="from3rdParty"
+                          :readonly="inheritedRecipient !== '' && from3rdParty"
                           :state="isValidRecipient"
                           list="showColdRecipientList"
                           aria-describedby="inputLiveFeedback"
                           placeholder="Paste or scan an address.">
             </b-form-input>
-            <datalist id="showColdRecipientList">
+            <datalist v-if="!from3rdParty"
+                      id="showColdRecipientList">
               <option v-for="addr in coldRecipientAddressList.keys()"
                       :key="addr">{{ addr }}</option>
             </datalist>
@@ -263,7 +265,7 @@
             <b-form-input id="cold-amount-input"
                           class="amount-input"
                           v-model="amount"
-                          :readonly="from3rdParty"
+                          :readonly="inheritedAmount !== '' && from3rdParty"
                           aria-describedby="inputLiveFeedback"
                           :state="isValidAmount"
                           onfocus="this.select()">
@@ -294,7 +296,7 @@
             <b-form-textarea id="coldDescriptionInput"
                              v-model="description"
                              :rows="3"
-                             :readonly="from3rdParty"
+                             :readonly="inheritedDescription !== '' && from3rdParty"
                              :no-resize="true"
                              aria-describedby="inputDescriptionLiveFeedback"
                              :state="isValidDescription">
@@ -441,9 +443,9 @@ import { mapActions, mapState } from 'vuex'
 var initData = {
     superNodes: [],
     errorMessage: '',
-    recipient: '',
-    amount: 0,
-    description: '',
+    recipient: this ? (this.from3rdParty ? this.inheritedRecipient : '') : '',
+    amount: this ? (this.from3rdParty ? (this.inheritedAmount !== '' ? this.inheritedAmount : 0) : 0) : 0,
+    description: this ? (this.from3rdParty ? this.inheritedDescription : '') : '',
     pageId: 1,
     fee: BigNumber(TX_FEE),
     coldPageId: 1,
@@ -790,7 +792,7 @@ export default {
         },
         resetPage() {
             this.recipient = this.from3rdParty ? this.inheritedRecipient : ''
-            this.amount = this.from3rdParty ? this.inheritedAmount : 0
+            this.amount = this.from3rdParty ? (this.inheritedAmount !== '' ? this.inheritedAmount : 0) : 0
             this.description = this.from3rdParty ? this.inheritedDescription : ''
             this.tmpRecipient = ''
             this.pageId = 1
