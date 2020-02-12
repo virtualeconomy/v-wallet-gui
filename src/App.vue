@@ -21,7 +21,7 @@ export default {
     created() {
         let params = this.$route.query
         let path = this.$route.path
-        if (path === '/payment' && params.hasOwnProperty('recipient') && params.hasOwnProperty('amount')) {
+        if (path === '/payment') {
             this.updatePaymentRedirect(params)
             this.$router.push({
                 name: 'login',
