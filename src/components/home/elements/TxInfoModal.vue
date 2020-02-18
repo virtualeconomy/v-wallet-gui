@@ -61,12 +61,32 @@
       <div class="tx-address"
            v-if="displayAddress!==''">
         <label>From</label>
-        <span>{{ displayAddress }}</span>
+        <span class="addrPos">{{ displayAddress }}</span>
+        <div>
+          <b-btn
+            id="address-cpy"
+            class="btn-copy"
+            v-b-popover.click.topright="'Copied!'"
+            @click="copyText('address-cpy', 'txAddressId')"
+            variant="link">
+            <img src="@/assets/imgs/icons/operate/ic_copy.svg">
+          </b-btn>
+        </div>
       </div>
       <div class="tx-address"
            v-if="displayRecipient!==''">
         <label>To</label>
-        <span>{{ displayRecipient }}</span>
+        <span class="addrPos">{{ displayRecipient }}</span>
+        <div>
+          <b-btn
+            id="recipient-cpy"
+            class="btn-copy"
+            v-b-popover.click.topright="'Copied!'"
+            @click="copyText('recipient-cpy', 'txRecipientId')"
+            variant="link">
+            <img src="@/assets/imgs/icons/operate/ic_copy.svg">
+          </b-btn>
+        </div>
       </div>
       <div class="tx-timestamp">
         <label>Timestamp</label>
@@ -138,6 +158,14 @@
     <textarea class="copy-txid"
               v-model="modalId"
               ref="tId"
+              readonly></textarea>
+    <textarea class="copy-txid"
+              v-model="txAddress"
+              ref="txAddressId"
+              readonly></textarea>
+    <textarea class="copy-txid"
+              v-model="txRecipient"
+              ref="txRecipientId"
               readonly></textarea>
   </b-modal>
 </template>
@@ -333,6 +361,14 @@ export default {
         copyTxId() {
             this.$refs.tId.select()
             window.document.execCommand('copy')
+        },
+        copyText(buttonId, refName) {
+            this.$refs[refName].select()
+            window.document.execCommand('copy')
+            this.$root.$emit('bv::show::popover', buttonId)
+            setTimeout(() => {
+                this.$root.$emit('bv::hide::popover', buttonId)
+            }, 400)
         }
     }
 }
@@ -619,4 +655,14 @@ export default {
     padding-right: 2px;
     padding-bottom: 8px;
  }
+.btn-copy {
+    cursor: pointer;
+    float: right;
+    margin-top: -40px;
+    margin-right: -10px;
+}
+.addrPos {
+    position: relative;
+    margin-right: 30px;
+}
 </style>
