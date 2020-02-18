@@ -7,10 +7,10 @@
               class="cold-lease-tip">(Cold Wallet does not support batch cancel lease)</span>
       </div>
       <div v-if="leaseRecords.length > 0 && startCancelLease"
-           class="show-fee"
+           class="show-select"
            @click="showSelect">
         <span class="show-position"> Select / Unselect All </span>
-        <input class="show-fee2"
+        <input class="show-select2"
                type="checkbox"
                v-model="startSelect"
                @click="showSelect">
@@ -73,6 +73,7 @@
                              :address-index="addressIndex"
                              :address="address"
                              :wallet-type="walletType"
+                             :start-cancel-lease="startCancelLease"
                              :start-select="startSelect"
                              :cancel-lease-records="cancelLeaseRecords"
                              @updateCancelLeaseRecords="updateCancelLeaseRecords"
@@ -256,8 +257,7 @@ export default {
             }
         },
         showSelect() {
-            if (!this.startSelect) this.startSelect = true
-            else this.startSelect = false
+            this.startSelect = !this.startSelect
         },
         changeShowNum(newNum) {
             if (!this.changeShowDisable) {
@@ -375,9 +375,9 @@ export default {
 }
 .show-position {
     position: absolute;
-    left: -40px;
+    left: -45px;
 }
-.show-fee {
+.show-select {
     position: absolute;
     right:560px;
     width: 116px;
@@ -390,7 +390,7 @@ export default {
     display: flex;
     justify-content:center;
 }
-.show-fee2 {
+.show-select2 {
     position: absolute;
     right:7px;
     width: 15px;

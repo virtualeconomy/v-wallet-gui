@@ -3,10 +3,11 @@
                fluid>
     <b-row align-v="center">
       <b-col class="select-cancel-lease"
-             v-if="startSelect && txIcon==='leased out' && leaseStatus !== 'canceled'"
+             v-if="startCancelLease && txIcon==='leased out' && leaseStatus !== 'canceled'"
              cols="auto">
         <input class="select-lease-out"
                type="checkbox"
+               ref="unitSelect"
                v-model="cancelFlag"
                @click="selectLeaseOut">
       </b-col>
@@ -191,6 +192,14 @@ export default {
     created() {
         this.cancelFlag = false
     },
+    watch: {
+        startSelect() {
+            if (this.startSelect === !this.cancelFlag) {
+                console.log(this.$refs)
+                this.$refs.unitSelect.click()
+            }
+        }
+    },
     data: function() {
         return {
             heightGap: 0,
@@ -244,6 +253,10 @@ export default {
         leaseStatus: {
             type: String,
             default: 'active'
+        },
+        startCancelLease: {
+            type: Boolean,
+            default: false
         },
         startSelect: {
             type: Boolean,
