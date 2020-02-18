@@ -6,14 +6,14 @@
         <span v-if="walletType === 'coldWallet' && coldRecordNum > 1"
               class="cold-lease-tip">(Cold Wallet does not support batch cancel lease)</span>
       </div>
-      <div v-if="leaseRecords.length > 0"
+      <div v-if="leaseRecords.length > 0 && startCancelLease"
            class="show-fee"
-           @click="showFee">
-        <span class="show-position"> ShowTxFee </span>
+           @click="showSelect">
+        <span class="show-position"> Select / Unselect All </span>
         <input class="show-fee2"
                type="checkbox"
-               v-model="feeFlag"
-               @click="showFee">
+               v-model="startSelect"
+               @click="showSelect">
       </div>
       <b-dropdown class="pd-select"
                   router-tag="div"
@@ -40,8 +40,15 @@
         </b-dropdown-item>
       </b-dropdown>
       <b-button class="btn-lease"
-                v-b-modal.leaseModal>
+                v-b-modal.leaseModal
+                v-if="!startCancelLease">
         <b>Start Lease</b>
+      </b-button>
+      <b-button class="btn-lease"
+                v-if="startCancelLease"
+                :disabled="walletType === 'coldWallet' && coldRecordNum > 1"
+                @click="confirmCancel()">
+        <b>Confirm Cancel</b>
       </b-button>
       <b-button class="btn-cancel"
                 v-if="!startCancelLease"
@@ -50,9 +57,8 @@
       </b-button>
       <b-button class="btn-cancel"
                 v-if="startCancelLease"
-                :disabled="walletType === 'coldWallet' && coldRecordNum > 1"
-                @click="confirmCancel()">
-        <b>Confirm Cancel</b>
+                @click="cancelBack()">
+        <b>Back</b>
       </b-button>
     </div>
     <div v-if="leaseRecords.length > 0"
@@ -62,13 +68,12 @@
         <div v-for="record in leaseRecords"
              :key="record.id">
           <TransactionRecord :tx-record="record"
-                             :fee-flag="feeFlag"
                              :cold-public-key="coldPublicKey"
                              :trans-type="transType"
                              :address-index="addressIndex"
                              :address="address"
                              :wallet-type="walletType"
-                             :start-cancel-lease="startCancelLease"
+                             :start-select="startSelect"
                              :cancel-lease-records="cancelLeaseRecords"
                              @updateCancelLeaseRecords="updateCancelLeaseRecords"
                              :lease-status="record.leaseStatus"></TransactionRecord>
@@ -124,7 +129,6 @@ export default {
     },
     data() {
         return {
-            feeFlag: false,
             leaseRecords: [],
             showNums: [10, 50, 100, 200, 500, 1000],
             showingNum: 10,
@@ -144,6 +148,7 @@ export default {
             transType: 'lease',
             myHeight: '0',
             startCancelLease: false,
+            startSelect: false,
             cancelLeaseRecords: {},
             insufficientFlag: false,
             coldRecordNum: 0,
@@ -250,9 +255,9 @@ export default {
                 })
             }
         },
-        showFee() {
-            if (!this.feeFlag) this.feeFlag = true
-            else this.feeFlag = false
+        showSelect() {
+            if (!this.startSelect) this.startSelect = true
+            else this.startSelect = false
         },
         changeShowNum(newNum) {
             if (!this.changeShowDisable) {
@@ -264,6 +269,9 @@ export default {
         },
         cancelLease() {
             this.startCancelLease = true
+        },
+        cancelBack() {
+            this.startCancelLease = false
         },
         confirmBack() {
             this.startCancelLease = false
@@ -367,7 +375,7 @@ export default {
 }
 .show-position {
     position: absolute;
-    left: 13px;
+    left: -40px;
 }
 .show-fee {
     position: absolute;

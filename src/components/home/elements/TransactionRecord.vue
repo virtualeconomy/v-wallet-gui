@@ -3,7 +3,7 @@
                fluid>
     <b-row align-v="center">
       <b-col class="select-cancel-lease"
-             v-if="startCancelLease && txIcon==='leased out' && leaseStatus !== 'canceled'"
+             v-if="startSelect && txIcon==='leased out' && leaseStatus !== 'canceled'"
              cols="auto">
         <input class="select-lease-out"
                type="checkbox"
@@ -245,7 +245,7 @@ export default {
             type: String,
             default: 'active'
         },
-        startCancelLease: {
+        startSelect: {
             type: Boolean,
             default: false
         },
