@@ -213,7 +213,6 @@ export default {
             walletType: '',
             sortFlag: 0,
             activeTab: 'token',
-            available: BigNumber(0),
             leasedIn: BigNumber(0),
             leasedOut: BigNumber(0),
             total: BigNumber(0),
@@ -283,9 +282,19 @@ export default {
     beforeDestroy() {
         clearTimeout(this.sessionClearTimeout)
     },
+    watch: {
+        available(now, old) {
+            if (this.balance[this.selectedAddress]) {
+                if (this.balance[this.selectedAddress].isEqualTo(old) && !this.balance[this.selectedAddress].isEqualTo(now)) {
+                    this.balance[this.selectedAddress] = now
+                }
+            }
+        }
+    },
     computed: {
         ...mapState({
             chain: 'chain',
+            available: 'available',
             paymentRedirect: 'paymentRedirect'
         }),
         from3rdParty() {
@@ -430,7 +439,7 @@ export default {
                     }
                 }
             }, respError => {
-                Vue.set(this.balance, address, new BigNumber(NaN))
+                Vue.set(this.balance, address, new BigNumber(0))
             })
         },
         getBlockHeight() {
