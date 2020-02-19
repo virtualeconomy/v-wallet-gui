@@ -18,11 +18,11 @@ const store = new Vuex.Store({
         tokenManagementStatus: JSON.parse(window.localStorage.getItem('tokenManagementStatus')),
         heightStatus: JSON.parse(window.localStorage.getItem('heightStatus')),
         eventPool: {},
-        available: BigNumber(NaN),
-        leasedIn: BigNumber(NaN),
-        leasedOut: BigNumber(NaN),
+        available: BigNumber(0),
+        leasedIn: BigNumber(0),
+        leasedOut: BigNumber(0),
         selectedAddress: '',
-        total: BigNumber(NaN),
+        total: BigNumber(0),
         intervalStatus: '',
         addTokenStatus: 0,
         paymentRedirect: {},
@@ -47,7 +47,7 @@ const store = new Vuex.Store({
         },
         updateSelectedAddress(state, status) {
             state.selectedAddress = status['address']
-            state.available = status['balance']
+            state.available = status['balance'] ? status['balance'] : BigNumber(0)
             state.total = BigNumber(0)
             state.leasedIn = BigNumber(0)
             state.leasedOut = BigNumber(0)
