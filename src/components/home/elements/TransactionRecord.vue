@@ -195,7 +195,6 @@ export default {
     watch: {
         startSelect() {
             if (this.startSelect === !this.cancelFlag) {
-                console.log(this.$refs)
                 this.$refs.unitSelect.click()
             }
         }
