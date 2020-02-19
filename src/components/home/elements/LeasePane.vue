@@ -50,18 +50,7 @@
                 @click="redirectToVsysrate()">
         <b>List of nodes</b>
       </b-button>
-      <b-button variant="dark"
-                class="btn-leasing"
-                v-b-modal.leaseModal>
-        <b>Start Leasing</b>
-      </b-button>
     </div>
-    <Lease show="false"
-           :balances="balance"
-           :cold-addresses="coldAddresses"
-           :addresses="addresses"
-           :selected-address="address"
-           :selected-wallet-type="walletType"></Lease>
   </div>
 </template>
 

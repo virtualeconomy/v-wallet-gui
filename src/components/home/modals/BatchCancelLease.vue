@@ -1,16 +1,59 @@
 <template>
-  <b-modal :id="'cancelLeaseModal_' + modalId"
+  <b-modal :id="'batchCancelLeaseModal'"
            centered
            hide-footer
            hide-header
-           ref="cancelLeaseModal"
+           ref="batchCancelLeaseModal"
            @hidden="resetPage">
     <button
       class="close btn-close"
       @click="closeModal">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
-    <b-container v-if="page==='confirm'"
+    <b-container class="cl-modal"
+                 v-if="insufficientFlag">
+      <p class="insufficient-tip">
+        <small>You do not have enough balance to pay the transaction fee.</small>
+      </p>
+      <b-button variant="warning"
+                class="btn-continue"
+                size="lg"
+                block
+                @click="closeModal">OK, I see
+      </b-button>
+    </b-container>
+    <b-container class="cl-modal"
+                 v-else-if="page === 'confirm' && walletType === 'hotWallet'">
+      <p class="check-cancel">
+        <small>Are you sure to confirm these transactions?</small>
+      </p>
+      <p v-show="sendError"
+         class="text-danger">
+        <small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small>
+      </p>
+      <b-row>
+        <b-col class="col-lef">
+          <b-button
+            class="btn-back"
+            block
+            variant="light"
+            size="lg"
+            @click="closeModal">Back
+          </b-button>
+        </b-col>
+        <b-col class="col-rit">
+          <b-button
+            block
+            class="btn-confirm"
+            variant="warning"
+            size="lg"
+            :disabled="hasConfirmed"
+            @click="batchCancelLease">Confirm
+          </b-button>
+        </b-col>
+      </b-row>
+    </b-container>
+    <b-container v-if="page==='confirm' && walletType === 'coldWallet'"
                  class="cl-modal">
       <div class="md-content">
         <div class="cl-title">
@@ -19,15 +62,15 @@
                  width="60px"
                  height="60px">
           </div>
-          <div class="cl-amount">{{ formatter(amount) }} VSYS</div>
+          <div class="cl-amount">{{ formatter(coldLeaseRecord['amount']) }} VSYS</div>
         </div>
         <div class="cl-address">
           <label>From</label>
-          <span>{{ address }}</span>
+          <span>{{ coldLeaseRecord['address'] }}</span>
         </div>
         <div class="cl-address">
           <label>To</label>
-          <span>{{ recipient }}</span>
+          <span>{{ coldLeaseRecord['recipient'] }}</span>
         </div>
         <div class="cl-fee">
           <label>Fee</label>
@@ -55,13 +98,10 @@
             variant="warning"
             size="lg"
             :disabled="hasConfirmed"
-            @click="sendCancelLease">Confirm
+            @click="batchCancelLease">Confirm
           </b-button>
         </b-col>
       </b-row>
-    </b-container>
-    <b-container v-else-if="page==='success'">
-      <CancelSuccess @show-details="showDetails"></CancelSuccess>
     </b-container>
     <b-container v-else-if="page==='cold' && getDevice==='Ledger'"
                  class="text-left">
@@ -85,7 +125,7 @@
     <b-container v-else-if="page==='cold'"
                  class="text-left">
       <ColdSignature :data-object="dataObject.toJsonForColdSignature()"
-                     :cold-public-key="this.coldPublicKey"
+                     :cold-public-key="this.coldLeaseRecord['coldPublicKey']"
                      :transaction-bytes="dataObject.toBytes()"
                      @get-signature="getSignature"
                      @prev-page="prevPage"></ColdSignature>
@@ -102,8 +142,8 @@ import CancelSuccess from './CancelSuccess'
 import TxInfoModal from '../elements/TxInfoModal'
 import seedLib from '@/libs/seed'
 import Vue from 'vue'
-import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
+import browser from '@/utils/browser'
 import LedgerConfirm from './LedgerConfirm'
 import Transaction from '@/js-v-sdk/src/transaction'
 import { mapActions, mapState } from 'vuex'
@@ -112,61 +152,35 @@ export default {
     components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm, LedgerConfirm },
     data: function() {
         return {
-            errorMessage: '',
             page: 'confirm',
+            errorMessage: '',
             timestamp: Date.now() * 1e6,
             coldSignature: '',
             sendError: false,
             signed: false,
-            hasConfirmed: false
+            hasConfirmed: false,
+            fee: BigNumber(TX_FEE)
         }
     },
     props: {
+        cancelLeaseRecords: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        coldLeaseRecord: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        insufficientFlag: {
+            type: Boolean,
+            default: false,
+            require: true
+        },
         walletType: {
             type: String,
             default: '',
-            require: true
-        },
-        address: {
-            type: String,
-            default: '',
-            require: true
-        },
-        amount: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
-        fee: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(TX_FEE)
-            },
-            require: true
-        },
-        recipient: {
-            type: String,
-            default: '',
-            require: true
-        },
-        modalId: {
-            type: String,
-            default: '',
-            require: true
-        },
-        coldSigned: {
-            type: Boolean,
-            default: false
-        },
-        coldPublicKey: {
-            type: String,
-            default: ''
-        },
-        addressIndex: {
-            type: Number,
-            default: 0,
             require: true
         }
     },
@@ -179,9 +193,7 @@ export default {
             return Vue.ls.get('address')
         },
         dataObject() {
-            let tra = this.buildTransaction(this.coldPublicKey)
-            console.log('coldPublicKey in hahha: ', this.coldPublicKey)
-            console.log('tra in hahha: ', tra)
+            let tra = this.buildTransaction(this.coldLeaseRecord['coldPublicKey'], this.coldLeaseRecord['txRecordId'])
             return tra
         },
         userInfo() {
@@ -214,51 +226,20 @@ export default {
     methods: {
         ...mapActions(['updateBalance']),
         resetPage() {
-            this.page = 'confirm'
             this.timestamp = Date.now() * 1e6
+            this.page = 'confirm'
             this.signed = false
             this.sendError = false
             this.coldSignature = ''
             this.hasConfirmed = false
         },
         closeModal() {
-            this.$refs.cancelLeaseModal.hide()
+            this.$refs.batchCancelLeaseModal.hide()
         },
-        buildTransaction(publicKey) {
+        buildTransaction(publicKey, txRecordId) {
             let tra = new Transaction(NETWORK_BYTE)
-            tra.buildCancelLeasingTx(publicKey, this.modalId, this.timeStamp)
+            tra.buildCancelLeasingTx(publicKey, txRecordId, this.timeStamp)
             return tra
-        },
-        sendCancelLease() {
-            let sendTx
-            if (this.walletType === 'coldWallet') {
-                if (!this.signed) {
-                    this.page = 'cold'
-                    return
-                } else {
-                    let signature = this.coldSignature
-                    sendTx = this.dataObject.toJsonForSendingTx(signature)
-                }
-            } else {
-                if (this.hasConfirmed) {
-                    return
-                }
-                this.hasConfirmed = true
-                let builtTransaction = this.buildTransaction(this.getKeypair(this.address).publicKey)
-                this.account.buildFromPrivateKey(this.getKeypair(this.address).privateKey)
-                let signature = this.account.getSignature(builtTransaction.toBytes())
-                sendTx = builtTransaction.toJsonForSendingTx(signature)
-            }
-            this.chain.sendCancelLeasingTx(sendTx).then(response => {
-                this.page = 'success'
-                this.updateBalance(true)
-            }, respErr => {
-                this.errorMessage = respErr.message
-                if (this.errorMessage === undefined) {
-                    this.errorMessage = 'Unknown. Please check network connection!'
-                }
-                this.sendError = true
-            })
         },
         prevPage() {
             this.page = 'confirm'
@@ -268,11 +249,44 @@ export default {
             this.signed = true
             this.page = 'confirm'
         },
+        getKeypair(addressIndex) {
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, addressIndex).keyPair
+        },
         showDetails() {
             this.$emit('show-details', this.timestamp)
         },
-        getKeypair() {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addressIndex).keyPair
+        batchCancelLease() {
+            for (let eachLeaseCancelRecord in this.cancelLeaseRecords) {
+                let eachCancel = JSON.parse(this.cancelLeaseRecords[eachLeaseCancelRecord])
+                let sendTx
+                if (this.walletType === 'coldWallet') {
+                    if (!this.signed) {
+                        this.page = 'cold'
+                        return
+                    } else {
+                        let signature = this.coldSignature
+                        sendTx = this.dataObject.toJsonForSendingTx(signature)
+                    }
+                } else {
+                    this.hasConfirmed = true
+                    let builtTransaction = this.buildTransaction(this.getKeypair(eachCancel['addressIndex']).publicKey, eachCancel['txRecordId'])
+                    this.account.buildFromPrivateKey(this.getKeypair(eachCancel['addressIndex']).privateKey)
+                    let signature = this.account.getSignature(builtTransaction.toBytes())
+                    sendTx = builtTransaction.toJsonForSendingTx(signature)
+                }
+                this.chain.sendCancelLeasingTx(sendTx).then(response => {
+                    this.updateBalance(true)
+                }, respErr => {
+                    this.errorMessage = respErr.message
+                    if (this.errorMessage === undefined) {
+                        this.errorMessage = 'Unknown. Please check network connection!'
+                    }
+                    this.sendError = true
+                })
+            }
+            this.$emit('confirmBack')
+            this.hasConfirmed = false
+            this.closeModal()
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
@@ -342,7 +356,7 @@ export default {
     position: absolute;
     right: 0;
     margin-right: 20px;
-    margin-top: 20px;
+    margin-top: 10px;
 }
 .btn-confirm {
     height: 44px;
@@ -375,5 +389,19 @@ export default {
 .row {
     margin-top: 26px;
     margin-bottom: 10px;
+}
+.check-cancel {
+    font-size: 25px;
+    color: #181B3A;
+    letter-spacing: 0;
+    text-align: center;
+    margin-top: 5px;
+}
+.insufficient-tip {
+    font-size: 25px;
+    color: red;
+    letter-spacing: 0;
+    text-align: center;
+    margin-top: 5px;
 }
 </style>

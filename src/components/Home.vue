@@ -154,7 +154,11 @@
                                 :active-tab="activeTab"
                                 :wallet-type="walletType"
                                 :cold-public-key="coldPublicKey"
-                                :address-index="addresses[selectedAddress]"></LeaseRecords>
+                                :address-index="addresses[selectedAddress]"
+                                :cold-addresses="coldAddresses"
+                                :addresses="addresses"
+                                :update-lease-records-flag="updateLeaseRecordsFlag"
+                                :balance="balance"></LeaseRecords>
                 </div>
                 <SendToken :from3rd-party="from3rdParty"
                            :token-id="tokenId"
@@ -222,7 +226,8 @@ export default {
             unity: BigNumber(1),
             inheritedAmount: '',
             inheritedRecipient: '',
-            inheritedDescription: ''
+            inheritedDescription: '',
+            updateLeaseRecordsFlag: false
         }
     },
     created() {
@@ -487,6 +492,7 @@ export default {
             if (this.selectedAddress !== addr) {
                 this.selectedAddress = addr
                 this.updateSelectedAddress({address: addr, balance: this.balance[addr]})
+                this.updateLeaseRecordsFlag = true
             } else {
                 this.selectedAddress = ''
                 setTimeout(() => {

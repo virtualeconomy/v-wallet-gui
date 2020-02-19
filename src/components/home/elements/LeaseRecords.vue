@@ -2,14 +2,18 @@
   <div class="records">
     <div class="title-records">
       <span>Leasing Records</span>
-      <div v-if="leaseRecords.length > 0"
-           class="show-fee"
-           @click="showFee">
-        <span class="show-position"> ShowTxFee </span>
-        <input class="show-fee2"
+      <div>
+        <span v-if="walletType === 'coldWallet' && coldRecordNum > 1"
+              class="cold-lease-tip">(Cold Wallet does not support batch cancel lease)</span>
+      </div>
+      <div v-if="leaseRecords.length > 0 && startCancelLease"
+           class="show-select"
+           @click="showSelect">
+        <span class="show-position"> Select / Unselect All </span>
+        <input class="show-select2"
                type="checkbox"
-               v-model="feeFlag"
-               @click="showFee">
+               v-model="startSelect"
+               @click="showSelect">
       </div>
       <b-dropdown class="pd-select"
                   router-tag="div"
@@ -35,6 +39,27 @@
           Show {{ num }} records
         </b-dropdown-item>
       </b-dropdown>
+      <b-button class="btn-lease"
+                v-b-modal.leaseModal
+                v-if="!startCancelLease">
+        <b>Start Lease</b>
+      </b-button>
+      <b-button class="btn-lease"
+                v-if="startCancelLease"
+                :disabled="walletType === 'coldWallet' && coldRecordNum > 1"
+                @click="confirmCancel()">
+        <b>Confirm Cancel</b>
+      </b-button>
+      <b-button class="btn-cancel"
+                v-if="!startCancelLease"
+                @click="cancelLease()">
+        <b>Cancel Lease</b>
+      </b-button>
+      <b-button class="btn-cancel"
+                v-if="startCancelLease"
+                @click="cancelBack()">
+        <b>Back</b>
+      </b-button>
     </div>
     <div v-if="leaseRecords.length > 0"
          class="inherit-height">
@@ -43,12 +68,15 @@
         <div v-for="record in leaseRecords"
              :key="record.id">
           <TransactionRecord :tx-record="record"
-                             :fee-flag="feeFlag"
                              :cold-public-key="coldPublicKey"
                              :trans-type="transType"
                              :address-index="addressIndex"
                              :address="address"
                              :wallet-type="walletType"
+                             :start-cancel-lease="startCancelLease"
+                             :start-select="startSelect"
+                             :cancel-lease-records="cancelLeaseRecords"
+                             @updateCancelLeaseRecords="updateCancelLeaseRecords"
                              :lease-status="record.leaseStatus"></TransactionRecord>
         </div>
       </div>
@@ -61,30 +89,47 @@
          class="empty">
       There is no transaction record.
     </div>
+    <Lease show="false"
+           :balances="balance"
+           :cold-addresses="coldAddresses"
+           :addresses="addresses"
+           :selected-address="address"
+           :selected-wallet-type="walletType"></Lease>
+    <BatchCancelLease :cancel-lease-records="cancelLeaseRecords"
+                      :wallet-type="walletType"
+                      :cold-lease-record="coldLeaseRecord"
+                      @confirmBack="confirmBack"
+                      :insufficient-flag="insufficientFlag"></BatchCancelLease>
   </div>
 </template>
 
 <script>
 
-import { LEASE_TX } from '@/js-v-sdk/src/constants'
+import { LEASE_TX, TX_FEE } from '@/js-v-sdk/src/constants'
+import BigNumber from 'bignumber.js'
 import Vue from 'vue'
 import TransactionRecord from './TransactionRecord'
 import browser from '@/utils/browser'
 import { mapState } from 'vuex'
+import Lease from '../modals/Lease'
+import BatchCancelLease from '../modals/BatchCancelLease'
 export default {
     name: 'LeaseRecords',
     components: {
-        TransactionRecord
+        TransactionRecord,
+        Lease,
+        BatchCancelLease
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 300) + 'px'
         if (this.address && Vue.ls.get('pwd') && this.activeTab === 'lease') {
             this.getLeaseRecords()
         }
+        this.cancelLeaseRecords = {}
+        this.coldLeaseRecord = {}
     },
     data() {
         return {
-            feeFlag: false,
             leaseRecords: [],
             showNums: [10, 50, 100, 200, 500, 1000],
             showingNum: 10,
@@ -102,7 +147,13 @@ export default {
                 attachment: 'attachment'
             },
             transType: 'lease',
-            myHeight: '0'
+            myHeight: '0',
+            startCancelLease: false,
+            startSelect: false,
+            cancelLeaseRecords: {},
+            insufficientFlag: false,
+            coldRecordNum: 0,
+            coldLeaseRecord: {}
         }
     },
     props: {
@@ -128,6 +179,25 @@ export default {
         activeTab: {
             type: String,
             default: 'trans'
+        },
+        addresses: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        coldAddresses: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        balance: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        updateLeaseRecordsFlag: {
+            type: Boolean,
+            default: false
         }
     },
     watch: {
@@ -151,11 +221,18 @@ export default {
                     this.getLeaseRecords()
                 }
             }
+        },
+        leaseRecords() {
+            if (this.updateLeaseRecordsFlag === true) {
+                this.cancelLeaseRecords = {}
+                this.coldRecordNum = Object.keys(this.cancelLeaseRecords).length
+            }
         }
     },
     computed: {
         ...mapState({
-            chain: 'chain'
+            chain: 'chain',
+            total: 'total'
         })
     },
     methods: {
@@ -179,9 +256,8 @@ export default {
                 })
             }
         },
-        showFee() {
-            if (!this.feeFlag) this.feeFlag = true
-            else this.feeFlag = false
+        showSelect() {
+            this.startSelect = !this.startSelect
         },
         changeShowNum(newNum) {
             if (!this.changeShowDisable) {
@@ -190,6 +266,33 @@ export default {
                     this.getLeaseRecords()
                 }
             }
+        },
+        cancelLease() {
+            this.startCancelLease = true
+        },
+        cancelBack() {
+            this.startCancelLease = false
+        },
+        confirmBack() {
+            this.startCancelLease = false
+        },
+        confirmCancel() {
+            this.$root.$emit('bv::show::modal', 'batchCancelLeaseModal')
+            if (this.walletType === 'coldWallet') {
+                let coldRecord
+                for (let eachLeaseCancelRecord in this.cancelLeaseRecords) {
+                    coldRecord = JSON.parse(this.cancelLeaseRecords[eachLeaseCancelRecord])
+                    break
+                }
+                this.coldLeaseRecord = coldRecord
+            } else {
+                this.coldLeaseRecord = {}
+            }
+        },
+        updateCancelLeaseRecords(data) {
+            this.cancelLeaseRecords = data
+            this.coldRecordNum = Object.keys(this.cancelLeaseRecords).length
+            this.insufficientFlag = this.total.minus(BigNumber(TX_FEE).times(Object.keys(this.cancelLeaseRecords).length)).isLessThan(BigNumber(0))
         }
     }
 }
@@ -256,7 +359,7 @@ export default {
 }
 .pd-select {
     position: absolute;
-    right: 40px;
+    right: 350px;
     display: flex;
     height: 36px;
     z-index: 100;
@@ -272,11 +375,11 @@ export default {
 }
 .show-position {
     position: absolute;
-    left: 13px;
+    left: -45px;
 }
-.show-fee {
+.show-select {
     position: absolute;
-    right:250px;
+    right:560px;
     width: 116px;
     height: 36px;
     border-color: #E8E9ED;
@@ -287,7 +390,7 @@ export default {
     display: flex;
     justify-content:center;
 }
-.show-fee2 {
+.show-select2 {
     position: absolute;
     right:7px;
     width: 15px;
@@ -296,5 +399,48 @@ export default {
     z-index: 100;
     cursor:pointer;
     background-color: #FFF;
+}
+.btn-lease {
+    z-index: 100;
+    position: absolute;
+    right:185px;
+    margin-bottom: 6px;
+    background: #FF8737;
+    border-radius: 4px;
+    border: 1px solid #FF8737;
+    font-size: 15px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    width: 130px;
+    height: 36px;
+    margin-left: 8px;
+}
+.btn-lease:active, .btn-lease:hover {
+    background-color: #EB7D34 !important;
+    border: 1px solid #EB7D34 !important;
+}
+.btn-cancel{
+    z-index: 100;
+    position: absolute;
+    right:35px;
+    margin-bottom: 6px;
+    background: #FFFFFF;
+    border-radius: 4px;
+    border: 1px solid #E8E9ED;
+    font-size: 15px;
+    color: #FF8737;
+    letter-spacing: 0;
+    width: 130px;
+    height: 36px;
+    margin-left: 8px;
+}
+.btn-cancel:active {
+    background-color: #EB7D34 !important;
+    border: 1px solid #EB7D34 !important;
+}
+.cold-lease-tip {
+    color: red;
+    font-size: 15px;
+    margin-left: 10px;
 }
 </style>

@@ -2,6 +2,15 @@
   <b-container class="record-unit"
                fluid>
     <b-row align-v="center">
+      <b-col class="select-cancel-lease"
+             v-if="startCancelLease && txIcon==='leased out' && leaseStatus !== 'canceled'"
+             cols="auto">
+        <input class="select-lease-out"
+               type="checkbox"
+               ref="unitSelect"
+               v-model="cancelFlag"
+               @click="selectLeaseOut">
+      </b-col>
       <b-col class="record-icon"
              cols="auto">
         <img v-if="txIcon==='sent'"
@@ -176,10 +185,20 @@ import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { mapState } from 'vuex'
 import certify from '@/utils/certify'
-
+import Vue from 'vue'
 export default {
     name: 'Record',
     components: { CancelLease, TxInfoModal },
+    created() {
+        this.cancelFlag = false
+    },
+    watch: {
+        startSelect() {
+            if (this.startSelect === !this.cancelFlag) {
+                this.$refs.unitSelect.click()
+            }
+        }
+    },
     data: function() {
         return {
             heightGap: 0,
@@ -187,7 +206,8 @@ export default {
             cancelTime: 0,
             showCancelDetails: false,
             contractType: '',
-            tokenId: ''
+            tokenId: '',
+            cancelFlag: false
         }
     },
     props: {
@@ -232,6 +252,19 @@ export default {
         leaseStatus: {
             type: String,
             default: 'active'
+        },
+        startCancelLease: {
+            type: Boolean,
+            default: false
+        },
+        startSelect: {
+            type: Boolean,
+            default: false
+        },
+        cancelLeaseRecords: {
+            type: Object,
+            default: function() {},
+            require: true
         }
     },
     computed: {
@@ -457,6 +490,28 @@ export default {
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
+        },
+        selectLeaseOut() {
+            if (!this.cancelFlag) {
+                this.cancelFlag = true
+                let unitLeaseInfo = {
+                    'address': this.txAddress,
+                    'recipient': this.txRecipient,
+                    'amount': this.txAmount,
+                    'txFee': this.txFee,
+                    'coldPublicKey': this.coldPublicKey,
+                    'txTimestamp': this.txRecord.timestamp,
+                    'addressIndex': this.addressIndex,
+                    'txRecordId': this.txRecord.id
+                }
+                this.cancelLeaseRecords[this.address + this.recipient + this.txRecord.timestamp] = {}
+                Vue.set(this.cancelLeaseRecords, this.address + this.recipient + this.txRecord.timestamp, JSON.stringify(unitLeaseInfo))
+                this.$emit('updateCancelLeaseRecords', this.cancelLeaseRecords)
+            } else {
+                this.cancelFlag = false
+                delete this.cancelLeaseRecords[this.address + this.recipient + this.txRecord.timestamp]
+                this.$emit('updateCancelLeaseRecords', this.cancelLeaseRecords)
+            }
         }
     }
 }
@@ -471,6 +526,19 @@ export default {
     border-bottom: 1px solid #EDEDF0;
     border-left: 2px solid white;
     padding: 12px 0;
+    .select-cancel-lease {
+        .select-lease-out {
+            width: 15px;
+            height: 30px;
+            display: flex;
+            z-index: 100;
+            cursor:pointer;
+            background-color: #FFF;
+        }
+        margin-left: 20px;
+        margin-right: -35px;
+        text-align: right;
+    }
     .record-icon {
         margin-left: 20px;
         text-align: right;
