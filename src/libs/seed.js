@@ -87,6 +87,7 @@ export default {
                 return Number(word)
             }
         }
+        return false
     },
     encryptSeedPhrase: encryptSeedPhrase,
     decryptSeedPhrase: decryptSeedPhrase

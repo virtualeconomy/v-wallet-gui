@@ -120,8 +120,8 @@ export default {
             return this.seedInput === ''
         },
         isValidSeed() {
-            const wordList = this.seedPhrase.split(' ')
-            return (wordList.length === 15 || wordList.length === 18) && seedLib.isSystemPhrase(wordList) === true
+            let wordList = this.seedPhrase.split(' ')
+            return (wordList.length === 15 || wordList.length === 18) && seedLib.isSystemPhrase(wordList)
         },
         seedPlaceHolder() {
             return this.showSeedErr ? '' : 'Enter seed words here'
@@ -140,7 +140,7 @@ export default {
             this.seedPhrase = this.seedInput.trim()
             if (!this.isValidSeed) {
                 if (this.isAuto()) {
-                    const wordList = this.seedPhrase.split(' ')
+                    let wordList = this.seedPhrase.split(' ')
                     let index = seedLib.findNonSystemPhrase(wordList)
                     let message = wordList[index] + ' is not official word. Please check the spell.'
                     alert(message)
