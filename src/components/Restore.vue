@@ -141,7 +141,7 @@ export default {
             if (!this.isValidSeed) {
                 if (this.isAuto()) {
                     const wordList = this.seedPhrase.split(' ')
-                    let index = seedLib.isSystemPhrase(wordList)
+                    let index = seedLib.findNonSystemPhrase(wordList)
                     let message = wordList[index] + ' is not official word. Please check the spell.'
                     alert(message)
                 } else {
