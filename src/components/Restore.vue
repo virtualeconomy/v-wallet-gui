@@ -36,12 +36,12 @@
               <input name="select"
                      type="radio"
                      checked="checked"
-                     value="0">   I used official generated seed (auto correct mode)
+                     value="auto_correct">   I used official generated seed (auto correct mode)
             </label>
             <label>
               <input name="select"
                      type="radio"
-                     value="1">   I used own seed (free input mode)
+                     value="free_input">   I used own seed (free input mode)
             </label>
           </div>
           <b-form-textarea
@@ -132,7 +132,7 @@ export default {
             let radio = document.getElementsByName('select')
             for (let i = 0; i < radio.length; i++) {
                 if (radio[i].checked) {
-                    return radio[i].value === '0'
+                    return radio[i].value === 'auto_correct'
                 }
             }
         },
