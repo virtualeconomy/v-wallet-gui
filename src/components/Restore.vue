@@ -141,8 +141,11 @@ export default {
             if (!this.isValidSeed) {
                 if (this.isAuto()) {
                     let wordList = this.seedPhrase.split(' ')
-                    let index = seedLib.findNonSystemPhrase(wordList)
-                    let message = wordList[index] + ' is not official word. Please check the spell.'
+                    let message = 'Some words missed! The offical word number should be 15 or 18. You input ' + wordList.length + ' words. Please check your seed input.'
+                    if (wordList.length === 15 || wordList.length === 18) {
+                        let index = seedLib.findNonSystemPhrase(wordList)
+                        message = wordList[index] + ' is not official word. Please check the spell.'
+                    }
                     alert(message)
                 } else {
                     let isConfirmed = confirm('Warning! The seed phrase above is from a user-supplied source. An insecure entropy source can lead to total loss of the wallet.')
