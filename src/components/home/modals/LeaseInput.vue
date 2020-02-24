@@ -28,6 +28,27 @@
         <span class="balance">{{ formatter(walletType === 'hotWallet' ? balances[address] : balances[coldAddress]) }} VSYS</span>
       </b-btn>
     </b-form-group>
+    <div class="select-node">
+      <b-dropdown id="dropdown-grouped"
+                  text="Select Node"
+                  variant="outline-danger"
+                  class="m-2">
+        <div style="height:300px;overflow:scroll">
+          <b-dropdown-group id="dropdown-group-1"
+                            v-for="node in nodeList.body.data"
+                            :key="node.index"
+                            :header="showNodeName(node.Address, node.name)">
+            <b-dropdown-item-button @click="selectSupernode(node.Address, node.name)">Supernode: {{ node.name }}</b-dropdown-item-button>
+            <b-dropdown-item-button v-if="node.SubNode"
+                                    v-for="subNode in node.SubNode"
+                                    @click="selectSubnode(node.Address, subNode.id, subNode.name)"
+                                    :key="subNode.index">Subnode: {{ subNode.name }}
+            </b-dropdown-item-button>
+            <b-dropdown-divider></b-dropdown-divider>
+          </b-dropdown-group>
+        </div>
+      </b-dropdown>
+    </div>
     <b-form-group label="Recipient"
                   :label-for="'recipient-input' + walletType">
       <b-form-input v-if="walletType==='hotWallet'"
@@ -137,7 +158,6 @@ import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 import common from '@/js-v-sdk/src/utils/common'
 import { mapState } from 'vuex'
-
 export default {
     name: 'LeaseInput',
     data: function() {
@@ -152,7 +172,9 @@ export default {
             coldAddress: this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress,
             fee: BigNumber(TX_FEE),
             hotRecipientAddressList: {},
-            coldRecipientAddressList: {}
+            coldRecipientAddressList: {},
+            tmpRecipient: '',
+            isSuperSubNode: false
         }
     },
     props: {
@@ -190,6 +212,11 @@ export default {
         selectedWalletType: {
             type: String,
             default: '',
+            require: true
+        },
+        nodeList: {
+            type: Object,
+            default: function() {},
             require: true
         }
     },
@@ -236,7 +263,7 @@ export default {
             return address === this.recipient
         },
         isValidRecipient() {
-            let recipient = this.recipient
+            let recipient = this.isSuperSubNode ? this.tmpRecipient : this.recipient
             if (!recipient) {
                 return void 0
             }
@@ -317,7 +344,7 @@ export default {
             }
         },
         nextPage() {
-            this.$emit('get-data', this.recipient, this.amount, this.walletType === 'hotWallet' ? this.address : this.coldAddress, this.walletType)
+            this.$emit('get-data', this.isSuperSubNode ? this.tmpRecipient : this.recipient, this.amount, this.walletType === 'hotWallet' ? this.address : this.coldAddress, this.walletType, this.fee)
         },
         options(addrs) {
             let res = Object.keys(addrs).reduce((options, addr) => {
@@ -335,6 +362,8 @@ export default {
             this.paused = false
             this.address = this.selectedWalletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
+            this.isSuperSubNode = false
+            this.tmpRecipient = ''
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
@@ -347,6 +376,28 @@ export default {
                 this.coldRecipientAddressList.set(this.recipient, '1')
                 window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' leaseRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
             }
+        },
+        showNodeName(address, name) {
+            const addrChars = address.split('')
+            addrChars.splice(6, 23, '******')
+            return name + ' (' + addrChars.join('') + ')'
+        },
+        selectSupernode(address, name) {
+            this.isSuperSubNode = true
+            this.tmpRecipient = address
+            const addrChars = address.split('')
+            addrChars.splice(6, 23, '******')
+            let addressDeal = addrChars.join('')
+            this.recipient = name + ' Supernode (' + addressDeal + ')'
+        },
+        selectSubnode(address, id, name) {
+            this.isSuperSubNode = true
+            this.tmpRecipient = address
+            const addrChars = address.split('')
+            addrChars.splice(6, 23, '******')
+            let addressDeal = addrChars.join('')
+            this.recipient = name + ' Subnode (' + addressDeal + ')'
+            this.fee = BigNumber(TX_FEE).plus(BigNumber(0.00000001).multipliedBy(id))
         }
     }
 }
@@ -414,5 +465,12 @@ export default {
     font-size: 13px;
     color: #9091A3;
     letter-spacing: 0;
+}
+.select-node {
+    position: relative;
+    display: inline-block;
+    float: right;
+    margin-top: -15px;
+    margin-right: -8px;
 }
 </style>

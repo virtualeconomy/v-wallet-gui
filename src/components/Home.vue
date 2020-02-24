@@ -157,6 +157,7 @@
                                 :address-index="addresses[selectedAddress]"
                                 :cold-addresses="coldAddresses"
                                 :addresses="addresses"
+                                :node-list="nodeList"
                                 :update-lease-records-flag="updateLeaseRecordsFlag"
                                 :balance="balance"></LeaseRecords>
                 </div>
@@ -226,13 +227,17 @@ export default {
             inheritedAmount: '',
             inheritedRecipient: '',
             inheritedDescription: '',
-            updateLeaseRecordsFlag: false
+            updateLeaseRecordsFlag: false,
+            nodeList: {}
         }
     },
     created() {
         if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
         } else {
+            this.$http.get('https://test-rate.virtualeconomytech.com/api/superNodesDetail').then(function(result) {
+                this.nodeList = result
+            })
             this.getBlockHeight()
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address

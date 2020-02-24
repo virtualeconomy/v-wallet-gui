@@ -94,6 +94,7 @@
            :cold-addresses="coldAddresses"
            :addresses="addresses"
            :selected-address="address"
+           :node-list="nodeList"
            :selected-wallet-type="walletType"></Lease>
     <BatchCancelLease :cancel-lease-records="cancelLeaseRecords"
                       :wallet-type="walletType"
@@ -198,6 +199,11 @@ export default {
         updateLeaseRecordsFlag: {
             type: Boolean,
             default: false
+        },
+        nodeList: {
+            type: Object,
+            default: function() {},
+            require: true
         }
     },
     watch: {
