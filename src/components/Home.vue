@@ -190,7 +190,7 @@ import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
 import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
-import { INITIAL_SESSION_TIMEOUT } from '@/constants'
+import { INITIAL_SESSION_TIMEOUT, VSYS_RATE } from '@/constants'
 import seedLib from '@/libs/seed.js'
 import TransactionRecords from './home/elements/TransactionRecords'
 import LeasePane from './home/elements/LeasePane'
@@ -235,7 +235,8 @@ export default {
         if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
         } else {
-            this.$http.get('https://test-rate.virtualeconomytech.com/api/superNodesDetail').then(function(result) {
+            this.$http.get(VSYS_RATE).then(function(result) {
+                console.log(result.body)
                 this.nodeList = result
             })
             this.getBlockHeight()
