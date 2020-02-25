@@ -30,6 +30,20 @@
               the words should be seperated by single space
             </small>
           </p>
+          <div v-if="!showSeedErr"
+               class="input-mode">
+            <label>
+              <input name="select"
+                     type="radio"
+                     checked="checked"
+                     value="auto_correct">   I used official generated seed (auto correct mode)
+            </label>
+            <label>
+              <input name="select"
+                     type="radio"
+                     value="free_input">   I used own seed (free input mode)
+            </label>
+          </div>
           <b-form-textarea
             class="non-square"
             v-model="seedInput"
@@ -106,7 +120,7 @@ export default {
             return this.seedInput === ''
         },
         isValidSeed() {
-            const wordList = this.seedPhrase.split(' ')
+            let wordList = this.seedPhrase.split(' ')
             return (wordList.length === 15 || wordList.length === 18) && seedLib.isSystemPhrase(wordList)
         },
         seedPlaceHolder() {
@@ -114,12 +128,30 @@ export default {
         }
     },
     methods: {
+        isAuto() {
+            let radio = document.getElementsByName('select')
+            for (let i = 0; i < radio.length; i++) {
+                if (radio[i].checked) {
+                    return radio[i].value === 'auto_correct'
+                }
+            }
+        },
         checkSeed() {
             this.seedPhrase = this.seedInput.trim()
             if (!this.isValidSeed) {
-                let isConfirmed = confirm('Warning! The seed phrase above is from a user-supplied source. An insecure entropy source can lead to total loss of the wallet.')
-                if (isConfirmed) {
-                    this.showSeedErr = true
+                if (this.isAuto()) {
+                    let wordList = this.seedPhrase.split(' ')
+                    let message = 'Some words missed! The offical word number should be 15 or 18. You input ' + wordList.length + ' words. Please check your seed input.'
+                    if (wordList.length === 15 || wordList.length === 18) {
+                        let index = seedLib.findNonSystemPhrase(wordList)
+                        message = wordList[index] + ' is not official word. Please check the spell.'
+                    }
+                    alert(message)
+                } else {
+                    let isConfirmed = confirm('Warning! The seed phrase above is from a user-supplied source. An insecure entropy source can lead to total loss of the wallet.')
+                    if (isConfirmed) {
+                        this.showSeedErr = true
+                    }
                 }
             } else {
                 this.showSeedErr = true
@@ -137,6 +169,12 @@ export default {
         },
 
         hideErrMsg() {
+            if (this.isAuto()) {
+                let editInput = this.seedInput.split(' ')
+                this.seedInput = editInput.filter(function(s) {
+                    return s && s.trim()
+                }).join(' ').toLowerCase()
+            }
             this.showSeedErr = false
         }
     },
@@ -215,6 +253,9 @@ export default {
 .seed-des {
     text-align: left;
     line-height: 120%;
+}
+.input-mode {
+    text-align: left;
 }
 .home {
     margin-top: 40px;

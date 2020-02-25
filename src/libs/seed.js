@@ -76,11 +76,18 @@ export default {
     isSystemPhrase: function (wordList) {
         for (let word in wordList) {
             if (seedDictionary_1.default.indexOf(wordList[word]) == -1) {
-                console.log(word)
                 return false
             }
         }
         return true
+    },
+    findNonSystemPhrase: function(wordList) {
+        for (let word in wordList) {
+            if (seedDictionary_1.default.indexOf(wordList[word]) == -1) {
+                return Number(word)
+            }
+        }
+        return false
     },
     encryptSeedPhrase: encryptSeedPhrase,
     decryptSeedPhrase: decryptSeedPhrase
