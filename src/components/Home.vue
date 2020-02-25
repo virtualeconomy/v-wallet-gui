@@ -236,7 +236,6 @@ export default {
             this.$router.push('/login')
         } else {
             this.$http.get(VSYS_RATE).then(function(result) {
-                console.log(result.body)
                 this.nodeList = result
             })
             this.getBlockHeight()
