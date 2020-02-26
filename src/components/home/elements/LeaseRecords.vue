@@ -201,8 +201,8 @@ export default {
             default: false
         },
         nodeList: {
-            type: Object,
-            default: function() {},
+            type: Array,
+            default: function() { return [] },
             require: true
         }
     },

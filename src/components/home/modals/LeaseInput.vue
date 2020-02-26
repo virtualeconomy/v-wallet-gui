@@ -29,21 +29,24 @@
       </b-btn>
     </b-form-group>
     <div class="select-node">
-      <b-dropdown id="dropdown-grouped"
+      <b-dropdown class="m-2"
+                  no-caret
+                  id="dropdown-grouped"
                   text="Select Node"
-                  variant="outline-danger"
-                  class="m-2">
+                  size="sm"
+                  variant="warning">
         <div style="height:300px;overflow:scroll">
           <b-dropdown-group id="dropdown-group-1"
-                            v-for="node in nodeList.body.data"
+                            v-for="node in nodeList"
                             :key="node.index"
+                            v-if="node.IsSuperNode"
                             :header="showNodeName(node.Address, node.name)">
-            <b-dropdown-item-button @click="selectSupernode(node.Address, node.name)">Supernode: {{ node.name }}</b-dropdown-item-button>
+            <b-dropdown-item-button @click="selectSupernode(node.Address, node.name)"><span style="color: black">Supernode: {{ node.name }}</span></b-dropdown-item-button>
             <b-dropdown-item-button v-if="node.SubNode"
                                     v-for="subNode in node.SubNode"
+                                    style="color: black"
                                     @click="selectSubnode(node.Address, subNode.id, subNode.name)"
-                                    :key="subNode.index">Subnode: {{ subNode.name }}
-            </b-dropdown-item-button>
+                                    :key="subNode.index"><span style="color: black">Subnode: {{ subNode.name }}</span></b-dropdown-item-button>
             <b-dropdown-divider></b-dropdown-divider>
           </b-dropdown-group>
         </div>
@@ -215,8 +218,8 @@ export default {
             require: true
         },
         nodeList: {
-            type: Object,
-            default: function() {},
+            type: Array,
+            default: function() { return [] },
             require: true
         }
     },
@@ -364,6 +367,7 @@ export default {
             this.coldAddress = this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
             this.isSuperSubNode = false
             this.tmpRecipient = ''
+            this.fee = BigNumber(TX_FEE)
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
@@ -389,6 +393,7 @@ export default {
             addrChars.splice(6, 23, '******')
             let addressDeal = addrChars.join('')
             this.recipient = name + ' Supernode (' + addressDeal + ')'
+            this.fee = BigNumber(TX_FEE)
         },
         selectSubnode(address, id, name) {
             this.isSuperSubNode = true

@@ -190,7 +190,8 @@ import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
 import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
-import { INITIAL_SESSION_TIMEOUT, VSYS_RATE } from '@/constants'
+import { INITIAL_SESSION_TIMEOUT } from '@/constants'
+import {VSYS_RATE} from '../network'
 import seedLib from '@/libs/seed.js'
 import TransactionRecords from './home/elements/TransactionRecords'
 import LeasePane from './home/elements/LeasePane'
@@ -228,7 +229,7 @@ export default {
             inheritedRecipient: '',
             inheritedDescription: '',
             updateLeaseRecordsFlag: false,
-            nodeList: {}
+            nodeList: []
         }
     },
     created() {
@@ -236,7 +237,7 @@ export default {
             this.$router.push('/login')
         } else {
             this.$http.get(VSYS_RATE).then(function(result) {
-                this.nodeList = result
+                this.nodeList = result.body.data
             })
             this.getBlockHeight()
             this.setUsrLocalStorage('lastLogin', new Date().getTime())

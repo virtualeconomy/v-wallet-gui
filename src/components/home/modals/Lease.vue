@@ -247,8 +247,8 @@ export default {
             require: true
         },
         nodeList: {
-            type: Object,
-            default: function() {},
+            type: Array,
+            default: function() { return [] },
             require: true
         }
     },
