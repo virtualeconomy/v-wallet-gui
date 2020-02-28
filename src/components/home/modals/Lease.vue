@@ -341,7 +341,7 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            tra.buildLeasingTx(publicKey, this.recipient, this.amount, this.timeStamp)
+            tra.buildLeasingTx(publicKey, this.recipient, this.amount, this.timeStamp, this.fee)
             return tra
         },
         sendData(walletType) {
