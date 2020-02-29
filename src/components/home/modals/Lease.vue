@@ -75,6 +75,7 @@
                       :default-address="defaultAddress"
                       :default-cold-address="defaultColdAddress"
                       ref="coldAddrInput"
+                      :node-list="nodeList"
                       :selected-address="selectedAddress"
                       :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="coldPageId===2">
