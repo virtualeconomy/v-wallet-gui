@@ -4,7 +4,7 @@
     <div class="card-body card-asset text-left">
       <div class="card-text mb-2">
         <p class="mb-0 show-number addr"><b>{{ addressShow }}</b></p>
-        <p class="mb-0 asset-title">Wallet Address</p>
+        <p class="mb-0 asset-title">#{{ index + 1 }} Wallet Address</p>
       </div>
       <div class="card-text">
         <img src="@/assets/imgs/icons/wallet/Symbol_Yellow.svg"
@@ -36,6 +36,10 @@ export default {
         },
         address: {
             type: String,
+            required: true
+        },
+        index: {
+            type: Number,
             required: true
         },
         balance: {

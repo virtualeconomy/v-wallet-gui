@@ -26,6 +26,7 @@
           </div>
           <Asset v-if="addresses"
                  v-for="(index, address) in addresses"
+                 :index="index"
                  :key="address"
                  :address="address"
                  :balance="balance[address]"
@@ -48,20 +49,22 @@
             </span>
           </div>
           <Asset v-if="coldAddresses&&sortFlag===0"
-                 v-for="(coldPublicKey, coldAddress) in coldAddresses"
+                 v-for="(coldPublicKey, coldAddress, index) in coldAddresses"
                  :address="coldAddress"
                  :key="coldAddress"
                  :balance="balance[coldAddress]"
                  :selected="coldAddress === selectedAddress"
+                 :index="index"
                  class="pointer unselectable"
                  @click.native="selectWallet(coldAddress, 'coldWallet')">
           </Asset>
           <Asset v-if="coldAddresses&&sortFlag===1"
-                 v-for="(coldPublicKey, coldAddress) in sortedAddresses"
+                 v-for="(coldPublicKey, coldAddress, index) in sortedAddresses"
                  :address="coldAddress"
                  :key="coldAddress"
                  :balance="balance[coldAddress]"
                  :selected="coldAddress === selectedAddress"
+                 :index="index"
                  class="pointer unselectable"
                  @click.native="selectWallet(coldAddress, 'coldWallet')">
           </Asset>
