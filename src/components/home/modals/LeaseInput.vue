@@ -388,10 +388,14 @@ export default {
         },
         addRecipientList() {
             if (this.walletType === 'hotWallet') {
-                this.hotRecipientAddressList.set(this.recipient, '1')
+                if (!this.isSuperSubNode) {
+                    this.hotRecipientAddressList.set(this.recipient, '1')
+                }
                 window.localStorage.setItem('Hot ' + this.defaultAddress + ' leaseRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
             } else {
-                this.coldRecipientAddressList.set(this.recipient, '1')
+                if (!this.isSuperSubNode) {
+                    this.coldRecipientAddressList.set(this.recipient, '1')
+                }
                 window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' leaseRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
             }
         },
