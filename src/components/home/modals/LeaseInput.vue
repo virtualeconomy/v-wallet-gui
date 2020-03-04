@@ -28,6 +28,30 @@
         <span class="balance">{{ formatter(walletType === 'hotWallet' ? balances[address] : balances[coldAddress]) }} VSYS</span>
       </b-btn>
     </b-form-group>
+    <div class="select-node">
+      <b-dropdown class="m-2"
+                  no-caret
+                  id="dropdown-grouped"
+                  text="Select Node"
+                  size="sm"
+                  variant="warning">
+        <div style="height:300px;overflow:scroll">
+          <b-dropdown-group id="dropdown-group-1"
+                            v-for="node in nodeList"
+                            :key="node.index"
+                            v-if="node.IsSuperNode"
+                            :header="showNodeName(node.Address, node.name)">
+            <b-dropdown-item-button @click="selectSupernode(node.Address, node.name)"><span style="color: black">Supernode: {{ node.name }}</span></b-dropdown-item-button>
+            <b-dropdown-item-button v-if="node.SubNode"
+                                    v-for="subNode in node.SubNode"
+                                    style="color: black"
+                                    @click="selectSubnode(node.Address, subNode.id, subNode.name)"
+                                    :key="subNode.index"><span style="color: black">Subnode: {{ subNode.name }}</span></b-dropdown-item-button>
+            <b-dropdown-divider></b-dropdown-divider>
+          </b-dropdown-group>
+        </div>
+      </b-dropdown>
+    </div>
     <b-form-group label="Recipient"
                   :label-for="'recipient-input' + walletType">
       <b-form-input v-if="walletType==='hotWallet'"
@@ -137,7 +161,6 @@ import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 import common from '@/js-v-sdk/src/utils/common'
 import { mapState } from 'vuex'
-
 export default {
     name: 'LeaseInput',
     data: function() {
@@ -152,7 +175,9 @@ export default {
             coldAddress: this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress,
             fee: BigNumber(TX_FEE),
             hotRecipientAddressList: {},
-            coldRecipientAddressList: {}
+            coldRecipientAddressList: {},
+            tmpRecipient: '',
+            isSuperSubNode: false
         }
     },
     props: {
@@ -191,6 +216,11 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        nodeList: {
+            type: Array,
+            default: function() { return [] },
+            require: true
         }
     },
     created() {
@@ -203,6 +233,20 @@ export default {
         item = window.localStorage.getItem('Cold ' + this.defaultColdAddress + ' leaseRecipientAddressList ')
         if (item) {
             this.coldRecipientAddressList.load(JSON.parse(item))
+        }
+    },
+    watch: {
+        amount(newAmount, oldAmount) {
+            let balance = this.walletType === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
+            if (this.fee.isGreaterThan(BigNumber(balance))) {
+                this.$nextTick(() => {
+                    this.amount = BigNumber(0).toString()
+                })
+            } else if (BigNumber(this.amount).isGreaterThan(BigNumber(balance).minus(this.fee))) {
+                this.$nextTick(() => {
+                    this.amount = balance.minus(this.fee).toString()
+                })
+            }
         }
     },
     computed: {
@@ -226,7 +270,7 @@ export default {
         },
         isInsufficient() {
             let balance = this.walletType === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return BigNumber(this.amount).isGreaterThan(BigNumber(balance).minus(TX_FEE))
+            return BigNumber(balance).isLessThan(this.fee)
         },
         isSubmitDisabled() {
             return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && this.isValidAmount)
@@ -236,7 +280,7 @@ export default {
             return address === this.recipient
         },
         isValidRecipient() {
-            let recipient = this.recipient
+            let recipient = this.isSuperSubNode ? this.tmpRecipient : this.recipient
             if (!recipient) {
                 return void 0
             }
@@ -317,7 +361,7 @@ export default {
             }
         },
         nextPage() {
-            this.$emit('get-data', this.recipient, this.amount, this.walletType === 'hotWallet' ? this.address : this.coldAddress, this.walletType)
+            this.$emit('get-data', this.isSuperSubNode ? this.tmpRecipient : this.recipient, this.amount, this.walletType === 'hotWallet' ? this.address : this.coldAddress, this.walletType, this.fee)
         },
         options(addrs) {
             let res = Object.keys(addrs).reduce((options, addr) => {
@@ -335,18 +379,48 @@ export default {
             this.paused = false
             this.address = this.selectedWalletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
+            this.isSuperSubNode = false
+            this.tmpRecipient = ''
+            this.fee = BigNumber(TX_FEE)
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
         },
         addRecipientList() {
             if (this.walletType === 'hotWallet') {
-                this.hotRecipientAddressList.set(this.recipient, '1')
+                if (!this.isSuperSubNode) {
+                    this.hotRecipientAddressList.set(this.recipient, '1')
+                }
                 window.localStorage.setItem('Hot ' + this.defaultAddress + ' leaseRecipientAddressList ', JSON.stringify(this.hotRecipientAddressList.dump()))
             } else {
-                this.coldRecipientAddressList.set(this.recipient, '1')
+                if (!this.isSuperSubNode) {
+                    this.coldRecipientAddressList.set(this.recipient, '1')
+                }
                 window.localStorage.setItem('Cold ' + this.defaultColdAddress + ' leaseRecipientAddressList ', JSON.stringify(this.coldRecipientAddressList.dump()))
             }
+        },
+        showNodeName(address, name) {
+            const addrChars = address.split('')
+            addrChars.splice(6, 23, '******')
+            return name + ' (' + addrChars.join('') + ')'
+        },
+        selectSupernode(address, name) {
+            this.isSuperSubNode = true
+            this.tmpRecipient = address
+            const addrChars = address.split('')
+            addrChars.splice(6, 23, '******')
+            let addressDeal = addrChars.join('')
+            this.recipient = name + ' Supernode (' + addressDeal + ')'
+            this.fee = BigNumber(TX_FEE)
+        },
+        selectSubnode(address, id, name) {
+            this.isSuperSubNode = true
+            this.tmpRecipient = address
+            const addrChars = address.split('')
+            addrChars.splice(6, 23, '******')
+            let addressDeal = addrChars.join('')
+            this.recipient = name + ' Subnode (' + addressDeal + ')'
+            this.fee = BigNumber(TX_FEE).plus(BigNumber(0.00000001).multipliedBy(id))
         }
     }
 }
@@ -414,5 +488,12 @@ export default {
     font-size: 13px;
     color: #9091A3;
     letter-spacing: 0;
+}
+.select-node {
+    position: relative;
+    display: inline-block;
+    float: right;
+    margin-top: -15px;
+    margin-right: -8px;
 }
 </style>

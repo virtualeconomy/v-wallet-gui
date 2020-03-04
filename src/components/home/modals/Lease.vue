@@ -25,6 +25,7 @@
                       :default-cold-address="defaultColdAddress"
                       ref="addrInput"
                       :selected-address="selectedAddress"
+                      :node-list="nodeList"
                       :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="pageId===2">
             <Confirm :tx-type="'lease'"
@@ -74,6 +75,7 @@
                       :default-address="defaultAddress"
                       :default-cold-address="defaultColdAddress"
                       ref="coldAddrInput"
+                      :node-list="nodeList"
                       :selected-address="selectedAddress"
                       :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="coldPageId===2">
@@ -244,6 +246,11 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        nodeList: {
+            type: Array,
+            default: function() { return [] },
+            require: true
         }
     },
     computed: {
@@ -296,7 +303,8 @@ export default {
         closeModal() {
             this.$refs.leaseModal.hide()
         },
-        getData(recipient, amount, address, walletType) {
+        getData(recipient, amount, address, walletType, fee) {
+            this.fee = fee
             this.recipient = recipient
             this.amount = BigNumber(amount)
             if (walletType === 'hotWallet') {
@@ -334,7 +342,7 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            tra.buildLeasingTx(publicKey, this.recipient, this.amount, this.timeStamp)
+            tra.buildLeasingTx(publicKey, this.recipient, this.amount, this.timeStamp, this.fee)
             return tra
         },
         sendData(walletType) {

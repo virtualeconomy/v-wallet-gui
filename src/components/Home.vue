@@ -160,6 +160,7 @@
                                 :address-index="addresses[selectedAddress]"
                                 :cold-addresses="coldAddresses"
                                 :addresses="addresses"
+                                :node-list="nodeList"
                                 :update-lease-records-flag="updateLeaseRecordsFlag"
                                 :balance="balance"></LeaseRecords>
                 </div>
@@ -193,6 +194,7 @@ import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
 import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
 import { INITIAL_SESSION_TIMEOUT } from '@/constants'
+import {VSYS_RATE} from '../network'
 import seedLib from '@/libs/seed.js'
 import TransactionRecords from './home/elements/TransactionRecords'
 import LeasePane from './home/elements/LeasePane'
@@ -229,13 +231,17 @@ export default {
             inheritedAmount: '',
             inheritedRecipient: '',
             inheritedDescription: '',
-            updateLeaseRecordsFlag: false
+            updateLeaseRecordsFlag: false,
+            nodeList: []
         }
     },
     created() {
         if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
         } else {
+            this.$http.get(VSYS_RATE).then(function(result) {
+                this.nodeList = result.body.data
+            })
             this.getBlockHeight()
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address

@@ -527,6 +527,20 @@ export default {
             this.hotRecipientAddressList.load(JSON.parse(item))
         }
     },
+    watch: {
+        amount(newAmount, oldAmount) {
+            let balance = this.selectedWalletType === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
+            if (this.fee.isGreaterThan(BigNumber(balance))) {
+                this.$nextTick(() => {
+                    this.amount = BigNumber(0).toString()
+                })
+            } else if (BigNumber(this.amount).isGreaterThan(BigNumber(balance).minus(this.fee))) {
+                this.$nextTick(() => {
+                    this.amount = balance.minus(this.fee).toString()
+                })
+            }
+        }
+    },
     computed: {
         ...mapState({
             chain: 'chain',
@@ -609,7 +623,7 @@ export default {
         },
         isInsufficient() {
             let balance = this.selectedWalletType === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return BigNumber(this.amount).isGreaterThan(BigNumber(balance).minus(TX_FEE))
+            return BigNumber(balance).isLessThan(this.fee)
         },
         isValidAmount() {
             if (BigNumber(this.amount).isEqualTo(0)) {
