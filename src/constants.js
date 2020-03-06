@@ -1,6 +1,6 @@
 "use strict";
 
-export const WALLET_VERSION = '0.2.3'
+export const WALLET_VERSION = '0.2.4'
 export const INITIAL_SESSION_TIMEOUT = 5
 export const INITIAL_NONCE = 0;
 export const TRANSFER_ATTACHMENT_BYTE_LIMIT = 140;
