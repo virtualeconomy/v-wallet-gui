@@ -43,7 +43,7 @@
                     label="To"
                     label-for="recipientAddress_confirm">
         <b-form-input id="recipientAddress_confirm"
-                      v-model="recipient"
+                      v-model="showRecipient"
                       class="addr"
                       readonly
                       :plaintext="true">
@@ -77,9 +77,11 @@
 </template>
 
 <script>
+import { MAX_ALIAS_LENGTH } from '@/constants'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { TX_FEE } from '@/js-v-sdk/src/constants'
+import Vue from 'vue'
 export default {
     name: 'Confirm',
     props: {
@@ -120,6 +122,30 @@ export default {
     methods: {
         formatter(num) {
             return browser.bigNumberFormatter(num)
+        }
+    },
+    computed: {
+        defaultAddress() {
+            return Vue.ls.get('address')
+        },
+        showRecipient() {
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                if (this.recipient.length <= MAX_ALIAS_LENGTH && alias) {
+                    for (let key in alias) {
+                        if (this.recipient.toLowerCase() === alias[key].toLowerCase()) {
+                            return alias[key] + ' (' + key + ')'
+                        }
+                    }
+                } else {
+                    for (let key in alias) {
+                        if (this.recipient === key) {
+                            return alias[key] + ' (' + key + ')'
+                        }
+                    }
+                    return this.recipient
+                }
+            }
         }
     }
 }

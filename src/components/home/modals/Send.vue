@@ -146,7 +146,7 @@
         </b-container>
         <b-container v-if="pageId===2">
           <Confirm :address=showAddress()
-                   :recipient=showRecipient()
+                   :recipient="recipient"
                    :amount=inputAmount(amount)
                    :fee="fee"
                    :description="description"
@@ -319,7 +319,7 @@
         </b-container>
         <b-container v-if="coldPageId===2">
           <Confirm :address=showAddress()
-                   :recipient=showRecipient()
+                   :recipient="recipient"
                    :amount=inputAmount(amount)
                    :fee="fee"
                    :description="description"
@@ -377,8 +377,8 @@
         </b-container>
         <b-container v-show="coldPageId===4">
           <Confirm :address=showAddress()
-                   :recipient=showRecipient()
-                   :amount=inputAmount(amount)
+                   :recipient="dataObject.stored_tx.recipient"
+                   :amount=inputAmount(dataObject.stored_tx.amount)
                    :fee="fee"
                    :description="description"
                    :tx-type="'payment'">
@@ -440,6 +440,7 @@ import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 import LedgerConfirm from './LedgerConfirm'
 import { mapActions, mapState } from 'vuex'
+import Account from '@/js-v-sdk/src/account'
 var initData = {
     superNodes: [],
     errorMessage: '',
@@ -667,6 +668,9 @@ export default {
             }
         },
         inputAmount(num) {
+            if (this.coldPageId === 4) {
+                return BigNumber(num).dividedBy(1e8)
+            }
             return BigNumber(num)
         },
         showRecipient() {
@@ -700,15 +704,20 @@ export default {
                 }
                 return this.address
             } else {
+                let acc = new Account(NETWORK_BYTE)
+                let coldAddress = this.coldAddress
+                if (this.coldPageId === 4) {
+                    coldAddress = acc.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, NETWORK_BYTE)
+                }
                 if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
                     let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
                     for (let key in alias) {
-                        if (this.coldAddress === key) {
+                        if (coldAddress === key) {
                             return alias[key] + ' (' + key + ')'
                         }
                     }
                 }
-                return this.coldAddress
+                return coldAddress
             }
         },
         buildTransaction(publicKey) {
