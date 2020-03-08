@@ -145,13 +145,7 @@
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
-          <Confirm :address=showAddress()
-                   :recipient="recipient"
-                   :amount=inputAmount(amount)
-                   :fee="fee"
-                   :description="description"
-                   :tx-type="'payment'">
-          </Confirm>
+          <Confirm :data-object="dataObject"></Confirm>
           <p v-show="sendError"
              class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
@@ -177,12 +171,7 @@
           </b-row>
         </b-container>
         <b-container v-if="pageId===3">
-          <Success :address=showAddress()
-                   :recipient=showRecipient()
-                   :amount=inputAmount(amount)
-                   :fee="fee"
-                   :description="description">
-          </Success>
+          <Success :data-object="dataObject"></Success>
           <b-button variant="warning"
                     block
                     size="lg"
@@ -318,13 +307,7 @@
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
-          <Confirm :address=showAddress()
-                   :recipient="recipient"
-                   :amount=inputAmount(amount)
-                   :fee="fee"
-                   :description="description"
-                   :tx-type="'payment'">
-          </Confirm>
+          <Confirm :data-object="dataObject"></Confirm>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -376,13 +359,7 @@
                          @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
-          <Confirm :address=showAddress()
-                   :recipient="dataObject.stored_tx.recipient"
-                   :amount=inputAmount(dataObject.stored_tx.amount)
-                   :fee="fee"
-                   :description="description"
-                   :tx-type="'payment'">
-          </Confirm>
+          <Confirm :data-object="dataObject"></Confirm>
           <p v-show="sendError"
              class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
@@ -407,12 +384,7 @@
           </b-row>
         </b-container>
         <b-container v-show="coldPageId===5">
-          <Success :address=showAddress()
-                   :recipient=showRecipient()
-                   :amount=inputAmount(amount)
-                   :fee="fee"
-                   :description="description">
-          </Success>
+          <Success :data-object="dataObject"></Success>
           <b-button variant="warning"
                     block
                     size="lg"
@@ -440,7 +412,6 @@ import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 import LedgerConfirm from './LedgerConfirm'
 import { mapActions, mapState } from 'vuex'
-import Account from '@/js-v-sdk/src/account'
 var initData = {
     superNodes: [],
     errorMessage: '',
@@ -665,59 +636,6 @@ export default {
                 }
             } else {
                 this.tmpRecipient = recipient
-            }
-        },
-        inputAmount(num) {
-            if (this.coldPageId === 4) {
-                return BigNumber(num).dividedBy(1e8)
-            }
-            return BigNumber(num)
-        },
-        showRecipient() {
-            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-                if (this.recipient.length <= MAX_ALIAS_LENGTH && alias) {
-                    for (let key in alias) {
-                        if (this.recipient.toLowerCase() === alias[key].toLowerCase()) {
-                            return alias[key] + ' (' + key + ')'
-                        }
-                    }
-                } else {
-                    for (let key in alias) {
-                        if (this.recipient === key) {
-                            return alias[key] + ' (' + key + ')'
-                        }
-                    }
-                    return this.recipient
-                }
-            }
-        },
-        showAddress() {
-            if (this.selectedWalletType === 'hotWallet') {
-                if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-                    let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-                    for (let key in alias) {
-                        if (this.address === key) {
-                            return alias[key] + ' (' + key + ')'
-                        }
-                    }
-                }
-                return this.address
-            } else {
-                let acc = new Account(NETWORK_BYTE)
-                let coldAddress = this.coldAddress
-                if (this.coldPageId === 4) {
-                    coldAddress = acc.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, NETWORK_BYTE)
-                }
-                if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-                    let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-                    for (let key in alias) {
-                        if (coldAddress === key) {
-                            return alias[key] + ' (' + key + ')'
-                        }
-                    }
-                }
-                return coldAddress
             }
         },
         buildTransaction(publicKey) {

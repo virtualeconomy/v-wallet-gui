@@ -10,7 +10,7 @@
                     label="Amount"
                     label-for="amount_confirm">
         <b-form-input id="amount_confirm"
-                      :value="formatter(amount) + ' VSYS'"
+                      :value="amount + ' VSYS'"
                       class="amount"
                       readonly
                       :plaintext="true">
@@ -43,7 +43,7 @@
                     label="To"
                     label-for="recipientAddress_confirm">
         <b-form-input id="recipientAddress_confirm"
-                      v-model="showRecipient"
+                      v-model="recipient"
                       class="addr"
                       readonly
                       :plaintext="true">
@@ -66,7 +66,7 @@
                     label="Fee"
                     label-for="fee_confirm">
         <b-form-input id="fee_confirm"
-                      :value="formatter(fee) + ' VSYS'"
+                      :value="fee + ' VSYS'"
                       class="fee"
                       readonly
                       :plaintext="true">
@@ -80,71 +80,67 @@
 import { MAX_ALIAS_LENGTH } from '@/constants'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE } from '@/js-v-sdk/src/constants'
 import Vue from 'vue'
+import { NETWORK_BYTE } from '@/network'
+import Account from '@/js-v-sdk/src/account'
 export default {
     name: 'Confirm',
     props: {
-        address: {
-            type: String,
-            require: true,
-            default: ''
-        },
-        recipient: {
-            type: String,
-            require: true,
-            default: ''
-        },
-        amount: {
-            type: BigNumber,
-            require: true,
-            default: function() {
-                return BigNumber(0)
-            }
-        },
-        fee: {
-            type: BigNumber,
-            require: true,
-            default: function() {
-                return BigNumber(TX_FEE)
-            }
-        },
-        description: {
-            type: String,
-            default: ''
-        },
-        txType: {
-            type: String,
-            require: true,
-            default: ''
-        }
-    },
-    methods: {
-        formatter(num) {
-            return browser.bigNumberFormatter(num)
+        dataObject: {
+            type: Object,
+            default: function() {},
+            require: true
         }
     },
     computed: {
+        fee() {
+            return browser.bigNumberFormatter(BigNumber(this.dataObject.stored_tx.fee).dividedBy(1e8))
+        },
+        amount() {
+            return browser.bigNumberFormatter(BigNumber(this.dataObject.stored_tx.amount).dividedBy(1e8))
+        },
         defaultAddress() {
             return Vue.ls.get('address')
         },
-        showRecipient() {
+        description() {
+            return this.dataObject.stored_tx.attachment
+        },
+        address() {
+            let acc = new Account(NETWORK_BYTE)
+            let address = acc.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, NETWORK_BYTE)
             if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
                 let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-                if (this.recipient.length <= MAX_ALIAS_LENGTH && alias) {
+                for (let key in alias) {
+                    if (address === key) {
+                        return alias[key] + ' (' + key + ')'
+                    }
+                }
+            }
+            return address
+        },
+        recipient() {
+            let recipient = this.dataObject.stored_tx.recipient
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                if (recipient.length <= MAX_ALIAS_LENGTH && alias) {
                     for (let key in alias) {
-                        if (this.recipient.toLowerCase() === alias[key].toLowerCase()) {
+                        if (recipient.toLowerCase() === alias[key].toLowerCase()) {
                             return alias[key] + ' (' + key + ')'
                         }
                     }
                 } else {
                     for (let key in alias) {
-                        if (this.recipient === key) {
+                        if (recipient === key) {
                             return alias[key] + ' (' + key + ')'
                         }
                     }
-                    return this.recipient
+                    return recipient
                 }
+            }
+        },
+        txType() {
+            if (this.dataObject.stored_tx.transactionType === 2) {
+                return 'payment'
             }
         }
     }

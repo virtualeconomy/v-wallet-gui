@@ -7,7 +7,7 @@
                     label="Amount"
                     label-for="amount_success">
         <b-form-input id="amount_success"
-                      :value="formatter(amount) + ' VSYS'"
+                      :value="amount + ' VSYS'"
                       class="amount"
                       readonly
                       :plaintext="true">
@@ -51,7 +51,7 @@
                     label="Fee"
                     label-for="fee_success">
         <b-form-input id="fee_success"
-                      :value="formatter(fee) + ' VSYS'"
+                      :value="fee + ' VSYS'"
                       class="fee"
                       readonly
                       :plaintext="true">
@@ -64,42 +64,64 @@
 <script>
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE } from '@/js-v-sdk/src/constants'
+import { NETWORK_BYTE } from '@/network'
+import Account from '@/js-v-sdk/src/account'
+import { MAX_ALIAS_LENGTH } from '@/constants'
+import Vue from 'vue'
 export default {
     name: 'Confirm',
     props: {
-        address: {
-            type: String,
-            required: true,
-            default: ''
-        },
-        recipient: {
-            type: String,
-            required: true,
-            default: ''
-        },
-        amount: {
-            type: BigNumber,
-            required: true,
-            default: function() {
-                return BigNumber(0)
-            }
-        },
-        fee: {
-            type: BigNumber,
-            required: true,
-            default: function() {
-                return BigNumber(TX_FEE)
-            }
-        },
-        description: {
-            type: String,
-            default: ''
+        dataObject: {
+            type: Object,
+            default: function() {},
+            require: true
         }
     },
-    methods: {
-        formatter(num) {
-            return browser.bigNumberFormatter(num)
+    computed: {
+        fee() {
+            return browser.bigNumberFormatter(BigNumber(this.dataObject.stored_tx.fee).dividedBy(1e8))
+        },
+        amount() {
+            return browser.bigNumberFormatter(BigNumber(this.dataObject.stored_tx.amount).dividedBy(1e8))
+        },
+        defaultAddress() {
+            return Vue.ls.get('address')
+        },
+        description() {
+            return this.dataObject.stored_tx.attachment
+        },
+        address() {
+            let acc = new Account(NETWORK_BYTE)
+            let address = acc.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, NETWORK_BYTE)
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                for (let key in alias) {
+                    if (address === key) {
+                        return alias[key] + ' (' + key + ')'
+                    }
+                }
+            }
+            return address
+        },
+        recipient() {
+            let recipient = this.dataObject.stored_tx.recipient
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                if (recipient.length <= MAX_ALIAS_LENGTH && alias) {
+                    for (let key in alias) {
+                        if (recipient.toLowerCase() === alias[key].toLowerCase()) {
+                            return alias[key] + ' (' + key + ')'
+                        }
+                    }
+                } else {
+                    for (let key in alias) {
+                        if (recipient === key) {
+                            return alias[key] + ' (' + key + ')'
+                        }
+                    }
+                    return recipient
+                }
+            }
         }
     }
 }
