@@ -165,6 +165,7 @@
                  :tx-fee="fee"
                  :tx-amount="txAmount"
                  :trans-type="'lease'"
+                 :tx-status="'unconfirmed'"
                  :self-send="isRaisingLease"></TxInfoModal>
   </div>
 </template>

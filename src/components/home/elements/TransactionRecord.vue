@@ -154,6 +154,7 @@
                  :height-gap="heightGap"
                  :tx-time="cancelTime"
                  :tx-icon="'leased out canceled'"
+                 :tx-status="'unconfirmed'"
                  :trans-type="'cancelLease'"
                  v-if="transType==='lease'"
                  :tx-amount="txAmount"

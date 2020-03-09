@@ -19,19 +19,19 @@
                  width="60px"
                  height="60px">
           </div>
-          <div class="cl-amount">{{ formatter(amount) }} VSYS</div>
+          <div class="cl-amount">{{ showAmount }} VSYS</div>
         </div>
         <div class="cl-address">
           <label>From</label>
-          <span>{{ address }}</span>
+          <span>{{ showAddress }}</span>
         </div>
         <div class="cl-address">
           <label>To</label>
-          <span>{{ recipient }}</span>
+          <span>{{ showRecipient }}</span>
         </div>
         <div class="cl-fee">
-          <label>Fee</label>
-          <span>{{ formatter(fee) }} VSYS</span>
+          <label>Lease ID</label>
+          <span class="lease-id">{{ leaseId }} </span>
         </div>
       </div>
       <p v-show="sendError"
@@ -95,7 +95,6 @@
 
 <script>
 import Confirm from './Confirm'
-import { TX_FEE } from '@/js-v-sdk/src/constants'
 import { NETWORK_BYTE } from '@/network'
 import ColdSignature from './ColdSignature'
 import CancelSuccess from './CancelSuccess'
@@ -107,6 +106,8 @@ import BigNumber from 'bignumber.js'
 import LedgerConfirm from './LedgerConfirm'
 import Transaction from '@/js-v-sdk/src/transaction'
 import { mapActions, mapState } from 'vuex'
+import { MAX_ALIAS_LENGTH } from '@/constants'
+import Account from '@/js-v-sdk/src/account'
 export default {
     name: 'CancelLease',
     components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm, LedgerConfirm },
@@ -118,7 +119,9 @@ export default {
             coldSignature: '',
             sendError: false,
             signed: false,
-            hasConfirmed: false
+            hasConfirmed: false,
+            recipient: '',
+            amount: 0
         }
     },
     props: {
@@ -128,25 +131,6 @@ export default {
             require: true
         },
         address: {
-            type: String,
-            default: '',
-            require: true
-        },
-        amount: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
-        fee: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(TX_FEE)
-            },
-            require: true
-        },
-        recipient: {
             type: String,
             default: '',
             require: true
@@ -170,6 +154,13 @@ export default {
             require: true
         }
     },
+    created() {
+        this.chain.getTxById(this.dataObject.stored_tx.txId).then(res => {
+            this.recipient = res['recipient']
+            this.amount = res['amount']
+            return res
+        })
+    },
     computed: {
         ...mapState({
             chain: 'chain',
@@ -182,7 +173,12 @@ export default {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addressIndex).keyPair
         },
         dataObject() {
-            let tra = this.buildTransaction(this.coldPublicKey)
+            let tra
+            if (this.walletType === 'hotWallet') {
+                tra = this.buildTransaction(this.getKeypair(this.address).publicKey)
+            } else {
+                tra = this.buildTransaction(this.coldPublicKey)
+            }
             return tra
         },
         userInfo() {
@@ -210,6 +206,45 @@ export default {
                 }
             }
             return addrInfo
+        },
+        showAmount() {
+            return browser.bigNumberFormatter(BigNumber(this.amount).dividedBy(1e8))
+        },
+        leaseId() {
+            return this.dataObject.stored_tx.txId
+        },
+        showAddress() {
+            let acc = new Account(NETWORK_BYTE)
+            let address = acc.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, NETWORK_BYTE)
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                for (let key in alias) {
+                    if (address === key) {
+                        return alias[key] + ' (' + key + ')'
+                    }
+                }
+            }
+            return address
+        },
+        showRecipient() {
+            let recipient = this.recipient
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                if (recipient.length <= MAX_ALIAS_LENGTH && alias) {
+                    for (let key in alias) {
+                        if (recipient.toLowerCase() === alias[key].toLowerCase()) {
+                            return alias[key] + ' (' + key + ')'
+                        }
+                    }
+                } else {
+                    for (let key in alias) {
+                        if (recipient === key) {
+                            return alias[key] + ' (' + key + ')'
+                        }
+                    }
+                    return recipient
+                }
+            }
         }
     },
     methods: {
@@ -245,10 +280,9 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                let builtTransaction = this.buildTransaction(this.selectedKeypair.publicKey)
-                this.account.buildFromPrivateKey(this.selectedKeypair.privateKey)
-                let signature = this.account.getSignature(builtTransaction.toBytes())
-                sendTx = builtTransaction.toJsonForSendingTx(signature)
+                this.account.buildFromPrivateKey(this.getKeypair(this.address).privateKey)
+                let signature = this.account.getSignature(this.dataObject.toBytes())
+                sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
             this.chain.sendCancelLeasingTx(sendTx).then(response => {
                 this.page = 'success'
@@ -272,8 +306,8 @@ export default {
         showDetails() {
             this.$emit('show-details', this.timestamp)
         },
-        formatter(num) {
-            return browser.bigNumberFormatter(num)
+        getKeypair() {
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addressIndex).keyPair
         }
     }
 }
@@ -374,4 +408,8 @@ export default {
     margin-top: 26px;
     margin-bottom: 10px;
 }
+.lease-id {
+    font-size: 13px !important;
+}
+
 </style>
