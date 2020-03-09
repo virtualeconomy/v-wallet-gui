@@ -15,6 +15,7 @@
       </button>
       <b-tabs>
         <b-tab title="Hot Wallet"
+               @click="changeToHotWallet"
                :active="selectedWalletType==='hotWallet'">
           <LeaseInput :balances="balances"
                       @get-data="getData"
@@ -28,11 +29,7 @@
                       :node-list="nodeList"
                       :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="pageId===2">
-            <Confirm :tx-type="'lease'"
-                     :amount=inputAmount(amount)
-                     :address="address"
-                     :recipient="recipient"
-                     :fee="fee"></Confirm>
+            <Confirm :data-object="dataObject"></Confirm>
             <p v-show="sendError"
                class="text-danger">
               <small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small>
@@ -60,12 +57,12 @@
             </b-row>
           </b-container>
           <LeaseSuccess v-else-if="pageId===3"
-                        :amount=inputAmount(amount)
-                        :address="recipient"
+                        :data-object="dataObject"
                         @show-details="showDetails"></LeaseSuccess>
         </b-tab>
         <b-tab title="Cold Wallet"
                :disabled="noColdAddress"
+               @click="changeToColdWallet"
                :active="selectedWalletType==='coldWallet'">
           <LeaseInput :balances="balances"
                       @get-data="getData"
@@ -79,11 +76,7 @@
                       :selected-address="selectedAddress"
                       :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="coldPageId===2">
-            <Confirm :tx-type="'lease'"
-                     :amount=inputAmount(amount)
-                     :address="coldAddress"
-                     :recipient="recipient"
-                     :fee="fee"></Confirm>
+            <Confirm :data-object="dataObject"></Confirm>
             <b-row>
               <b-col class="col-lef">
                 <b-button
@@ -134,11 +127,7 @@
                            @prev-page="prevColdPage"></ColdSignature>
           </b-container>
           <b-container v-else-if="coldPageId===4">
-            <Confirm :tx-type="'lease'"
-                     :amount=inputAmount(amount)
-                     :address="coldAddress"
-                     :recipient="recipient"
-                     :fee="fee"></Confirm>
+            <Confirm :data-object="dataObject"></Confirm>
             <p v-show="sendError"
                class="text-danger">
               <small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small>
@@ -165,7 +154,7 @@
             </b-row>
           </b-container>
           <LeaseSuccess v-else-if="coldPageId===5"
-                        :amount=inputAmount(amount)
+                        :data-object="dataObject"
                         @show-details="showDetails"></LeaseSuccess>
         </b-tab>
       </b-tabs>
@@ -218,7 +207,8 @@ export default {
             timestamp: Date.now() * 1e6,
             hasConfirmed: false,
             isRaisingLease: 'true',
-            errorMessage: ''
+            errorMessage: '',
+            selectedWallet: 'hotWallet'
         }
     },
     props: {
@@ -275,8 +265,7 @@ export default {
             return ''
         },
         dataObject() {
-            let tra = this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
-            return tra
+            return this.selectedWallet === 'hotWallet' ? this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey) : this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -297,9 +286,6 @@ export default {
     },
     methods: {
         ...mapActions(['updateBalance']),
-        inputAmount(num) {
-            return BigNumber(num)
-        },
         closeModal() {
             this.$refs.leaseModal.hide()
         },
@@ -403,6 +389,12 @@ export default {
             if (this.$refs.coldAddrInput) {
                 this.$refs.coldAddrInput.resetData()
             }
+        },
+        changeToHotWallet() {
+            this.selectedWallet = 'hotWallet'
+        },
+        changeToColdWallet() {
+            this.selectedWallet = 'coldWallet'
         }
     }
 }

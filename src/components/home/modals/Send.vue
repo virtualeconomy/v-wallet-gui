@@ -607,8 +607,7 @@ export default {
             return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && (this.isValidDescription || this.description === '') && this.isValidAmount && this.address !== '')
         },
         dataObject() {
-            let tra = this.buildTransaction(this.coldAddressInfo.publicKey)
-            return tra
+            return this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
         }
     },
     methods: {

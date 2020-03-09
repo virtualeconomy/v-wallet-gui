@@ -141,6 +141,8 @@ export default {
         txType() {
             if (this.dataObject.stored_tx.transactionType === 2) {
                 return 'payment'
+            } if (this.dataObject.stored_tx.transactionType === 3) {
+                return 'lease'
             }
         }
     }
