@@ -649,10 +649,9 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                let builtTransaction = this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey)
                 this.account.buildFromPrivateKey(this.getKeypair(this.addresses[this.address]).privateKey)
-                let signature = this.account.getSignature(builtTransaction.toBytes())
-                sendTx = builtTransaction.toJsonForSendingTx(signature)
+                let signature = this.account.getSignature(this.dataObject.toBytes())
+                sendTx = this.dataObject.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
                 let signature = this.coldSignature
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
