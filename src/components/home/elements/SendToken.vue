@@ -320,11 +320,11 @@
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
-          <TokenConfirm :address="coldAddress"
-                        :recipient="recipient"
-                        :amount=inputAmount(amount)
+          <TokenConfirm :address="getAddressFromDataObject"
+                        :recipient="dataObject.stored_tx.functionData.recipient"
+                        :amount=inputAmount(dataObject.stored_tx.functionData.amount)
                         :fee="fee"
-                        :description="description"
+                        :description="dataObject.stored_tx.attachment"
                         :tx-type="'Send Token'">
           </TokenConfirm>
           <b-row>
@@ -360,11 +360,11 @@
                          @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
-          <TokenConfirm :address="coldAddress"
-                        :amount=inputAmount(amount)
+          <TokenConfirm :address="getAddressFromDataObject"
+                        :amount=inputAmount(dataObject.stored_tx.functionData.amount)
                         :fee="fee"
-                        :recipient="recipient"
-                        :description="description"
+                        :recipient="dataObject.stored_tx.functionData.recipient"
+                        :description="dataObject.stored_tx.attachment"
                         :tx-type="'Send Token'">
           </TokenConfirm>
           <p v-show="sendError"
@@ -392,10 +392,10 @@
         </b-container>
         <b-container v-show="coldPageId===5">
           <TokenSuccess class="tokenSucced"
-                        :address="coldAddress"
-                        :recipient="recipient"
-                        :amount=inputAmount(amount)
-                        :description="description"
+                        :address="getAddressFromDataObject"
+                        :recipient="dataObject.stored_tx.functionData.recipient"
+                        :amount=inputAmount(dataObject.stored_tx.functionData.amount)
+                        :description="dataObject.stored_tx.attachment"
                         :fee="fee"
                         :tx-type="'Send Token'">
           </TokenSuccess>
@@ -587,6 +587,13 @@ export default {
             let balance = this.selectedWalletType === 'hotWallet' ? this.tokenBalances[this.address] : this.tokenBalances[this.coldAddress]
             return BigNumber(this.amount).isGreaterThan(BigNumber(balance))
         },
+        coldAddressInfo() {
+            if (this.coldAddresses.hasOwnProperty(this.coldAddress)) {
+                return this.coldAddresses[this.coldAddress]
+            } else {
+                return {'api': 1, 'publicKey': '', 'device': 'unknown'}
+            }
+        },
         isValidRecipient() {
             let recipient = this.recipient
             if (!recipient) {
@@ -616,8 +623,11 @@ export default {
             }
             return common.getLength(this.description) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
+        getAddressFromDataObject() {
+            return this.dataObject.stored_tx.senderPublicKey ? this.account.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, this.dataObject.network_byte) : this.coldAddress
+        },
         dataObject() {
-            let tra = this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
+            let tra = this.buildTransaction(this.coldAddressInfo.publicKey)
             return tra
         }
     },
@@ -628,7 +638,7 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            tra.buildSendTokenTx(publicKey, this.tokenId, this.recipient, this.amount, this.tokenUnity, this.isSplit, this.description)
+            tra.buildSendTokenTx(publicKey, this.tokenId, this.recipient, this.amount, this.tokenUnity, this.isSplit, this.description, this.timeStamp)
             return tra
         },
         sendData(walletType) {
