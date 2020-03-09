@@ -13,10 +13,9 @@
         @click="closeModal">
         <img src="@/assets/imgs/icons/operate/ic_close.svg">
       </button>
-      <b-tabs>
+      <b-tabs @input="hideQrScan">
         <b-tab title="Hot Wallet"
-               @click="changeToHotWallet"
-               :active="selectedWalletType==='hotWallet'">
+               :active="selectedWallet==='hotWallet'">
           <LeaseInput :balances="balances"
                       @get-data="getData"
                       v-if="pageId===1"
@@ -27,7 +26,7 @@
                       ref="addrInput"
                       :selected-address="selectedAddress"
                       :node-list="nodeList"
-                      :selected-wallet-type="selectedWalletType"></LeaseInput>
+                      :selected-wallet-type="selectedWallet"></LeaseInput>
           <b-container v-else-if="pageId===2">
             <Confirm :data-object="dataObject"></Confirm>
             <p v-show="sendError"
@@ -62,8 +61,7 @@
         </b-tab>
         <b-tab title="Cold Wallet"
                :disabled="noColdAddress"
-               @click="changeToColdWallet"
-               :active="selectedWalletType==='coldWallet'">
+               :active="selectedWallet==='coldWallet'">
           <LeaseInput :balances="balances"
                       @get-data="getData"
                       v-if="coldPageId===1"
@@ -74,7 +72,7 @@
                       ref="coldAddrInput"
                       :node-list="nodeList"
                       :selected-address="selectedAddress"
-                      :selected-wallet-type="selectedWalletType"></LeaseInput>
+                      :selected-wallet-type="selectedWallet"></LeaseInput>
           <b-container v-else-if="coldPageId===2">
             <Confirm :data-object="dataObject"></Confirm>
             <b-row>
@@ -208,8 +206,11 @@ export default {
             hasConfirmed: false,
             isRaisingLease: 'true',
             errorMessage: '',
-            selectedWallet: 'hotWallet'
+            selectedWallet: ''
         }
+    },
+    create() {
+        this.selectedWallet = this ? this.selectedWalletType : 'hotWallet'
     },
     props: {
         balances: {
@@ -390,11 +391,17 @@ export default {
                 this.$refs.coldAddrInput.resetData()
             }
         },
-        changeToHotWallet() {
-            this.selectedWallet = 'hotWallet'
-        },
-        changeToColdWallet() {
-            this.selectedWallet = 'coldWallet'
+        hideQrScan(tabIndex) {
+            if (tabIndex === 0) {
+                this.resetPage()
+                this.pageId = 1
+                this.selectedWallet = 'hotWallet'
+            } else {
+                this.resetPage()
+                this.coldPageId = 1
+                this.selectedWallet = 'coldWallet'
+            }
+            this.scanShow = false
         }
     }
 }
