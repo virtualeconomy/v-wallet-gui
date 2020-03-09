@@ -626,6 +626,9 @@ export default {
         getAddressFromDataObject() {
             return this.dataObject.stored_tx.senderPublicKey ? this.account.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, this.dataObject.network_byte) : this.coldAddress
         },
+        selectedKeypair() {
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+        },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddressInfo.publicKey)
             return tra
@@ -648,8 +651,8 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                let builtTransaction = this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey)
-                this.account.buildFromPrivateKey(this.getKeypair(this.addresses[this.address]).privateKey)
+                let builtTransaction = this.buildTransaction(this.selectedKeypair.publicKey)
+                this.account.buildFromPrivateKey(this.selectedKeypair.privateKey)
                 let signature = this.account.getSignature(builtTransaction.toBytes())
                 sendTx = builtTransaction.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
@@ -871,9 +874,6 @@ export default {
             this.selectedWalletType = this ? this.walletType : 'hotWallet'
             this.address = this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : ''
             this.coldAddress = this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : ''
-        },
-        getKeypair(index) {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)

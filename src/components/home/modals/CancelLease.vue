@@ -178,10 +178,11 @@ export default {
         defaultAddress() {
             return Vue.ls.get('address')
         },
+        selectedKeypair() {
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addressIndex).keyPair
+        },
         dataObject() {
             let tra = this.buildTransaction(this.coldPublicKey)
-            console.log('coldPublicKey in hahha: ', this.coldPublicKey)
-            console.log('tra in hahha: ', tra)
             return tra
         },
         userInfo() {
@@ -244,8 +245,8 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                let builtTransaction = this.buildTransaction(this.getKeypair(this.address).publicKey)
-                this.account.buildFromPrivateKey(this.getKeypair(this.address).privateKey)
+                let builtTransaction = this.buildTransaction(this.selectedKeypair.publicKey)
+                this.account.buildFromPrivateKey(this.selectedKeypair.privateKey)
                 let signature = this.account.getSignature(builtTransaction.toBytes())
                 sendTx = builtTransaction.toJsonForSendingTx(signature)
             }
@@ -270,9 +271,6 @@ export default {
         },
         showDetails() {
             this.$emit('show-details', this.timestamp)
-        },
-        getKeypair() {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addressIndex).keyPair
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)

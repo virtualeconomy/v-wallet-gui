@@ -606,8 +606,11 @@ export default {
         isSubmitDisabled() {
             return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && (this.isValidDescription || this.description === '') && this.isValidAmount && this.address !== '')
         },
+        selectedKeypair() {
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+        },
         dataObject() {
-            return this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
+            return this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.selectedKeypair.publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
         }
     },
     methods: {
@@ -649,7 +652,7 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                this.account.buildFromPrivateKey(this.getKeypair(this.addresses[this.address]).privateKey)
+                this.account.buildFromPrivateKey(this.selectedKeypair.privateKey)
                 let signature = this.account.getSignature(this.dataObject.toBytes())
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
@@ -860,9 +863,6 @@ export default {
                 options.push({ value: addr, text: addr })
                 return options
             }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
-        },
-        getKeypair(index) {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         showPage() {
             this.selectedWalletType = this ? this.walletType : 'hotWallet'

@@ -15,7 +15,7 @@
       </button>
       <b-tabs @input="hideQrScan">
         <b-tab title="Hot Wallet"
-               :active="selectedWallet==='hotWallet'">
+               :active="selectedWalletType==='hotWallet'">
           <LeaseInput :balances="balances"
                       @get-data="getData"
                       v-if="pageId===1"
@@ -26,7 +26,7 @@
                       ref="addrInput"
                       :selected-address="selectedAddress"
                       :node-list="nodeList"
-                      :selected-wallet-type="selectedWallet"></LeaseInput>
+                      :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="pageId===2">
             <Confirm :data-object="dataObject"></Confirm>
             <p v-show="sendError"
@@ -61,7 +61,7 @@
         </b-tab>
         <b-tab title="Cold Wallet"
                :disabled="noColdAddress"
-               :active="selectedWallet==='coldWallet'">
+               :active="selectedWalletType==='coldWallet'">
           <LeaseInput :balances="balances"
                       @get-data="getData"
                       v-if="coldPageId===1"
@@ -72,7 +72,7 @@
                       ref="coldAddrInput"
                       :node-list="nodeList"
                       :selected-address="selectedAddress"
-                      :selected-wallet-type="selectedWallet"></LeaseInput>
+                      :selected-wallet-type="selectedWalletType"></LeaseInput>
           <b-container v-else-if="coldPageId===2">
             <Confirm :data-object="dataObject"></Confirm>
             <b-row>
@@ -206,11 +206,8 @@ export default {
             hasConfirmed: false,
             isRaisingLease: 'true',
             errorMessage: '',
-            selectedWallet: ''
+            selectedWalletType: this ? this.walletType : 'hotWallet'
         }
-    },
-    create() {
-        this.selectedWallet = this ? this.selectedWalletType : 'hotWallet'
     },
     props: {
         balances: {
@@ -228,7 +225,7 @@ export default {
             default: function() {},
             require: true
         },
-        selectedWalletType: {
+        walletType: {
             type: String,
             default: 'hotWallet',
             require: true
@@ -265,8 +262,11 @@ export default {
             }
             return ''
         },
+        selectedKeypair() {
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+        },
         dataObject() {
-            return this.selectedWallet === 'hotWallet' ? this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey) : this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
+            return this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.selectedKeypair.publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -314,6 +314,7 @@ export default {
             this.sendError = false
             this.coldSignature = ''
             this.coldAddress = ''
+            this.selectedWalletType = this ? this.walletType : 'hotWallet'
         },
         prevPage() {
             this.sendError = false
@@ -339,10 +340,9 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                let builtTransaction = this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey)
-                this.account.buildFromPrivateKey(this.getKeypair(this.addresses[this.address]).privateKey)
-                let signature = this.account.getSignature(builtTransaction.toBytes())
-                sendTx = builtTransaction.toJsonForSendingTx(signature)
+                this.account.buildFromPrivateKey(this.selectedKeypair.privateKey)
+                let signature = this.account.getSignature(this.dataObject.toBytes())
+                sendTx = this.dataObject.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
                 let signature = this.coldSignature
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
@@ -380,9 +380,6 @@ export default {
             this.$root.$emit('bv::hide::modal', 'txInfoModal_lease' + this.txId + this.isRaisingLease)
             this.$root.$emit('bv::show::modal', 'txInfoModal_lease' + this.txId + this.isRaisingLease)
         },
-        getKeypair(index) {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
-        },
         showPage() {
             if (this.$refs.addrInput) {
                 this.$refs.addrInput.resetData()
@@ -395,11 +392,11 @@ export default {
             if (tabIndex === 0) {
                 this.resetPage()
                 this.pageId = 1
-                this.selectedWallet = 'hotWallet'
+                this.selectedWalletType = 'hotWallet'
             } else {
                 this.resetPage()
                 this.coldPageId = 1
-                this.selectedWallet = 'coldWallet'
+                this.selectedWalletType = 'coldWallet'
             }
             this.scanShow = false
         }
