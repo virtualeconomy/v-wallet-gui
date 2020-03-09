@@ -1,3 +1,3 @@
-export const NETWORK_BYTE = 'T'.charCodeAt(0);
-export const NODE_IP = 'http://test.v.systems:9922';
-export const VSYS_RATE = 'https://test-rate.virtualeconomytech.com/api/superNodesDetail'
+export const NETWORK_BYTE = 'M'.charCodeAt(0);
+export const NODE_IP = '/api';
+export const VSYS_RATE = 'https://vsysrate.com/api/superNodesDetail'
