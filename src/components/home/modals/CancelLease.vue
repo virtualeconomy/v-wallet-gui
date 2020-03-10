@@ -29,9 +29,9 @@
           <label>To</label>
           <span>{{ showRecipient }}</span>
         </div>
-        <div class="cl-fee">
+        <div class="cl-txId">
           <label>Lease ID</label>
-          <span class="lease-id">{{ leaseId }} </span>
+          <span>{{ leaseId }} </span>
         </div>
       </div>
       <p v-show="sendError"
@@ -175,7 +175,7 @@ export default {
         dataObject() {
             let tra
             if (this.walletType === 'hotWallet') {
-                tra = this.buildTransaction(this.getKeypair(this.address).publicKey)
+                tra = this.buildTransaction(this.selectedKeypair.publicKey)
             } else {
                 tra = this.buildTransaction(this.coldPublicKey)
             }
@@ -216,35 +216,10 @@ export default {
         showAddress() {
             let acc = new Account(NETWORK_BYTE)
             let address = acc.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, NETWORK_BYTE)
-            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-                for (let key in alias) {
-                    if (address === key) {
-                        return alias[key] + ' (' + key + ')'
-                    }
-                }
-            }
             return address
         },
         showRecipient() {
-            let recipient = this.recipient
-            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-                if (recipient.length <= MAX_ALIAS_LENGTH && alias) {
-                    for (let key in alias) {
-                        if (recipient.toLowerCase() === alias[key].toLowerCase()) {
-                            return alias[key] + ' (' + key + ')'
-                        }
-                    }
-                } else {
-                    for (let key in alias) {
-                        if (recipient === key) {
-                            return alias[key] + ' (' + key + ')'
-                        }
-                    }
-                    return recipient
-                }
-            }
+            return this.recipient
         }
     },
     methods: {
@@ -280,7 +255,7 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                this.account.buildFromPrivateKey(this.getKeypair(this.address).privateKey)
+                this.account.buildFromPrivateKey(this.selectedKeypair.privateKey)
                 let signature = this.account.getSignature(this.dataObject.toBytes())
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
@@ -305,9 +280,6 @@ export default {
         },
         showDetails() {
             this.$emit('show-details', this.timestamp)
-        },
-        getKeypair() {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addressIndex).keyPair
         }
     }
 }
@@ -351,14 +323,14 @@ export default {
             letter-spacing: 0;
         }
     }
-    .cl-fee {
+    .cl-txId {
         text-align: left;
         border-bottom: 1px solid #E8E9ED;
         height: 48px;
         padding-top: 15px;
         span {
             float:right;
-            font-size: 15px;
+            font-size: 12px;
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
@@ -407,9 +379,6 @@ export default {
 .row {
     margin-top: 26px;
     margin-bottom: 10px;
-}
-.lease-id {
-    font-size: 13px !important;
 }
 
 </style>
