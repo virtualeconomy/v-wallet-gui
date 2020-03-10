@@ -203,6 +203,8 @@
               </span>
               <span class="balance">{{ formatter(balances[coldAddress]) }} VSYS</span>
             </b-btn>
+            <span class="cold-check"
+                  v-if="!isValidColdPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
           </b-form-group>
           <b-form-group label="Recipient"
                         label-for="cold-recipient-input">
@@ -536,11 +538,15 @@ export default {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
         },
         secretInfo() {
-            return JSON.parse(
-                seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
+            if (this.userInfo) {
+                return JSON.parse(
+                    seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
+            }
         },
         seedPhrase() {
-            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+            if (this.secretInfo) {
+                return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+            }
         },
         wordList() {
             return this.seedPhrase.split(' ')
@@ -604,10 +610,25 @@ export default {
             return this.checkPrecision && this.isValidNumFormat && !this.isInsufficient && !this.isNegative
         },
         isSubmitDisabled() {
-            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && (this.isValidDescription || this.description === '') && this.isValidAmount && this.address !== '')
+            return !(this.isValidColdPublicKey && this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && (this.isValidDescription || this.description === '') && this.isValidAmount && this.address !== '')
         },
         selectedKeypair() {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+            if (this.seedPhrase) {
+                return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+            } else {
+                return { 'privateKey': '', 'publicKey': '' }
+            }
+        },
+        isValidColdPublicKey() {
+            try {
+                if (this.selectedWalletType === 'hotWallet') {
+                    return true
+                } else {
+                    return this.coldAddressInfo.address === this.account.convertPublicKeyToAddress(this.coldAddressInfo.publicKey, NETWORK_BYTE)
+                }
+            } catch (e) {
+                return false
+            }
         },
         dataObject() {
             return this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.selectedKeypair.publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
@@ -998,5 +1019,11 @@ export default {
 .row {
     margin-top: 26px;
     margin-bottom: 10px;
+}
+.cold-check {
+    display: block;
+    margin-top: 5px;
+    font-size: 80%;
+    color: #dc3545;
 }
 </style>

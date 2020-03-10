@@ -33,6 +33,9 @@
           <label>Lease ID</label>
           <span>{{ leaseId }} </span>
         </div>
+        <span class="cold-check"
+              v-if="!isValidColdPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
+
       </div>
       <p v-show="sendError"
          class="text-danger">
@@ -54,7 +57,7 @@
             class="btn-confirm"
             variant="warning"
             size="lg"
-            :disabled="hasConfirmed"
+            :disabled="hasConfirmed || !isValidColdPublicKey"
             @click="sendCancelLease">Confirm
           </b-button>
         </b-col>
@@ -106,8 +109,6 @@ import BigNumber from 'bignumber.js'
 import LedgerConfirm from './LedgerConfirm'
 import Transaction from '@/js-v-sdk/src/transaction'
 import { mapActions, mapState } from 'vuex'
-import { MAX_ALIAS_LENGTH } from '@/constants'
-import Account from '@/js-v-sdk/src/account'
 export default {
     name: 'CancelLease',
     components: { TxInfoModal, CancelSuccess, ColdSignature, Confirm, LedgerConfirm },
@@ -181,6 +182,17 @@ export default {
             }
             return tra
         },
+        isValidColdPublicKey() {
+            try {
+                if (this.walletType === 'hotWallet') {
+                    return true
+                } else {
+                    return this.address === this.account.convertPublicKeyToAddress(this.coldPublicKey, NETWORK_BYTE)
+                }
+            } catch (e) {
+                return false
+            }
+        },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
         },
@@ -214,9 +226,11 @@ export default {
             return this.dataObject.stored_tx.txId
         },
         showAddress() {
-            let acc = new Account(NETWORK_BYTE)
-            let address = acc.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, NETWORK_BYTE)
-            return address
+            try {
+                return this.account.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, this.dataObject.network_byte)
+            } catch (e) {
+                return 'Missing or invalid public key'
+            }
         },
         showRecipient() {
             return this.recipient
@@ -379,6 +393,12 @@ export default {
 .row {
     margin-top: 26px;
     margin-bottom: 10px;
+}
+.cold-check {
+    display: block;
+    margin-top: 5px;
+    font-size: 80%;
+    color: #dc3545;
 }
 
 </style>

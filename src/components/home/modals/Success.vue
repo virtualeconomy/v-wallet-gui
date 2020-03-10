@@ -64,9 +64,9 @@
 <script>
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { NETWORK_BYTE } from '@/network'
-import Account from '@/js-v-sdk/src/account'
+import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
 import { MAX_ALIAS_LENGTH } from '@/constants'
+import { mapState } from 'vuex'
 import Vue from 'vue'
 export default {
     name: 'Confirm',
@@ -78,11 +78,14 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            account: 'account'
+        }),
         fee() {
-            return browser.bigNumberFormatter(BigNumber(this.dataObject.stored_tx.fee).dividedBy(1e8))
+            return browser.bigNumberFormatter(BigNumber(this.dataObject.stored_tx.fee).dividedBy(VSYS_PRECISION))
         },
         amount() {
-            return browser.bigNumberFormatter(BigNumber(this.dataObject.stored_tx.amount).dividedBy(1e8))
+            return browser.bigNumberFormatter(BigNumber(this.dataObject.stored_tx.amount).dividedBy(VSYS_PRECISION))
         },
         defaultAddress() {
             return Vue.ls.get('address')
@@ -91,17 +94,19 @@ export default {
             return this.dataObject.stored_tx.attachment
         },
         address() {
-            let acc = new Account(NETWORK_BYTE)
-            let address = acc.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, NETWORK_BYTE)
-            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-                for (let key in alias) {
-                    if (address === key) {
-                        return alias[key] + ' (' + key + ')'
+            try {
+                let address = this.account.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, this.dataObject.network_byte)
+                if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                    let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                    for (let key in alias) {
+                        if (address === key) {
+                            return alias[key] + ' (' + key + ')'
+                        }
                     }
                 }
+                return address
+            } catch (e) {
             }
-            return address
         },
         recipient() {
             let recipient = this.dataObject.stored_tx.recipient

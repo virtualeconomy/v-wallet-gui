@@ -216,6 +216,8 @@
               </span>
               <span class="balance">Token Balance {{ formatter(tokenBalances[coldAddress]) }}</span>
             </b-btn>
+            <span class="cold-check"
+                  v-if="!isValidColdPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
           </b-form-group>
           <b-form-group label="Recipient"
                         label-for="cold-recipient-input">
@@ -559,11 +561,15 @@ export default {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
         },
         secretInfo() {
-            return JSON.parse(
-                seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
+            if (this.userInfo) {
+                return JSON.parse(
+                    seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
+            }
         },
         seedPhrase() {
-            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+            if (this.secretInfo) {
+                return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+            }
         },
         wordList() {
             return this.seedPhrase.split(' ')
@@ -572,7 +578,7 @@ export default {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         isSubmitDisabled() {
-            return !(this.recipient && this.isValidRecipient && (this.isValidDescription || !this.description) && this.isValidAmount && !this.isInsufficient)
+            return !(this.isValidColdPublicKey && this.recipient && this.isValidRecipient && (this.isValidDescription || !this.description) && this.isValidAmount && !this.isInsufficient)
         },
         isNegative() {
             return BigNumber(this.amount).isLessThan(0)
@@ -624,17 +630,35 @@ export default {
             return common.getLength(this.description) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
         getAddressFromDataObject() {
-            return this.dataObject.stored_tx.senderPublicKey ? this.account.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, this.dataObject.network_byte) : this.coldAddress
+            try {
+                return this.account.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, this.dataObject.network_byte)
+            } catch (e) {
+
+            }
+        },
+        isValidColdPublicKey() {
+            try {
+                if (this.selectedWalletType === 'hotWallet') {
+                    return true
+                } else {
+                    return this.coldAddressInfo.address === this.account.convertPublicKeyToAddress(this.coldAddressInfo.publicKey, NETWORK_BYTE)
+                }
+            } catch (e) {
+                return false
+            }
         },
         getFeeFromDataObject() {
             return BigNumber(this.dataObject.stored_tx.fee).dividedBy(VSYS_PRECISION)
         },
         selectedKeypair() {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+            if (this.seedPhrase) {
+                return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+            } else {
+                return { 'privateKey': '', 'publicKey': '' }
+            }
         },
         dataObject() {
-            let tra = this.buildTransaction(this.coldAddressInfo.publicKey)
-            return tra
+            return this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.selectedKeypair.publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
         }
     },
     methods: {
@@ -991,6 +1015,12 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.cold-check {
+    display: block;
+    margin-top: 5px;
+    font-size: 80%;
+    color: #dc3545;
 }
 .vsys-check {
     display: block;

@@ -27,6 +27,8 @@
         </span>
         <span class="balance">{{ formatter(walletType === 'hotWallet' ? balances[address] : balances[coldAddress]) }} VSYS</span>
       </b-btn>
+      <span class="cold-check"
+            v-if="!isValidColdPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
     </b-form-group>
     <div class="select-node">
       <b-dropdown class="m-2"
@@ -159,6 +161,7 @@ import { TX_FEE, VSYS_PRECISION, PROTOCOL, API_VERSION, OPC_ACCOUNT } from '@/js
 import browser from '@/utils/browser'
 import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
+import { NETWORK_BYTE } from '@/network'
 import common from '@/js-v-sdk/src/utils/common'
 import { mapState } from 'vuex'
 export default {
@@ -171,8 +174,8 @@ export default {
             qrInit: false,
             qrErrMsg: void 0,
             paused: false,
-            address: this.selectedWalletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress,
-            coldAddress: this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress,
+            address: this ? (this.selectedWalletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : '',
+            coldAddress: this ? (this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : '',
             fee: BigNumber(TX_FEE),
             hotRecipientAddressList: {},
             coldRecipientAddressList: {},
@@ -273,11 +276,29 @@ export default {
             return BigNumber(balance).isLessThan(this.fee)
         },
         isSubmitDisabled() {
-            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && this.isValidAmount)
+            return !(this.isValidColdPublicKey && this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && this.isValidAmount)
         },
         isSameWithSender() {
             let address = this.walletType === 'hotWallet' ? this.address : this.coldAddress
             return address === this.recipient
+        },
+        coldAddressInfo() {
+            if (this.coldAddresses.hasOwnProperty(this.coldAddress)) {
+                return this.coldAddresses[this.coldAddress]
+            } else {
+                return {'api': 1, 'publicKey': '', 'device': 'unknown'}
+            }
+        },
+        isValidColdPublicKey() {
+            try {
+                if (this.walletType === 'hotWallet') {
+                    return true
+                } else {
+                    return this.coldAddressInfo.address === this.account.convertPublicKeyToAddress(this.coldAddressInfo.publicKey, NETWORK_BYTE)
+                }
+            } catch (e) {
+                return false
+            }
         },
         isValidRecipient() {
             let recipient = this.isSuperSubNode ? this.tmpRecipient : this.recipient
@@ -495,5 +516,11 @@ export default {
     float: right;
     margin-top: -15px;
     margin-right: -8px;
+}
+.cold-check {
+    display: block;
+    margin-top: 5px;
+    font-size: 80%;
+    color: #dc3545;
 }
 </style>

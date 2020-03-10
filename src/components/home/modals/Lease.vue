@@ -15,7 +15,7 @@
       </button>
       <b-tabs @input="hideQrScan">
         <b-tab title="Hot Wallet"
-               :active="selectedWalletType==='hotWallet'">
+               :active="walletType==='hotWallet'">
           <LeaseInput :balances="balances"
                       @get-data="getData"
                       v-if="pageId===1"
@@ -61,7 +61,7 @@
         </b-tab>
         <b-tab title="Cold Wallet"
                :disabled="noColdAddress"
-               :active="selectedWalletType==='coldWallet'">
+               :active="walletType==='coldWallet'">
           <LeaseInput :balances="balances"
                       @get-data="getData"
                       v-if="coldPageId===1"
