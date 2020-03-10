@@ -323,7 +323,7 @@
           <TokenConfirm :address="getAddressFromDataObject"
                         :recipient="dataObject.stored_tx.functionData.recipient"
                         :amount=inputAmount(dataObject.stored_tx.functionData.amount)
-                        :fee="fee"
+                        :fee="getFeeFromDataObject"
                         :description="dataObject.stored_tx.attachment"
                         :tx-type="'Send Token'">
           </TokenConfirm>
@@ -362,7 +362,7 @@
         <b-container v-show="coldPageId===4">
           <TokenConfirm :address="getAddressFromDataObject"
                         :amount=inputAmount(dataObject.stored_tx.functionData.amount)
-                        :fee="fee"
+                        :fee="getFeeFromDataObject"
                         :recipient="dataObject.stored_tx.functionData.recipient"
                         :description="dataObject.stored_tx.attachment"
                         :tx-type="'Send Token'">
@@ -396,7 +396,7 @@
                         :recipient="dataObject.stored_tx.functionData.recipient"
                         :amount=inputAmount(dataObject.stored_tx.functionData.amount)
                         :description="dataObject.stored_tx.attachment"
-                        :fee="fee"
+                        :fee="getFeeFromDataObject"
                         :tx-type="'Send Token'">
           </TokenSuccess>
           <b-button variant="warning"
@@ -625,6 +625,9 @@ export default {
         },
         getAddressFromDataObject() {
             return this.dataObject.stored_tx.senderPublicKey ? this.account.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, this.dataObject.network_byte) : this.coldAddress
+        },
+        getFeeFromDataObject() {
+            return BigNumber(this.dataObject.stored_tx.fee).dividedBy(VSYS_PRECISION)
         },
         selectedKeypair() {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
