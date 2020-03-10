@@ -314,8 +314,8 @@ export default {
             this.timestamp = Date.now() * 1e6
             this.sendError = false
             this.coldSignature = ''
-            this.coldAddress = ''
-            this.selectedWalletType = this ? this.walletType : 'hotWallet'
+            this.address = this.selectedWalletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
+            this.coldAddress = this.selectedWalletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
         },
         prevPage() {
             this.sendError = false
@@ -382,6 +382,7 @@ export default {
             this.$root.$emit('bv::show::modal', 'txInfoModal_lease' + this.txId + this.isRaisingLease)
         },
         showPage() {
+            this.selectedWalletType = this ? this.walletType : 'hotWallet'
             if (this.$refs.addrInput) {
                 this.$refs.addrInput.resetData()
             }
