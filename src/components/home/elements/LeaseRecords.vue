@@ -95,7 +95,7 @@
            :addresses="addresses"
            :selected-address="address"
            :node-list="nodeList"
-           :selected-wallet-type="walletType"></Lease>
+           :wallet-type="walletType"></Lease>
     <BatchCancelLease :cancel-lease-records="cancelLeaseRecords"
                       :wallet-type="walletType"
                       :cold-lease-record="coldLeaseRecord"

@@ -145,13 +145,7 @@
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
-          <Confirm :address=showAddress()
-                   :recipient=showRecipient()
-                   :amount=inputAmount(amount)
-                   :fee="fee"
-                   :description="description"
-                   :tx-type="'payment'">
-          </Confirm>
+          <Confirm :data-object="dataObject"></Confirm>
           <p v-show="sendError"
              class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
@@ -177,12 +171,7 @@
           </b-row>
         </b-container>
         <b-container v-if="pageId===3">
-          <Success :address=showAddress()
-                   :recipient=showRecipient()
-                   :amount=inputAmount(amount)
-                   :fee="fee"
-                   :description="description">
-          </Success>
+          <Success :data-object="dataObject"></Success>
           <b-button variant="warning"
                     block
                     size="lg"
@@ -214,6 +203,8 @@
               </span>
               <span class="balance">{{ formatter(balances[coldAddress]) }} VSYS</span>
             </b-btn>
+            <span class="cold-check"
+                  v-if="!isValidPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
           </b-form-group>
           <b-form-group label="Recipient"
                         label-for="cold-recipient-input">
@@ -318,13 +309,7 @@
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
-          <Confirm :address=showAddress()
-                   :recipient=showRecipient()
-                   :amount=inputAmount(amount)
-                   :fee="fee"
-                   :description="description"
-                   :tx-type="'payment'">
-          </Confirm>
+          <Confirm :data-object="dataObject"></Confirm>
           <b-row>
             <b-col class="col-lef">
               <b-button
@@ -376,13 +361,7 @@
                          @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
-          <Confirm :address=showAddress()
-                   :recipient=showRecipient()
-                   :amount=inputAmount(amount)
-                   :fee="fee"
-                   :description="description"
-                   :tx-type="'payment'">
-          </Confirm>
+          <Confirm :data-object="dataObject"></Confirm>
           <p v-show="sendError"
              class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
           <b-row>
@@ -407,12 +386,7 @@
           </b-row>
         </b-container>
         <b-container v-show="coldPageId===5">
-          <Success :address=showAddress()
-                   :recipient=showRecipient()
-                   :amount=inputAmount(amount)
-                   :fee="fee"
-                   :description="description">
-          </Success>
+          <Success :data-object="dataObject"></Success>
           <b-button variant="warning"
                     block
                     size="lg"
@@ -564,11 +538,15 @@ export default {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
         },
         secretInfo() {
-            return JSON.parse(
-                seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
+            if (this.userInfo) {
+                return JSON.parse(
+                    seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
+            }
         },
         seedPhrase() {
-            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+            if (this.secretInfo) {
+                return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+            }
         },
         wordList() {
             return this.seedPhrase.split(' ')
@@ -632,11 +610,28 @@ export default {
             return this.checkPrecision && this.isValidNumFormat && !this.isInsufficient && !this.isNegative
         },
         isSubmitDisabled() {
-            return !(this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && (this.isValidDescription || this.description === '') && this.isValidAmount && this.address !== '')
+            return !(this.isValidPublicKey && this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && (this.isValidDescription || this.description === '') && this.isValidAmount && this.address !== '')
+        },
+        selectedKeypair() {
+            if (this.seedPhrase) {
+                return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+            } else {
+                return { 'privateKey': '', 'publicKey': '' }
+            }
+        },
+        isValidPublicKey() {
+            try {
+                if (this.selectedWalletType === 'hotWallet') {
+                    return true
+                } else {
+                    return this.coldAddressInfo.address === this.account.convertPublicKeyToAddress(this.coldAddressInfo.publicKey, NETWORK_BYTE)
+                }
+            } catch (e) {
+                return false
+            }
         },
         dataObject() {
-            let tra = this.buildTransaction(this.coldAddressInfo.publicKey)
-            return tra
+            return this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.selectedKeypair.publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
         }
     },
     methods: {
@@ -666,51 +661,6 @@ export default {
                 this.tmpRecipient = recipient
             }
         },
-        inputAmount(num) {
-            return BigNumber(num)
-        },
-        showRecipient() {
-            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-                if (this.recipient.length <= MAX_ALIAS_LENGTH && alias) {
-                    for (let key in alias) {
-                        if (this.recipient.toLowerCase() === alias[key].toLowerCase()) {
-                            return alias[key] + ' (' + key + ')'
-                        }
-                    }
-                } else {
-                    for (let key in alias) {
-                        if (this.recipient === key) {
-                            return alias[key] + ' (' + key + ')'
-                        }
-                    }
-                    return this.recipient
-                }
-            }
-        },
-        showAddress() {
-            if (this.selectedWalletType === 'hotWallet') {
-                if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-                    let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-                    for (let key in alias) {
-                        if (this.address === key) {
-                            return alias[key] + ' (' + key + ')'
-                        }
-                    }
-                }
-                return this.address
-            } else {
-                if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-                    let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-                    for (let key in alias) {
-                        if (this.coldAddress === key) {
-                            return alias[key] + ' (' + key + ')'
-                        }
-                    }
-                }
-                return this.coldAddress
-            }
-        },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
             tra.buildPaymentTx(publicKey, this.tmpRecipient, this.amount, this.description, this.timeStamp)
@@ -723,10 +673,9 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                let builtTransaction = this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey)
-                this.account.buildFromPrivateKey(this.getKeypair(this.addresses[this.address]).privateKey)
-                let signature = this.account.getSignature(builtTransaction.toBytes())
-                sendTx = builtTransaction.toJsonForSendingTx(signature)
+                this.account.buildFromPrivateKey(this.selectedKeypair.privateKey)
+                let signature = this.account.getSignature(this.dataObject.toBytes())
+                sendTx = this.dataObject.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
                 let signature = this.coldSignature
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
@@ -936,9 +885,6 @@ export default {
                 return options
             }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
         },
-        getKeypair(index) {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
-        },
         showPage() {
             this.selectedWalletType = this ? this.walletType : 'hotWallet'
             this.address = this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : ''
@@ -1073,5 +1019,11 @@ export default {
 .row {
     margin-top: 26px;
     margin-bottom: 10px;
+}
+.cold-check {
+    display: block;
+    margin-top: 5px;
+    font-size: 80%;
+    color: #dc3545;
 }
 </style>

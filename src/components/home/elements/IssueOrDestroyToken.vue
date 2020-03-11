@@ -478,6 +478,9 @@ export default {
         isValidIssuer() {
             return this.address === this.issuer
         },
+        selectedKeypair() {
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+        },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.address].publicKey)
             return tra
@@ -502,8 +505,8 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                let builtTransaction = this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey)
-                this.account.buildFromPrivateKey(this.getKeypair(this.addresses[this.address]).privateKey)
+                let builtTransaction = this.buildTransaction(this.selectedKeypair.publicKey)
+                this.account.buildFromPrivateKey(this.selectedKeypair.privateKey)
                 let signature = this.account.getSignature(builtTransaction.toBytes())
                 sendTx = builtTransaction.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
@@ -569,9 +572,6 @@ export default {
         getSignature(signature) {
             this.coldSignature = signature
             this.coldPageId++
-        },
-        getKeypair(index) {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)

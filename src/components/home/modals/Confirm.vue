@@ -10,7 +10,7 @@
                     label="Amount"
                     label-for="amount_confirm">
         <b-form-input id="amount_confirm"
-                      :value="formatter(amount) + ' VSYS'"
+                      :value="amount + ' VSYS'"
                       class="amount"
                       readonly
                       :plaintext="true">
@@ -66,7 +66,7 @@
                     label="Fee"
                     label-for="fee_confirm">
         <b-form-input id="fee_confirm"
-                      :value="formatter(fee) + ' VSYS'"
+                      :value="fee + ' VSYS'"
                       class="fee"
                       readonly
                       :plaintext="true">
@@ -77,49 +77,78 @@
 </template>
 
 <script>
+import { MAX_ALIAS_LENGTH } from '@/constants'
+import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
-import { TX_FEE } from '@/js-v-sdk/src/constants'
+import Vue from 'vue'
+import { mapState } from 'vuex'
 export default {
     name: 'Confirm',
     props: {
-        address: {
-            type: String,
-            require: true,
-            default: ''
-        },
-        recipient: {
-            type: String,
-            require: true,
-            default: ''
-        },
-        amount: {
-            type: BigNumber,
-            require: true,
-            default: function() {
-                return BigNumber(0)
-            }
-        },
-        fee: {
-            type: BigNumber,
-            require: true,
-            default: function() {
-                return BigNumber(TX_FEE)
-            }
-        },
-        description: {
-            type: String,
-            default: ''
-        },
-        txType: {
-            type: String,
-            require: true,
-            default: ''
+        dataObject: {
+            type: Object,
+            default: function() {},
+            require: true
         }
     },
-    methods: {
-        formatter(num) {
-            return browser.bigNumberFormatter(num)
+    computed: {
+        ...mapState({
+            account: 'account'
+        }),
+        fee() {
+            return browser.bigNumberFormatter(BigNumber(this.dataObject.stored_tx.fee).dividedBy(VSYS_PRECISION))
+        },
+        amount() {
+            return browser.bigNumberFormatter(BigNumber(this.dataObject.stored_tx.amount).dividedBy(VSYS_PRECISION))
+        },
+        defaultAddress() {
+            return Vue.ls.get('address')
+        },
+        description() {
+            return this.dataObject.stored_tx.attachment
+        },
+        address() {
+            try {
+                let address = this.account.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, this.dataObject.network_byte)
+                if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                    let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                    for (let key in alias) {
+                        if (address === key) {
+                            return alias[key] + ' (' + key + ')'
+                        }
+                    }
+                }
+                return address
+            } catch (e) {
+            }
+        },
+        recipient() {
+            let recipient = this.dataObject.stored_tx.recipient
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                if (recipient.length <= MAX_ALIAS_LENGTH && alias) {
+                    for (let key in alias) {
+                        if (recipient.toLowerCase() === alias[key].toLowerCase()) {
+                            return alias[key] + ' (' + key + ')'
+                        }
+                    }
+                } else {
+                    for (let key in alias) {
+                        if (recipient === key) {
+                            return alias[key] + ' (' + key + ')'
+                        }
+                    }
+                    return recipient
+                }
+            }
+        },
+        txType() {
+            if (this.dataObject.stored_tx.transactionType === 2) {
+                return 'payment'
+            } if (this.dataObject.stored_tx.transactionType === 3) {
+                return 'lease'
+            }
         }
     }
 }

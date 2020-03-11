@@ -589,6 +589,9 @@ export default {
         isInteger() {
             return BigNumber(this.newUnity).isInteger()
         },
+        selectedKeypair() {
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+        },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.address].publicKey)
             return tra
@@ -611,8 +614,8 @@ export default {
                 }
                 this.fee = BigNumber(CONTRACT_EXEC_FEE)
                 this.feeScale = FEE_SCALE
-                let builtTransaction = this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey)
-                this.account.buildFromPrivateKey(this.getKeypair(this.addresses[this.address]).privateKey)
+                let builtTransaction = this.buildTransaction(this.selectedKeypair.publicKey)
+                this.account.buildFromPrivateKey(this.selectedKeypair.privateKey)
                 let signature = this.account.getSignature(builtTransaction.toBytes())
                 sendTx = builtTransaction.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
@@ -780,9 +783,6 @@ export default {
                 ctx.closePath()
                 ctx.stroke()
             }
-        },
-        getKeypair(index) {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)

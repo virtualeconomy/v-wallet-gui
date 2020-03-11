@@ -3,7 +3,7 @@
     <img src="@/assets/imgs/icons/operate/ic_success_circle.svg">
     <div>
       <p class="p-tips">Your transaction is on the way!</p>
-      <p class="p-info">You have leased {{ formatter(amount) }} VSYS</p>
+      <p class="p-info">You have leased {{ amount }} VSYS</p>
     </div>
     <b-button variant="warning"
               class="btn-detail"
@@ -24,30 +24,20 @@ export default {
         }
     },
     props: {
-        amount: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
+        dataObject: {
+            type: Object,
+            default: function() {},
             require: true
-        },
-        address: {
-            type: String,
-            default: '',
-            require: true
-        },
-        txId: {
-            type: String,
-            default: '',
-            require: true
+        }
+    },
+    computed: {
+        amount() {
+            return browser.bigNumberFormatter(BigNumber(this.dataObject.stored_tx.amount).dividedBy(1e8))
         }
     },
     methods: {
         showDetails() {
             this.$emit('show-details')
-        },
-        formatter(num) {
-            return browser.bigNumberFormatter(num)
         }
     }
 }

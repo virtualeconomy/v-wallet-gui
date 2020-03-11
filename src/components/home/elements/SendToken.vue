@@ -216,6 +216,8 @@
               </span>
               <span class="balance">Token Balance {{ formatter(tokenBalances[coldAddress]) }}</span>
             </b-btn>
+            <span class="cold-check"
+                  v-if="!isValidPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
           </b-form-group>
           <b-form-group label="Recipient"
                         label-for="cold-recipient-input">
@@ -320,11 +322,11 @@
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
-          <TokenConfirm :address="coldAddress"
-                        :recipient="recipient"
-                        :amount=inputAmount(amount)
-                        :fee="fee"
-                        :description="description"
+          <TokenConfirm :address="getAddressFromDataObject"
+                        :recipient="dataObject.stored_tx.functionData.recipient"
+                        :amount=inputAmount(dataObject.stored_tx.functionData.amount)
+                        :fee="getFeeFromDataObject"
+                        :description="dataObject.stored_tx.attachment"
                         :tx-type="'Send Token'">
           </TokenConfirm>
           <b-row>
@@ -360,11 +362,11 @@
                          @prev-page="prevPage"></ColdSignature>
         </b-container>
         <b-container v-show="coldPageId===4">
-          <TokenConfirm :address="coldAddress"
-                        :amount=inputAmount(amount)
-                        :fee="fee"
-                        :recipient="recipient"
-                        :description="description"
+          <TokenConfirm :address="getAddressFromDataObject"
+                        :amount=inputAmount(dataObject.stored_tx.functionData.amount)
+                        :fee="getFeeFromDataObject"
+                        :recipient="dataObject.stored_tx.functionData.recipient"
+                        :description="dataObject.stored_tx.attachment"
                         :tx-type="'Send Token'">
           </TokenConfirm>
           <p v-show="sendError"
@@ -392,11 +394,11 @@
         </b-container>
         <b-container v-show="coldPageId===5">
           <TokenSuccess class="tokenSucced"
-                        :address="coldAddress"
-                        :recipient="recipient"
-                        :amount=inputAmount(amount)
-                        :description="description"
-                        :fee="fee"
+                        :address="getAddressFromDataObject"
+                        :recipient="dataObject.stored_tx.functionData.recipient"
+                        :amount=inputAmount(dataObject.stored_tx.functionData.amount)
+                        :description="dataObject.stored_tx.attachment"
+                        :fee="getFeeFromDataObject"
                         :tx-type="'Send Token'">
           </TokenSuccess>
           <b-button variant="warning"
@@ -559,11 +561,15 @@ export default {
             return JSON.parse(window.localStorage.getItem(this.defaultAddress))
         },
         secretInfo() {
-            return JSON.parse(
-                seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
+            if (this.userInfo) {
+                return JSON.parse(
+                    seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
+            }
         },
         seedPhrase() {
-            return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+            if (this.secretInfo) {
+                return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
+            }
         },
         wordList() {
             return this.seedPhrase.split(' ')
@@ -572,7 +578,7 @@ export default {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         isSubmitDisabled() {
-            return !(this.recipient && this.isValidRecipient && (this.isValidDescription || !this.description) && this.isValidAmount && !this.isInsufficient)
+            return !(this.isValidPublicKey && this.recipient && this.isValidRecipient && (this.isValidDescription || !this.description) && this.isValidAmount && !this.isInsufficient)
         },
         isNegative() {
             return BigNumber(this.amount).isLessThan(0)
@@ -586,6 +592,13 @@ export default {
         isTokenInsufficient() {
             let balance = this.selectedWalletType === 'hotWallet' ? this.tokenBalances[this.address] : this.tokenBalances[this.coldAddress]
             return BigNumber(this.amount).isGreaterThan(BigNumber(balance))
+        },
+        coldAddressInfo() {
+            if (this.coldAddresses.hasOwnProperty(this.coldAddress)) {
+                return this.coldAddresses[this.coldAddress]
+            } else {
+                return {'api': 1, 'publicKey': '', 'device': 'unknown'}
+            }
         },
         isValidRecipient() {
             let recipient = this.recipient
@@ -616,9 +629,36 @@ export default {
             }
             return common.getLength(this.description) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
         },
+        getAddressFromDataObject() {
+            try {
+                return this.account.convertPublicKeyToAddress(this.dataObject.stored_tx.senderPublicKey, this.dataObject.network_byte)
+            } catch (e) {
+
+            }
+        },
+        isValidPublicKey() {
+            try {
+                if (this.selectedWalletType === 'hotWallet') {
+                    return true
+                } else {
+                    return this.coldAddressInfo.address === this.account.convertPublicKeyToAddress(this.coldAddressInfo.publicKey, NETWORK_BYTE)
+                }
+            } catch (e) {
+                return false
+            }
+        },
+        getFeeFromDataObject() {
+            return BigNumber(this.dataObject.stored_tx.fee).dividedBy(VSYS_PRECISION)
+        },
+        selectedKeypair() {
+            if (this.seedPhrase) {
+                return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+            } else {
+                return { 'privateKey': '', 'publicKey': '' }
+            }
+        },
         dataObject() {
-            let tra = this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
-            return tra
+            return this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.selectedKeypair.publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
         }
     },
     methods: {
@@ -628,7 +668,7 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            tra.buildSendTokenTx(publicKey, this.tokenId, this.recipient, this.amount, this.tokenUnity, this.isSplit, this.description)
+            tra.buildSendTokenTx(publicKey, this.tokenId, this.recipient, this.amount, this.tokenUnity, this.isSplit, this.description, this.timeStamp)
             return tra
         },
         sendData(walletType) {
@@ -638,8 +678,8 @@ export default {
                     return
                 }
                 this.hasConfirmed = true
-                let builtTransaction = this.buildTransaction(this.getKeypair(this.addresses[this.address]).publicKey)
-                this.account.buildFromPrivateKey(this.getKeypair(this.addresses[this.address]).privateKey)
+                let builtTransaction = this.buildTransaction(this.selectedKeypair.publicKey)
+                this.account.buildFromPrivateKey(this.selectedKeypair.privateKey)
                 let signature = this.account.getSignature(builtTransaction.toBytes())
                 sendTx = builtTransaction.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
@@ -862,9 +902,6 @@ export default {
             this.address = this ? (this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress) : ''
             this.coldAddress = this ? (this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress) : ''
         },
-        getKeypair(index) {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
-        },
         formatter(num) {
             return browser.bigNumberFormatter(num)
         }
@@ -978,6 +1015,12 @@ export default {
 }
 .col-rit {
     padding-left: 10px;
+}
+.cold-check {
+    display: block;
+    margin-top: 5px;
+    font-size: 80%;
+    color: #dc3545;
 }
 .vsys-check {
     display: block;

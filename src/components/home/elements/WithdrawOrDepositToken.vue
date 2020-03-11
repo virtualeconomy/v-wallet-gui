@@ -400,6 +400,9 @@ export default {
             let contractArr = base58.decode(this.contractId)
             return contractArr && contractArr.length === 26 && contractArr[0] === 6
         },
+        selectedKeypair() {
+            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
+        },
         dataObject() {
             return {
                 protocol: PROTOCOL,
@@ -434,7 +437,7 @@ export default {
                 this.feeScale = FEE_SCALE
                 const dataInfo = {
                     contractId: this.contractId,
-                    senderPublicKey: this.getKeypair(this.addresses[this.address]).publicKey,
+                    senderPublicKey: this.selectedKeypair.publicKey,
                     fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
                     feeScale: FEE_SCALE,
                     timestamp: this.timeStamp,
@@ -515,9 +518,6 @@ export default {
             this.coldSignature = signature
             this.dataObject.timestamp *= 1e6
             this.coldPageId++
-        },
-        getKeypair(index) {
-            return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, index).keyPair
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
