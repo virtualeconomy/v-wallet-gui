@@ -204,7 +204,7 @@
               <span class="balance">{{ formatter(balances[coldAddress]) }} VSYS</span>
             </b-btn>
             <span class="cold-check"
-                  v-if="!isValidColdPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
+                  v-if="!isValidPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
           </b-form-group>
           <b-form-group label="Recipient"
                         label-for="cold-recipient-input">
@@ -610,7 +610,7 @@ export default {
             return this.checkPrecision && this.isValidNumFormat && !this.isInsufficient && !this.isNegative
         },
         isSubmitDisabled() {
-            return !(this.isValidColdPublicKey && this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && (this.isValidDescription || this.description === '') && this.isValidAmount && this.address !== '')
+            return !(this.isValidPublicKey && this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && (this.isValidDescription || this.description === '') && this.isValidAmount && this.address !== '')
         },
         selectedKeypair() {
             if (this.seedPhrase) {
@@ -619,7 +619,7 @@ export default {
                 return { 'privateKey': '', 'publicKey': '' }
             }
         },
-        isValidColdPublicKey() {
+        isValidPublicKey() {
             try {
                 if (this.selectedWalletType === 'hotWallet') {
                     return true

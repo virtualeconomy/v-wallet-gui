@@ -34,7 +34,7 @@
           <span>{{ leaseId }} </span>
         </div>
         <span class="cold-check"
-              v-if="!isValidColdPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
+              v-if="!isValidPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
 
       </div>
       <p v-show="sendError"
@@ -57,7 +57,7 @@
             class="btn-confirm"
             variant="warning"
             size="lg"
-            :disabled="hasConfirmed || !isValidColdPublicKey"
+            :disabled="hasConfirmed || !isValidPublicKey"
             @click="sendCancelLease">Confirm
           </b-button>
         </b-col>
@@ -182,7 +182,7 @@ export default {
             }
             return tra
         },
-        isValidColdPublicKey() {
+        isValidPublicKey() {
             try {
                 if (this.walletType === 'hotWallet') {
                     return true

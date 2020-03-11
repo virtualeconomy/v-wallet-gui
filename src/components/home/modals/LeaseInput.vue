@@ -28,7 +28,7 @@
         <span class="balance">{{ formatter(walletType === 'hotWallet' ? balances[address] : balances[coldAddress]) }} VSYS</span>
       </b-btn>
       <span class="cold-check"
-            v-if="!isValidColdPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
+            v-if="!isValidPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
     </b-form-group>
     <div class="select-node">
       <b-dropdown class="m-2"
@@ -276,7 +276,7 @@ export default {
             return BigNumber(balance).isLessThan(this.fee)
         },
         isSubmitDisabled() {
-            return !(this.isValidColdPublicKey && this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && this.isValidAmount)
+            return !(this.isValidPublicKey && this.recipient && BigNumber(this.amount).isGreaterThan(0) && this.isValidRecipient && this.isValidAmount)
         },
         isSameWithSender() {
             let address = this.walletType === 'hotWallet' ? this.address : this.coldAddress
@@ -289,7 +289,7 @@ export default {
                 return {'api': 1, 'publicKey': '', 'device': 'unknown'}
             }
         },
-        isValidColdPublicKey() {
+        isValidPublicKey() {
             try {
                 if (this.walletType === 'hotWallet') {
                     return true

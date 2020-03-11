@@ -217,7 +217,7 @@
               <span class="balance">Token Balance {{ formatter(tokenBalances[coldAddress]) }}</span>
             </b-btn>
             <span class="cold-check"
-                  v-if="!isValidColdPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
+                  v-if="!isValidPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
           </b-form-group>
           <b-form-group label="Recipient"
                         label-for="cold-recipient-input">
@@ -578,7 +578,7 @@ export default {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         isSubmitDisabled() {
-            return !(this.isValidColdPublicKey && this.recipient && this.isValidRecipient && (this.isValidDescription || !this.description) && this.isValidAmount && !this.isInsufficient)
+            return !(this.isValidPublicKey && this.recipient && this.isValidRecipient && (this.isValidDescription || !this.description) && this.isValidAmount && !this.isInsufficient)
         },
         isNegative() {
             return BigNumber(this.amount).isLessThan(0)
@@ -636,7 +636,7 @@ export default {
 
             }
         },
-        isValidColdPublicKey() {
+        isValidPublicKey() {
             try {
                 if (this.selectedWalletType === 'hotWallet') {
                     return true
