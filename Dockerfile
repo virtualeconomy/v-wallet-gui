@@ -6,6 +6,7 @@ RUN mkdir -p src/js-v-sdk/
 COPY src/js-v-sdk/package*.json src/js-v-sdk/
 RUN apk add --no-cache git
 RUN npm i -f
+RUN npm i -f src/js-v-sdk
 COPY . .
 RUN npm run build
 RUN apk --no-cache add bash openssl \
