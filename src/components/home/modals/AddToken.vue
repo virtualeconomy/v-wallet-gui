@@ -19,6 +19,27 @@
           <b-form-group label="Token ID or Name"
                         class="forms"
                         label-for="amountInput">
+            <div class="select-certified-token">
+              <b-dropdown class="m-2"
+                          no-caret
+                          id="dropdown-grouped"
+                          text="Select Token"
+                          size="sm"
+                          variant="warning">
+                <div style="height:150px;overflow:scroll">
+                  <b-dropdown-group id="dropdown-group-1"
+                                    v-for="(token, idx) in certifiedTokens"
+                                    :key="idx">
+                    <b-dropdown-item-button @click="selectToken(idx, token.name)">
+                      <img :src="token.iconUrl"
+                           style="width: 20px; height: 20px">
+                      <span style="color: mediumblue; margin-left: 20px">{{ token.name }}</span>
+                    </b-dropdown-item-button>
+                    <b-dropdown-divider></b-dropdown-divider>
+                  </b-dropdown-group>
+                </div>
+              </b-dropdown>
+            </div>
             <b-form-input id="amountInput"
                           class="input-t"
                           v-model="tokenId"
@@ -56,8 +77,21 @@ export default {
             tokens: {},
             tokenId: '',
             init: false,
-            responseErr: false
+            responseErr: false,
+            certifiedTokens: {}
         }
+    },
+    props: {
+        certifiedTokenList: {
+            type: Object,
+            default: function() {},
+            require: true
+        }
+    },
+    created() {
+        this.$parent.getCertifiedTokens().then(res => {
+            this.certifiedTokens = res
+        })
     },
     watch: {
         tokenId() {
@@ -91,9 +125,13 @@ export default {
                 return void 0
             }
             return !this.responseErr
+        },
+        officialTokenSvg() {
+            return function(iconUrl) {
+                return iconUrl
+            }
         }
     },
-
     methods: {
         ...mapActions(['changeAddTokenStatus']),
         closeModal() {
@@ -137,9 +175,11 @@ export default {
                     this.responseErr = true
                 })
             }
+        },
+        selectToken(id, name) {
+            this.tokenId = id
         }
     }
-
 }
 </script>
 
@@ -189,5 +229,12 @@ export default {
     position: absolute;
     left: -9999px;
     top: 0px;
+}
+.select-certified-token {
+    position: relative;
+    display: inline-block;
+    float: right;
+    margin-top: -40px;
+    margin-right: -8px;
 }
 </style>

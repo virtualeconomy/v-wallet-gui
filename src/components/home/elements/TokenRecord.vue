@@ -4,8 +4,8 @@
     <b-row align-v="center">
       <b-col class="record-icon"
              cols="auto">
-        <img v-if="isCertified"
-             :src="officialTokenSvg"
+        <img v-if="isCertified(tokenId)"
+             :src="officialTokenSvg(tokenId)"
              width="32px"
              height="32px">
         <img v-else
@@ -16,7 +16,7 @@
       <b-col class="record-detail"
              cols="auto">
         <b-row>
-          <b-col class="title">{{ isCertified ? officialName : tokenId }}</b-col>
+          <b-col class="title">{{ officialName(tokenId) }}</b-col>
         </b-row>
       </b-col>
       <b-col class="record-blank"></b-col>
@@ -53,7 +53,7 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
-          <b-dropdown-item v-if="!isCertified"
+          <b-dropdown-item v-if="!isCertified(tokenId)"
                            @click="verify">Verification</b-dropdown-item>
           <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
                            @click="supersede">Supersede</b-dropdown-item>
@@ -152,7 +152,6 @@ import SplitTokenOrSupersede from './SplitTokenOrSupersede'
 import { SHOW_UNSUPPORTED_FUNCTION } from '@/constants'
 import Vue from 'vue'
 import browser from '@/utils/browser'
-import certify from '@/utils/certify'
 import { mapActions, mapState } from 'vuex'
 import Receive from '../modals/Receive'
 export default {
@@ -173,7 +172,8 @@ export default {
             maker: '',
             functionName: '',
             contractId: '',
-            showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION
+            showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION,
+            certifiedTokenList: {}
         }
     },
     props: {
@@ -238,8 +238,10 @@ export default {
     created() {
         this.getTokenInfo()
         this.updateToken()
+        this.$parent.getCertifiedTokens().then(res => {
+            this.certifiedTokenList = res
+        })
     },
-
     computed: {
         ...mapState({
             chain: 'chain',
@@ -274,16 +276,27 @@ export default {
             } else return ''
         },
         isCertified() {
-            return certify.isCertified(this.tokenId)
+            return function(tokenId) {
+                return tokenId in this.certifiedTokenList
+            }
         },
         officialName() {
-            return certify.officialName(this.tokenId)
+            return function(tokenId) {
+                if (tokenId in this.certifiedTokenList) {
+                    console.log('yes yes yes')
+                    return this.certifiedTokenList[tokenId].name
+                } else {
+                    return tokenId
+                }
+            }
         },
         officialTokenSvg() {
-            try {
-                return require('@/assets/imgs/icons/token/' + this.officialName + '.svg')
-            } catch (err) {
-                return require('@/assets/imgs/icons/wallet/ic_token1.svg')
+            return function(tokenId) {
+                if (tokenId in this.certifiedTokenList) {
+                    return this.certifiedTokenList[tokenId].iconUrl
+                } else {
+                    return '@/assets/imgs/icons/wallet/ic_token1.svg'
+                }
             }
         },
         tokenDescription() {
@@ -317,8 +330,8 @@ export default {
             this.chain.getTokenBalance(this.address, this.tokenId).then(response => {
                 this.unity = BigNumber(response.unity)
                 this.tokenBalance = BigNumber(response.balance).dividedBy(response.unity)
-                if (certify.isCertified(this.tokenId) && this.isSplit) {
-                    certify.updateUnity(this.tokenId, this.unity.toNumber())
+                if (this.isCertified(this.tokenId) && this.isSplit) {
+                    this.updateUnity(this.tokenId, this.unity.toNumber())
                 }
             }, respError => {
             })
@@ -356,8 +369,8 @@ export default {
             this.chain.getTokenInfo(this.tokenId).then(response => {
                 this.tokens = response
                 this.unity = BigNumber(this.tokens.unity)
-                if (certify.isCertified(this.tokenId) && this.isSplit) {
-                    certify.updateUnity(this.tokenId, this.unity.toNumber())
+                if (this.isCertified(this.tokenId) && this.isSplit) {
+                    this.updateUnity(this.tokenId, this.unity.toNumber())
                 }
             }, respError => {
             })
@@ -445,6 +458,9 @@ export default {
                 this.removeFlag = false
                 this.removeTokenUpdateEventPool(this.tokenId)
             }
+        },
+        updateUnity(tokenId, unity) {
+            this.certifiedTokenList[tokenId].unity = unity
         }
     }
 }
