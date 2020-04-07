@@ -283,7 +283,6 @@ export default {
         officialName() {
             return function(tokenId) {
                 if (tokenId in this.certifiedTokenList) {
-                    console.log('yes yes yes')
                     return this.certifiedTokenList[tokenId].name
                 } else {
                     return tokenId

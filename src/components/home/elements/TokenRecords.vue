@@ -150,33 +150,29 @@ export default {
                 this.getTokenRecords()
             }
         },
+        async deal(result) {
+            for (let index in result.body.data.list) {
+                let token = result.body.data.list[index]
+                let contractId = common.tokenIDToContractID(token.Id)
+                let contractInfo = await this.chain.getContractInfo(contractId)
+                this.isCertifiedTokenSplit = contractInfo.type === 'TokenContractWithSplit'
+                let tokenInfo = await this.chain.getTokenInfo(token.Id)
+                this.certifiedTokenList[token.Id] = {
+                    name: token.Name,
+                    support_split: this.isCertifiedTokenSplit,
+                    unity: BigNumber(tokenInfo.unity),
+                    iconUrl: EXPLORER + token.IconUrl
+                }
+            }
+        },
         getCertifiedTokens() {
             return new Promise((resolve, reject) => {
-                try {
-                    this.$http.get(CERTIFICATED_TOKEN).then(function(result) {
-                        for (let index in result.body.data.list) {
-                            let token = result.body.data.list[index]
-                            let contractId = common.tokenIDToContractID(token.Id)
-                            this.chain.getContractInfo(contractId).then(response => {
-                                this.isCertifiedTokenSplit = response.type === 'TokenContractWithSplit'
-                            }, respError => {
-                            })
-                            this.chain.getTokenInfo(token.Id).then(response => {
-                                let tokenInfo = response
-                                this.certifiedTokenList[token.Id] = {
-                                    name: token.Name,
-                                    support_split: this.isCertifiedTokenSplit,
-                                    unity: BigNumber(tokenInfo.unity),
-                                    iconUrl: EXPLORER + token.IconUrl
-                                }
-                            }, respError => {
-                            })
-                        }
-                        resolve(this.certifiedTokenList)
-                    })
-                } catch (e) {
+                this.$http.get(CERTIFICATED_TOKEN).then(async function(result) {
+                    await this.deal(result)
+                    resolve(this.certifiedTokenList)
+                }, respError => {
                     this.certifiedTokenList = certify.getCertifiedTokens()
-                }
+                })
             })
         }
     }
