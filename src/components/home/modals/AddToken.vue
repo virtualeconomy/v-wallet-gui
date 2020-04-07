@@ -25,6 +25,7 @@
                           id="dropdown-grouped"
                           text="Select Token"
                           size="sm"
+                          right
                           variant="warning">
                 <div style="height:150px;overflow:scroll">
                   <b-dropdown-group id="dropdown-group-1"

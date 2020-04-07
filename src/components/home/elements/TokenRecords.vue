@@ -45,7 +45,8 @@ import browser from '@/utils/browser'
 import TokenRecord from './TokenRecord'
 import AddToken from '../modals/AddToken'
 import certify from '@/utils/certify'
-import {CERTIFICATED_TOKEN, EXPLORER} from '@/network'
+import {EXPLORER} from '@/network'
+import { CERTIFICATED_TOKEN } from '@/constants'
 import BigNumber from 'bignumber.js'
 import common from '@/js-v-sdk/src/utils/common'
 import { mapState } from 'vuex'
@@ -150,7 +151,7 @@ export default {
                 this.getTokenRecords()
             }
         },
-        async deal(result) {
+        async processCertifiedTokenResult(result) {
             for (let index in result.body.data.list) {
                 let token = result.body.data.list[index]
                 let contractId = common.tokenIDToContractID(token.Id)
@@ -167,8 +168,8 @@ export default {
         },
         getCertifiedTokens() {
             return new Promise((resolve, reject) => {
-                this.$http.get(CERTIFICATED_TOKEN).then(async function(result) {
-                    await this.deal(result)
+                this.$http.get(EXPLORER + CERTIFICATED_TOKEN).then(async function(result) {
+                    await this.processCertifiedTokenResult(result)
                     resolve(this.certifiedTokenList)
                 }, respError => {
                     this.certifiedTokenList = certify.getCertifiedTokens()
