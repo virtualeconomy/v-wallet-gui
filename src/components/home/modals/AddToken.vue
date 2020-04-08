@@ -114,11 +114,6 @@ export default {
                 return void 0
             }
             return !this.responseErr
-        },
-        officialTokenSvg() {
-            return function(iconUrl) {
-                return iconUrl
-            }
         }
     },
     methods: {
