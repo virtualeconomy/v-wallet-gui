@@ -86,9 +86,6 @@ export default {
             this.responseErr = false
         }
     },
-    created() {
-        console.log('addToken: ', this.certifiedTokenList)
-    },
     computed: {
         ...mapState({
             chain: 'chain',
