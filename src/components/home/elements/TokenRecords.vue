@@ -44,6 +44,7 @@ import Vue from 'vue'
 import browser from '@/utils/browser'
 import TokenRecord from './TokenRecord'
 import AddToken from '../modals/AddToken'
+import { mapState } from 'vuex'
 export default {
     name: 'TokenRecords',
     components: {
@@ -108,6 +109,11 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            chain: 'chain',
+            tokenManagementStatus: 'tokenManagementStatus',
+            tokenSplitStatus: 'tokenSplitStatus'
+        }),
         addTokenStatus() {
             return this.$store.state.addTokenStatus
         },

@@ -26,7 +26,8 @@ const store = new Vuex.Store({
         intervalStatus: '',
         addTokenStatus: 0,
         paymentRedirect: {},
-        assetStatus: false
+        assetStatus: false,
+        certifiedTokenList: {}
     },
     mutations: {
         changeSettingsStatus(state, status) {
@@ -60,11 +61,17 @@ const store = new Vuex.Store({
         },
         updatePaymentRedirect(state, status) {
             state.paymentRedirect = status
+        },
+        updateCertifiedTokenList(state, status) {
+            state.certifiedTokenList = status
         }
     },
     actions: {
         updatePaymentRedirect(context, status) {
             context.commit('updatePaymentRedirect', status)
+        },
+        updateCertifiedTokenList(context, status) {
+            context.commit('updateCertifiedTokenList', status)
         },
         updateAssetStatus(context, status) {
             context.commit('updateAssetStatus', status)

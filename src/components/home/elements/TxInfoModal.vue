@@ -175,8 +175,8 @@ import Vue from 'vue'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { TX_FEE } from '@/js-v-sdk/src/constants'
-import { TX_TEST_EXPLORER, TX_EXPLORER } from '@/constants'
-import { NETWORK_BYTE } from '@/network'
+import { TX_URL } from '@/constants'
+import { NETWORK_BYTE, EXPLORER } from '@/network'
 import { mapActions, mapState } from 'vuex'
 export default {
     name: 'TxInfoModal',
@@ -346,11 +346,7 @@ export default {
             return this.tokenId in tokens
         },
         txInfo() {
-            if (this.networkType === 'T') {
-                window.open(TX_TEST_EXPLORER + this.modalId)
-            } else {
-                window.open(TX_EXPLORER + this.modalId)
-            }
+            window.open(EXPLORER + TX_URL + this.modalId)
         },
         closeModal() {
             this.$refs.infoModal.hide()
