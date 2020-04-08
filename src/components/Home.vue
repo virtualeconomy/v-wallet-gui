@@ -193,7 +193,7 @@ import Asset from './home/elements/Asset'
 import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
 import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
-import { INITIAL_SESSION_TIMEOUT } from '@/constants'
+import { INITIAL_SESSION_TIMEOUT, CERTIFICATED_TOKEN } from '@/constants'
 import {VSYS_RATE} from '../network'
 import seedLib from '@/libs/seed.js'
 import TransactionRecords from './home/elements/TransactionRecords'
@@ -207,7 +207,8 @@ import BigNumber from 'bignumber.js'
 import { mapActions, mapState } from 'vuex'
 import SendToken from './home/elements/SendToken'
 import common from '@/js-v-sdk/src/utils/common'
-
+import certify from '@/utils/certify'
+import {EXPLORER} from '@/network'
 export default {
     name: 'Home',
     data: function() {
@@ -232,7 +233,9 @@ export default {
             inheritedRecipient: '',
             inheritedDescription: '',
             updateLeaseRecordsFlag: false,
-            nodeList: []
+            nodeList: [],
+            certifiedTokenList: {},
+            isCertifiedTokenSplit: false
         }
     },
     created() {
@@ -243,6 +246,9 @@ export default {
                 this.nodeList = result.body.data
             })
             this.getBlockHeight()
+            this.getCertifiedTokens().then(res => {
+                this.updateCertifiedTokenList(res)
+            })
             this.setUsrLocalStorage('lastLogin', new Date().getTime())
             this.selectedAddress = this.address
             this.walletType = 'hotWallet'
@@ -355,7 +361,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['updateSelectedAddress', 'updateBalance', 'updatePaymentRedirect']),
+        ...mapActions(['updateSelectedAddress', 'updateBalance', 'updatePaymentRedirect', 'updateCertifiedTokenList']),
         showErrorMsgBox(errorMessage) {
             const h = this.$createElement
             const titleVNode = h('div', { domProps: { innerHTML: 'Error' }, class: ['error-title'] })
@@ -542,6 +548,32 @@ export default {
         },
         refreshAccount() {
             this.getAddresses()
+        },
+        async processCertifiedTokenResult(result) {
+            for (let index in result.body.data.list) {
+                let token = result.body.data.list[index]
+                let contractId = common.tokenIDToContractID(token.Id)
+                let contractInfo = await this.chain.getContractInfo(contractId)
+                this.isCertifiedTokenSplit = contractInfo.type === 'TokenContractWithSplit'
+                let tokenInfo = await this.chain.getTokenInfo(token.Id)
+                this.certifiedTokenList[token.Id] = {
+                    name: token.Name,
+                    support_split: this.isCertifiedTokenSplit,
+                    unity: BigNumber(tokenInfo.unity),
+                    iconUrl: EXPLORER + token.IconUrl
+                }
+            }
+        },
+        getCertifiedTokens() {
+            return new Promise((resolve, reject) => {
+                this.$http.get(EXPLORER + CERTIFICATED_TOKEN).then(async function(result) {
+                    await this.processCertifiedTokenResult(result)
+                    resolve(this.certifiedTokenList)
+                }, respError => {
+                    this.certifiedTokenList = certify.getCertifiedTokens()
+                    resolve(this.certifiedTokenList)
+                })
+            })
         }
     },
     components: {

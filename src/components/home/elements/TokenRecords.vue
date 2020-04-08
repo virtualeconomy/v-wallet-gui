@@ -44,11 +44,6 @@ import Vue from 'vue'
 import browser from '@/utils/browser'
 import TokenRecord from './TokenRecord'
 import AddToken from '../modals/AddToken'
-import certify from '@/utils/certify'
-import {EXPLORER} from '@/network'
-import { CERTIFICATED_TOKEN } from '@/constants'
-import BigNumber from 'bignumber.js'
-import common from '@/js-v-sdk/src/utils/common'
 import { mapState } from 'vuex'
 export default {
     name: 'TokenRecords',
@@ -60,16 +55,13 @@ export default {
         if (this.address && Vue.ls.get('pwd')) {
             this.getTokenRecords()
         }
-        this.getCertifiedTokens()
     },
     data() {
         return {
             tokenRecords: {},
             changeShowDisable: false,
             myHeight: '0',
-            records: {},
-            certifiedTokenList: {},
-            isCertifiedTokenSplit: false
+            records: {}
         }
     },
     props: {
@@ -150,31 +142,6 @@ export default {
             if (remove === true) {
                 this.getTokenRecords()
             }
-        },
-        async processCertifiedTokenResult(result) {
-            for (let index in result.body.data.list) {
-                let token = result.body.data.list[index]
-                let contractId = common.tokenIDToContractID(token.Id)
-                let contractInfo = await this.chain.getContractInfo(contractId)
-                this.isCertifiedTokenSplit = contractInfo.type === 'TokenContractWithSplit'
-                let tokenInfo = await this.chain.getTokenInfo(token.Id)
-                this.certifiedTokenList[token.Id] = {
-                    name: token.Name,
-                    support_split: this.isCertifiedTokenSplit,
-                    unity: BigNumber(tokenInfo.unity),
-                    iconUrl: EXPLORER + token.IconUrl
-                }
-            }
-        },
-        getCertifiedTokens() {
-            return new Promise((resolve, reject) => {
-                this.$http.get(EXPLORER + CERTIFICATED_TOKEN).then(async function(result) {
-                    await this.processCertifiedTokenResult(result)
-                    resolve(this.certifiedTokenList)
-                }, respError => {
-                    this.certifiedTokenList = certify.getCertifiedTokens()
-                })
-            })
         }
     }
 }

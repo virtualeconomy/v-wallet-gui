@@ -29,7 +29,7 @@
                           variant="warning">
                 <div style="height:150px;overflow:scroll">
                   <b-dropdown-group id="dropdown-group-1"
-                                    v-for="(token, idx) in certifiedTokens"
+                                    v-for="(token, idx) in certifiedTokenList"
                                     :key="idx">
                     <b-dropdown-item-button @click="selectToken(idx, token.name)">
                       <img :src="token.iconUrl"
@@ -78,30 +78,21 @@ export default {
             tokens: {},
             tokenId: '',
             init: false,
-            responseErr: false,
-            certifiedTokens: {}
+            responseErr: false
         }
-    },
-    props: {
-        certifiedTokenList: {
-            type: Object,
-            default: function() {},
-            require: true
-        }
-    },
-    created() {
-        this.$parent.getCertifiedTokens().then(res => {
-            this.certifiedTokens = res
-        })
     },
     watch: {
         tokenId() {
             this.responseErr = false
         }
     },
+    created() {
+        console.log('addToken: ', this.certifiedTokenList)
+    },
     computed: {
         ...mapState({
-            chain: 'chain'
+            chain: 'chain',
+            certifiedTokenList: 'certifiedTokenList'
         }),
         contractId() {
             try {
@@ -177,7 +168,7 @@ export default {
                 })
             }
         },
-        selectToken(id, name) {
+        selectToken(id) {
             this.tokenId = id
         }
     }

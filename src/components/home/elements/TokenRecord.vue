@@ -172,8 +172,7 @@ export default {
             maker: '',
             functionName: '',
             contractId: '',
-            showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION,
-            certifiedTokenList: {}
+            showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION
         }
     },
     props: {
@@ -238,15 +237,13 @@ export default {
     created() {
         this.getTokenInfo()
         this.updateToken()
-        this.$parent.getCertifiedTokens().then(res => {
-            this.certifiedTokenList = res
-        })
     },
     computed: {
         ...mapState({
             chain: 'chain',
             tokenManagementStatus: 'tokenManagementStatus',
-            tokenSplitStatus: 'tokenSplitStatus'
+            tokenSplitStatus: 'tokenSplitStatus',
+            certifiedTokenList: 'certifiedTokenList'
         }),
         defaultAddress() {
             return Vue.ls.get('address')
@@ -275,29 +272,6 @@ export default {
                 return BigNumber(this.tokens.total).dividedBy(this.unity)
             } else return ''
         },
-        isCertified() {
-            return function(tokenId) {
-                return tokenId in this.certifiedTokenList
-            }
-        },
-        officialName() {
-            return function(tokenId) {
-                if (tokenId in this.certifiedTokenList) {
-                    return this.certifiedTokenList[tokenId].name
-                } else {
-                    return tokenId
-                }
-            }
-        },
-        officialTokenSvg() {
-            return function(tokenId) {
-                if (tokenId in this.certifiedTokenList) {
-                    return this.certifiedTokenList[tokenId].iconUrl
-                } else {
-                    return '@/assets/imgs/icons/wallet/ic_token1.svg'
-                }
-            }
-        },
         tokenDescription() {
             if (this.tokens.description && this.tokens.description !== undefined) {
                 let bytes = base58.decode(this.tokens.description)
@@ -321,6 +295,19 @@ export default {
         },
         unhoverIco() {
             this.hovered = false
+        },
+        isCertified(tokenId) {
+            return tokenId in this.certifiedTokenList
+        },
+        officialName(tokenId) {
+            if (tokenId in this.certifiedTokenList) {
+                return this.certifiedTokenList[tokenId].name
+            } else {
+                return tokenId
+            }
+        },
+        officialTokenSvg(tokenId) {
+            return this.certifiedTokenList[tokenId].iconUrl
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
