@@ -163,7 +163,8 @@ export default {
     },
     computed: {
         ...mapState({
-            assetStatus: 'assetStatus'
+            assetStatus: 'assetStatus',
+            account: 'account'
         }),
         defaultAddress() {
             return Vue.ls.get('address')
@@ -172,7 +173,13 @@ export default {
             if (!this.curAddress) {
                 return void 0
             }
-            return this.isExistedAddress
+            let isValid = false
+            try {
+                isValid = this.account.checkAddress(this.curAddress)
+            } catch (e) {
+                console.log(e)
+            }
+            return isValid
         },
         isExistedAddress() {
             return this.curAddress in this.addresses || this.curAddress in this.coldAddresses

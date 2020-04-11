@@ -56,8 +56,12 @@
             </b-form-input>
             <datalist v-if="!from3rdParty"
                       id="showHotRecipientList">
-              <option v-for="addr in hotRecipientAddressList.keys()"
+              <option v-if="!aliasAddressList && hotRecipientAddressList"
+                      v-for="addr in hotRecipientAddressList.keys()"
                       :key="addr">{{ addr }}</option>
+              <option v-if="aliasAddressList"
+                      v-for="(addr, index) in aliasAddressList"
+                      :key="index">{{ addr + " (" + index + ")" }}</option>
             </datalist>
             <img v-if="!from3rdParty"
                  src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
@@ -220,8 +224,12 @@
             </b-form-input>
             <datalist v-if="!from3rdParty"
                       id="showColdRecipientList">
-              <option v-for="addr in coldRecipientAddressList.keys()"
+              <option v-if="!aliasAddressList && coldRecipientAddressList"
+                      v-for="addr in coldRecipientAddressList.keys()"
                       :key="addr">{{ addr }}</option>
+              <option v-if="aliasAddressList"
+                      v-for="(addr, index) in aliasAddressList"
+                      :key="index">{{ addr + " (" + index + ")" }}</option>
             </datalist>
             <img v-if="!from3rdParty"
                  src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
@@ -436,7 +444,8 @@ var initData = {
     hasConfirmed: false,
     coldRecipientAddressList: {},
     hotRecipientAddressList: {},
-    tmpRecipient: ''
+    tmpRecipient: '',
+    aliasAddressList: {}
 }
 export default {
     name: 'Send',
@@ -490,6 +499,7 @@ export default {
     },
     created() {
         this.getSuperNodes()
+        this.aliasAddressList = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
         this.coldRecipientAddressList = new LRUCache(10)
         this.hotRecipientAddressList = new LRUCache(10)
         let item = window.localStorage.getItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ')
@@ -582,13 +592,20 @@ export default {
                 return void 0
             }
             let isValid = false
-            this.recordTmpRecipient(recipient)
-            let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
-            if (recipient.length <= MAX_ALIAS_LENGTH && alias) {
-                for (let key in alias) {
-                    if (recipient.toLowerCase() === alias[key].toLowerCase()) {
-                        recipient = key
-                        break
+            let pre = recipient.indexOf('(')
+            let lat = recipient.indexOf(')')
+            if (pre !== -1) {
+                recipient = recipient.substr(pre + 1, lat - pre - 1)
+                this.recordTmpRecipient(recipient)
+            } else {
+                this.recordTmpRecipient(recipient)
+                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                if (recipient.length <= MAX_ALIAS_LENGTH && alias) {
+                    for (let key in alias) {
+                        if (recipient.toLowerCase() === alias[key].toLowerCase()) {
+                            recipient = key
+                            break
+                        }
                     }
                 }
             }
