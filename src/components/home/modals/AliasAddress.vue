@@ -78,8 +78,8 @@
                       onfocus="this.select()">
         </b-form-input>
         <b-form-invalid-feedback id="inputLiveFeedback"
-                                 v-if="!isExistedAddress">
-          Please input your valid address!
+                                 v-if="!isValidAddress">
+          Please input valid address!
         </b-form-invalid-feedback>
       </b-form-group>
       <b-form-group label="Alias Name"
@@ -180,9 +180,6 @@ export default {
                 console.log(e)
             }
             return isValid
-        },
-        isExistedAddress() {
-            return this.curAddress in this.addresses || this.curAddress in this.coldAddresses
         },
         isExistedAlias() {
             if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
