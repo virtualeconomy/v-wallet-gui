@@ -56,8 +56,12 @@
             </b-form-input>
             <datalist v-if="!from3rdParty"
                       id="showHotRecipientList">
-              <option v-for="addr in hotRecipientAddressList.keys()"
+              <option v-if="!aliasAddressList && hotRecipientAddressList"
+                      v-for="addr in hotRecipientAddressList.keys()"
                       :key="addr">{{ addr }}</option>
+              <option v-if="aliasAddressList"
+                      v-for="(addr, index) in aliasAddressList"
+                      :key="index">{{ addr + " (" + index + ")" }}</option>
             </datalist>
             <img v-if="!from3rdParty"
                  src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
@@ -233,8 +237,12 @@
             </b-form-input>
             <datalist v-if="!from3rdParty"
                       id="showColdRecipientList">
-              <option v-for="addr in coldRecipientAddressList.keys()"
+              <option v-if="!aliasAddressList && coldRecipientAddressList"
+                      v-for="addr in coldRecipientAddressList.keys()"
                       :key="addr"> {{ addr }}</option>
+              <option v-if="aliasAddressList"
+                      v-for="(addr, index) in aliasAddressList"
+                      :key="index">{{ addr + " (" + index + ")" }}</option>
             </datalist>
             <img v-if="!from3rdParty"
                  src="@/assets/imgs/icons/operate/ic_qr_code_line.svg"
@@ -417,7 +425,7 @@ import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { CONTRACT_EXEC_FEE, VSYS_PRECISION, API_VERSION, PROTOCOL, OPC_ACCOUNT, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/js-v-sdk/src/constants'
 import { NETWORK_BYTE } from '@/network'
-import { TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants'
+import { TRANSFER_ATTACHMENT_BYTE_LIMIT, MAX_ALIAS_LENGTH } from '@/constants'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -448,7 +456,9 @@ var initData = {
     hasConfirmed: false,
     coldRecipientAddressList: {},
     hotRecipientAddressList: {},
-    functionIndex: this ? (this.isSplit ? SEND_FUNCIDX_SPLIT : SEND_FUNCIDX) : SEND_FUNCIDX_SPLIT
+    functionIndex: this ? (this.isSplit ? SEND_FUNCIDX_SPLIT : SEND_FUNCIDX) : SEND_FUNCIDX_SPLIT,
+    tmpRecipient: '',
+    aliasAddressList: {}
 }
 export default {
     name: 'SendToken',
@@ -525,6 +535,7 @@ export default {
     created() {
         this.coldRecipientAddressList = new LRUCache(10)
         this.hotRecipientAddressList = new LRUCache(10)
+        this.aliasAddressList = this.getAlias()
         let item = window.localStorage.getItem('Cold ' + this.defaultColdAddress + ' sendTokenRecipientAddressList ')
         if (item) {
             this.coldRecipientAddressList.load(JSON.parse(item))
@@ -606,6 +617,23 @@ export default {
                 return void 0
             }
             let isValid = false
+            let pre = recipient.indexOf('(')
+            let lat = recipient.indexOf(')')
+            if (pre !== -1) {
+                recipient = recipient.substr(pre + 1, lat - pre - 1)
+                this.recordTmpRecipient(recipient)
+            } else {
+                this.recordTmpRecipient(recipient)
+                let alias = this.getAlias()
+                if (recipient.length <= MAX_ALIAS_LENGTH && alias) {
+                    for (let key in alias) {
+                        if (recipient.toLowerCase() === alias[key].toLowerCase()) {
+                            recipient = key
+                            break
+                        }
+                    }
+                }
+            }
             try {
                 isValid = this.account.checkAddress(recipient)
             } catch (e) {
@@ -668,8 +696,21 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            tra.buildSendTokenTx(publicKey, this.tokenId, this.recipient, this.amount, this.tokenUnity, this.isSplit, this.description, this.timeStamp)
+            tra.buildSendTokenTx(publicKey, this.tokenId, this.tmpRecipient, this.amount, this.tokenUnity, this.isSplit, this.description, this.timeStamp)
             return tra
+        },
+        recordTmpRecipient(recipient) {
+            let alias = this.getAlias()
+            if (recipient.length <= MAX_ALIAS_LENGTH && alias) {
+                for (let key in alias) {
+                    if (recipient.toLowerCase() === alias[key].toLowerCase()) {
+                        this.tmpRecipient = key
+                        break
+                    }
+                }
+            } else {
+                this.tmpRecipient = recipient
+            }
         },
         sendData(walletType) {
             let sendTx
@@ -766,6 +807,7 @@ export default {
             this.recipient = this.from3rdParty ? this.inheritedRecipient : ''
             this.amount = this.from3rdParty ? (this.inheritedAmount !== '' ? this.inheritedAmount : 0) : 0
             this.description = this.from3rdParty ? this.inheritedDescription : ''
+            this.tmpRecipient = ''
             this.pageId = 1
             this.coldPageId = 1
             this.coldAddress = ''
@@ -904,6 +946,11 @@ export default {
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
+        },
+        getAlias() {
+            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)).hasOwnProperty('alias')) {
+                return JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            }
         }
     }
 }
