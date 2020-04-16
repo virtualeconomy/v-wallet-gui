@@ -948,8 +948,11 @@ export default {
             return browser.bigNumberFormatter(num)
         },
         getAlias() {
-            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)).hasOwnProperty('alias')) {
-                return JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            let userData = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            if (userData.hasOwnProperty('alias')) {
+                return userData.alias
+            } else {
+                return {}
             }
         }
     }

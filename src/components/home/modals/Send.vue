@@ -499,7 +499,7 @@ export default {
     },
     created() {
         this.getSuperNodes()
-        this.aliasAddressList = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+        this.aliasAddressList = this.getAlias()
         this.coldRecipientAddressList = new LRUCache(10)
         this.hotRecipientAddressList = new LRUCache(10)
         let item = window.localStorage.getItem('Cold ' + this.defaultColdAddress + ' sendRecipientAddressList ')
@@ -599,7 +599,7 @@ export default {
                 this.recordTmpRecipient(recipient)
             } else {
                 this.recordTmpRecipient(recipient)
-                let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+                let alias = this.getAlias()
                 if (recipient.length <= MAX_ALIAS_LENGTH && alias) {
                     for (let key in alias) {
                         if (recipient.toLowerCase() === alias[key].toLowerCase()) {
@@ -666,7 +666,7 @@ export default {
             })
         },
         recordTmpRecipient(recipient) {
-            let alias = JSON.parse(window.localStorage.getItem(this.defaultAddress)).alias
+            let alias = this.getAlias()
             if (recipient.length <= MAX_ALIAS_LENGTH && alias) {
                 for (let key in alias) {
                     if (recipient.toLowerCase() === alias[key].toLowerCase()) {
@@ -909,6 +909,14 @@ export default {
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
+        },
+        getAlias() {
+            let userData = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            if (userData.hasOwnProperty('alias')) {
+                return userData.alias
+            } else {
+                return {}
+            }
         }
     }
 }
