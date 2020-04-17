@@ -354,7 +354,7 @@ export default {
         },
         txTitle() {
             if (this.txType === 'Leased Out') {
-                return 'Start Leasing'
+                return 'Lease Out'
             } else if (this.txType === 'Leased In') {
                 return 'Incoming Leasing'
             } else if (this.txType === 'Leased Out Canceled') {
