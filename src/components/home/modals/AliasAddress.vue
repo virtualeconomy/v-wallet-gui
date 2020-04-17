@@ -78,8 +78,8 @@
                       onfocus="this.select()">
         </b-form-input>
         <b-form-invalid-feedback id="inputLiveFeedback"
-                                 v-if="!isExistedAddress">
-          Please input your valid address!
+                                 v-if="!isValidAddress">
+          Please input valid address!
         </b-form-invalid-feedback>
       </b-form-group>
       <b-form-group label="Alias Name"
@@ -163,7 +163,8 @@ export default {
     },
     computed: {
         ...mapState({
-            assetStatus: 'assetStatus'
+            assetStatus: 'assetStatus',
+            account: 'account'
         }),
         defaultAddress() {
             return Vue.ls.get('address')
@@ -172,10 +173,13 @@ export default {
             if (!this.curAddress) {
                 return void 0
             }
-            return this.isExistedAddress
-        },
-        isExistedAddress() {
-            return this.curAddress in this.addresses || this.curAddress in this.coldAddresses
+            let isValid = false
+            try {
+                isValid = this.account.checkAddress(this.curAddress)
+            } catch (e) {
+                console.log(e)
+            }
+            return isValid
         },
         isExistedAlias() {
             if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
