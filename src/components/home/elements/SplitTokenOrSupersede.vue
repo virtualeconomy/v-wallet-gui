@@ -410,6 +410,7 @@ import common from '@/js-v-sdk/src/utils/common'
 import Transaction from '@/js-v-sdk/src/transaction'
 import BigNumber from 'bignumber.js'
 import { mapActions, mapState } from 'vuex'
+import { TokenContractDataGenerator } from '@/js-v-sdk/src/data'
 export default {
     name: 'SplitTokenOrSupersede',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -602,7 +603,8 @@ export default {
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
             let functionIndex = this.functionName === 'Split Token' ? SPLIT_FUNCIDX : SUPERSEDE_FUNCIDX
-            let functionData = this.functionName === 'Split Token' ? {'new_unity': BigNumber(this.newFinalUnity)} : {'new_issuer': (this.newIssuer)}
+            let dataGenerator = new TokenContractDataGenerator()
+            let functionData = this.functionName === 'Split Token' ? dataGenerator.createSplitData(BigNumber(this.newFinalUnity)) : dataGenerator.createSupersedeData(this.newIssuer)
             tra.buildExecuteContractTx(publicKey, this.contractId, functionIndex, functionData, this.timeStamp)
             return tra
         },

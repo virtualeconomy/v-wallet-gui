@@ -368,7 +368,7 @@ export default {
             } else if (this.txType === 'Execute Contract Function') {
                 return 'Execute Contract Function'
             } else if (this.txType === 'Register Contract') {
-                return 'Register Contract'
+                return 'Register ' + this.txRecord.contractType
             }
         },
         txTime() {

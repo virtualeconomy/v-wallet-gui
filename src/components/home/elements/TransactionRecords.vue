@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import { VSYS_PRECISION, EXECUTE_CONTRACT_TX } from '@/js-v-sdk/src/constants'
+import { VSYS_PRECISION, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX } from '@/js-v-sdk/src/constants'
 import BigNumber from 'bignumber.js'
 import TransactionRecord from './TransactionRecord'
 import Vue from 'vue'
@@ -253,6 +253,18 @@ export default {
                                     recItem['amount'] = functionData[1]
                                     recItem['sentToken'] = true
                                     recItem['officialName'] = certify.officialName(tokenId)
+                                }
+                            }
+                            if (recItem['type'] === REGISTER_CONTRACT_TX) {
+                                let contract = recItem.contract
+                                let triggersLength = contract.triggers.length
+                                let descriptorsLength = contract.descriptors.length
+                                if (triggersLength === 1) {
+                                    recItem['contractType'] = 'TokenContract'
+                                } else if (triggersLength === 3 && descriptorsLength === 6) {
+                                    recItem['contractType'] = 'PaymentChannelContract'
+                                } else if (triggersLength === 3 && descriptorsLength === 1) {
+                                    recItem['contractType'] = 'LockContract'
                                 }
                             }
                             if (recItem['recipient'] === this.address && this.address === senderAddr) { // send to self

@@ -26,9 +26,11 @@
                           class="contract-input"
                           v-model="contractId"
                           :state="isValidContractId"
+                          @input="hideContractError"
+                          placeholder="Payment channel contract or Lock contract"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid Contract ID
+              {{ this.validContractType ? 'Invalid Contract ID' : 'Not PaymentChannel Contract or Lock Contract' }}
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group label="Amount"
@@ -74,7 +76,7 @@
                     size="lg"
                     block
                     :disabled="isSubmitDisabled"
-                    @click="nextPage">{{ functionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
+                    @click="checkContract">{{ functionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
@@ -133,9 +135,11 @@
                           class="contract-input"
                           v-model="contractId"
                           :state="isValidContractId"
+                          @input="hideContractError"
+                          placeholder="Payment channel contract or Lock contract"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
-              Invalid Contract ID
+              {{ this.validContractType ? 'Invalid Contract ID' : 'Not PaymentChannel Contract or Lock Contract' }}
             </b-form-invalid-feedback>
           </b-form-group>
           <b-form-group label="Amount"
@@ -181,7 +185,7 @@
                     block
                     size="lg"
                     :disabled="isSubmitDisabled"
-                    @click="nextPage">{{ functionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
+                    @click="checkContract">{{ functionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
@@ -214,9 +218,11 @@
         </b-container>
         <b-container v-if="coldPageId===3"
                      class="text-left">
-          <ColdSignature :data-object="dataObject"
+          <ColdSignature :data-object="dataObject.toJsonForColdSignature()"
                          :qr-total-page="1"
                          v-if="coldPageId===3"
+                         :cold-public-key = "coldAddresses[address].publicKey"
+                         :transaction-bytes="dataObject.toBytes()"
                          @get-signature="getSignature"
                          @next-page="nextPage"
                          @prev-page="prevPage"></ColdSignature>
@@ -273,8 +279,8 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { CONTRACT_EXEC_FEE, VSYS_PRECISION, FEE_SCALE, API_VERSION, PROTOCOL, OPC_FUNCTION, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT } from '@/js-v-sdk/src/constants'
-import { NODE_IP } from '@/network'
+import { CONTRACT_EXEC_FEE, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT } from '@/js-v-sdk/src/constants'
+import { NETWORK_BYTE } from '@/network'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -282,7 +288,9 @@ import browser from '@/utils/browser'
 import common from '@/js-v-sdk/src/utils/common'
 import BigNumber from 'bignumber.js'
 import base58 from 'base-58'
-import { mapActions } from 'vuex'
+import { mapActions, mapState } from 'vuex'
+import Transaction from '@/js-v-sdk/src/transaction'
+import { TokenContractDataGenerator } from '@/js-v-sdk/src/data'
 export default {
     name: 'WithdrawToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -298,7 +306,8 @@ export default {
             coldSignature: '',
             timeStamp: Date.now() * 1e6,
             hasConfirmed: false,
-            contractId: ''
+            contractId: '',
+            validContractType: true
         }
     },
     props: {
@@ -356,6 +365,10 @@ export default {
         }
     },
     computed: {
+        ...mapState({
+            chain: 'chain',
+            account: 'account'
+        }),
         defaultAddress() {
             return Vue.ls.get('address')
         },
@@ -397,28 +410,25 @@ export default {
             return true
         },
         isValidContractId() {
-            let contractArr = base58.decode(this.contractId)
-            return contractArr && contractArr.length === 26 && contractArr[0] === 6
+            if (!this.contractId) {
+                return void 0
+            }
+            try {
+                let contractArr = base58.decode(this.contractId)
+                return contractArr && contractArr.length === 26 && contractArr[0] === 6 && this.validContractType
+            } catch (e) {
+                return false
+            }
         },
         selectedKeypair() {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
         },
+        executorContractId() {
+            return common.tokenIDToContractID(this.tokenId)
+        },
         dataObject() {
-            return {
-                protocol: PROTOCOL,
-                api: API_VERSION,
-                opc: OPC_FUNCTION,
-                address: this.address,
-                senderPublicKey: this.coldAddresses[this.address].publicKey,
-                fee: this.fee * VSYS_PRECISION,
-                feeScale: FEE_SCALE,
-                timestamp: Date.now(),
-                attachment: '',
-                contractId: this.contractId,
-                functionId: this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX),
-                // function: this.functionName === 'Withdraw Token' ? transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)) : transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                functionExplain: (this.functionName === 'Withdraw Token' ? 'Withdraw ' : 'Deposit ') + this.amount + (this.functionName === 'Withdraw Token' ? ' token from ' : ' token to ') + this.contractId
-            }
+            let tra = this.buildTransaction(this.coldAddresses[this.address].publicKey)
+            return tra
         }
     },
     methods: {
@@ -426,41 +436,30 @@ export default {
         inputAmount(num) {
             return BigNumber(num)
         },
+        buildTransaction(publicKey) {
+            let tra = new Transaction(NETWORK_BYTE)
+            let functionIndex = this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX)
+            let dataGenerator = new TokenContractDataGenerator()
+            let functionData = this.functionName === 'Withdraw Token' ? dataGenerator.createWithdrawData(this.contractId, this.address, this.amount, this.tokenUnity) : dataGenerator.createDepositData(this.address, this.contractId, this.amount, this.tokenUnity)
+            tra.buildExecuteContractTx(publicKey, this.executorContractId, functionIndex, functionData, this.timeStamp)
+            return tra
+        },
         sendData(walletType) {
-            let apiSchema
+            let sendTx
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
                     return
                 }
                 this.hasConfirmed = true
-                this.fee = BigNumber(CONTRACT_EXEC_FEE)
-                this.feeScale = FEE_SCALE
-                const dataInfo = {
-                    contractId: this.contractId,
-                    senderPublicKey: this.selectedKeypair.publicKey,
-                    fee: CONTRACT_EXEC_FEE * VSYS_PRECISION,
-                    feeScale: FEE_SCALE,
-                    timestamp: this.timeStamp,
-                    functionIndex: this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX)
-                    // functionData: this.functionName === 'Withdraw Token' ? transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)) : transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)),
-                    // signature: transaction.prepareExecContractSignature(this.contractId, this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX), this.functionName === 'Withdraw Token' ? transaction.prepareWithdraw(this.contractId, this.address, BigNumber(this.amount).multipliedBy(this.tokenUnity)) : transaction.prepareDeposit(this.address, this.contractId, BigNumber(this.amount).multipliedBy(this.tokenUnity)), this.attachment, BigNumber(CONTRACT_EXEC_FEE * VSYS_PRECISION), this.feeScale, BigNumber(this.timeStamp), this.getKeypair(this.addresses[this.address]).privateKey)
-                }
-                apiSchema = dataInfo
+                let builtTransaction = this.buildTransaction(this.selectedKeypair.publicKey)
+                this.account.buildFromPrivateKey(this.selectedKeypair.privateKey)
+                let signature = this.account.getSignature(builtTransaction.toBytes())
+                sendTx = builtTransaction.toJsonForSendingTx(signature)
             } else if (walletType === 'coldWallet') {
-                const coldDataInfo = {
-                    contractId: this.dataObject.contractId,
-                    senderPublicKey: this.dataObject.senderPublicKey,
-                    fee: this.dataObject.fee,
-                    feeScale: this.dataObject.feeScale,
-                    timestamp: this.dataObject.timestamp,
-                    functionIndex: this.dataObject.functionId,
-                    functionData: this.dataObject.function,
-                    signature: this.coldSignature
-                }
-                apiSchema = coldDataInfo
+                let signature = this.coldSignature
+                sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
-            const url = NODE_IP + '/contract/broadcast/execute'
-            this.$http.post(url, apiSchema).then(response => {
+            this.chain.sendExecuteContractTx(sendTx).then(response => {
                 if (response.hasOwnProperty('error')) {
                     this.errorMessage = response.message
                     this.sendError = true
@@ -476,11 +475,29 @@ export default {
                     setTimeout(this.sendBalanceChange, delayTime)
                 }
             }, respErr => {
-                this.errorMessage = respErr.body.message
+                this.errorMessage = respErr.message
                 if (this.errorMessage === undefined) {
                     this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
                 }
                 this.sendError = true
+            })
+        },
+        checkContract() {
+            this.chain.getContractInfo(this.contractId).then(response => {
+                if (response.type === 'PaymentChannelContract' || response.type === 'LockContract') {
+                    this.sendError = false
+                    this.hasConfirmed = false
+                    if (this.walletType === 'hotWallet') {
+                        this.pageId++
+                        this.timeStamp = Date.now() * 1e6
+                    } else {
+                        this.coldPageId++
+                    }
+                } else {
+                    this.validContractType = false
+                }
+            }, respErr => {
+                this.validContractType = false
             })
         },
         nextPage() {
@@ -507,6 +524,10 @@ export default {
             this.sendError = false
             this.coldSignature = ''
             this.contractId = ''
+            this.validContractType = true
+        },
+        hideContractError() {
+            this.validContractType = true
         },
         endSend() {
             this.$refs.withdrawOrDepositTokenModal.hide()
@@ -516,7 +537,6 @@ export default {
         },
         getSignature(signature) {
             this.coldSignature = signature
-            this.dataObject.timestamp *= 1e6
             this.coldPageId++
         },
         formatter(num) {
