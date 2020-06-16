@@ -46,15 +46,15 @@
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision && ((!isExceededBalance && this.functionName === 'Deposit Token') || this.functionName === 'Withdraw Token')">
+                                     v-else-if="!checkPrecision">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededBalance && this.functionName === 'Deposit Token'">
-              Deposited token is larger than balance
+                                     v-else-if="isExceededBalance && (this.functionName === 'Deposit Token' || this.functionName === 'Deposit VSYS')">
+              Deposited {{ this.functionName === 'Deposit Token' ? 'token' : 'vsys' }} is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isEnoughContractBalance && this.functionName === 'Withdraw Token'">
+                                     v-else-if="!isEnoughContractBalance && (this.functionName === 'Withdraw Token' || this.functionName === 'Withdraw VSYS')">
               Withdrawed token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -76,7 +76,7 @@
                     size="lg"
                     block
                     :disabled="isSubmitDisabled"
-                    @click="checkContract">{{ functionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
+                    @click="checkContract">{{ functionName === 'Withdraw Token' || functionName === 'Withdraw VSYS' ? 'Withdraw' : 'Deposit' }}
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
@@ -84,7 +84,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :contract-id="contractId"
-                        :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
+                        :tx-type="getTxType">
           </TokenConfirm>
           <p v-show="sendError"
              class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
@@ -115,7 +115,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :contract-id="contractId"
-                        :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
+                        :tx-type="getTxType">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -155,7 +155,7 @@
               Invalid format.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!checkPrecision && ((!isExceededBalance && this.functionName === 'Deposit Token') || this.functionName === 'Withdraw Token')">
+                                     v-else-if="!checkPrecision">
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
@@ -193,7 +193,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :contract-id="contractId"
-                        :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
+                        :tx-type="getTxType">
           </TokenConfirm>
           <b-row>
             <b-col class="col-lef">
@@ -232,7 +232,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :contract-id="contractId"
-                        :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
+                        :tx-type="getTxType">
           </TokenConfirm>
           <p v-show="sendError"
              class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small>}</p>
@@ -263,7 +263,7 @@
                         :amount=inputAmount(amount)
                         :fee="fee"
                         :contract-id="contractId"
-                        :tx-type="functionName === 'Withdraw Token' ? 'Withdraw Token from Contract' : 'Deposit Token to Contract'">
+                        :tx-type="getTxType">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -279,7 +279,7 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { CONTRACT_EXEC_FEE, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT } from '@/js-v-sdk/src/constants'
+import { CONTRACT_EXEC_FEE, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT, SYSTEM_CONTRACT_DEPOSIT_FUNCIDX, SYSTEM_CONTRACT_WITHDRAW_FUNCIDX } from '@/js-v-sdk/src/constants'
 import { NETWORK_BYTE } from '@/network'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
@@ -290,7 +290,7 @@ import BigNumber from 'bignumber.js'
 import base58 from 'base-58'
 import { mapActions, mapState } from 'vuex'
 import Transaction from '@/js-v-sdk/src/transaction'
-import { TokenContractDataGenerator } from '@/js-v-sdk/src/data'
+import { TokenContractDataGenerator, SystemContractDataGenerator } from '@/js-v-sdk/src/data'
 export default {
     name: 'WithdrawToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -389,10 +389,11 @@ export default {
             if (BigNumber(this.amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision && this.isValidNumFormat && (this.functionName === 'Withdraw Token' ? this.isEnoughContractBalance : !this.isExceededBalance) && !this.isNegative
+            return this.checkPrecision && this.isValidNumFormat && (this.functionName === 'Withdraw Token' || this.functionName === 'Withdraw VSYS' ? this.isEnoughContractBalance : !this.isExceededBalance) && !this.isNegative
         },
         isExceededBalance() {
-            return BigNumber(this.amount).isGreaterThan(this.tokenBalance)
+            let tokenBalance = this.functionName === 'Deposit VSYS' ? BigNumber(this.tokenBalance).minus(CONTRACT_EXEC_FEE) : this.tokenBalance
+            return BigNumber(this.amount).isGreaterThan(tokenBalance)
         },
         isInsufficient() {
             return BigNumber(this.balance).isLessThan(BigNumber(CONTRACT_EXEC_FEE))
@@ -408,6 +409,18 @@ export default {
         },
         isEnoughContractBalance() {
             return true
+        },
+        getTxType() {
+            switch (this.functionName) {
+            case 'Deposit Token':
+                return 'Deposit Token to Contract'
+            case 'Deposit VSYS':
+                return 'Deposit VSYS to Contract'
+            case 'Withdraw Token':
+                return 'Withdraw Token from Contract'
+            case 'Withdraw VSYS':
+                return 'Withdraw VSYS from Contract'
+            }
         },
         isValidContractId() {
             if (!this.contractId) {
@@ -438,9 +451,26 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            let functionIndex = this.functionName === 'Withdraw Token' ? (this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX) : (this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX)
-            let dataGenerator = new TokenContractDataGenerator()
-            let functionData = this.functionName === 'Withdraw Token' ? dataGenerator.createWithdrawData(this.contractId, this.address, this.amount, this.tokenUnity) : dataGenerator.createDepositData(this.address, this.contractId, this.amount, this.tokenUnity)
+            let dataGenerator = this.functionName === 'Withdraw Token' || this.functionName === 'Deposit Token' ? new TokenContractDataGenerator() : new SystemContractDataGenerator()
+            let functionIndex, functionData
+            switch (this.functionName) {
+            case 'Deposit Token':
+                functionIndex = this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX
+                functionData = dataGenerator.createDepositData(this.address, this.contractId, this.amount, this.tokenUnity)
+                break
+            case 'Deposit VSYS':
+                functionIndex = SYSTEM_CONTRACT_DEPOSIT_FUNCIDX
+                functionData = dataGenerator.createDepositData(this.address, this.contractId, this.amount)
+                break
+            case 'Withdraw Token':
+                functionIndex = this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX
+                functionData = dataGenerator.createWithdrawData(this.contractId, this.address, this.amount, this.tokenUnity)
+                break
+            case 'Withdraw VSYS':
+                functionData = dataGenerator.createWithdrawData(this.contractId, this.address, this.amount)
+                functionIndex = SYSTEM_CONTRACT_WITHDRAW_FUNCIDX
+                break
+            }
             tra.buildExecuteContractTx(publicKey, this.executorContractId, functionIndex, functionData, this.timeStamp)
             return tra
         },
@@ -471,8 +501,10 @@ export default {
                     this.coldPageId++
                 }
                 this.updateBalance(true)
-                for (let delayTime = 6000; delayTime <= 54000; delayTime *= 3) { //  Refresh interval will be 6s, 18s, 54s
-                    setTimeout(this.sendBalanceChange, delayTime)
+                if (this.functionName === 'Withdraw Token' || this.functionName === 'Deposit Token') {
+                    for (let delayTime = 6000; delayTime <= 54000; delayTime *= 3) { //  Refresh interval will be 6s, 18s, 54s
+                        setTimeout(this.sendBalanceChange, delayTime)
+                    }
                 }
             }, respErr => {
                 this.errorMessage = respErr.message

@@ -42,6 +42,13 @@
         <img v-if="!isMobile"
              class="icon-btn"
              src="@/assets/imgs/icons/wallet/ic_receive.svg"><b> {{ !isMobile ? 'Receive':'Recv' }} </b></b-button>
+      <b-dropdown v-if="advancedFunctionsStatus"
+                  no-caret
+                  text="Advanced Functions"
+                  variant="link">
+        <b-dropdown-item @click="depositVsys">Deposit to Contract </b-dropdown-item>
+        <b-dropdown-item @click="withdrawVsys">Withdraw from Contract</b-dropdown-item>
+      </b-dropdown>
     </div>
     <Send :balances="balances"
           :inherited-amount="inheritedAmount"
@@ -60,6 +67,16 @@
                  :addresses="addresses"
                  :selected-address="address"
                  :wallet-type="walletType"></CreateToken>
+    <WithdrawOrDepositToken :token-id="tokenId"
+                            :address="address"
+                            :wallet-type="walletType"
+                            :addresses="addresses"
+                            :cold-addresses="coldAddresses"
+                            :token-balance="balances[address]"
+                            :balance="balances[address]"
+                            :function-name="functionName"
+                            :token-unity="tokenUnity">
+    </WithdrawOrDepositToken>
   </div>
 </template>
 
@@ -70,18 +87,23 @@ import Send from '../modals/Send'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { mapState } from 'vuex'
-
+import { NETWORK_BYTE } from '@/network'
+import { SYSTEM_CONTRACT_TOKEN_ID_TEST, SYSTEM_CONTRACT_TOKEN_ID } from '@/js-v-sdk/src/contract'
+import WithdrawOrDepositToken from './WithdrawOrDepositToken'
 export default {
     name: 'TokenPane',
     components: {
-        CreateToken, Receive, Send
+        CreateToken, Receive, WithdrawOrDepositToken, Send
     },
     data() {
         return {
             inheritedAmount: '',
             inheritedRecipient: '',
             inheritedDescription: '',
-            isMobile: false
+            functionName: '',
+            tokenUnity: BigNumber(1e8),
+            isMobile: false,
+            tokenId: ''
         }
     },
     created() {
@@ -90,6 +112,7 @@ export default {
             this.inheritedAmount = this.paymentRedirect.hasOwnProperty('amount') ? this.paymentRedirect['amount'] : this.inheritedAmount
             this.inheritedRecipient = this.paymentRedirect.hasOwnProperty('recipient') ? this.paymentRedirect['recipient'] : this.inheritedRecipient
         }
+        this.tokenId = String.fromCharCode(NETWORK_BYTE) === 'T' ? SYSTEM_CONTRACT_TOKEN_ID_TEST : SYSTEM_CONTRACT_TOKEN_ID
         this.isMobile = browser.isMobile()
     },
     mounted() {
@@ -101,6 +124,7 @@ export default {
         ...mapState({
             paymentRedirect: 'paymentRedirect',
             available: 'available',
+            advancedFunctionsStatus: 'advancedFunctionsStatus',
             total: 'total'
         }),
         getDevice() {
@@ -147,6 +171,22 @@ export default {
         }
     },
     methods: {
+        withdrawVsys() {
+            if (this.getDevice === 'Ledger') {
+                alert('This feature is not supported')
+            } else {
+                this.functionName = 'Withdraw VSYS'
+                this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal_' + this.tokenId)
+            }
+        },
+        depositVsys() {
+            if (this.getDevice === 'Ledger') {
+                alert('This feature is not supported')
+            } else {
+                this.functionName = 'Deposit VSYS'
+                this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal_' + this.tokenId)
+            }
+        },
         formatter(num) {
             return browser.bigNumberFormatter(num)
         },
@@ -214,5 +254,19 @@ export default {
     border: 1px solid @sendColor;
     width: 124px;
     height: 42px;
+}
+.add-button {
+    background-color: transparent;
+    opacity: 1;
+    border: none;
+    outline: none;
+    font-family: Roboto-Bold;
+    font-size: 15px;
+    color: #FF8837;
+    letter-spacing: 0;
+    text-align: right;
+    line-height: 15px;
+    padding-left: 2px;
+    padding-right: 2px;
 }
 </style>

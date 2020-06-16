@@ -40,6 +40,13 @@
       <div class="timeout-setting div-t">
         <input class="enable-function"
                type="checkbox"
+               v-model="curAdvancedFunctionsStatus"
+               @click="enableAdvancedFunctions">
+        <label class="label-st">Enable Advanced Functions</label>
+      </div>
+      <div class="timeout-setting div-t">
+        <input class="enable-function"
+               type="checkbox"
                v-model="curManagementStatus"
                @click="enableTokenManagement">
         <label class="label-st">Enable Token Management Functionality</label>
@@ -85,6 +92,7 @@ export default {
         this.curManagementStatus = this.tokenManagementStatus
         this.curSplitStatus = this.tokenSplitStatus
         this.curHeightStatus = this.heightStatus
+        this.curAdvancedFunctionsStatus = this.advancedFunctionsStatus
     },
     props: {
         setUsrLocalStorage: {
@@ -105,6 +113,7 @@ export default {
             curHeightStatus: this.heightStatus,
             curSplitStatus: this.tokenSplitStatus,
             curManagementStatus: this.tokenManagementStatus,
+            curAdvancedFunctionsStatus: this.advancedFunctionsStatus,
             selectedLang: 'en',
             langOptions: [
                 {
@@ -143,6 +152,7 @@ export default {
     },
     computed: {
         ...mapState({
+            advancedFunctionsStatus: 'advancedFunctionsStatus',
             tokenManagementStatus: 'tokenManagementStatus',
             tokenSplitStatus: 'tokenSplitStatus',
             heightStatus: 'heightStatus'
@@ -179,6 +189,9 @@ export default {
         showHeight() {
             this.curHeightStatus = !this.curHeightStatus
         },
+        enableAdvancedFunctions() {
+            this.curAdvancedFunctionsStatus = !this.curAdvancedFunctionsStatus
+        },
         enableTokenManagement() {
             this.curManagementStatus = !this.curManagementStatus
         },
@@ -204,7 +217,7 @@ export default {
             this.$emit('passParamToParent')
         },
         confirm() {
-            this.changeSettingsStatus({'split': this.curSplitStatus, 'management': this.curManagementStatus, 'height': this.curHeightStatus})
+            this.changeSettingsStatus({'split': this.curSplitStatus, 'management': this.curManagementStatus, 'height': this.curHeightStatus, 'advancedFunctionsStatus': this.curAdvancedFunctionsStatus})
             this.changeSession()
             this.$refs.settingModal.hide()
         },
@@ -212,6 +225,7 @@ export default {
             this.curSplitStatus = this.tokenSplitStatus
             this.curManagementStatus = this.tokenManagementStatus
             this.curHeightStatus = this.heightStatus
+            this.curAdvancedFunctionsStatus = this.advancedFunctionsStatus
             this.selectedSession = this.getSelectedSession()
         }
     }

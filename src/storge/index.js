@@ -17,6 +17,7 @@ const store = new Vuex.Store({
         tokenSplitStatus: JSON.parse(window.localStorage.getItem('tokenSplitStatus')),
         tokenManagementStatus: JSON.parse(window.localStorage.getItem('tokenManagementStatus')),
         heightStatus: JSON.parse(window.localStorage.getItem('heightStatus')),
+        advancedFunctionsStatus: JSON.parse(window.localStorage.getItem('advancedFunctionsStatus')),
         eventPool: {},
         available: BigNumber(0),
         leasedIn: BigNumber(0),
@@ -34,6 +35,7 @@ const store = new Vuex.Store({
             state.tokenSplitStatus = status['split']
             state.tokenManagementStatus = status['management']
             state.heightStatus = status['height']
+            state.advancedFunctionsStatus = status['advancedFunctionsStatus']
         },
         updateAssetStatus(state, status) {
             state.assetStatus = status
@@ -166,6 +168,7 @@ const store = new Vuex.Store({
             window.localStorage.setItem('tokenSplitStatus', status['split'])
             window.localStorage.setItem('heightStatus', status['height'])
             window.localStorage.setItem('tokenManagementStatus', status['management'])
+            window.localStorage.setItem('advancedFunctionsStatus', status['advancedFunctionsStatus'])
         }
     },
     getters: {

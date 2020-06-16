@@ -249,8 +249,8 @@ export default {
                                 let tokenId = common.contractIDToTokenID(recItem['contractId'])
                                 if (certify.isCertified(tokenId) && (recItem['functionIndex'] === 4 || (recItem['functionIndex'] === 3 && base58.decode(recItem['functionData'])[1] === 2))) {
                                     let functionData = convert.parseFunctionData(recItem['functionData'])
-                                    recItem['recipient'] = functionData[0]
-                                    recItem['amount'] = functionData[1]
+                                    recItem['recipient'] = functionData[0]['data']
+                                    recItem['amount'] = functionData[1]['data']
                                     recItem['sentToken'] = true
                                     recItem['officialName'] = certify.officialName(tokenId)
                                 }
