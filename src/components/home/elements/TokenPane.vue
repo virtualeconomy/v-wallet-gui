@@ -45,7 +45,7 @@
       <div>
         <b-dropdown v-if="advancedFunctionsStatus"
                     no-caret
-                    text="Advanced Functions"
+                    text="Advanced Functionalities"
                     variant="link">
           <b-dropdown-item @click="depositVsys">Deposit to Contract </b-dropdown-item>
           <b-dropdown-item @click="withdrawVsys">Withdraw from Contract</b-dropdown-item>

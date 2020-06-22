@@ -42,21 +42,21 @@
                type="checkbox"
                v-model="curAdvancedFunctionsStatus"
                @click="enableAdvancedFunctions">
-        <label class="label-st">Enable Advanced Functions</label>
+        <label class="label-st">Enable Advanced Functionalities</label>
       </div>
       <div class="timeout-setting div-t">
         <input class="enable-function"
                type="checkbox"
                v-model="curManagementStatus"
                @click="enableTokenManagement">
-        <label class="label-st">Enable Token Management Functionality</label>
+        <label class="label-st">Enable Token Management Functionalities</label>
       </div>
       <div class="timeout-setting div-t">
         <input class="enable-function"
                type="checkbox"
                v-model="curSplitStatus"
                @click="enableTokenSplit">
-        <label class="label-st">Enable Token Split/Revert Functionality</label>
+        <label class="label-st">Enable Token Split/Revert Functionalities</label>
       </div>
     </div>
     <b-row class="btn-bottom">
