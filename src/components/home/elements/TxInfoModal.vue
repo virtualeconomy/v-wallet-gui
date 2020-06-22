@@ -106,6 +106,11 @@
         <label>ID</label>
         <span>{{ displayId }}</span>
       </div>
+      <div class="tx-id"
+           v-if="txType === 'Register Contract' || txTitle === 'Withdraw Token' || txTitle === 'Withdraw VSYS' || txTitle === 'Deposit Token' || txTitle === 'Deposit VSYS'">
+        <label>Contract ID</label>
+        <span>{{ contractId }}</span>
+      </div>
       <div v-if="txBlock"
            class="tx-block">
         <label>Block Height</label>
@@ -203,6 +208,14 @@ export default {
             default: ''
         },
         txType: {
+            type: String,
+            default: ''
+        },
+        txTitle: {
+            type: String,
+            default: ''
+        },
+        contractId: {
             type: String,
             default: ''
         },

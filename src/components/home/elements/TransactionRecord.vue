@@ -141,6 +141,8 @@
                  :tx-amount="txAmount"
                  :tx-block="txBlock"
                  :tx-status="txStatus"
+                 :tx-title="txTitle"
+                 :contract-id="contractId"
                  :contract-type="contractType"
                  :token-id="tokenId"
                  :tx-attachment="txAttachment"
@@ -413,6 +415,9 @@ export default {
                 return '0' + date
             }
             return date.toString()
+        },
+        contractId() {
+            return this.txRecord.contractId
         },
         txAmount() {
             if (this.isSentToken) {
