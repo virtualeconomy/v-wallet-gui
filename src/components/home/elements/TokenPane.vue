@@ -42,13 +42,15 @@
         <img v-if="!isMobile"
              class="icon-btn"
              src="@/assets/imgs/icons/wallet/ic_receive.svg"><b> {{ !isMobile ? 'Receive':'Recv' }} </b></b-button>
-      <b-dropdown v-if="advancedFunctionsStatus"
-                  no-caret
-                  text="Advanced Functions"
-                  variant="link">
-        <b-dropdown-item @click="depositVsys">Deposit to Contract </b-dropdown-item>
-        <b-dropdown-item @click="withdrawVsys">Withdraw from Contract</b-dropdown-item>
-      </b-dropdown>
+      <div>
+        <b-dropdown v-if="advancedFunctionsStatus"
+                    no-caret
+                    text="Advanced Functions"
+                    variant="link">
+          <b-dropdown-item @click="depositVsys">Deposit to Contract </b-dropdown-item>
+          <b-dropdown-item @click="withdrawVsys">Withdraw from Contract</b-dropdown-item>
+        </b-dropdown>
+      </div>
     </div>
     <Send :balances="balances"
           :inherited-amount="inheritedAmount"
