@@ -315,6 +315,7 @@ import Transaction from '@/js-v-sdk/src/transaction'
 import BigNumber from 'bignumber.js'
 import { mapActions, mapState } from 'vuex'
 import certify from '@/utils/certify'
+import { TokenContractDataGenerator } from '@/js-v-sdk/src/data'
 export default {
     name: 'IssueOrDestroyToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -494,7 +495,8 @@ export default {
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
             let functionIndex = this.functionName === 'Issue Token' ? ISSUE_FUNCIDX : DESTROY_FUNCIDX
-            let functionData = {amount: this.amount, unity: this.tokenUnity}
+            let dataGenerator = new TokenContractDataGenerator()
+            let functionData = dataGenerator.createIssueData(this.amount, this.tokenUnity)
             tra.buildExecuteContractTx(publicKey, this.contractId, functionIndex, functionData, this.timeStamp)
             return tra
         },

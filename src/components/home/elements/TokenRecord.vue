@@ -63,9 +63,9 @@
                            @click="destroyToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenSplitStatus && isSplit"
                            @click="splitToken">Split Token</b-dropdown-item>
-          <b-dropdown-item v-if="tokenManagementStatus && showUnsupportedFunction"
+          <b-dropdown-item v-if="advancedFunctionsStatus"
                            @click="depositToken">Deposit to Contract </b-dropdown-item>
-          <b-dropdown-item v-if="tokenManagementStatus && showUnsupportedFunction"
+          <b-dropdown-item v-if="advancedFunctionsStatus"
                            @click="withdrawToken">Withdraw from Contract</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Hide Token</b-dropdown-item>
         </b-dropdown>
@@ -242,6 +242,7 @@ export default {
         ...mapState({
             chain: 'chain',
             tokenManagementStatus: 'tokenManagementStatus',
+            advancedFunctionsStatus: 'advancedFunctionsStatus',
             tokenSplitStatus: 'tokenSplitStatus',
             certifiedTokenList: 'certifiedTokenList'
         }),

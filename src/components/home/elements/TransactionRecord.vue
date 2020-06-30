@@ -141,6 +141,8 @@
                  :tx-amount="txAmount"
                  :tx-block="txBlock"
                  :tx-status="txStatus"
+                 :tx-title="txTitle"
+                 :contract-id="contractId"
                  :contract-type="contractType"
                  :token-id="tokenId"
                  :tx-attachment="txAttachment"
@@ -178,12 +180,15 @@ import common from '@/js-v-sdk/src/utils/common'
 import base58 from 'base-58'
 import converters from '@/js-v-sdk/src/utils/converters'
 import CancelLease from '../modals/CancelLease'
-import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX } from '@/js-v-sdk/src/constants'
+import { SYSTEM_CONTRACT_TOKEN_ID_TEST, SYSTEM_CONTRACT_TOKEN_ID } from '@/js-v-sdk/src/contract'
+import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX, CONTRACT_ACCOUNT_TYPE, ACCOUNT_ADDR_TYPE } from '@/js-v-sdk/src/constants'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { mapState } from 'vuex'
+import { NETWORK_BYTE } from '@/network'
 import certify from '@/utils/certify'
 import Vue from 'vue'
+import convert from '@/js-v-sdk/src/utils/convert'
 export default {
     name: 'Record',
     components: { CancelLease, TxInfoModal },
@@ -366,9 +371,20 @@ export default {
             } else if (this.txType === 'Received') {
                 return 'Received'
             } else if (this.txType === 'Execute Contract Function') {
+                let functionData = convert.parseFunctionData(this.txRecord.functionData)
+                if (functionData.length === 3) {
+                    let tokenId = common.contractIDToTokenID(this.txRecord.contractId)
+                    let systemTokenId = String.fromCharCode(NETWORK_BYTE) === 'T' ? SYSTEM_CONTRACT_TOKEN_ID_TEST : SYSTEM_CONTRACT_TOKEN_ID
+                    if (functionData[0]['type'] === CONTRACT_ACCOUNT_TYPE && functionData[1]['type'] === ACCOUNT_ADDR_TYPE) {
+                        return 'Withdraw ' + (tokenId === systemTokenId ? 'VSYS' : 'Token')
+                    }
+                    if (functionData[1]['type'] === CONTRACT_ACCOUNT_TYPE && functionData[0]['type'] === ACCOUNT_ADDR_TYPE) {
+                        return 'Deposit ' + (tokenId === systemTokenId ? 'VSYS' : 'Token')
+                    }
+                }
                 return 'Execute Contract Function'
             } else if (this.txType === 'Register Contract') {
-                return 'Register Contract'
+                return 'Register ' + this.txRecord.contractType
             }
         },
         txTime() {
@@ -399,6 +415,9 @@ export default {
                 return '0' + date
             }
             return date.toString()
+        },
+        contractId() {
+            return this.txRecord.contractId
         },
         txAmount() {
             if (this.isSentToken) {

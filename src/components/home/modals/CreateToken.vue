@@ -382,6 +382,7 @@ import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
 import common from '@/js-v-sdk/src/utils/common'
 import { mapActions, mapState } from 'vuex'
+import { TokenContractDataGenerator } from '@/js-v-sdk/src/data'
 var initData = {
     errorMessage: '',
     qrArray: new Array(0),
@@ -561,8 +562,9 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            let initData = {amount: this.amount, unity: BigNumber(Math.pow(10, this.unity)), token_description: this.tokenDescription}
             let contract = this.support === false ? TOKEN_CONTRACT : TOKEN_CONTRACT_WITH_SPLIT
+            let dataGenerator = new TokenContractDataGenerator()
+            let initData = dataGenerator.createInitData(this.amount, BigNumber(Math.pow(10, this.unity)), this.tokenDescription)
             tra.buildRegisterContractTx(publicKey, contract, initData, this.contractDescription, this.timeStamp)
             return tra
         },
