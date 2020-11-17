@@ -177,7 +177,7 @@ export default {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {
-                this.functionName = 'Withdraw VSYS'
+                this.functionName = 'Withdraw'
                 this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal_' + this.tokenId)
             }
         },
@@ -185,7 +185,7 @@ export default {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
             } else {
-                this.functionName = 'Deposit VSYS'
+                this.functionName = 'Deposit'
                 this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal_' + this.tokenId)
             }
         },
