@@ -63,10 +63,6 @@
                            @click="destroyToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenSplitStatus && isSplit"
                            @click="splitToken">Split Token</b-dropdown-item>
-          <b-dropdown-item v-if="advancedFunctionsStatus"
-                           @click="depositToken">Deposit to Contract </b-dropdown-item>
-          <b-dropdown-item v-if="advancedFunctionsStatus"
-                           @click="withdrawToken">Withdraw from Contract</b-dropdown-item>
           <b-dropdown-item @click="removeToken">Hide Token</b-dropdown-item>
         </b-dropdown>
       </b-col>
@@ -406,15 +402,6 @@ export default {
                 this.$root.$emit('bv::show::modal', 'issueOrDestroyTokenModal_' + this.tokenId)
             }
         },
-        withdrawToken() {
-            if (this.getDevice === 'Ledger') {
-                alert('This feature is not supported')
-            } else {
-                this.functionName = 'Withdraw Token'
-                this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal_' + this.tokenId)
-            }
-        },
         destroyToken() {
             if (this.getDevice === 'Ledger') {
                 alert('This feature is not supported')
@@ -422,15 +409,6 @@ export default {
                 this.functionName = 'Destroy Token'
                 this.getTokenInfo()
                 this.$root.$emit('bv::show::modal', 'issueOrDestroyTokenModal_' + this.tokenId)
-            }
-        },
-        depositToken() {
-            if (this.getDevice === 'Ledger') {
-                alert('This feature is not supported')
-            } else {
-                this.functionName = 'Deposit Token'
-                this.getTokenInfo()
-                this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal_' + this.tokenId)
             }
         },
         removeToken() {
