@@ -326,13 +326,13 @@
                     block
                     size="lg"
                     :disabled="isSubmitDisabled"
-                    @click="nextPage(); addRecipientList()">Continue
+                    @click="nextPage();addRecipientList()">Continue
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
           <TokenConfirm :address="getAddressFromDataObject"
-                        :recipient="dataObject.stored_tx.functionData.recipient"
-                        :amount=inputAmount(dataObject.stored_tx.functionData.amount)
+                        :recipient="getRecipientFromDataObject"
+                        :amount="inputAmount(getAmountFromDataObject)"
                         :fee="getFeeFromDataObject"
                         :description="dataObject.stored_tx.attachment"
                         :tx-type="'Send Token'">
@@ -371,9 +371,9 @@
         </b-container>
         <b-container v-show="coldPageId===4">
           <TokenConfirm :address="getAddressFromDataObject"
-                        :amount=inputAmount(dataObject.stored_tx.functionData.amount)
+                        :amount="inputAmount(getAmountFromDataObject)"
                         :fee="getFeeFromDataObject"
-                        :recipient="dataObject.stored_tx.functionData.recipient"
+                        :recipient="getRecipientFromDataObject"
                         :description="dataObject.stored_tx.attachment"
                         :tx-type="'Send Token'">
           </TokenConfirm>
@@ -403,8 +403,8 @@
         <b-container v-show="coldPageId===5">
           <TokenSuccess class="tokenSucced"
                         :address="getAddressFromDataObject"
-                        :recipient="dataObject.stored_tx.functionData.recipient"
-                        :amount=inputAmount(dataObject.stored_tx.functionData.amount)
+                        :recipient="getRecipientFromDataObject"
+                        :amount="inputAmount(getAmountFromDataObject)"
                         :description="dataObject.stored_tx.attachment"
                         :fee="getFeeFromDataObject"
                         :tx-type="'Send Token'">
@@ -684,6 +684,12 @@ export default {
             } else {
                 return { 'privateKey': '', 'publicKey': '' }
             }
+        },
+        getAmountFromDataObject() {
+            return BigNumber(this.dataObject.stored_tx.functionData[1].value).dividedBy(this.tokenUnity)
+        },
+        getRecipientFromDataObject() {
+            return this.dataObject.stored_tx.functionData[0].value
         },
         dataObject() {
             return this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.selectedKeypair.publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
