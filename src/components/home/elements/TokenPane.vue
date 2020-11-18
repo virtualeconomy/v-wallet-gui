@@ -69,15 +69,13 @@
                  :addresses="addresses"
                  :selected-address="address"
                  :wallet-type="walletType"></CreateToken>
-    <WithdrawOrDepositToken :token-id="tokenId"
-                            :address="address"
+    <WithdrawOrDepositToken :address="address"
                             :wallet-type="walletType"
                             :addresses="addresses"
+                            :token-id="tokenId"
                             :cold-addresses="coldAddresses"
-                            :token-balance="balances[address]"
                             :balance="balances[address]"
-                            :function-name="functionName"
-                            :token-unity="tokenUnity">
+                            :function-name="functionName">
     </WithdrawOrDepositToken>
   </div>
 </template>
@@ -178,7 +176,7 @@ export default {
                 alert('This feature is not supported')
             } else {
                 this.functionName = 'Withdraw'
-                this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal_' + this.tokenId)
+                this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal')
             }
         },
         depositVsys() {
@@ -186,7 +184,7 @@ export default {
                 alert('This feature is not supported')
             } else {
                 this.functionName = 'Deposit'
-                this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal_' + this.tokenId)
+                this.$root.$emit('bv::show::modal', 'withdrawOrDepositTokenModal')
             }
         },
         formatter(num) {

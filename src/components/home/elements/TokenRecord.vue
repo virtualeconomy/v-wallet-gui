@@ -90,18 +90,6 @@
                          :function-name="functionName"
                          @updateToken="updateToken">
     </IssueOrDestroyToken>
-    <WithdrawOrDepositToken :token-id="tokenId"
-                            :address="address"
-                            :wallet-type="walletType"
-                            :addresses="addresses"
-                            :cold-addresses="coldAddresses"
-                            :token-balance="tokenBalance"
-                            :balance="balances[address]"
-                            :function-name="functionName"
-                            :token-unity="unity"
-                            :is-split="isSplit"
-                            @updateToken="updateToken">
-    </WithdrawOrDepositToken>
     <SplitTokenOrSupersede :issuer="issuer"
                            :token-id="tokenId"
                            :maker="maker"

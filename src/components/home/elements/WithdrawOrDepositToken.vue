@@ -1,5 +1,5 @@
 <template>
-  <b-modal :id="'withdrawOrDepositTokenModal_' + tokenId"
+  <b-modal id="withdrawOrDepositTokenModal"
            centered
            lazy
            title="WithdrawOrDepositToken"
@@ -51,11 +51,7 @@
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isExceededBalance && (this.functionName === 'Deposit')">
-              Deposited {{ this.realFunctionName === 'Deposit Token' ? 'token' : 'vsys' }} is larger than balance
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isEnoughContractBalance && (this.functionName === 'Withdraw')">
-              Withdrawed token is larger than balance
+              Deposited {{ this.actionName === 'Deposit Token' ? 'token' : 'vsys' }} is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative">
@@ -159,12 +155,8 @@
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededBalance && this.realFunctionName=== 'Deposit Token'">
+                                     v-else-if="isExceededBalance && this.actionName=== 'Deposit Token'">
               Deposited token is larger than balance
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isEnoughContractBalance && this.realFunctionName === 'Withdraw Token'">
-              Withdrawed token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative">
@@ -185,7 +177,7 @@
                     block
                     size="lg"
                     :disabled="isSubmitDisabled"
-                    @click="checkContract">{{ this.realFunctionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
+                    @click="checkContract">{{ this.actionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
@@ -281,6 +273,7 @@ import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { CONTRACT_EXEC_FEE, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT, SYSTEM_CONTRACT_DEPOSIT_FUNCIDX, SYSTEM_CONTRACT_WITHDRAW_FUNCIDX } from '@/js-v-sdk/src/constants'
 import { NETWORK_BYTE } from '@/network'
+import {SYSTEM_CONTRACT_TOKEN_ID_TEST} from '@/constants'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -308,11 +301,11 @@ export default {
             hasConfirmed: false,
             contractId: '',
             validContractType: true,
-            newTokenId: '',
+            tokenId: '',
             isSplit: '',
             tokenUnity: '',
             tokenBalance: BigNumber(0),
-            realFunctionName: ''
+            actionName: ''
         }
     },
     props: {
@@ -335,11 +328,6 @@ export default {
         walletType: {
             type: String,
             default: 'hotWallet',
-            require: true
-        },
-        tokenId: {
-            type: String,
-            default: '',
             require: true
         },
         address: {
@@ -377,10 +365,10 @@ export default {
             if (BigNumber(this.amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision && this.isValidNumFormat && (this.realFunctionName === 'Withdraw Token' || this.realFunctionName === 'Withdraw VSYS' ? this.isEnoughContractBalance : !this.isExceededBalance) && !this.isNegative
+            return this.checkPrecision && this.isValidNumFormat && (this.actionName === 'Withdraw Token' || this.actionName === 'Withdraw VSYS' ? true : !this.isExceededBalance) && !this.isNegative
         },
         isExceededBalance() {
-            let tokenBalance = this.realFunctionName === 'Deposit VSYS' ? BigNumber(this.tokenBalance).minus(CONTRACT_EXEC_FEE) : this.tokenBalance
+            let tokenBalance = this.actionName === 'Deposit VSYS' ? BigNumber(this.tokenBalance).minus(CONTRACT_EXEC_FEE) : this.tokenBalance
             return BigNumber(this.amount).isGreaterThan(tokenBalance)
         },
         isInsufficient() {
@@ -395,11 +383,8 @@ export default {
         checkPrecision() {
             return common.checkPrecision(BigNumber(this.amount).multipliedBy(this.tokenUnity), 0)
         },
-        isEnoughContractBalance() {
-            return true
-        },
         getTxType() {
-            switch (this.realFunctionName) {
+            switch (this.actionName) {
             case 'Deposit Token':
                 return 'Deposit Token to Contract'
             case 'Deposit VSYS':
@@ -425,7 +410,7 @@ export default {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
         },
         executorContractId() {
-            return common.tokenIDToContractID(this.newTokenId)
+            return common.tokenIDToContractID(this.tokenId)
         },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.address].publicKey)
@@ -439,9 +424,9 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            let dataGenerator = this.realFunctionName === 'Withdraw Token' || this.realFunctionName === 'Deposit Token' ? new TokenContractDataGenerator() : new SystemContractDataGenerator()
+            let dataGenerator = this.actionName === 'Withdraw Token' || this.actionName === 'Deposit Token' ? new TokenContractDataGenerator() : new SystemContractDataGenerator()
             let functionIndex, functionData
-            switch (this.realFunctionName) {
+            switch (this.actionName) {
             case 'Deposit Token':
                 functionIndex = this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX
                 functionData = dataGenerator.createDepositData(this.address, this.contractId, this.amount, this.tokenUnity)
@@ -489,7 +474,7 @@ export default {
                     this.coldPageId++
                 }
                 this.updateBalance(true)
-                if (this.realFunctionName === 'Withdraw Token' || this.realFunctionName === 'Deposit Token') {
+                if (this.actionName === 'Withdraw Token' || this.actionName === 'Deposit Token') {
                     for (let delayTime = 6000; delayTime <= 54000; delayTime *= 3) { //  Refresh interval will be 6s, 18s, 54s
                         setTimeout(this.sendBalanceChange, delayTime)
                     }
@@ -545,16 +530,14 @@ export default {
             this.coldSignature = ''
             this.contractId = ''
             this.validContractType = true
-            this.newTokenId = ''
-            this.realFunctionName = ''
-            this.newTokenId = ''
+            this.tokenId = ''
+            this.actionName = ''
             this.isSplit = ''
             this.tokenUnity = ''
             this.tokenBalance = BigNumber(0)
         },
         hideContractError() {
             this.chain.getContractInfo(this.contractId).then(response => {
-                const SYSTEM_CONTRACT_TOKEN_ID_TEST = 'TWuKDNU1SAheHR99s1MbGZLPh1KophEmKk1eeU3mW'
                 let tokenId = ''
                 let contractInfo = response.info
                 for (let i = 0; i < contractInfo.length; i++) {
@@ -568,8 +551,8 @@ export default {
                 this.chain.getTokenBalance(this.address, tokenId).then(res => {
                     this.tokenBalance = BigNumber(res.balance).dividedBy(res.unity).toString()
                 })
-                this.realFunctionName = this.functionName + (tokenId === SYSTEM_CONTRACT_TOKEN_ID_TEST ? ' VSYS' : ' Token')
-                this.newTokenId = tokenId
+                this.actionName = this.functionName + (tokenId === SYSTEM_CONTRACT_TOKEN_ID_TEST ? ' VSYS' : ' Token')
+                this.tokenId = tokenId
                 let tokenContract = common.tokenIDToContractID(tokenId)
                 this.chain.getContractInfo(tokenContract).then(res => {
                     this.isSplit = res.type === 'TokenContractWithSplit'
