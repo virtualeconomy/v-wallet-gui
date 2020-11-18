@@ -1,5 +1,5 @@
 <template>
-  <b-modal :id="'withdrawOrDepositTokenModal_' + tokenId"
+  <b-modal id="withdrawOrDepositTokenModal"
            centered
            lazy
            title="WithdrawOrDepositToken"
@@ -50,12 +50,8 @@
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededBalance && (this.functionName === 'Deposit Token' || this.functionName === 'Deposit VSYS')">
-              Deposited {{ this.functionName === 'Deposit Token' ? 'token' : 'vsys' }} is larger than balance
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isEnoughContractBalance && (this.functionName === 'Withdraw Token' || this.functionName === 'Withdraw VSYS')">
-              Withdrawed token is larger than balance
+                                     v-else-if="isExceededBalance && (this.functionName === 'Deposit')">
+              Deposited {{ this.actionName === 'Deposit Token' ? 'token' : 'vsys' }} is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative">
@@ -76,7 +72,7 @@
                     size="lg"
                     block
                     :disabled="isSubmitDisabled"
-                    @click="checkContract">{{ functionName === 'Withdraw Token' || functionName === 'Withdraw VSYS' ? 'Withdraw' : 'Deposit' }}
+                    @click="checkContract">{{ functionName === 'Withdraw' ? 'Withdraw' : 'Deposit' }}
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
@@ -159,12 +155,8 @@
               Invalid format. The number of digits after the decimal point may be larger than the token precision.
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="isExceededBalance && this.functionName === 'Deposit Token'">
+                                     v-else-if="isExceededBalance && this.actionName=== 'Deposit Token'">
               Deposited token is larger than balance
-            </b-form-invalid-feedback>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     v-else-if="!isEnoughContractBalance && this.functionName === 'Withdraw Token'">
-              Withdrawed token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative">
@@ -185,7 +177,7 @@
                     block
                     size="lg"
                     :disabled="isSubmitDisabled"
-                    @click="checkContract">{{ functionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
+                    @click="checkContract">{{ this.actionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
@@ -281,6 +273,7 @@ import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
 import { CONTRACT_EXEC_FEE, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT, SYSTEM_CONTRACT_DEPOSIT_FUNCIDX, SYSTEM_CONTRACT_WITHDRAW_FUNCIDX } from '@/js-v-sdk/src/constants'
 import { NETWORK_BYTE } from '@/network'
+import {SYSTEM_CONTRACT_TOKEN_ID_TEST} from '@/constants'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -307,24 +300,16 @@ export default {
             timeStamp: Date.now() * 1e6,
             hasConfirmed: false,
             contractId: '',
-            validContractType: true
+            validContractType: true,
+            tokenId: '',
+            isSplit: '',
+            tokenUnity: '',
+            tokenBalance: BigNumber(0),
+            actionName: ''
         }
     },
     props: {
-        tokenBalance: {
-            type: BigNumber,
-            default: function() {
-                return BigNumber(0)
-            },
-            require: true
-        },
         balance: {
-            type: BigNumber,
-            default: function() {
-            },
-            require: true
-        },
-        tokenUnity: {
             type: BigNumber,
             default: function() {
             },
@@ -345,18 +330,9 @@ export default {
             default: 'hotWallet',
             require: true
         },
-        tokenId: {
-            type: String,
-            default: '',
-            require: true
-        },
         address: {
             type: String,
             default: ''
-        },
-        isSplit: {
-            type: Boolean,
-            default: false
         },
         functionName: {
             type: String,
@@ -389,10 +365,10 @@ export default {
             if (BigNumber(this.amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision && this.isValidNumFormat && (this.functionName === 'Withdraw Token' || this.functionName === 'Withdraw VSYS' ? this.isEnoughContractBalance : !this.isExceededBalance) && !this.isNegative
+            return this.checkPrecision && this.isValidNumFormat && (this.actionName === 'Withdraw Token' || this.actionName === 'Withdraw VSYS' ? true : !this.isExceededBalance) && !this.isNegative
         },
         isExceededBalance() {
-            let tokenBalance = this.functionName === 'Deposit VSYS' ? BigNumber(this.tokenBalance).minus(CONTRACT_EXEC_FEE) : this.tokenBalance
+            let tokenBalance = this.actionName === 'Deposit VSYS' ? BigNumber(this.tokenBalance).minus(CONTRACT_EXEC_FEE) : this.tokenBalance
             return BigNumber(this.amount).isGreaterThan(tokenBalance)
         },
         isInsufficient() {
@@ -407,11 +383,8 @@ export default {
         checkPrecision() {
             return common.checkPrecision(BigNumber(this.amount).multipliedBy(this.tokenUnity), 0)
         },
-        isEnoughContractBalance() {
-            return true
-        },
         getTxType() {
-            switch (this.functionName) {
+            switch (this.actionName) {
             case 'Deposit Token':
                 return 'Deposit Token to Contract'
             case 'Deposit VSYS':
@@ -451,9 +424,9 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            let dataGenerator = this.functionName === 'Withdraw Token' || this.functionName === 'Deposit Token' ? new TokenContractDataGenerator() : new SystemContractDataGenerator()
+            let dataGenerator = this.actionName === 'Withdraw Token' || this.actionName === 'Deposit Token' ? new TokenContractDataGenerator() : new SystemContractDataGenerator()
             let functionIndex, functionData
-            switch (this.functionName) {
+            switch (this.actionName) {
             case 'Deposit Token':
                 functionIndex = this.isSplit ? DEPOSIT_FUNCIDX_SPLIT : DEPOSIT_FUNCIDX
                 functionData = dataGenerator.createDepositData(this.address, this.contractId, this.amount, this.tokenUnity)
@@ -501,7 +474,7 @@ export default {
                     this.coldPageId++
                 }
                 this.updateBalance(true)
-                if (this.functionName === 'Withdraw Token' || this.functionName === 'Deposit Token') {
+                if (this.actionName === 'Withdraw Token' || this.actionName === 'Deposit Token') {
                     for (let delayTime = 6000; delayTime <= 54000; delayTime *= 3) { //  Refresh interval will be 6s, 18s, 54s
                         setTimeout(this.sendBalanceChange, delayTime)
                     }
@@ -557,9 +530,35 @@ export default {
             this.coldSignature = ''
             this.contractId = ''
             this.validContractType = true
+            this.tokenId = ''
+            this.actionName = ''
+            this.isSplit = ''
+            this.tokenUnity = ''
+            this.tokenBalance = BigNumber(0)
         },
         hideContractError() {
-            this.validContractType = true
+            this.chain.getContractInfo(this.contractId).then(response => {
+                let tokenId = ''
+                let contractInfo = response.info
+                for (let i = 0; i < contractInfo.length; i++) {
+                    if (contractInfo[i]['name'] === 'tokenId' && contractInfo[i]['type'] === 'TokenId') {
+                        tokenId = contractInfo[i]['data']
+                    }
+                }
+                this.chain.getTokenInfo(tokenId).then(res => {
+                    this.tokenUnity = BigNumber(res.unity)
+                })
+                this.chain.getTokenBalance(this.address, tokenId).then(res => {
+                    this.tokenBalance = BigNumber(res.balance).dividedBy(res.unity).toString()
+                })
+                this.actionName = this.functionName + (tokenId === SYSTEM_CONTRACT_TOKEN_ID_TEST ? ' VSYS' : ' Token')
+                this.tokenId = tokenId
+                let tokenContract = common.tokenIDToContractID(tokenId)
+                this.chain.getContractInfo(tokenContract).then(res => {
+                    this.isSplit = res.type === 'TokenContractWithSplit'
+                })
+                this.validContractType = true
+            })
         },
         endSend() {
             this.$refs.withdrawOrDepositTokenModal.hide()

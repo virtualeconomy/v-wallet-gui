@@ -9,3 +9,7 @@ export const FEEDBACK_URL = 'https://github.com/virtualeconomy/v-wallet-gui/issu
 export const SHOW_UNSUPPORTED_FUNCTION = false
 export const MAX_ALIAS_LENGTH = 8
 export const CERTIFICATED_TOKEN = '/api/tokens'
+export const SYSTEM_CONTRACT_TOKEN_ID_TEST = 'TWuKDNU1SAheHR99s1MbGZLPh1KophEmKk1eeU3mW'
+export const SYSTEM_CONTRACT_TOKEN_ID = ''
+
+
