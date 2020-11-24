@@ -595,7 +595,7 @@ export default {
         },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.address].publicKey)
-            tra['stored_tx']['functionExplain'] = 'Set issuer to ' + tra['stored_tx']['functionData'][0]['value']
+            tra['stored_tx']['functionExplain'] = this.functionName === 'Split Token' ? 'Set token unity to ' + tra['stored_tx']['functionData'][0]['value'] : 'Set issuer to ' + tra['stored_tx']['functionData'][0]['value']
             return tra
         }
     },
