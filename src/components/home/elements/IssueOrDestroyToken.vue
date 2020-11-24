@@ -484,6 +484,7 @@ export default {
         },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.address].publicKey)
+            tra['stored_tx']['functionExplain'] = this.functionName === 'Issue Token' ? 'Issue ' + BigNumber(tra['stored_tx']['functionData'][0]['value']).dividedBy(this.tokenUnity) + ' Token' : 'Destroy ' + BigNumber(tra['stored_tx']['functionData'][0]['value']).dividedBy(this.tokenUnity) + ' Token'
             return tra
         }
     },
