@@ -692,7 +692,11 @@ export default {
             return this.dataObject.stored_tx.functionData[0].value
         },
         dataObject() {
-            return this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.selectedKeypair.publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
+            let dataObject = this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.selectedKeypair.publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
+            if (this.selectedWalletType === 'coldWallet') {
+                dataObject['stored_tx']['functionExplain'] = 'Sent ' + BigNumber(dataObject['stored_tx']['functionData'][1]['value']).dividedBy(this.tokenUnity) + ' token to ' + dataObject['stored_tx']['functionData'][0]['value']
+            }
+            return dataObject
         }
     },
     methods: {
