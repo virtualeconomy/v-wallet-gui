@@ -414,6 +414,7 @@ export default {
         },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.address].publicKey)
+            tra['stored_tx']['functionExplain'] = this.functionName === 'Deposit' ? 'Deposit Token' : 'Withdraw Token'
             return tra
         }
     },
