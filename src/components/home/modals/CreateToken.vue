@@ -382,7 +382,8 @@ import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
 import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
 import common from '@/js-v-sdk/src/utils/common'
 import { mapActions, mapState } from 'vuex'
-import { TokenContractDataGenerator } from '@/js-v-sdk/src/data'
+import { TokenContractDataGenerator, NonFungibleTokenContractDataGenerator, getContractFunctionIndex } from '@/js-v-sdk/src/data'
+import { NFT } from '@/js-v-sdk/src/contract_type'
 var initData = {
     errorMessage: '',
     qrArray: new Array(0),
@@ -403,7 +404,10 @@ var initData = {
     tokenId: '',
     selectedWalletType: this ? this.walletType : 'hotWallet',
     contractDescription: '',
-    tokenDescription: ''
+    tokenDescription: '',
+    selectedNFTContract: false,
+    nftContractID: '',
+    attachment: 'issue nft'
 }
 export default {
     name: 'CreateToken',
@@ -562,10 +566,18 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            let contract = this.support === false ? TOKEN_CONTRACT : TOKEN_CONTRACT_WITH_SPLIT
-            let dataGenerator = new TokenContractDataGenerator()
-            let initData = dataGenerator.createInitData(this.amount, BigNumber(Math.pow(10, this.unity)), this.tokenDescription)
-            tra.buildRegisterContractTx(publicKey, contract, initData, this.contractDescription, this.timeStamp)
+            if (this.selectedNFTContract) {
+                let dataGenerator = new NonFungibleTokenContractDataGenerator()
+                let initData = dataGenerator.createIssueData(this.tokenDescription)
+                let functionIndex = getContractFunctionIndex(NFT, 'ISSUE')
+                tra.buildExecuteContractTx(publicKey, this.nftContractID, functionIndex, initData, this.timeStamp, this.attachment)
+                return tra
+            } else {
+                let contract = this.support === false ? TOKEN_CONTRACT : TOKEN_CONTRACT_WITH_SPLIT
+                let dataGenerator = new TokenContractDataGenerator()
+                let initData = dataGenerator.createInitData(this.amount, BigNumber(Math.pow(10, this.unity)), this.tokenDescription)
+                tra.buildRegisterContractTx(publicKey, contract, initData, this.contractDescription, this.timeStamp)
+            }
             return tra
         },
         sendData(walletType) {
@@ -583,27 +595,51 @@ export default {
                 let signature = this.coldSignature
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
-            this.chain.sendRegisterContractTx(sendTx).then(response => {
-                if (response.hasOwnProperty('error')) {
-                    this.errorMessage = response.message
+            if (this.selectedNFTContract) {
+                this.chain.sendExecuteContractTx(sendTx).then(response => {
+                    if (response.hasOwnProperty('error')) {
+                        this.errorMessage = response.message
+                        this.sendError = true
+                        return
+                    }
+                    if (walletType === 'hotWallet') {
+                        this.pageId++
+                    } else {
+                        this.coldPageId++
+                    }
+                    let tokenId = common.contractIDToTokenID(this.nftContractID)
+                    this.addTokenUpdateEventPool(tokenId)
+                    this.updateBalance(true)
+                }, respErr => {
+                    this.errorMessage = respErr.message
+                    if (this.errorMessage === undefined) {
+                        this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
+                    }
                     this.sendError = true
-                    return
-                }
-                if (walletType === 'hotWallet') {
-                    this.pageId++
-                } else {
-                    this.coldPageId++
-                }
-                let tokenId = common.contractIDToTokenID(response.contractId)
-                this.addTokenUpdateEventPool(tokenId)
-                this.updateBalance(true)
-            }, respErr => {
-                this.errorMessage = respErr.message
-                if (this.errorMessage === undefined) {
-                    this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
-                }
-                this.sendError = true
-            })
+                })
+            } else {
+                this.chain.sendRegisterContractTx(sendTx).then(response => {
+                    if (response.hasOwnProperty('error')) {
+                        this.errorMessage = response.message
+                        this.sendError = true
+                        return
+                    }
+                    if (walletType === 'hotWallet') {
+                        this.pageId++
+                    } else {
+                        this.coldPageId++
+                    }
+                    let tokenId = common.contractIDToTokenID(response.contractId)
+                    this.addTokenUpdateEventPool(tokenId)
+                    this.updateBalance(true)
+                }, respErr => {
+                    this.errorMessage = respErr.message
+                    if (this.errorMessage === undefined) {
+                        this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
+                    }
+                    this.sendError = true
+                })
+            }
         },
         nextPage() {
             this.sendError = false
