@@ -115,6 +115,7 @@
                :wallet-type="walletType"
                :is-split="isSplit"
                :token-unity="unity"
+               :contract-type="contractType"
                @updateToken="updateToken">
     </SendToken>
     <Receive show="false"
@@ -156,7 +157,8 @@ export default {
             maker: '',
             functionName: '',
             contractId: '',
-            showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION
+            showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION,
+            contractType: ''
         }
     },
     props: {
@@ -221,6 +223,7 @@ export default {
     created() {
         this.getTokenInfo()
         this.updateToken()
+        this.getContractType()
     },
     computed: {
         ...mapState({
@@ -414,6 +417,15 @@ export default {
         },
         updateUnity(tokenId, unity) {
             this.certifiedTokenList[tokenId].unity = unity
+        },
+        getContractType() {
+            let contractId = common.tokenIDToContractID(this.tokenId)
+            let contractType = ''
+            this.chain.getContractInfo(contractId).then(response => {
+                contractType = response.type
+            }, respError => {
+            })
+            this.contractType = contractType
         }
     }
 }

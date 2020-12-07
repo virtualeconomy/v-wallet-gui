@@ -434,6 +434,8 @@ import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 import common from '@/js-v-sdk/src/utils/common'
 import Transaction from '@/js-v-sdk/src/transaction'
+import {NonFungibleTokenContractDataGenerator, getContractFunctionIndex} from '@/js-v-sdk/src/data'
+import { NFT } from '@/js-v-sdk/src/contract_type'
 import { mapActions, mapState } from 'vuex'
 var initData = {
     errorMessage: '',
@@ -501,6 +503,11 @@ export default {
             require: true
         },
         tokenId: {
+            type: String,
+            default: '',
+            require: true
+        },
+        contractType: {
             type: String,
             default: '',
             require: true
@@ -706,7 +713,16 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            tra.buildSendTokenTx(publicKey, this.tokenId, this.tmpRecipient, this.amount, this.tokenUnity, this.isSplit, this.description, this.timeStamp)
+            if (this.contractType === 'NonFungibleContract') {
+                let contractId = common.tokenIDToContractID(this.tokenId)
+                let tokenIndex = common.getTokenIndex(this.tokenId)
+                const dataGenerator = new NonFungibleTokenContractDataGenerator()
+                let functionData = dataGenerator.createSendData(this.tmpRecipient, tokenIndex)
+                let functionIndex = getContractFunctionIndex(NFT, 'SEND')
+                tra.buildExecuteContractTx(publicKey, contractId, functionIndex, functionData, this.timestamp, this.description)
+            } else {
+                tra.buildSendTokenTx(publicKey, this.tokenId, this.tmpRecipient, this.amount, this.tokenUnity, this.isSplit, this.description, this.timeStamp)
+            }
             return tra
         },
         recordTmpRecipient(recipient) {
