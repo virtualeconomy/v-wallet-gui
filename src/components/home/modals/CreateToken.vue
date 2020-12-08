@@ -39,8 +39,24 @@
               <span class="balance">{{ formatter(balances[address]) }} VSYS</span>
             </b-btn>
           </b-form-group>
+          <b-form-group >
+            <b-form-radio-group v-model="tokenMethod"
+                                plain
+                                style="display: flex;flex-direction: column"
+                                :options="tokenSplitStatus?selectedOptions1:selectedOptions2"></b-form-radio-group>
+          </b-form-group>
+          <b-form-group label="Contract"
+                        label-for="descriptionInput"
+                        v-show="tokenMethod=='NFT'">
+            <b-form-select id=address-input
+                           v-model="address"
+                           :options="options(addresses)"></b-form-select>
+            <div class="mt">Cannot see your NFT contract?</div>
+            <div class="no_nft_tips">You can <span class="tips_color">Create NFT contract</span> or add existing contract in <span class="tips_color">management panel.</span></div>
+          </b-form-group>
           <b-form-group label="Contract Description"
-                        label-for="descriptionInput">
+                        label-for="descriptionInput"
+                        v-show="tokenMethod!='NFT'">
             <b-form-textarea id="descriptionInput"
                              v-model="contractDescription"
                              :rows="2"
@@ -60,7 +76,8 @@
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Max Supply"
-                        label-for="amount-input">
+                        label-for="amount-input"
+                        v-show="tokenMethod!='NFT'">
             <b-form-input id="amount-input"
                           class="amount-input"
                           v-model="amount"
@@ -89,7 +106,7 @@
               Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-show="tokenMethod!='NFT'">
             <span style="font-size: 15px !important;color: #9091A3;">Unity: 10<sup>{{ unity }}</sup> (The minimum amount will be {{ formatter(1/Math.pow(10, unity)) }} Token)</span>
             <div style="margin-top: 10px;">
               <span class="unity-number">10<sup>0</sup></span>
@@ -407,7 +424,17 @@ var initData = {
     tokenDescription: '',
     selectedNFTContract: false,
     nftContractID: '',
-    attachment: 'issue nft'
+    attachment: 'issue nft',
+    tokenMethod: 'FT',
+    selectedOptions1: [
+        {text: 'Fungible Token', value: 'FT'},
+        {text: 'Fungible Token with split/reverse-split function', value: 'FTWF'},
+        {text: 'Non Fungible Token', value: 'NFT'}
+    ],
+    selectedOptions2: [
+        {text: 'Fungible Token', value: 'FT'},
+        {text: 'Non Fungible Token', value: 'NFT'}
+    ]
 }
 export default {
     name: 'CreateToken',
@@ -674,6 +701,7 @@ export default {
             this.selectedWalletType = this.walletType
             this.contractDescription = ''
             this.tokenDescription = ''
+            this.tokenMethod = 'FT'
         },
         endSend() {
             this.$refs.createTokenModal.hide()
@@ -706,6 +734,17 @@ export default {
 </script>
 
 <style scoped lang="less">
+.mt{
+    margin-top: 10px;
+}
+.no_nft_tips{
+    color: #9091a3;
+    font-size: 13px
+}
+.tips_color{
+    color: #FF8737;
+    font-size: 12px
+}
 .scan-ok-btn, .scan-again-btn {
     margin-top: 10px;
 }

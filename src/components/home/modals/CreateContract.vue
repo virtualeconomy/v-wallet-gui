@@ -1,5 +1,122 @@
 <template>
-
+  <b-modal id="createContractModal"
+           centered
+           lazy
+           title="Create Token"
+           hide-footer
+           hide-header
+           ref="createContractModal"
+           :busy="true"
+           style="padding-left: 0px;"
+           @hidden="closeModal">
+    <button
+      class="close btn-close"
+      @click="endSend">
+      <img src="@/assets/imgs/icons/operate/ic_close.svg">
+    </button>
+    <b-tabs @input="hideQrScan">
+      <b-tab title="Hot Wallet"
+             :disabled="!pageId"
+             :active="walletType==='hotWallet'">
+        <b-container
+          style="text-align: left;"
+          v-if="pageId===1">
+          <b-form-group label="Wallet Address"
+                        label-for="address-input">
+            <b-form-select id=address-input
+                           class="addr-input"
+                           v-model="address"
+                           :options="options(addresses)"></b-form-select>
+            <b-btn
+              block
+              variant="light"
+              disabled
+              class="balance-input"
+              readonly>
+              <span class="balance-title">
+                Balance
+              </span>
+              <span class="balance">{{ formatter(balances[address]) }} VSYS</span>
+            </b-btn>
+          </b-form-group>
+          <b-form-group >
+            <b-form-radio-group v-model="contractMethod"
+                                plain
+                                style="display: flex;flex-direction: column"
+                                :options="selectedOptions"></b-form-radio-group>
+          </b-form-group>
+          <b-form-group label="Contract Description"
+                        label-for="descriptionInput">
+            <b-form-textarea id="descriptionInput"
+                             v-model="contractDescription"
+                             :rows="2"
+                             :no-resize="true"
+                             placeholder="Max 140 characters. When you have done, this content can not be revised"
+                             :state="isValidDescription(contractDescription)">
+            </b-form-textarea>
+          </b-form-group>
+          <b-form-group style="margin-top: 10px;">
+            <label class="fee-remark">Transaction Fee {{ Number(fee) }} VSYS</label>
+            <span v-if="isInsufficient"
+                  class="vsys-check">Insufficient VSYS balance.</span>
+          </b-form-group>
+          <b-button variant="warning"
+                    class="btn-continue"
+                    size="lg"
+                    block
+                    :disabled="!isSubmitDisabled"
+                    @click="nextPage">Continue
+          </b-button>
+        </b-container>
+        <b-container v-if="pageId===2">
+          <TokenConfirm :address="address"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
+                        :tx-type="contractMethod">
+          </TokenConfirm>
+          <p v-show="sendError"
+             class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
+          <b-row>
+            <b-col class="col-lef">
+              <b-button
+                class="btn-back"
+                block
+                variant="light"
+                size="lg"
+                @click="prevPage">Back
+              </b-button>
+            </b-col>
+            <b-col class="col-rit">
+              <b-button
+                block
+                class="btn-confirm"
+                variant="warning"
+                size="lg"
+                :disabled="hasConfirmed"
+                @click="sendData('hotWallet')">Confirm
+              </b-button>
+            </b-col>
+          </b-row>
+        </b-container>
+        <b-container v-if="pageId===3">
+          <TokenSuccess :address="address"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
+                        :tx-type="'Register New Token'">
+          </TokenSuccess>
+          <b-button variant="warning"
+                    block
+                    size="lg"
+                    @click="endSend">OK
+          </b-button>
+        </b-container>
+      </b-tab>
+      <b-tab title="Cold Wallet"
+             :disabled="noColdAddress || !coldPageId"
+             :active="walletType==='coldWallet'">
+      </b-tab>
+    </b-tabs>
+  </b-modal>
 </template>
 
 <script>
@@ -7,7 +124,7 @@ import Vue from 'vue'
 import browser from '@/utils/browser'
 import Transaction from '@/js-v-sdk/src/transaction'
 import { NETWORK_BYTE } from '@/network'
-import { NFT, LOCK, PAYMENT_CHANNEL } from '@/js-v-sdk/src/contract_type'
+import { NFT, LOCK } from '@/js-v-sdk/src/contract_type'
 import { mapActions, mapState } from 'vuex'
 import { TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants'
 import seedLib from '@/libs/seed.js'
@@ -16,10 +133,11 @@ import { NON_FUNGIBLE_TOKEN_CONTRACT, LOCK_CONTRACT, PAYMENT_CONTRACT } from '@/
 import { NonFungibleTokenContractDataGenerator, LockContractDataGenerator, PaymentChannelContractDataGenerator } from '@/js-v-sdk/src/data'
 import { CONTRACT_REGISTER_FEE } from '@/js-v-sdk/src/constants'
 import BigNumber from 'bignumber.js'
+import TokenConfirm from './TokenConfirm'
+import TokenSuccess from './TokenSuccess'
 
 var initData = {
     selectedContractType: '',
-    selectedAddress: '',
     selectedTokenID: '',
     tokenList: {},
     errorMessage: '',
@@ -35,12 +153,19 @@ var initData = {
     timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     selectedWalletType: this ? this.walletType : 'hotWallet',
-    contractDescription: ''
+    contractDescription: '',
+    contractMethod: 'Non-Fungible Token(NFT) Contract',
+    selectedOptions: [
+        {text: 'Non-Fungible Token(NFT) Contract', value: 'Non-Fungible Token(NFT) Contract'},
+        {text: 'Payment Channel Contract', value: 'Payment Channel Contract'},
+        {text: 'Look Contract', value: 'Look Contract'}
+    ],
+    amount: 1
 }
 
 export default {
     name: 'CreateContract',
-    prop: {
+    props: {
         balances: {
             type: Object,
             default: function() {
@@ -55,6 +180,16 @@ export default {
         addresses: {
             type: Object,
             default: function() {},
+            require: true
+        },
+        walletType: {
+            type: String,
+            default: 'hotWallet',
+            require: true
+        },
+        selectedAddress: {
+            type: String,
+            default: this ? this.defaultAddress : undefined,
             require: true
         }
     },
@@ -119,6 +254,10 @@ export default {
         },
         getArray() {
             return this.qrArray
+        },
+        isInsufficient() {
+            let balance = this.selectedWalletType === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
+            return BigNumber(balance).isLessThan(BigNumber(CONTRACT_REGISTER_FEE))
         }
     },
     methods: {
@@ -139,6 +278,7 @@ export default {
             this.selectedAddress = ''
             this.selectedContractType = ''
             this.contractDescription = ''
+            this.contractMethod = 'Non-Fungible Token(NFT) Contract'
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
@@ -241,11 +381,204 @@ export default {
                 options.push({ value: addr, text: addr })
                 return options
             }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
+        },
+        closeModal() {
+            this.resetData()
+            this.$refs.createContractModal.hide()
+        },
+        inputAmount(num) {
+            return BigNumber(num)
         }
+    },
+    components: {
+        TokenConfirm,
+        TokenSuccess
     }
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
+.mt{
+    margin-top: 10px;
+}
+.no_nft_tips{
+    color: #9091a3;
+    font-size: 13px
+}
+.tips_color{
+    color: #FF8737;
+    font-size: 12px
+}
+.scan-ok-btn, .scan-again-btn {
+    margin-top: 10px;
+}
 
+textarea::-webkit-input-placeholder {
+    font-family: Roboto-Regular;
+    text-align: left;
+    font-size: 15px;
+    color: #C0C1CC;
+    padding-top: 5px;
+    letter-spacing: 0;
+}
+.qr-code {
+    width: 26px;
+    cursor: pointer;
+    position: absolute;
+    margin-top: -37px;
+    margin-left: 380px;
+}
+.qr-info {
+    text-align: left;
+    color: #9091a3;
+}
+.addr-input {
+    border: 1px solid #E8E9ED;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+    background-color: #FFF;
+    font-size: 15px;
+    color: #181B3A;
+    letter-spacing: 0;
+    height: 48px !important;
+}
+.recipient-input {
+    padding-right: 35px;
+    height: 48px;
+}
+.amount-input {
+    height: 48px;
+}
+.balance-title {
+    float: left;
+    font-size: 15px;
+    color: #9091A3;
+    letter-spacing: 0;
+}
+.balance {
+    float: right;
+    font-size: 15px;
+    color: #FF8737;
+    letter-spacing: 0;
+    text-align: right;
+}
+.balance-input {
+    border: 1px solid #E8E9ED !important;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    opacity: 1;
+    background-color: #FAFAFA;
+    height: 37px;
+}
+.btn-close {
+    position: absolute;
+    right: 0;
+    margin-right: 20px;
+    margin-top: 20px;
+}
+.btn-continue {
+    font-size: 17px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    text-align: center;
+    height: 50px;
+}
+.fee-remark {
+    font-size: 13px;
+    color: #9091A3;
+    letter-spacing: 0;
+}
+.center {
+    text-align: center;
+}
+.qrcode-waiting {
+    vertical-align: middle;
+    display: flex;
+    margin-right: auto;
+    margin-left: auto;
+    margin-top: 20px;
+}
+.qr-window {
+    padding: 0 100px;
+}
+.btn-confirm {
+    height: 44px;
+    font-size: 17px;
+    color: #FFFFFF;
+    letter-spacing: 0;
+    text-align: center;
+}
+.btn-back {
+    background: #FAFAFA;
+    border: 1px solid #E8E9ED;
+    border-radius: 4px;
+    font-size: 17px;
+    color: #4F515E;
+    letter-spacing: 0;
+    text-align: center;
+}
+.col-lef {
+    padding-right: 10px;
+}
+.col-rit {
+    padding-left: 10px;
+}
+.col-form-label {
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    color: red !important;
+    letter-spacing: 0;
+}
+.bar-minus {
+    position: absolute;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    margin-left: 2px;
+    color: #fff !important;
+    background-color: #FF8737 !important;
+    border-color: #FF8737 !important;
+    border-radius: 50%;
+}
+.bar-plus {
+    position: absolute;
+    margin-left: 307px;
+    margin-right: 2px;
+    color: #fff !important;
+    background-color: #FF8737 !important;
+    border-color: #FF8737 !important;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+}
+.pg-bar {
+    position: absolute;
+    margin-top: -18px;
+    margin-left: 55px;
+    padding-top: 0px;
+    width: 271px;
+    height: 16px;
+}
+.unity-number {
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    color: #181B3A;
+    letter-spacing: 0;
+}
+.unity-number-second {
+    position:absolute;
+    margin-left: 332px;
+    margin-top: 2px;
+    font-family: Roboto-Regular;
+    font-size: 15px;
+    color: #181B3A;
+    letter-spacing: 0;
+}
+.vsys-check {
+    display: block;
+    margin-top: -10px;
+    font-size: 80%;
+    color: #dc3545;
+}
 </style>
