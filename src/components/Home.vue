@@ -2,9 +2,6 @@
   <div class="home"
        @mousemove=resetSessionClearTimeout>
     <nav-bar :addresses="addresses"
-             :balance="balance[selectedAddress]"
-             :wallet-type="walletType"
-             :balances="balance"
              :address="selectedAddress"
              class="navibar"
              :cold-addresses="coldAddresses"
