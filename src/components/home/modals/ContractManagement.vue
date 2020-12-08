@@ -54,6 +54,9 @@ export default {
                 console.log(e)
             }
             return isValid
+        },
+        isSupportContract() {
+            return this.curContractType === 'NFT' || this.curContractType === 'Lock' || this.curContractType === 'Payment'
         }
     },
     methods: {
