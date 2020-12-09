@@ -49,8 +49,8 @@
                         label-for="descriptionInput"
                         v-show="tokenMethod=='NFT'">
             <b-form-select id=address-input
-                           v-model="address"
-                           :options="options(addresses)"></b-form-select>
+                           v-model="contract"
+                           :options="options(contracts,'con')"></b-form-select>
             <div class="mt">Cannot see your NFT contract?</div>
             <div class="no_nft_tips">You can <span class="tips_color">Create NFT contract</span> or add existing contract in <span class="tips_color">management panel.</span></div>
           </b-form-group>
@@ -140,7 +140,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled"
+                    :disabled="tokenMethod=='NFT'?isContract:isSubmitDisabled"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -434,7 +434,9 @@ var initData = {
     selectedOptions2: [
         {text: 'Fungible Token', value: 'FT'},
         {text: 'Non Fungible Token', value: 'NFT'}
-    ]
+    ],
+    contract: '',
+    contracts: {}
 }
 export default {
     name: 'CreateToken',
@@ -470,6 +472,11 @@ export default {
     data: function() {
         return initData
     },
+    created() {
+        if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
+            this.contracts = JSON.parse(window.localStorage.getItem(this.defaultAddress)).contract
+        }
+    },
     computed: {
         ...mapState({
             chain: 'chain',
@@ -503,6 +510,9 @@ export default {
         },
         isSubmitDisabled() {
             return !(!this.isInsufficient && (this.isValidDescription(this.contractDescription) || !this.contractDescription) && (this.isValidDescription(this.tokenDescription) || !this.tokenDescription) && this.isValidAmount)
+        },
+        isContract() {
+            return this.contract === ''
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -720,11 +730,11 @@ export default {
                 this.coldPageId = 1
             }
         },
-        options(addrs) {
+        options(addrs, type) {
             return Object.keys(addrs).reduce((options, addr) => {
                 options.push({ value: addr, text: addr })
                 return options
-            }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
+            }, [{ value: '', text: '<span class="text-muted">Please select a ' + (type === 'con' ? 'contract</span>' : 'wallet address</span>'), disabled: true }])
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)

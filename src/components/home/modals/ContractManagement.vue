@@ -24,7 +24,7 @@
                     v-b-modal.createContractModal>New Contract
         </b-button></div>
         <div class="scroll"
-             :style="{'max-height': '280px', 'min-height': '280px'}">
+             :style="{'max-height': '280px', 'min-height': '280px', 'margin-top': '10px'}">
           <b-form-group>
             <b-input-group class="mb-2"
                            v-for="(alias, addr, index) in contractList"
@@ -59,8 +59,8 @@
               <b-input-group-append>
                 <b-btn variant="danger"
                        v-b-tooltip.hover.topleft
-                       title="WARN! To delete the alias address"
-                       @click="deleteAlias(addr)"
+                       title="WARN! To delete the contract"
+                       @click="deleteContract(addr)"
                        size="sm">×</b-btn>
               </b-input-group-append>
             </b-input-group>

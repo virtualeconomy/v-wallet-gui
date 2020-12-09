@@ -64,7 +64,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="!isSubmitDisabled"
+                    :disabled="isInsufficient"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -156,8 +156,8 @@ var initData = {
     contractDescription: '',
     selectedOptions: [
         {text: 'Non-Fungible Token(NFT) Contract', value: 'NonFungibleContract'},
-        {text: 'Payment Channel Contract', value: 'PaymentChannelContract'},
-        {text: 'Look Contract', value: 'LockContract'}
+        {text: 'Payment Channel Contract', value: 'PaymentChannelContract', disabled: true},
+        {text: 'Look Contract', value: 'LockContract', disabled: true}
     ],
     amount: 1
 }
@@ -194,8 +194,6 @@ export default {
     },
     data: function() {
         return initData
-    },
-    created() {
     },
     computed: {
         ...mapState({
@@ -274,7 +272,6 @@ export default {
             this.qrArray = textArray
         },
         resetData() {
-            this.selectedAddress = ''
             this.contractDescription = ''
             this.selectedContractType = 'NonFungibleContract'
         },
@@ -360,6 +357,7 @@ export default {
         },
         endSend() {
             this.$refs.createContractModal.hide()
+            this.$parent.resetData()
         },
         getSignature(signature) {
             this.coldSignature = signature
