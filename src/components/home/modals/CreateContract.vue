@@ -40,7 +40,7 @@
             </b-btn>
           </b-form-group>
           <b-form-group >
-            <b-form-radio-group v-model="contractMethod"
+            <b-form-radio-group v-model="selectedContractType"
                                 plain
                                 style="display: flex;flex-direction: column"
                                 :options="selectedOptions"></b-form-radio-group>
@@ -72,7 +72,7 @@
           <TokenConfirm :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="contractMethod">
+                        :tx-type="selectedContractType">
           </TokenConfirm>
           <p v-show="sendError"
              class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
@@ -137,7 +137,7 @@ import TokenConfirm from './TokenConfirm'
 import TokenSuccess from './TokenSuccess'
 
 var initData = {
-    selectedContractType: '',
+    selectedContractType: 'NonFungibleContract',
     selectedTokenID: '',
     tokenList: {},
     errorMessage: '',
@@ -154,11 +154,10 @@ var initData = {
     hasConfirmed: false,
     selectedWalletType: this ? this.walletType : 'hotWallet',
     contractDescription: '',
-    contractMethod: 'Non-Fungible Token(NFT) Contract',
     selectedOptions: [
-        {text: 'Non-Fungible Token(NFT) Contract', value: 'Non-Fungible Token(NFT) Contract'},
-        {text: 'Payment Channel Contract', value: 'Payment Channel Contract'},
-        {text: 'Look Contract', value: 'Look Contract'}
+        {text: 'Non-Fungible Token(NFT) Contract', value: 'NonFungibleContract'},
+        {text: 'Payment Channel Contract', value: 'PaymentChannelContract'},
+        {text: 'Look Contract', value: 'LockContract'}
     ],
     amount: 1
 }
@@ -276,9 +275,8 @@ export default {
         },
         resetData() {
             this.selectedAddress = ''
-            this.selectedContractType = ''
             this.contractDescription = ''
-            this.contractMethod = 'Non-Fungible Token(NFT) Contract'
+            this.selectedContractType = 'NonFungibleContract'
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
@@ -318,7 +316,8 @@ export default {
                     this.coldPageId++
                 }
                 let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-                Vue.set(userInfo.contract, response.contractId, this.selectedContractType)
+                let type = this.selectedContractType === 'NonFungibleContract' ? 'NFT' : (this.selectedContractType === 'LockContract' ? 'Lock' : 'Payment')
+                Vue.set(userInfo.contract, response.contractId, type)
                 window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
                 this.updateBalance(true)
             }, respErr => {
