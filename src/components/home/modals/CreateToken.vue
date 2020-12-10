@@ -43,13 +43,14 @@
             <b-form-radio-group v-model="tokenMethod"
                                 plain
                                 style="display: flex;flex-direction: column"
+                                @change="changeRadioState"
                                 :options="tokenSplitStatus?selectedOptions1:selectedOptions2"></b-form-radio-group>
           </b-form-group>
           <b-form-group label="Contract"
                         label-for="descriptionInput"
                         v-show="tokenMethod=='NFT'">
             <b-form-select id=address-input
-                           v-model="contract"
+                           v-model="nftContractID"
                            :options="options(contracts,'con')"></b-form-select>
             <div class="mt">Cannot see your NFT contract?</div>
             <div class="no_nft_tips">You can <span class="tips_color">Create NFT contract</span> or add existing contract in <span class="tips_color">management panel.</span></div>
@@ -435,7 +436,6 @@ var initData = {
         {text: 'Fungible Token', value: 'FT'},
         {text: 'Non Fungible Token', value: 'NFT'}
     ],
-    contract: '',
     contracts: {}
 }
 export default {
@@ -566,6 +566,12 @@ export default {
     },
     methods: {
         ...mapActions(['updateBalance', 'changeEventPool', 'changeAddTokenStatus', 'addTokenUpdateEventPool']),
+        changeRadioState(val) {
+            this.selectedNFTContract = val === 'NFT'
+            if (this.selectedNFTContract) {
+                this.amount = 1
+            }
+        },
         getQrArray() {
             const qrSize = 300
             let tempDataObject = JSON.parse(JSON.stringify(this.dataObject.toJsonForColdSignature()))

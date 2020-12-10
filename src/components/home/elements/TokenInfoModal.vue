@@ -35,6 +35,10 @@
         <label>Issuer</label>
         <span>{{ issuer }}</span>
       </div>
+      <div class="tx-block">
+        <label>Contract Type</label>
+        <span>{{ contractType }}</span>
+      </div>
       <div class="tx-attachment">
         <label>Max Supply</label>
         <span>{{ formatter(maxSupply) }}</span>
@@ -99,6 +103,10 @@ export default {
             type: String,
             default: '',
             require: true
+        },
+        contractType: {
+            type: String,
+            default: ''
         }
     },
     computed: {

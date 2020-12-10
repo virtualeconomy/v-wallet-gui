@@ -56,10 +56,13 @@
           <b-dropdown-item v-if="!isCertified(tokenId)"
                            @click="verify">Verification</b-dropdown-item>
           <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
+                           :disabled="contractType==='NonFungibleContract'"
                            @click="supersede">Supersede</b-dropdown-item>
           <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
+                           :disabled="contractType==='NonFungibleContract'"
                            @click="issueToken">Issue Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
+                           :disabled="contractType==='NonFungibleContract'"
                            @click="destroyToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenSplitStatus && isSplit"
                            @click="splitToken">Split Token</b-dropdown-item>
@@ -73,6 +76,7 @@
                     :maker="maker"
                     :contract-id="contractId"
                     :max-supply="maxSupply"
+                    :contract-type="contractType"
                     :current-supply="formatter(currentSupply)"
                     :token-description="tokenDescription">
     </TokenInfoModal>
@@ -423,9 +427,9 @@ export default {
             let contractType = ''
             this.chain.getContractInfo(contractId).then(response => {
                 contractType = response.type
+                this.contractType = contractType
             }, respError => {
             })
-            this.contractType = contractType
         }
     }
 }
