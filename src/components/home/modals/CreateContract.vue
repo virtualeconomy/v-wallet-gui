@@ -114,6 +114,134 @@
       <b-tab title="Cold Wallet"
              :disabled="noColdAddress || !coldPageId"
              :active="walletType==='coldWallet'">
+        <b-container v-if="coldPageId===1"
+                     class="text-left">
+          <b-form-group label="Wallet Address"
+                        label-for="wallet-address">
+            <b-form-select id=wallet-address
+                           class="addr-input"
+                           v-model="coldAddress"
+                           :options="options(coldAddresses)"></b-form-select>
+            <b-btn
+              block
+              variant="light"
+              disabled
+              class="balance-input"
+              readonly>
+              <span class="balance-title">Balance
+              </span>
+              <span class="balance">{{ formatter(balances[coldAddress]) }} VSYS</span>
+            </b-btn>
+          </b-form-group>
+          <b-form-group >
+            <b-form-radio-group v-model="selectedContractType"
+                                plain
+                                style="display: flex;flex-direction: column"
+                                :options="selectedOptions"></b-form-radio-group>
+          </b-form-group>
+          <b-form-group label="Contract Description"
+                        label-for="descriptionInput">
+            <b-form-textarea id="descriptionInput"
+                             v-model="contractDescription"
+                             :rows="2"
+                             :no-resize="true"
+                             placeholder="Max 140 characters. When you have done, this content can not be revised"
+                             :state="isValidDescription(contractDescription)">
+            </b-form-textarea>
+          </b-form-group>
+          <b-form-group>
+            <label class="fee-remark">Transaction Fee {{ Number(fee) }} VSYS</label>
+            <span v-if="isInsufficient"
+                  class="vsys-check">Insufficient VSYS balance.</span>
+          </b-form-group>
+          <b-button variant="warning"
+                    class="btn-continue"
+                    block
+                    size="lg"
+                    :disabled="isInsufficient"
+                    @click="nextPage">Continue
+          </b-button>
+        </b-container>
+        <b-container v-if="coldPageId===2">
+          <TokenConfirm :address="coldAddress"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
+                        :tx-type="selectedContractType">
+          </TokenConfirm>
+          <b-row>
+            <b-col class="col-lef">
+              <b-button
+                class="btn-back"
+                block
+                variant="light"
+                size="lg"
+                @click="prevPage">Back
+              </b-button>
+            </b-col>
+            <b-col class="col-rit">
+              <b-button
+                block
+                class="btn-confirm"
+                variant="warning"
+                size="lg"
+                @click=" getQrArray(); nextPage()">Confirm
+              </b-button>
+            </b-col>
+          </b-row>
+        </b-container>
+        <b-container v-if="coldPageId===3"
+                     class="text-left">
+          <ColdSignature :data-object="dataObject.toJsonForColdSignature()"
+                         :qr-total-page="qrPage"
+                         :qr-array="getArray"
+                         v-if="coldPageId===3"
+                         :cold-public-key="coldAddresses[coldAddress].publicKey"
+                         :transaction-bytes="dataObject.toBytes()"
+                         @get-signature="getSignature"
+                         @next-page="nextPage"
+                         @prev-page="prevPage"></ColdSignature>
+        </b-container>
+        <b-container v-show="coldPageId===4">
+          <TokenConfirm :address="coldAddress"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
+                        :tx-type="selectedContractType">
+          </TokenConfirm>
+          <p v-show="sendError"
+             class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
+          <b-row>
+            <b-col class="col-lef">
+              <b-button
+                class="btn-back"
+                block
+                variant="light"
+                size="lg"
+                @click="prevPage">Back
+              </b-button>
+            </b-col>
+            <b-col class="col-rit">
+              <b-button
+                block
+                class="btn-confirm"
+                variant="warning"
+                size="lg"
+                @click="sendData('coldWallet')">Confirm
+              </b-button>
+            </b-col>
+          </b-row>
+        </b-container>
+        <b-container v-show="coldPageId===5">
+          <TokenSuccess :address="coldAddress"
+                        :amount=inputAmount(amount)
+                        :fee="fee"
+                        :tx-type="'Register New Token'">
+          </TokenSuccess>
+          <b-button variant="warning"
+                    block
+                    size="lg"
+                    @click="endSend">OK
+          </b-button>
+        </b-container>
       </b-tab>
     </b-tabs>
   </b-modal>
@@ -135,6 +263,7 @@ import { CONTRACT_REGISTER_FEE } from '@/js-v-sdk/src/constants'
 import BigNumber from 'bignumber.js'
 import TokenConfirm from './TokenConfirm'
 import TokenSuccess from './TokenSuccess'
+import ColdSignature from './ColdSignature'
 
 var initData = {
     selectedContractType: 'NonFungibleContract',
@@ -389,7 +518,8 @@ export default {
     },
     components: {
         TokenConfirm,
-        TokenSuccess
+        TokenSuccess,
+        ColdSignature
     }
 }
 </script>
