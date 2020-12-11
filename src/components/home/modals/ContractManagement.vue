@@ -98,7 +98,7 @@
             class="btn-add"
             variant="warning"
             size="lg"
-            :disabled="!isValidContract && !isSupportContract"
+            :disabled="!isValidContract || !isSupportContract"
             @click="addContract">Add
           </b-button>
         </b-col>
@@ -155,9 +155,7 @@ export default {
         }
     },
     created() {
-        if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-            this.contractList = JSON.parse(window.localStorage.getItem(this.defaultAddress)).contract
-        }
+        this.getLocalContracts()
     },
     computed: {
         ...mapState({
@@ -165,19 +163,6 @@ export default {
         }),
         defaultAddress() {
             return Vue.ls.get('address')
-        },
-        isExistedContract() {
-            if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-                let contracts = JSON.parse(window.localStorage.getItem(this.defaultAddress)).contract
-                if (contracts) {
-                    for (let key in contracts) {
-                        if (this.curContractID === key) {
-                            return true
-                        }
-                    }
-                }
-            }
-            return false
         },
         isValidContract() {
             if (!this.curContractID) {
@@ -197,8 +182,14 @@ export default {
         }
     },
     methods: {
+        getLocalContracts() {
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            if (userInfo && userInfo.contracts) {
+                this.contractList = JSON.parse(userInfo.contracts)
+            }
+        },
         resetData() {
-            this.contractList = JSON.parse(window.localStorage.getItem(this.defaultAddress)).contracts
+            this.contractList = JSON.parse(JSON.parse(window.localStorage.getItem(this.defaultAddress)).contracts)
             this.curContractID = ''
             this.curContractType = ''
             this.curContractIsValid = false
@@ -206,7 +197,7 @@ export default {
         setUsrLocalStorage(fieldName, value) {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             Vue.set(userInfo, fieldName, value)
-            window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
+            window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
         },
         addContract() {
             let tmpUserInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
@@ -223,9 +214,10 @@ export default {
         },
         deleteContract(contractID) {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            delete userInfo.contract[contractID]
-            window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
-            this.contractList = userInfo.contract
+            let contracts = JSON.parse(userInfo.contracts)
+            Vue.delete(contracts, contractID)
+            this.setUsrLocalStorage('contracts', JSON.stringify(contracts))
+            this.contractList = contracts
         },
         closeModal() {
             this.resetData()
@@ -254,6 +246,7 @@ export default {
                     }
                 }
             }, respError => {
+                this.curContractIsValid = false
             })
         }
     },
