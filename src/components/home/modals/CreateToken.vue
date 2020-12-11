@@ -48,7 +48,7 @@
           </b-form-group>
           <b-form-group label="Contract"
                         label-for="descriptionInput"
-                        v-show="tokenMethod=='NFT'">
+                        v-show="tokenMethod==='NFT'">
             <b-form-select id=address-input
                            v-model="nftContractID"
                            :options="options(contracts,'con')"></b-form-select>
@@ -57,7 +57,7 @@
           </b-form-group>
           <b-form-group label="Contract Description"
                         label-for="descriptionInput"
-                        v-show="tokenMethod!='NFT'">
+                        v-show="tokenMethod!=='NFT'">
             <b-form-textarea id="descriptionInput"
                              v-model="contractDescription"
                              :rows="2"
@@ -78,7 +78,7 @@
           </b-form-group>
           <b-form-group label="Max Supply"
                         label-for="amount-input"
-                        v-show="tokenMethod!='NFT'">
+                        v-show="tokenMethod!=='NFT'">
             <b-form-input id="amount-input"
                           class="amount-input"
                           v-model="amount"
@@ -107,7 +107,7 @@
               Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group v-show="tokenMethod!='NFT'">
+          <b-form-group v-show="tokenMethod!=='NFT'">
             <span style="font-size: 15px !important;color: #9091A3;">Unity: 10<sup>{{ unity }}</sup> (The minimum amount will be {{ formatter(1/Math.pow(10, unity)) }} Token)</span>
             <div style="margin-top: 10px;">
               <span class="unity-number">10<sup>0</sup></span>
@@ -123,15 +123,6 @@
               <span class="unity-number-second">10<sup>16</sup></span>
             </div>
           </b-form-group>
-          <div v-if="tokenSplitStatus"
-               style="margin-top: 10px;">
-            <span>
-              <img id="img_read"
-                   @click="changeIcon"
-                   style="font-size: 15px;z-index: 100;"
-                   src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/reverse-split token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after created)</span>
-            </span>
-          </div>
           <b-form-group style="margin-top: 10px;">
             <label class="fee-remark">Transaction Fee {{ Number(fee) }} VSYS</label>
             <span v-if="isInsufficient"
@@ -141,7 +132,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="tokenMethod=='NFT'?isContract:isSubmitDisabled"
+                    :disabled="tokenMethod==='NFT'?isContract:isSubmitDisabled"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -276,15 +267,6 @@
               <span class="unity-number-second">10<sup>16</sup></span>
             </div>
           </b-form-group>
-          <div v-if="tokenSplitStatus"
-               style="margin-top: 10px;">
-            <span>
-              <img id="img_read_cold"
-                   @click="changeIcon"
-                   style="font-size: 15px;z-index: 100;"
-                   src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after created)</span>
-            </span>
-          </div>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ Number(fee) }} VSYS</label>
             <span v-if="isInsufficient"
@@ -396,8 +378,6 @@ import ColdSignature from './ColdSignature'
 import browser from '@/utils/browser'
 import Transaction from '@/js-v-sdk/src/transaction'
 import BigNumber from 'bignumber.js'
-import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
-import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
 import common from '@/js-v-sdk/src/utils/common'
 import { mapActions, mapState } from 'vuex'
 import { TokenContractDataGenerator, NonFungibleTokenContractDataGenerator, getContractFunctionIndex } from '@/js-v-sdk/src/data'
@@ -473,8 +453,9 @@ export default {
         return initData
     },
     created() {
-        if (JSON.parse(window.localStorage.getItem(this.defaultAddress)) != null) {
-            this.contracts = JSON.parse(window.localStorage.getItem(this.defaultAddress)).contract
+        let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+        if (userInfo && userInfo.contracts) {
+            this.contracts = userInfo.contracts
         }
     },
     computed: {
@@ -512,7 +493,7 @@ export default {
             return !(!this.isInsufficient && (this.isValidDescription(this.contractDescription) || !this.contractDescription) && (this.isValidDescription(this.tokenDescription) || !this.tokenDescription) && this.isValidAmount)
         },
         isContract() {
-            return this.contract === ''
+            return !this.nftContractID
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -567,9 +548,22 @@ export default {
     methods: {
         ...mapActions(['updateBalance', 'changeEventPool', 'changeAddTokenStatus', 'addTokenUpdateEventPool']),
         changeRadioState(val) {
-            this.selectedNFTContract = val === 'NFT'
-            if (this.selectedNFTContract) {
+            switch (val) {
+            case 'NFT':
+                this.selectedNFTContract = true
                 this.amount = 1
+                this.support = false
+                break
+            case 'FT':
+                this.selectedNFTContract = false
+                this.amount = 0
+                this.support = false
+                break
+            case 'FTWF':
+                this.selectedNFTContract = false
+                this.amount = 0
+                this.support = true
+                break
             }
         },
         getQrArray() {
@@ -583,16 +577,6 @@ export default {
                 textArray[i] = text.slice(i * qrSize, (i + 1) * qrSize)
             }
             this.qrArray = textArray
-        },
-        changeIcon() {
-            let imgId = this.selectedWalletType === 'hotWallet' ? 'img_read' : 'img_read_cold'
-            if (this.support === false) {
-                document.getElementById(imgId).src = imgread2
-                this.support = true
-            } else {
-                document.getElementById(imgId).src = imgread1
-                this.support = false
-            }
         },
         inputAmount(num) {
             return BigNumber(num)
@@ -614,7 +598,6 @@ export default {
                 let initData = dataGenerator.createIssueData(this.tokenDescription)
                 let functionIndex = getContractFunctionIndex(NFT, 'ISSUE')
                 tra.buildExecuteContractTx(publicKey, this.nftContractID, functionIndex, initData, this.timeStamp, this.attachment)
-                return tra
             } else {
                 let contract = this.support === false ? TOKEN_CONTRACT : TOKEN_CONTRACT_WITH_SPLIT
                 let dataGenerator = new TokenContractDataGenerator()
@@ -718,6 +701,7 @@ export default {
             this.contractDescription = ''
             this.tokenDescription = ''
             this.tokenMethod = 'FT'
+            this.nftContractID = ''
         },
         endSend() {
             this.$refs.createTokenModal.hide()
