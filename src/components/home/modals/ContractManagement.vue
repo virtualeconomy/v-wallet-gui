@@ -27,7 +27,7 @@
              :style="{'max-height': '280px', 'min-height': '280px', 'margin-top': '10px'}">
           <b-form-group>
             <b-input-group class="mb-2"
-                           v-for="(alias, addr, index) in contractList"
+                           v-for="(alias, addr, index) in contracts"
                            :key="addr">
               <b-form-input :value="alias"
                             class="alias-input"
@@ -117,7 +117,7 @@
 
 <script>
 import Vue from 'vue'
-import { mapState } from 'vuex'
+import { mapState, mapActions } from 'vuex'
 import CreateContract from './CreateContract'
 export default {
     name: 'ContractManagement',
@@ -153,16 +153,13 @@ export default {
         return {
             curContractID: '',
             curContractType: '',
-            contractList: {},
             curContractIsValid: false
         }
     },
-    created() {
-        this.getLocalContracts()
-    },
     computed: {
         ...mapState({
-            chain: 'chain'
+            chain: 'chain',
+            contracts: 'contracts'
         }),
         defaultAddress() {
             return Vue.ls.get('address')
@@ -185,14 +182,8 @@ export default {
         }
     },
     methods: {
-        getLocalContracts() {
-            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            if (userInfo && userInfo.contracts) {
-                this.contractList = JSON.parse(userInfo.contracts)
-            }
-        },
+        ...mapActions(['updateContracts']),
         resetData() {
-            this.contractList = JSON.parse(JSON.parse(window.localStorage.getItem(this.defaultAddress)).contracts)
             this.curContractID = ''
             this.curContractType = ''
             this.curContractIsValid = false
@@ -203,17 +194,15 @@ export default {
             window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
         },
         addContract() {
-            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            Vue.set(userInfo.contract, this.curContractID, this.curContractType)
-            window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
+            let contracts = this.contracts
+            Vue.set(contracts, this.curContractID, this.curContractType)
+            this.updateContracts(contracts)
             this.resetData()
         },
         deleteContract(contractID) {
-            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            let contracts = JSON.parse(userInfo.contracts)
+            let contracts = this.contracts
             Vue.delete(contracts, contractID)
-            this.setUsrLocalStorage('contracts', JSON.stringify(contracts))
-            this.contractList = contracts
+            this.updateContracts(contracts)
         },
         closeModal() {
             this.resetData()

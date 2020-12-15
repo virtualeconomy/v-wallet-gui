@@ -433,8 +433,7 @@ var initData = {
     selectedOptions2: [
         {text: 'Fungible Token', value: 'FT'},
         {text: 'Non Fungible Token', value: 'NFT'}
-    ],
-    contracts: {}
+    ]
 }
 export default {
     name: 'CreateToken',
@@ -471,13 +470,13 @@ export default {
         return initData
     },
     created() {
-        this.getContracts()
     },
     computed: {
         ...mapState({
             chain: 'chain',
             account: 'account',
-            tokenSplitStatus: 'tokenSplitStatus'
+            tokenSplitStatus: 'tokenSplitStatus',
+            contracts: 'contracts'
         }),
         defaultAddress() {
             return Vue.ls.get('address')
@@ -580,12 +579,6 @@ export default {
                 this.amount = 0
                 this.support = true
                 break
-            }
-        },
-        getContracts() {
-            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            if (userInfo && userInfo.contracts) {
-                this.contracts = userInfo.contracts
             }
         },
         getQrArray() {

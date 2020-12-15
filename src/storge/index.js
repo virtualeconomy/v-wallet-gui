@@ -28,7 +28,8 @@ const store = new Vuex.Store({
         addTokenStatus: 0,
         paymentRedirect: {},
         assetStatus: false,
-        certifiedTokenList: {}
+        certifiedTokenList: {},
+        contracts: {}
     },
     mutations: {
         changeSettingsStatus(state, status) {
@@ -66,6 +67,9 @@ const store = new Vuex.Store({
         },
         updateCertifiedTokenList(state, status) {
             state.certifiedTokenList = status
+        },
+        updateContracts(state, status) {
+            state.contracts = status
         }
     },
     actions: {
@@ -85,6 +89,9 @@ const store = new Vuex.Store({
             } else {
                 context.commit('updateSelectedAddress', status)
             }
+        },
+        updateContracts(context, status) {
+            context.commit('updateContract', status)
         },
         updateBalance(context, repeatable) {
             let randomIdentity = Math.floor(Math.random() * 100)
