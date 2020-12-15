@@ -110,7 +110,8 @@
                       :addresses="addresses"
                       :selected-address="address"
                       :balances="balances"
-                      :wallet-type="walletType"></CreateContract>
+                      :wallet-type="walletType"
+                      @resetData="resetData"></CreateContract>
     </b-modal>
   </div>
 </template>
@@ -188,11 +189,11 @@ export default {
         getLocalContracts() {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             if (userInfo && userInfo.contracts) {
-                this.contractList = JSON.parse(userInfo.contracts)
+                this.contractList = userInfo.contracts
             }
         },
         resetData() {
-            this.contractList = JSON.parse(JSON.parse(window.localStorage.getItem(this.defaultAddress)).contracts)
+            this.contractList = JSON.parse(window.localStorage.getItem(this.defaultAddress)).contracts
             this.curContractID = ''
             this.curContractType = ''
             this.curContractIsValid = false
@@ -204,15 +205,15 @@ export default {
         },
         addContract() {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            Vue.set(userInfo.contract, this.curContractID, this.curContractType)
+            Vue.set(userInfo.contracts, this.curContractID, this.curContractType)
             window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
             this.resetData()
         },
         deleteContract(contractID) {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            let contracts = JSON.parse(userInfo.contracts)
+            let contracts = userInfo.contracts
             Vue.delete(contracts, contractID)
-            this.setUsrLocalStorage('contracts', JSON.stringify(contracts))
+            this.setUsrLocalStorage('contracts', contracts)
             this.contractList = contracts
         },
         closeModal() {

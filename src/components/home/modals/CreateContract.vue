@@ -443,7 +443,7 @@ export default {
                 }
                 let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
                 let type = this.selectedContractType === 'NonFungibleContract' ? 'NFT' : (this.selectedContractType === 'LockContract' ? 'Lock' : 'Payment')
-                Vue.set(userInfo.contract, response.contractId, type)
+                Vue.set(userInfo.contracts, response.contractId, type)
                 window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
                 this.updateBalance(true)
             }, respErr => {
@@ -486,7 +486,7 @@ export default {
         },
         endSend() {
             this.$refs.createContractModal.hide()
-            this.$parent.resetData()
+            this.$emit('resetData')
         },
         getSignature(signature) {
             this.coldSignature = signature

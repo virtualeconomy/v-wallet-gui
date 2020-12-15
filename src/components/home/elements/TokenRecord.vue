@@ -424,10 +424,8 @@ export default {
         },
         getContractType() {
             let contractId = common.tokenIDToContractID(this.tokenId)
-            let contractType = ''
             this.chain.getContractInfo(contractId).then(response => {
-                contractType = response.type
-                this.contractType = contractType
+                this.contractType = response.type
             }, respError => {
             })
         }
