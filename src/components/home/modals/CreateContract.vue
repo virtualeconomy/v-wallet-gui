@@ -327,8 +327,7 @@ export default {
     computed: {
         ...mapState({
             chain: 'chain',
-            account: 'account',
-            contracts: 'contracts'
+            account: 'account'
         }),
         defaultAddress() {
             return Vue.ls.get('address')
@@ -388,7 +387,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['updateBalance', 'changeEventPool', 'changeAddTokenStatus', 'addTokenUpdateEventPool', 'updateContracts']),
+        ...mapActions(['updateBalance', 'changeEventPool', 'changeAddTokenStatus', 'addTokenUpdateEventPool']),
         getQrArray() {
             const qrSize = 300
             let tempDataObject = JSON.parse(JSON.stringify(this.dataObject.toJsonForColdSignature()))
@@ -442,10 +441,10 @@ export default {
                 } else {
                     this.coldPageId++
                 }
+                let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
                 let type = this.selectedContractType === 'NonFungibleContract' ? 'NFT' : (this.selectedContractType === 'LockContract' ? 'Lock' : 'Payment')
-                let contracts = this.contracts
-                Vue.set(contracts, response.contractId, type)
-                this.updateContracts(contracts)
+                Vue.set(userInfo.contract, response.contractId, type)
+                window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
                 this.updateBalance(true)
             }, respErr => {
                 this.errorMessage = respErr.message
