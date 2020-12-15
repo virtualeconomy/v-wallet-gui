@@ -487,7 +487,6 @@ export default {
         },
         endSend() {
             this.$refs.createContractModal.hide()
-            this.$parent.resetData()
         },
         getSignature(signature) {
             this.coldSignature = signature

@@ -91,7 +91,7 @@ const store = new Vuex.Store({
             }
         },
         updateContracts(context, status) {
-            context.commit('updateContract', status)
+            context.commit('updateContracts', status)
         },
         updateBalance(context, repeatable) {
             let randomIdentity = Math.floor(Math.random() * 100)
