@@ -567,7 +567,6 @@ export default {
                 this.selectedNFTContract = true
                 this.amount = 1
                 this.support = false
-                this.getContracts()
                 break
             case 'FT':
                 this.selectedNFTContract = false
