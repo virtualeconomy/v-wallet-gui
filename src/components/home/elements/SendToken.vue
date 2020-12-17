@@ -552,16 +552,6 @@ export default {
             this.hotRecipientAddressList.load(JSON.parse(item))
         }
     },
-    watch: {
-        amount(newAmount, oldAmount) {
-            let balance = this.selectedWalletType === 'hotWallet' ? this.tokenBalances[this.address] : this.tokenBalances[this.coldAddress]
-            if (BigNumber(this.amount).isGreaterThan(BigNumber(balance).minus(this.fee))) {
-                this.$nextTick(() => {
-                    this.amount = Number(balance)
-                })
-            }
-        }
-    },
     computed: {
         ...mapState({
             chain: 'chain',

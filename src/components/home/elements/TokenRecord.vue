@@ -55,14 +55,13 @@
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
           <b-dropdown-item v-if="!isCertified(tokenId)"
                            @click="verify">Verification</b-dropdown-item>
-          <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
+          <b-dropdown-item v-if="(tokenManagementStatus || address === tokenMaker) && contractType !=='NonFungibleContract'"
                            :disabled="contractType==='NonFungibleContract'"
                            @click="supersede">Supersede</b-dropdown-item>
-          <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
+          <b-dropdown-item v-if="(tokenManagementStatus || address === tokenMaker) && contractType !=='NonFungibleContract'"
                            :disabled="contractType==='NonFungibleContract'"
                            @click="issueToken">Issue Token</b-dropdown-item>
-          <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
-                           :disabled="contractType==='NonFungibleContract'"
+          <b-dropdown-item v-if="(tokenManagementStatus || address === tokenMaker) && contractType !=='NonFungibleContract'"
                            @click="destroyToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenSplitStatus && isSplit"
                            @click="splitToken">Split Token</b-dropdown-item>

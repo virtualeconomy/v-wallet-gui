@@ -585,7 +585,7 @@ export default {
         getContracts() {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             if (userInfo && userInfo.contracts) {
-                this.contracts = userInfo.contracts
+                this.contracts = JSON.parse(userInfo.contracts)
             }
         },
         getQrArray() {

@@ -189,11 +189,15 @@ export default {
         getLocalContracts() {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             if (userInfo && userInfo.contracts) {
-                this.contractList = userInfo.contracts
+                try {
+                    this.contractList = JSON.parse(userInfo.contracts)
+                } catch (err) {
+                    this.setUsrLocalStorage('contracts', JSON.stringify({}))
+                }
             }
         },
         resetData() {
-            this.contractList = JSON.parse(window.localStorage.getItem(this.defaultAddress)).contracts
+            this.contractList = JSON.parse(JSON.parse(window.localStorage.getItem(this.defaultAddress)).contracts)
             this.curContractID = ''
             this.curContractType = ''
             this.curContractIsValid = false
@@ -204,16 +208,23 @@ export default {
             window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
         },
         addContract() {
-            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            Vue.set(userInfo.contracts, this.curContractID, this.curContractType)
-            window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
+            let tmpUserInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            let contracts = {}
+            if (tmpUserInfo && tmpUserInfo.contracts) {
+                contracts = JSON.parse(tmpUserInfo.contracts)
+            }
+            if (this.curContractID in contracts) {
+                return
+            }
+            Vue.set(contracts, this.curContractID, this.curContractType)
+            this.setUsrLocalStorage('contracts', JSON.stringify(contracts))
             this.resetData()
         },
         deleteContract(contractID) {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
-            let contracts = userInfo.contracts
+            let contracts = JSON.parse(userInfo.contracts)
             Vue.delete(contracts, contractID)
-            this.setUsrLocalStorage('contracts', contracts)
+            this.setUsrLocalStorage('contracts', JSON.stringify(contracts))
             this.contractList = contracts
         },
         closeModal() {
