@@ -197,7 +197,7 @@ export default {
             }
         },
         resetData() {
-            this.contractList = JSON.parse(JSON.parse(window.localStorage.getItem(this.defaultAddress)).contracts)
+            this.getLocalContracts()
             this.curContractID = ''
             this.curContractType = ''
             this.curContractIsValid = false

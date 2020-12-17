@@ -56,6 +56,8 @@
             <div class="no_nft_tips">You can <span @click="openContracts"
                                                    class="tips_color">Create NFT contract</span> or add existing contract in <span @click="openContracts"
                                                                                                                                    class="tips_color">management panel.</span></div>
+            <span v-if="!isValidIssuer"
+                  class="contract-check">You are not issuer of this nft contract.</span>
           </b-form-group>
           <b-form-group label="Contract Description"
                         label-for="descriptionInput"
@@ -134,7 +136,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="tokenMethod==='NFT'?isContract:isSubmitDisabled"
+                    :disabled="tokenMethod==='NFT'?!isValidContract:isSubmitDisabled"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -217,7 +219,11 @@
                            v-model="nftContractID"
                            :options="options(contracts,'con')"></b-form-select>
             <div class="mt">Cannot see your NFT contract?</div>
-            <div class="no_nft_tips">You can <span class="tips_color">Create NFT contract</span> or add existing contract in <span class="tips_color">management panel.</span></div>
+            <div class="no_nft_tips">You can <span @click="openContracts"
+                                                   class="tips_color">Create NFT contract</span> or add existing contract in <span @click="openContracts"
+                                                                                                                                   class="tips_color">management panel.</span></div>
+            <span v-if="!isValidIssuer"
+                  class="contract-check">You are not issuer of this nft contract.</span>
           </b-form-group>
           <b-form-group label="Contract Description"
                         label-for="descriptionInput"
@@ -296,7 +302,7 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="tokenMethod==='NFT'?isContract:isSubmitDisabled"
+                    :disabled="tokenMethod==='NFT'?!isValidContract:isSubmitDisabled"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -389,7 +395,7 @@
 import Vue from 'vue'
 import { TOKEN_CONTRACT, TOKEN_CONTRACT_WITH_SPLIT } from '@/js-v-sdk/src/contract'
 import seedLib from '@/libs/seed.js'
-import { CONTRACT_REGISTER_FEE } from '@/js-v-sdk/src/constants'
+import { CONTRACT_REGISTER_FEE, CONTRACT_EXEC_FEE } from '@/js-v-sdk/src/constants'
 import { TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants'
 import { NETWORK_BYTE } from '@/network'
 import TokenConfirm from './TokenConfirm'
@@ -436,6 +442,7 @@ var initData = {
         {text: 'Fungible Token', value: 'FT'},
         {text: 'Non Fungible Token', value: 'NFT'}
     ],
+    isValidIssuer: true,
     contracts: {}
 }
 export default {
@@ -471,6 +478,26 @@ export default {
     },
     data: function() {
         return initData
+    },
+    watch: {
+        nftContractID(newContractId, oldContractId) {
+            if (newContractId) {
+                try {
+                    this.getContractInfo()
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+        },
+        address(newAddress, oldAddress) {
+            if (newAddress && this.nftContractID) {
+                try {
+                    this.getContractInfo()
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+        }
     },
     created() {
         this.getContracts()
@@ -509,8 +536,8 @@ export default {
         isSubmitDisabled() {
             return !(!this.isInsufficient && (this.isValidDescription(this.contractDescription) || !this.contractDescription) && (this.isValidDescription(this.tokenDescription) || !this.tokenDescription) && this.isValidAmount)
         },
-        isContract() {
-            return !this.nftContractID
+        isValidContract() {
+            return this.nftContractID && this.isValidIssuer
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -546,7 +573,7 @@ export default {
         },
         isInsufficient() {
             let balance = this.selectedWalletType === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return BigNumber(balance).isLessThan(BigNumber(CONTRACT_REGISTER_FEE))
+            return BigNumber(balance).isLessThan(this.fee)
         },
         selectedKeypair() {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
@@ -567,22 +594,32 @@ export default {
         changeRadioState(val) {
             switch (val) {
             case 'NFT':
+                this.fee = BigNumber(CONTRACT_EXEC_FEE)
                 this.selectedNFTContract = true
                 this.amount = 1
                 this.support = false
                 this.getContracts()
                 break
             case 'FT':
+                this.fee = BigNumber(CONTRACT_REGISTER_FEE)
                 this.selectedNFTContract = false
                 this.amount = 0
                 this.support = false
                 break
             case 'FTWF':
+                this.fee = BigNumber(CONTRACT_REGISTER_FEE)
                 this.selectedNFTContract = false
                 this.amount = 0
                 this.support = true
                 break
             }
+        },
+        getContractInfo() {
+            this.chain.getContractInfo(this.nftContractID).then(response => {
+                let issuer = response.info[0].data
+                this.isValidIssuer = issuer === this.address
+            }, respError => {
+            })
         },
         openContracts() {
             this.$refs.createTokenModal.hide()
@@ -591,7 +628,12 @@ export default {
         getContracts() {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             if (userInfo && userInfo.contracts) {
-                this.contracts = JSON.parse(userInfo.contracts)
+                let contracts = JSON.parse(userInfo.contracts)
+                for (let contract in contracts) {
+                    if (contracts[contract] === 'NFT') {
+                        Vue.set(this.contracts, contract, contracts[contract])
+                    }
+                }
             }
         },
         getQrArray() {
@@ -723,6 +765,7 @@ export default {
             this.coldSignature = ''
             this.support = false
             this.timeStamp = Date.now() * 1e6
+            this.fee = BigNumber(CONTRACT_REGISTER_FEE)
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
             this.selectedWalletType = this.walletType
@@ -730,6 +773,8 @@ export default {
             this.tokenDescription = ''
             this.tokenMethod = 'FT'
             this.nftContractID = ''
+            this.isValidIssuer = true
+            this.getContracts()
         },
         endSend() {
             this.$refs.createTokenModal.hide()
@@ -943,6 +988,11 @@ textarea::-webkit-input-placeholder {
 .vsys-check {
     display: block;
     margin-top: -10px;
+    font-size: 80%;
+    color: #dc3545;
+}
+.contract-check {
+    display: block;
     font-size: 80%;
     color: #dc3545;
 }

@@ -38,7 +38,7 @@
           <b-dropdown-item class="drop-down-item"
                            v-b-modal.aliasAddressModal>Alias Address</b-dropdown-item>
           <b-dropdown-item class="drop-down-item"
-                           v-b-modal.contractManagementModal>Contract Management</b-dropdown-item>
+                           v-b-modal.contractManagementModal>Contracts</b-dropdown-item>
           <b-dropdown-item @click="feedbackIssue"
                            class="drop-down-item">Issue & Help</b-dropdown-item>
           <b-dropdown-item class="drop-down-item"
