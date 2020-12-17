@@ -25,7 +25,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group v-else-if="txType==='Register New Token' || txType==='NonFungibleContract' || txType==='PaymentChannelContract' || txType==='LockContract'"
+      <b-form-group v-else-if="txType==='Register New Token'"
                     label-cols
                     class="form-line"
                     label="Total Supply"

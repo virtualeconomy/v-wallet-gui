@@ -53,7 +53,9 @@
                            v-model="nftContractID"
                            :options="options(contracts,'con')"></b-form-select>
             <div class="mt">Cannot see your NFT contract?</div>
-            <div class="no_nft_tips">You can <span class="tips_color">Create NFT contract</span> or add existing contract in <span class="tips_color">management panel.</span></div>
+            <div class="no_nft_tips">You can <span @click="openContracts"
+                                                   class="tips_color">Create NFT contract</span> or add existing contract in <span @click="openContracts"
+                                                                                                                                   class="tips_color">management panel.</span></div>
           </b-form-group>
           <b-form-group label="Contract Description"
                         label-for="descriptionInput"
@@ -582,6 +584,10 @@ export default {
                 break
             }
         },
+        openContracts() {
+            this.$refs.createTokenModal.hide()
+            this.$root.$emit('bv::show::modal', 'contractManagementModal')
+        },
         getContracts() {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             if (userInfo && userInfo.contracts) {
@@ -764,6 +770,7 @@ export default {
     font-size: 13px
 }
 .tips_color{
+    cursor: pointer;
     color: #FF8737;
     font-size: 12px
 }
