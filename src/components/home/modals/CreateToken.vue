@@ -144,7 +144,7 @@
           <TokenConfirm :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Register New Token'">
+                        :tx-type="txType">
           </TokenConfirm>
           <p v-show="sendError"
              class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
@@ -174,7 +174,7 @@
           <TokenSuccess :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Register New Token'">
+                        :tx-type="txType">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -310,7 +310,7 @@
           <TokenConfirm :address="coldAddress"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Register New Token'">
+                        :tx-type="txType">
           </TokenConfirm>
           <b-row>
             <b-col class="col-lef">
@@ -349,7 +349,7 @@
           <TokenConfirm :address="coldAddress"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Register New Token'">
+                        :tx-type="txType">
           </TokenConfirm>
           <p v-show="sendError"
              class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
@@ -378,7 +378,7 @@
           <TokenSuccess :address="coldAddress"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Register New Token'">
+                        :tx-type="txType">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -426,6 +426,7 @@ var initData = {
     timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     tokenId: '',
+    txType: 'Register New Token',
     selectedWalletType: this ? this.walletType : 'hotWallet',
     contractDescription: '',
     tokenDescription: '',
@@ -490,6 +491,15 @@ export default {
             }
         },
         address(newAddress, oldAddress) {
+            if (newAddress && this.nftContractID) {
+                try {
+                    this.getContractInfo()
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+        },
+        coldAddress(newAddress, oldAddress) {
             if (newAddress && this.nftContractID) {
                 try {
                     this.getContractInfo()
@@ -598,6 +608,7 @@ export default {
                 this.selectedNFTContract = true
                 this.amount = 1
                 this.support = false
+                this.txType = 'Issue NFT'
                 this.getContracts()
                 break
             case 'FT':
@@ -605,19 +616,22 @@ export default {
                 this.selectedNFTContract = false
                 this.amount = 0
                 this.support = false
+                this.txType = 'Register New Token'
                 break
             case 'FTWF':
                 this.fee = BigNumber(CONTRACT_REGISTER_FEE)
                 this.selectedNFTContract = false
                 this.amount = 0
                 this.support = true
+                this.txType = 'Register New Token'
                 break
             }
         },
         getContractInfo() {
             this.chain.getContractInfo(this.nftContractID).then(response => {
                 let issuer = response.info[0].data
-                this.isValidIssuer = issuer === this.address
+                let address = this.selectedWalletType === 'hotWallet' ? this.address : this.coldAddress
+                this.isValidIssuer = issuer === address
             }, respError => {
             })
         },
@@ -773,6 +787,8 @@ export default {
             this.tokenDescription = ''
             this.tokenMethod = 'FT'
             this.nftContractID = ''
+            this.txType = 'Register New Token'
+            this.selectedNFTContract = false
             this.isValidIssuer = true
             this.getContracts()
         },

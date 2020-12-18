@@ -39,11 +39,12 @@
               <span class="balance">{{ formatter(balances[address]) }} VSYS</span>
             </b-btn>
           </b-form-group>
-          <b-form-group >
+          <b-form-group>
             <b-form-radio-group v-model="selectedContractType"
                                 plain
                                 style="display: flex;flex-direction: column"
-                                :options="selectedOptions"></b-form-radio-group>
+                                :options="selectedOptions">
+            </b-form-radio-group>
           </b-form-group>
           <b-form-group label="Contract Description"
                         label-for="descriptionInput">
@@ -102,7 +103,7 @@
           <TokenSuccess :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Register New Token'">
+                        :tx-type="selectedContractType">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -234,7 +235,7 @@
           <TokenSuccess :address="coldAddress"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Register New Token'">
+                        :tx-type="selectedContractType">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -285,8 +286,8 @@ var initData = {
     contractDescription: '',
     selectedOptions: [
         {text: 'Non-Fungible Token(NFT) Contract', value: 'NonFungibleContract'},
-        {text: 'Payment Channel Contract', value: 'PaymentChannelContract', disabled: true},
-        {text: 'Look Contract', value: 'LockContract', disabled: true}
+        {text: '<span class="disabled">Payment Channel Contract (will be supported later)</span>', value: 'PaymentChannelContract', disabled: true},
+        {text: '<span class="disabled">Look Contract (will be supported later)</span>', value: 'LockContract', disabled: true}
     ],
     amount: 1
 }
@@ -527,6 +528,9 @@ export default {
 <style scoped lang="less">
 .mt{
     margin-top: 10px;
+}
+disabled{
+    color: grey !important;
 }
 .no_nft_tips{
     color: #9091a3;

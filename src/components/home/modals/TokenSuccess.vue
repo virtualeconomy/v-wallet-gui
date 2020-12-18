@@ -31,7 +31,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group v-else-if="txType==='Register New Token'"
+      <b-form-group v-else-if="txType==='Register New Token' || txType==='Issue NFT'"
                     label-cols
                     class="form-line"
                     label="Max Supply"
