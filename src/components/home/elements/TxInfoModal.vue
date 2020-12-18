@@ -102,14 +102,32 @@
         <span>{{ txAttachment }}</span>
         <span class="tx-attachment-whole">{{ txAttachment }}</span>
       </div>
-      <div class="tx-id">
+      <div class="tx-address">
         <label>ID</label>
-        <span>{{ displayId }}</span>
+        <span class="addrPos">{{ displayId }}</span>
+        <div>
+          <b-btn id="txId-cpy"
+                 class="btn-copy"
+                 v-b-popover.click.topright="'Copied!'"
+                 @click="copyText('txId-cpy', 'tId')"
+                 variant="link">
+            <img src="@/assets/imgs/icons/operate/ic_copy.svg">
+          </b-btn>
+        </div>
       </div>
-      <div class="tx-id"
+      <div class="tx-address"
            v-if="txType === 'Register Contract' || txTitle === 'Withdraw Token' || txTitle === 'Withdraw VSYS' || txTitle === 'Deposit Token' || txTitle === 'Deposit VSYS'">
         <label>Contract ID</label>
-        <span>{{ contractId }}</span>
+        <span class="addrPos">{{ contractId }}</span>
+        <div>
+          <b-btn id="contract-cpy"
+                 class="btn-copy"
+                 v-b-popover.click.topright="'Copied!'"
+                 @click="copyText('contract-cpy', 'txContractId')"
+                 variant="link">
+            <img src="@/assets/imgs/icons/operate/ic_copy.svg">
+          </b-btn>
+        </div>
       </div>
       <div v-if="txBlock"
            class="tx-block">
@@ -171,6 +189,10 @@
     <textarea class="copy-txid"
               v-model="txRecipient"
               ref="txRecipientId"
+              readonly></textarea>
+    <textarea class="copy-txid"
+              v-model="contractId"
+              ref="txContractId"
               readonly></textarea>
   </b-modal>
 </template>
