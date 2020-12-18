@@ -416,6 +416,11 @@ export default {
             tra.buildRegisterContractTx(publicKey, contract, initData, this.contractDescription, this.timeStamp)
             return tra
         },
+        setUsrLocalStorage(fieldName, value) {
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            Vue.set(userInfo, fieldName, value)
+            window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
+        },
         sendData(walletType) {
             let sendTx
             if (walletType === 'hotWallet') {
@@ -444,8 +449,12 @@ export default {
                 }
                 let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
                 let type = this.selectedContractType === 'NonFungibleContract' ? 'NFT' : (this.selectedContractType === 'LockContract' ? 'Lock' : 'Payment')
-                Vue.set(userInfo.contracts, response.contractId, type)
-                window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
+                let contracts = {}
+                if (userInfo && userInfo.contracts) {
+                    contracts = JSON.parse(userInfo.contracts)
+                }
+                Vue.set(contracts, response.contractId, type)
+                this.setUsrLocalStorage('contracts', JSON.stringify(contracts))
                 this.updateBalance(true)
             }, respErr => {
                 this.errorMessage = respErr.message

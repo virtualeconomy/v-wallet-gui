@@ -432,7 +432,6 @@ var initData = {
     tokenDescription: '',
     selectedNFTContract: false,
     nftContractID: '',
-    attachment: 'issue nft',
     tokenMethod: 'FT',
     selectedOptions1: [
         {text: 'Fungible Token', value: 'FT'},
@@ -681,7 +680,7 @@ export default {
                 let dataGenerator = new NonFungibleTokenContractDataGenerator()
                 let initData = dataGenerator.createIssueData(this.tokenDescription)
                 let functionIndex = getContractFunctionIndex(NFT, 'ISSUE')
-                tra.buildExecuteContractTx(publicKey, this.nftContractID, functionIndex, initData, this.timeStamp, this.attachment)
+                tra.buildExecuteContractTx(publicKey, this.nftContractID, functionIndex, initData, this.timeStamp, this.tokenDescription)
             } else {
                 let contract = this.support === false ? TOKEN_CONTRACT : TOKEN_CONTRACT_WITH_SPLIT
                 let dataGenerator = new TokenContractDataGenerator()
