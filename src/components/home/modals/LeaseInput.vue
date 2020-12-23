@@ -30,7 +30,8 @@
       <span class="cold-check"
             v-if="!isValidPublicKey">This cold wallet has invalid public key! If you import this cold wallet manually, please delete it and import it again.</span>
     </b-form-group>
-    <div class="select-node">
+    <div v-show="nodeList.length > 0"
+         class="select-node">
       <b-dropdown class="m-2"
                   no-caret
                   id="dropdown-grouped"
@@ -61,6 +62,7 @@
                     class="recipient-input"
                     type="text"
                     v-model="recipient"
+                    @input="changeStatus"
                     :state="isValidRecipient"
                     list="showHotRecipientList"
                     aria-describedby="inputLiveFeedBack"
@@ -71,6 +73,7 @@
                     class="recipient-input"
                     type="text"
                     v-model="recipient"
+                    @input="changeStatus"
                     :state="isValidRecipient"
                     list="showColdRecipientList"
                     aria-describedby="inputLiveFeedBack"
@@ -315,6 +318,9 @@ export default {
         }
     },
     methods: {
+        changeStatus() {
+            this.isSuperSubNode = false
+        },
         scanChange() {
             if (!this.qrInit) {
                 this.scanShow = !this.scanShow
@@ -352,6 +358,7 @@ export default {
             try {
                 let jsonObj = JSON.parse(decodeString.replace(/"amount":(\d+)/g, '"amount":"$1"')) // The protocol defined amount must use Long type. However, there is no Long type in JS. So we use BigNumber instead. Add quotes (") to amount field to ensure BigNumber parses amount without precision loss.
                 this.recipient = jsonObj.address
+                this.isSuperSubNode = false
                 let opc = jsonObj.opc
                 let api = jsonObj.api
                 let protocol = jsonObj.protocol

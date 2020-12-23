@@ -197,7 +197,6 @@ import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
 import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
 import { INITIAL_SESSION_TIMEOUT, CERTIFICATED_TOKEN } from '@/constants'
-import {VSYS_RATE} from '../network'
 import seedLib from '@/libs/seed.js'
 import TransactionRecords from './home/elements/TransactionRecords'
 import LeasePane from './home/elements/LeasePane'
@@ -211,7 +210,7 @@ import { mapActions, mapState } from 'vuex'
 import SendToken from './home/elements/SendToken'
 import common from '@/js-v-sdk/src/utils/common'
 import certify from '@/utils/certify'
-import {EXPLORER} from '@/network'
+import { EXPLORER, TEST_EXPLORER, NETWORK_BYTE, VSYS_RATE } from '@/network'
 export default {
     name: 'Home',
     data: function() {
@@ -245,9 +244,11 @@ export default {
         if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
         } else {
-            this.$http.get(VSYS_RATE).then(function(result) {
-                this.nodeList = result.body.data
-            })
+            if (String.fromCharCode(NETWORK_BYTE) === 'M') {
+                this.$http.get(VSYS_RATE).then(function(result) {
+                    this.nodeList = result.body.data
+                })
+            }
             this.getBlockHeight()
             this.getCertifiedTokens().then(res => {
                 this.updateCertifiedTokenList(res)
@@ -569,7 +570,8 @@ export default {
         },
         getCertifiedTokens() {
             return new Promise((resolve, reject) => {
-                this.$http.get(EXPLORER + CERTIFICATED_TOKEN).then(async function(result) {
+                let url = String.fromCharCode(NETWORK_BYTE) === 'T' ? TEST_EXPLORER : EXPLORER
+                this.$http.get(url + CERTIFICATED_TOKEN).then(async function(result) {
                     await this.processCertifiedTokenResult(result)
                     resolve(this.certifiedTokenList)
                 }, respError => {
