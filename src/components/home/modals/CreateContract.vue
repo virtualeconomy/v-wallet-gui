@@ -287,7 +287,7 @@ var initData = {
     selectedOptions: [
         {text: 'Non-Fungible Token(NFT) Contract', value: 'NonFungibleContract'},
         {text: '<span class="disabled">Payment Channel Contract (will be supported later)</span>', value: 'PaymentChannelContract', disabled: true},
-        {text: '<span class="disabled">Look Contract (will be supported later)</span>', value: 'LockContract', disabled: true}
+        {text: '<span class="disabled">Lock Contract (will be supported later)</span>', value: 'LockContract', disabled: true}
     ],
     amount: 1
 }
