@@ -591,6 +591,9 @@ export default {
             let tra = this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
             if (this.selectedNFTContract) {
                 tra['stored_tx']['functionExplain'] = 'Issue NFT'
+            } else {
+                tra['stored_tx']['contractInitExplain'] = 'Create token' + (this.support === false ? ' ' : ' (support split) ') + 'with max supply ' + BigNumber(tra['stored_tx']['initData'][0]['value']).dividedBy(tra['stored_tx']['initData'][1]['value'])
+                tra['stored_tx']['contractInitTextual'] = 'init(max=' + BigNumber(tra['stored_tx']['initData'][0]['value']).dividedBy(tra['stored_tx']['initData'][1]['value']) + ',unity= ' + BigNumber(tra['stored_tx']['initData'][1]['value']) + ",tokenDescription='" + tra['stored_tx']['initData'][2]['value'] + "')"
             }
             return tra
         },

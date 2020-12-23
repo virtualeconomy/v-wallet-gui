@@ -253,7 +253,7 @@ import Vue from 'vue'
 import browser from '@/utils/browser'
 import Transaction from '@/js-v-sdk/src/transaction'
 import { NETWORK_BYTE } from '@/network'
-import { NFT, LOCK } from '@/js-v-sdk/src/contract_type'
+import { NFT, LOCK, PAYMENT_CHANNEL } from '@/js-v-sdk/src/contract_type'
 import { mapActions, mapState } from 'vuex'
 import { TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants'
 import seedLib from '@/libs/seed.js'
@@ -285,9 +285,9 @@ var initData = {
     selectedWalletType: this ? this.walletType : 'hotWallet',
     contractDescription: '',
     selectedOptions: [
-        {text: 'Non-Fungible Token(NFT) Contract', value: 'NonFungibleContract'},
-        {text: '<span class="disabled">Payment Channel Contract (will be supported later)</span>', value: 'PaymentChannelContract', disabled: true},
-        {text: '<span class="disabled">Lock Contract (will be supported later)</span>', value: 'LockContract', disabled: true}
+        {text: 'Non-Fungible Token(NFT) Contract', value: NFT},
+        {text: '<span class="disabled">Payment Channel Contract (will be supported later)</span>', value: PAYMENT_CHANNEL, disabled: true},
+        {text: '<span class="disabled">Lock Contract (will be supported later)</span>', value: LOCK, disabled: true}
     ],
     amount: 1
 }
@@ -366,6 +366,18 @@ export default {
         },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
+            switch (this.selectedContractType) {
+            case PAYMENT_CHANNEL:
+                tra['stored_tx']['contractInitExplain'] = 'Register Payment Channel Contract'
+                break
+            case LOCK:
+                tra['stored_tx']['contractInitExplain'] = 'Register Lock Contract'
+                break
+            case NFT:
+                tra['stored_tx']['contractInitExplain'] = 'Register Non-Fungible Token(NFT) Contract'
+                break
+            }
+            tra['stored_tx']['contractInitTextual'] = ''
             return tra
         },
         isValidDescription() {
