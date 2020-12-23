@@ -589,6 +589,9 @@ export default {
         },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
+            if (this.selectedNFTContract) {
+                tra['stored_tx']['functionExplain'] = 'Issue NFT'
+            }
             return tra
         },
         qrPage() {

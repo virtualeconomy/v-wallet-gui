@@ -586,7 +586,7 @@ export default {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         isSubmitDisabled() {
-            return !(this.isValidPublicKey && this.recipient && this.isValidRecipient && (this.isValidDescription || !this.description) && this.isValidAmount && !this.isInsufficient)
+            return !(this.isValidPublicKey && this.recipient && this.isValidRecipient && (this.isValidDescription || !this.description) && this.isValidAmount && !this.isInsufficient && (this.contractType !== 'NonFungibleContract' || (this.contractType === 'NonFungibleContract' && BigNumber(this.amount).isEqualTo(1))))
         },
         isNegative() {
             return BigNumber(this.amount).isLessThan(0)
@@ -683,7 +683,11 @@ export default {
             }
         },
         getAmountFromDataObject() {
-            return BigNumber(this.dataObject.stored_tx.functionData[1].value).dividedBy(this.tokenUnity)
+            if (this.contractType === 'NonFungibleContract') {
+                return BigNumber(1)
+            } else {
+                return BigNumber(this.dataObject.stored_tx.functionData[1].value).dividedBy(this.tokenUnity)
+            }
         },
         getRecipientFromDataObject() {
             return this.dataObject.stored_tx.functionData[0].value
@@ -691,7 +695,11 @@ export default {
         dataObject() {
             let tra = this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.selectedKeypair.publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
             if (this.selectedWalletType === 'coldWallet') {
-                tra['stored_tx']['functionExplain'] = 'Sent ' + BigNumber(tra['stored_tx']['functionData'][1]['value']).dividedBy(this.tokenUnity) + ' token to ' + tra['stored_tx']['functionData'][0]['value']
+                if (this.contractType === 'NonFungibleContract') {
+                    tra['stored_tx']['functionExplain'] = 'Send NFT ' + this.tokenId + ' to ' + tra['stored_tx']['functionData'][0]['value']
+                } else {
+                    tra['stored_tx']['functionExplain'] = 'Send ' + BigNumber(tra['stored_tx']['functionData'][1]['value']).dividedBy(this.tokenUnity) + ' token to ' + tra['stored_tx']['functionData'][0]['value']
+                }
             }
             return tra
         }
