@@ -716,7 +716,7 @@ export default {
                 let newTokenIndex = firstTokenIndex
                 let newTokenId = ''
                 for (; ; newTokenIndex++) {
-                    newTokenId = common.getTokenIdByIndex(this.nftContractID, newTokenIndex)
+                    newTokenId = common.contractIDToTokenID(this.nftContractID, newTokenIndex)
                     let res = await this.chain.getTokenInfo(newTokenId)
                     if (res.hasOwnProperty('error')) {
                         break
