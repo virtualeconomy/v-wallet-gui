@@ -695,7 +695,7 @@ export default {
             }
             return tra
         },
-        sendData(walletType) {
+        async sendData(walletType) {
             let sendTx
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
@@ -711,6 +711,17 @@ export default {
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
             if (this.selectedNFTContract) {
+                let firstTokenId = common.contractIDToTokenID(this.nftContractID)
+                let firstTokenIndex = common.getTokenIndex(firstTokenId)
+                let newTokenIndex = firstTokenIndex
+                let newTokenId = ''
+                for (; ; newTokenIndex++) {
+                    newTokenId = common.getTokenIdByIndex(this.nftContractID, newTokenIndex)
+                    let res = await this.chain.getTokenInfo(newTokenId)
+                    if (res.hasOwnProperty('error')) {
+                        break
+                    }
+                }
                 this.chain.sendExecuteContractTx(sendTx).then(response => {
                     if (response.hasOwnProperty('error')) {
                         this.errorMessage = response.message
@@ -722,8 +733,7 @@ export default {
                     } else {
                         this.coldPageId++
                     }
-                    let tokenId = common.contractIDToTokenID(this.nftContractID)
-                    this.addTokenUpdateEventPool(tokenId)
+                    this.addTokenUpdateEventPool(newTokenId)
                     this.updateBalance(true)
                 }, respErr => {
                     this.errorMessage = respErr.message

@@ -23,7 +23,7 @@
       <b-col class="token-balance"
              cols="auto">
         <div>
-          <span>{{ formatter(tokenBalance) }} </span>
+          <span>{{ isNaN(tokenBalance) ? '' : formatter(tokenBalance) }} </span>
         </div>
       </b-col>
       <b-button class="btn-sendToken"
