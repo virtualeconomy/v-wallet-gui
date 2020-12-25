@@ -698,6 +698,21 @@ export default {
             }
             return tra
         },
+        getTokenIndexFromLocal() {
+            let records = JSON.parse(window.localStorage.getItem(this.seedAddress))
+            let index = 0
+            let tokenRecords = records.tokens ? JSON.parse(records.tokens) : {}
+            for (let token in tokenRecords) {
+                let contractId = common.tokenIDToContractID(token)
+                if (contractId === this.nftContractID) {
+                    let tokenIndex = common.getTokenIndex(token)
+                    if (tokenIndex >= index) {
+                        index = tokenIndex
+                    }
+                }
+            }
+            return index
+        },
         async sendData(walletType) {
             let sendTx
             if (walletType === 'hotWallet') {
@@ -714,7 +729,7 @@ export default {
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
             if (this.selectedNFTContract) {
-                let newTokenIndex = 0
+                let newTokenIndex = this.getTokenIndexFromLocal()
                 let newTokenId = ''
                 for (; ; newTokenIndex++) {
                     newTokenId = common.contractIDToTokenID(this.nftContractID, newTokenIndex)
