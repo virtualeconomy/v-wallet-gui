@@ -55,7 +55,7 @@
             <div class="mt">Cannot see your NFT contract?</div>
             <div class="no_nft_tips">You can <span @click="openContracts"
                                                    class="tips_color">Create NFT contract</span> or add existing contract in <span @click="openContracts"
-                                                                                                                                   class="tips_color">management panel.</span></div>
+                                                                                                                                   class="tips_color">Contracts panel.</span></div>
             <span v-if="!isValidIssuer"
                   class="contract-check">You are not issuer of this nft contract.</span>
           </b-form-group>
@@ -221,7 +221,7 @@
             <div class="mt">Cannot see your NFT contract?</div>
             <div class="no_nft_tips">You can <span @click="openContracts"
                                                    class="tips_color">Create NFT contract</span> or add existing contract in <span @click="openContracts"
-                                                                                                                                   class="tips_color">management panel.</span></div>
+                                                                                                                                   class="tips_color">Contracts panel.</span></div>
             <span v-if="!isValidIssuer"
                   class="contract-check">You are not issuer of this nft contract.</span>
           </b-form-group>
@@ -680,6 +680,9 @@ export default {
                 this.unity++
             }
         },
+        sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms))
+        },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
             if (this.selectedNFTContract) {
@@ -711,9 +714,7 @@ export default {
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
             if (this.selectedNFTContract) {
-                let firstTokenId = common.contractIDToTokenID(this.nftContractID)
-                let firstTokenIndex = common.getTokenIndex(firstTokenId)
-                let newTokenIndex = firstTokenIndex
+                let newTokenIndex = 0
                 let newTokenId = ''
                 for (; ; newTokenIndex++) {
                     newTokenId = common.contractIDToTokenID(this.nftContractID, newTokenIndex)
@@ -721,6 +722,7 @@ export default {
                     if (res.hasOwnProperty('error')) {
                         break
                     }
+                    await this.sleep(500)
                 }
                 this.chain.sendExecuteContractTx(sendTx).then(response => {
                     if (response.hasOwnProperty('error')) {

@@ -111,7 +111,7 @@
 </template>
 
 <script>
-import { VSYS_PRECISION, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX } from '@/js-v-sdk/src/constants'
+import { VSYS_PRECISION, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX, NFT_CONTRACT_SEND_FUNCIDX, ACCOUNT_ADDR_TYPE, INT32_TYPE, AMOUNT_TYPE, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/js-v-sdk/src/constants'
 import BigNumber from 'bignumber.js'
 import TransactionRecord from './TransactionRecord'
 import Vue from 'vue'
@@ -120,7 +120,6 @@ import browser from '@/utils/browser'
 import { mapState } from 'vuex'
 import common from '@/js-v-sdk/src/utils/common'
 import certify from '@/utils/certify'
-import base58 from 'base-58'
 import convert from '@/js-v-sdk/src/utils/convert'
 export default {
     name: 'TransactionRecords',
@@ -147,6 +146,7 @@ export default {
             response: [],
             responseExport: [],
             downloadFileType: 'csv',
+            tokenRecords: {},
             resFields: {
                 transaction_id: 'id',
                 transaction_fee: 'fee',
@@ -206,6 +206,11 @@ export default {
         ...mapState({
             chain: 'chain'
         }),
+        seedaddress() {
+            if (Vue.ls.get('address')) {
+                return Vue.ls.get('address')
+            }
+        },
         monthCounts() {
             return Object.keys(this.txRecords).length
         }
@@ -218,6 +223,16 @@ export default {
             const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
             const d = new Date(date / 1e6)
             return monthNames[d.getMonth()] + ', ' + d.getFullYear()
+        },
+        getSendExecuteContractTxType(functionIndex, Data) {
+            let functionData = convert.parseFunctionData(Data)
+            if (functionIndex === NFT_CONTRACT_SEND_FUNCIDX && functionData.length === 2 && functionData[0]['type'] === ACCOUNT_ADDR_TYPE && functionData[1]['type'] === INT32_TYPE) {
+                return 'NFT'
+            } else if ((functionIndex === SEND_FUNCIDX || functionIndex === SEND_FUNCIDX_SPLIT) && functionData.length === 2 && functionData[0]['type'] === ACCOUNT_ADDR_TYPE && functionData[1]['type'] === AMOUNT_TYPE) {
+                return 'Fungible Token'
+            } else {
+                return false
+            }
         },
         getTxRecords(type) {
             if (this.address) {
@@ -232,6 +247,8 @@ export default {
                 }
                 const recordLimit = this.showingNum
                 const txType = this.showingTypeValue
+                let records = JSON.parse(window.localStorage.getItem(this.seedaddress))
+                let tokenRecords = records.tokens ? JSON.parse(records.tokens) : {}
                 const getTransactions = () => { return this.showingTypeValue === 0 ? this.chain.getTxHistory(addr, recordLimit) : this.chain.getTxByType(addr, recordLimit, txType) }
                 getTransactions().then(response => {
                     if (addr === this.address && recordLimit === this.showingNum && txType === this.showingTypeValue) {
@@ -247,12 +264,17 @@ export default {
                             recList[month].push(recItem)
                             if (recItem['type'] === EXECUTE_CONTRACT_TX) {
                                 let tokenId = common.contractIDToTokenID(recItem['contractId'])
-                                if (certify.isCertified(tokenId) && (recItem['functionIndex'] === 4 || (recItem['functionIndex'] === 3 && base58.decode(recItem['functionData'])[1] === 2))) {
+                                if ((certify.isCertified(tokenId) && this.getSendExecuteContractTxType(recItem['functionIndex'], recItem['functionData']) === 'Fungible Token') || (tokenRecords.hasOwnProperty(tokenId) && this.getSendExecuteContractTxType(recItem['functionIndex'], recItem['functionData']) === 'NFT')) {
                                     let functionData = convert.parseFunctionData(recItem['functionData'])
                                     recItem['recipient'] = functionData[0]['data']
-                                    recItem['amount'] = functionData[1]['data']
+                                    if (functionData[1]['type'] === INT32_TYPE) {
+                                        recItem['amount'] = 1
+                                        recItem['officialName'] = 'NFT'
+                                    } else {
+                                        recItem['officialName'] = certify.officialName(tokenId)
+                                        recItem['amount'] = functionData[1]['data']
+                                    }
                                     recItem['sentToken'] = true
-                                    recItem['officialName'] = certify.officialName(tokenId)
                                 }
                             }
                             if (recItem['type'] === REGISTER_CONTRACT_TX) {

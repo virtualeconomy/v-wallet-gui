@@ -568,6 +568,7 @@ export default {
             this.getAddresses()
         },
         async processCertifiedTokenResult(result) {
+            let url = String.fromCharCode(NETWORK_BYTE) === 'T' ? TEST_EXPLORER : EXPLORER
             for (let index in result.body.data.list) {
                 let token = result.body.data.list[index]
                 let contractId = common.tokenIDToContractID(token.Id)
@@ -578,7 +579,7 @@ export default {
                     name: token.Name,
                     support_split: this.isCertifiedTokenSplit,
                     unity: BigNumber(tokenInfo.unity),
-                    iconUrl: EXPLORER + token.IconUrl
+                    iconUrl: url + token.IconUrl
                 }
             }
         },
