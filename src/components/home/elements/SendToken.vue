@@ -434,6 +434,8 @@ import LRUCache from 'lru-cache'
 import BigNumber from 'bignumber.js'
 import common from '@/js-v-sdk/src/utils/common'
 import Transaction from '@/js-v-sdk/src/transaction'
+import {NonFungibleTokenContractDataGenerator, getContractFunctionIndex} from '@/js-v-sdk/src/data'
+import { NFT } from '@/js-v-sdk/src/contract_type'
 import { mapActions, mapState } from 'vuex'
 var initData = {
     errorMessage: '',
@@ -505,6 +507,11 @@ export default {
             default: '',
             require: true
         },
+        contractType: {
+            type: String,
+            default: '',
+            require: true
+        },
         tokenBalances: {
             type: Object,
             default: function() {
@@ -545,16 +552,6 @@ export default {
             this.hotRecipientAddressList.load(JSON.parse(item))
         }
     },
-    watch: {
-        amount(newAmount, oldAmount) {
-            let balance = this.selectedWalletType === 'hotWallet' ? this.tokenBalances[this.address] : this.tokenBalances[this.coldAddress]
-            if (BigNumber(this.amount).isGreaterThan(BigNumber(balance).minus(this.fee))) {
-                this.$nextTick(() => {
-                    this.amount = Number(balance)
-                })
-            }
-        }
-    },
     computed: {
         ...mapState({
             chain: 'chain',
@@ -589,7 +586,7 @@ export default {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
         },
         isSubmitDisabled() {
-            return !(this.isValidPublicKey && this.recipient && this.isValidRecipient && (this.isValidDescription || !this.description) && this.isValidAmount && !this.isInsufficient)
+            return !(this.isValidPublicKey && this.recipient && this.isValidRecipient && (this.isValidDescription || !this.description) && this.isValidAmount && !this.isInsufficient && (this.contractType !== 'NonFungibleContract' || (this.contractType === 'NonFungibleContract' && BigNumber(this.amount).isEqualTo(1))))
         },
         isNegative() {
             return BigNumber(this.amount).isLessThan(0)
@@ -686,7 +683,11 @@ export default {
             }
         },
         getAmountFromDataObject() {
-            return BigNumber(this.dataObject.stored_tx.functionData[1].value).dividedBy(this.tokenUnity)
+            if (this.contractType === 'NonFungibleContract') {
+                return BigNumber(1)
+            } else {
+                return BigNumber(this.dataObject.stored_tx.functionData[1].value).dividedBy(this.tokenUnity)
+            }
         },
         getRecipientFromDataObject() {
             return this.dataObject.stored_tx.functionData[0].value
@@ -694,7 +695,11 @@ export default {
         dataObject() {
             let tra = this.selectedWalletType === 'hotWallet' ? this.buildTransaction(this.selectedKeypair.publicKey) : this.buildTransaction(this.coldAddressInfo.publicKey)
             if (this.selectedWalletType === 'coldWallet') {
-                tra['stored_tx']['functionExplain'] = 'Sent ' + BigNumber(tra['stored_tx']['functionData'][1]['value']).dividedBy(this.tokenUnity) + ' token to ' + tra['stored_tx']['functionData'][0]['value']
+                if (this.contractType === 'NonFungibleContract') {
+                    tra['stored_tx']['functionExplain'] = 'Send NFT ' + this.tokenId + ' to ' + tra['stored_tx']['functionData'][0]['value']
+                } else {
+                    tra['stored_tx']['functionExplain'] = 'Send ' + BigNumber(tra['stored_tx']['functionData'][1]['value']).dividedBy(this.tokenUnity) + ' token to ' + tra['stored_tx']['functionData'][0]['value']
+                }
             }
             return tra
         }
@@ -706,7 +711,16 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            tra.buildSendTokenTx(publicKey, this.tokenId, this.tmpRecipient, this.amount, this.tokenUnity, this.isSplit, this.description, this.timeStamp)
+            if (this.contractType === 'NonFungibleContract') {
+                let contractId = common.tokenIDToContractID(this.tokenId)
+                let tokenIndex = common.getTokenIndex(this.tokenId)
+                const dataGenerator = new NonFungibleTokenContractDataGenerator()
+                let functionData = dataGenerator.createSendData(this.tmpRecipient, tokenIndex)
+                let functionIndex = getContractFunctionIndex(NFT, 'SEND')
+                tra.buildExecuteContractTx(publicKey, contractId, functionIndex, functionData, this.timestamp, this.description)
+            } else {
+                tra.buildSendTokenTx(publicKey, this.tokenId, this.tmpRecipient, this.amount, this.tokenUnity, this.isSplit, this.description, this.timeStamp)
+            }
             return tra
         },
         recordTmpRecipient(recipient) {

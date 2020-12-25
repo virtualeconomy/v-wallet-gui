@@ -292,7 +292,8 @@ export default {
                 avtHash: this.avatarDataHex,
                 sessionTimeout: INITIAL_SESSION_TIMEOUT,
                 info: seedLib.encryptSeedPhrase(JSON.stringify(userInfo), this.password),
-                alias: {}
+                alias: {},
+                contracts: {}
             }
             window.localStorage.setItem(this.seed.address, JSON.stringify(savedInfo))
             this.$emit('show-page', 'saveBackup')

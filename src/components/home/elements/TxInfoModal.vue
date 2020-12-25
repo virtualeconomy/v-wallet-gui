@@ -102,14 +102,46 @@
         <span>{{ txAttachment }}</span>
         <span class="tx-attachment-whole">{{ txAttachment }}</span>
       </div>
-      <div class="tx-id">
+      <div class="tx-address">
         <label>ID</label>
-        <span>{{ displayId }}</span>
+        <span class="addrPos">{{ displayId }}</span>
+        <div>
+          <b-btn id="txId-cpy"
+                 class="btn-copy"
+                 v-b-popover.click.topright="'Copied!'"
+                 @click="copyText('txId-cpy', 'tId')"
+                 variant="link">
+            <img src="@/assets/imgs/icons/operate/ic_copy.svg">
+          </b-btn>
+        </div>
       </div>
-      <div class="tx-id"
-           v-if="txType === 'Register Contract' || txTitle === 'Withdraw Token' || txTitle === 'Withdraw VSYS' || txTitle === 'Deposit Token' || txTitle === 'Deposit VSYS'">
+      <div class="tx-address"
+           v-if="((txType === 'Sent' || txType === 'Received') && contractId) || txType === 'Register Contract' || txType === 'Execute Contract Function' || txTitle === 'Withdraw Token' || txTitle === 'Withdraw VSYS' || txTitle === 'Deposit Token' || txTitle === 'Deposit VSYS'">
         <label>Contract ID</label>
-        <span>{{ contractId }}</span>
+        <span class="addrPos">{{ contractId }}</span>
+        <div>
+          <b-btn id="contract-cpy"
+                 class="btn-copy"
+                 v-b-popover.click.topright="'Copied!'"
+                 @click="copyText('contract-cpy', 'txContractId')"
+                 variant="link">
+            <img src="@/assets/imgs/icons/operate/ic_copy.svg">
+          </b-btn>
+        </div>
+      </div>
+      <div class="tx-address"
+           v-if="((txType === 'Sent' || txType === 'Received') && tokenId)">
+        <label>Token ID</label>
+        <span class="addrPos">{{ tokenId }}</span>
+        <div>
+          <b-btn id="token-cpy"
+                 class="btn-copy"
+                 v-b-popover.click.topright="'Copied!'"
+                 @click="copyText('token-cpy', 'txTokenId')"
+                 variant="link">
+            <img src="@/assets/imgs/icons/operate/ic_copy.svg">
+          </b-btn>
+        </div>
       </div>
       <div v-if="txBlock"
            class="tx-block">
@@ -172,6 +204,14 @@
               v-model="txRecipient"
               ref="txRecipientId"
               readonly></textarea>
+    <textarea class="copy-txid"
+              v-model="contractId"
+              ref="txContractId"
+              readonly></textarea>
+    <textarea class="copy-txid"
+              v-model="tokenId"
+              ref="txTokenId"
+              readonly></textarea>
   </b-modal>
 </template>
 
@@ -181,7 +221,7 @@ import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { TX_FEE } from '@/js-v-sdk/src/constants'
 import { TX_URL } from '@/constants'
-import { NETWORK_BYTE, EXPLORER } from '@/network'
+import { NETWORK_BYTE, EXPLORER, TEST_EXPLORER } from '@/network'
 import { mapActions, mapState } from 'vuex'
 export default {
     name: 'TxInfoModal',
@@ -359,7 +399,8 @@ export default {
             return this.tokenId in tokens
         },
         txInfo() {
-            window.open(EXPLORER + TX_URL + this.modalId)
+            let url = String.fromCharCode(NETWORK_BYTE) === 'T' ? TEST_EXPLORER : EXPLORER
+            window.open(url + TX_URL + this.modalId)
         },
         closeModal() {
             this.$refs.infoModal.hide()

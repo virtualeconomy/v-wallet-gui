@@ -422,7 +422,11 @@ export default {
         txAmount() {
             if (this.isSentToken) {
                 let tokenId = common.contractIDToTokenID(this.txRecord.contractId)
-                let unity = certify.getUnity(tokenId)
+                let unity = 1
+                try {
+                    unity = certify.getUnity(tokenId)
+                } catch (e) {
+                }
                 return BigNumber(this.txRecord.amount).dividedBy(unity)
             }
             if (this.txRecord.lease) {
@@ -480,6 +484,15 @@ export default {
                 this.tokenId = 'Failed to get token id'
             })
         },
+        getSendTokenId() {
+            if (this.txRecord.officialName === 'NFT') {
+                let functionData = convert.parseFunctionData(this.txRecord.functionData)
+                let tokenIndex = functionData[1]['data']
+                this.tokenId = common.contractIDToTokenID(this.txRecord.contractId, tokenIndex)
+            } else {
+                this.tokenId = common.contractIDToTokenID(this.txRecord.contractId)
+            }
+        },
         copyTxId() {
             this.$refs.tId.select()
             window.document.execCommand('copy')
@@ -493,6 +506,9 @@ export default {
         showModal() {
             if (this.txType === 'Register Contract') {
                 this.getContractType()
+            }
+            if ((this.txType === 'Sent' || this.txType === 'Received') && this.isSentToken) {
+                this.getSendTokenId()
             }
             this.heightGap = this.getLastHeight - this.txRecord.height
             this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.transType + this.txRecord.id + this.selfSend)

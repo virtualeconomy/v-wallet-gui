@@ -2,6 +2,9 @@
   <div class="home"
        @mousemove=resetSessionClearTimeout>
     <nav-bar :addresses="addresses"
+             :balance="balance[selectedAddress]"
+             :wallet-type="walletType"
+             :balances="balance"
              :address="selectedAddress"
              class="navibar"
              :cold-addresses="coldAddresses"
@@ -194,7 +197,6 @@ import ImportColdWallet from './home/modals/ImportColdWallet'
 import Vue from 'vue'
 import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
 import { INITIAL_SESSION_TIMEOUT, CERTIFICATED_TOKEN } from '@/constants'
-import {VSYS_RATE} from '../network'
 import seedLib from '@/libs/seed.js'
 import TransactionRecords from './home/elements/TransactionRecords'
 import LeasePane from './home/elements/LeasePane'
@@ -208,7 +210,7 @@ import { mapActions, mapState } from 'vuex'
 import SendToken from './home/elements/SendToken'
 import common from '@/js-v-sdk/src/utils/common'
 import certify from '@/utils/certify'
-import {EXPLORER} from '@/network'
+import { EXPLORER, TEST_EXPLORER, NETWORK_BYTE, VSYS_RATE, TEST_VSYS_RATE } from '@/network'
 export default {
     name: 'Home',
     data: function() {
@@ -242,9 +244,7 @@ export default {
         if (!this.address || !Vue.ls.get('pwd')) {
             this.$router.push('/login')
         } else {
-            this.$http.get(VSYS_RATE).then(function(result) {
-                this.nodeList = result.body.data
-            })
+            this.getNodeList()
             this.getBlockHeight()
             this.getCertifiedTokens().then(res => {
                 this.updateCertifiedTokenList(res)
@@ -313,6 +313,7 @@ export default {
     },
     computed: {
         ...mapState({
+            account: 'account',
             chain: 'chain',
             available: 'available',
             paymentRedirect: 'paymentRedirect'
@@ -542,6 +543,23 @@ export default {
                 Vue.set(this.addresses, seed.address, index)
             }
         },
+        getNodeList() {
+            let rateUrl = String.fromCharCode(NETWORK_BYTE) === 'T' ? TEST_VSYS_RATE : VSYS_RATE
+            this.$http.get(rateUrl).then(function(result) {
+                let nodeList = result.body.data
+                for (let index in nodeList) {
+                    let isValid = false
+                    try {
+                        isValid = this.account.checkAddress(nodeList[index].Address)
+                    } catch (e) {
+                        console.log(e)
+                    }
+                    if (isValid) {
+                        this.nodeList.push(nodeList[index])
+                    }
+                }
+            })
+        },
         sortStatus() {
             if (this.sortFlag === 0) this.sortFlag = 1
             else this.sortFlag = 0
@@ -550,6 +568,7 @@ export default {
             this.getAddresses()
         },
         async processCertifiedTokenResult(result) {
+            let url = String.fromCharCode(NETWORK_BYTE) === 'T' ? TEST_EXPLORER : EXPLORER
             for (let index in result.body.data.list) {
                 let token = result.body.data.list[index]
                 let contractId = common.tokenIDToContractID(token.Id)
@@ -560,13 +579,14 @@ export default {
                     name: token.Name,
                     support_split: this.isCertifiedTokenSplit,
                     unity: BigNumber(tokenInfo.unity),
-                    iconUrl: EXPLORER + token.IconUrl
+                    iconUrl: url + token.IconUrl
                 }
             }
         },
         getCertifiedTokens() {
             return new Promise((resolve, reject) => {
-                this.$http.get(EXPLORER + CERTIFICATED_TOKEN).then(async function(result) {
+                let url = String.fromCharCode(NETWORK_BYTE) === 'T' ? TEST_EXPLORER : EXPLORER
+                this.$http.get(url + CERTIFICATED_TOKEN).then(async function(result) {
                     await this.processCertifiedTokenResult(result)
                     resolve(this.certifiedTokenList)
                 }, respError => {

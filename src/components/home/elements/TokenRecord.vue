@@ -23,7 +23,7 @@
       <b-col class="token-balance"
              cols="auto">
         <div>
-          <span>{{ formatter(tokenBalance) }} </span>
+          <span>{{ isNaN(tokenBalance) ? '' : formatter(tokenBalance) }} </span>
         </div>
       </b-col>
       <b-button class="btn-sendToken"
@@ -55,11 +55,13 @@
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
           <b-dropdown-item v-if="!isCertified(tokenId)"
                            @click="verify">Verification</b-dropdown-item>
-          <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
+          <b-dropdown-item v-if="(tokenManagementStatus || address === tokenMaker) && contractType !=='NonFungibleContract'"
+                           :disabled="contractType==='NonFungibleContract'"
                            @click="supersede">Supersede</b-dropdown-item>
-          <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
+          <b-dropdown-item v-if="(tokenManagementStatus || address === tokenMaker) && contractType !=='NonFungibleContract'"
+                           :disabled="contractType==='NonFungibleContract'"
                            @click="issueToken">Issue Token</b-dropdown-item>
-          <b-dropdown-item v-if="tokenManagementStatus || address === tokenMaker"
+          <b-dropdown-item v-if="(tokenManagementStatus || address === tokenMaker) && contractType !=='NonFungibleContract'"
                            @click="destroyToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenSplitStatus && isSplit"
                            @click="splitToken">Split Token</b-dropdown-item>
@@ -73,6 +75,7 @@
                     :maker="maker"
                     :contract-id="contractId"
                     :max-supply="maxSupply"
+                    :contract-type="contractType"
                     :current-supply="formatter(currentSupply)"
                     :token-description="tokenDescription">
     </TokenInfoModal>
@@ -115,6 +118,7 @@
                :wallet-type="walletType"
                :is-split="isSplit"
                :token-unity="unity"
+               :contract-type="contractType"
                @updateToken="updateToken">
     </SendToken>
     <Receive show="false"
@@ -156,7 +160,8 @@ export default {
             maker: '',
             functionName: '',
             contractId: '',
-            showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION
+            showUnsupportedFunction: SHOW_UNSUPPORTED_FUNCTION,
+            contractType: ''
         }
     },
     props: {
@@ -221,6 +226,7 @@ export default {
     created() {
         this.getTokenInfo()
         this.updateToken()
+        this.getContractType()
     },
     computed: {
         ...mapState({
@@ -414,6 +420,13 @@ export default {
         },
         updateUnity(tokenId, unity) {
             this.certifiedTokenList[tokenId].unity = unity
+        },
+        getContractType() {
+            let contractId = common.tokenIDToContractID(this.tokenId)
+            this.chain.getContractInfo(contractId).then(response => {
+                this.contractType = response.type
+            }, respError => {
+            })
         }
     }
 }

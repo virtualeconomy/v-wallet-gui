@@ -37,6 +37,8 @@
                            v-b-modal.settingsModal>Settings</b-dropdown-item>
           <b-dropdown-item class="drop-down-item"
                            v-b-modal.aliasAddressModal>Alias Address</b-dropdown-item>
+          <b-dropdown-item class="drop-down-item"
+                           v-b-modal.contractManagementModal>Contracts</b-dropdown-item>
           <b-dropdown-item @click="feedbackIssue"
                            class="drop-down-item">Issue & Help</b-dropdown-item>
           <b-dropdown-item class="drop-down-item"
@@ -60,6 +62,11 @@
               :set-usr-local-storage="setUsrLocalStorage"
               :address="address"></Settings>
     <About></About>
+    <ContractManagement :addresses="addresses"
+                        :cold-addresses="coldAddresses"
+                        :balances="balances"
+                        :wallet-type="walletType"
+                        :address="address"></ContractManagement>
   </div>
 
 </template>
@@ -69,6 +76,7 @@
 import Settings from '../modals/Settings'
 import Account from '../modals/Account'
 import AliasAddress from '../modals/AliasAddress'
+import ContractManagement from '../modals/ContractManagement'
 import About from '../modals/About'
 import { FEEDBACK_URL } from '@/constants'
 import { NETWORK_BYTE } from '@/network'
@@ -82,7 +90,8 @@ export default {
         Settings,
         Account,
         About,
-        AliasAddress
+        AliasAddress,
+        ContractManagement
     },
     props: {
         username: {
@@ -137,6 +146,16 @@ export default {
             default: function() {
                 return ''
             }
+        },
+        balances: {
+            type: Object,
+            default: function() {},
+            require: true
+        },
+        walletType: {
+            type: String,
+            default: 'hotWallet',
+            require: true
         }
     },
     data() {

@@ -39,8 +39,29 @@
               <span class="balance">{{ formatter(balances[address]) }} VSYS</span>
             </b-btn>
           </b-form-group>
+          <b-form-group >
+            <b-form-radio-group v-model="tokenMethod"
+                                plain
+                                style="display: flex;flex-direction: column"
+                                @change="changeRadioState"
+                                :options="tokenSplitStatus?selectedOptions1:selectedOptions2"></b-form-radio-group>
+          </b-form-group>
+          <b-form-group label="Contract"
+                        label-for="descriptionInput"
+                        v-show="tokenMethod==='NFT'">
+            <b-form-select id=address-input
+                           v-model="nftContractID"
+                           :options="options(contracts,'con')"></b-form-select>
+            <div class="mt">Cannot see your NFT contract?</div>
+            <div class="no_nft_tips">You can <span @click="openContracts"
+                                                   class="tips_color">Create NFT contract</span> or add existing contract in <span @click="openContracts"
+                                                                                                                                   class="tips_color">Contracts panel.</span></div>
+            <span v-if="!isValidIssuer"
+                  class="contract-check">You are not issuer of this nft contract.</span>
+          </b-form-group>
           <b-form-group label="Contract Description"
-                        label-for="descriptionInput">
+                        label-for="descriptionInput"
+                        v-show="tokenMethod!=='NFT'">
             <b-form-textarea id="descriptionInput"
                              v-model="contractDescription"
                              :rows="2"
@@ -60,7 +81,8 @@
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Max Supply"
-                        label-for="amount-input">
+                        label-for="amount-input"
+                        v-show="tokenMethod!=='NFT'">
             <b-form-input id="amount-input"
                           class="amount-input"
                           v-model="amount"
@@ -89,7 +111,7 @@
               Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-show="tokenMethod!=='NFT'">
             <span style="font-size: 15px !important;color: #9091A3;">Unity: 10<sup>{{ unity }}</sup> (The minimum amount will be {{ formatter(1/Math.pow(10, unity)) }} Token)</span>
             <div style="margin-top: 10px;">
               <span class="unity-number">10<sup>0</sup></span>
@@ -105,15 +127,6 @@
               <span class="unity-number-second">10<sup>16</sup></span>
             </div>
           </b-form-group>
-          <div v-if="tokenSplitStatus"
-               style="margin-top: 10px;">
-            <span>
-              <img id="img_read"
-                   @click="changeIcon"
-                   style="font-size: 15px;z-index: 100;"
-                   src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/reverse-split token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after created)</span>
-            </span>
-          </div>
           <b-form-group style="margin-top: 10px;">
             <label class="fee-remark">Transaction Fee {{ Number(fee) }} VSYS</label>
             <span v-if="isInsufficient"
@@ -123,7 +136,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isSubmitDisabled"
+                    :disabled="tokenMethod==='NFT'?!isValidContract:isSubmitDisabled"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -131,7 +144,7 @@
           <TokenConfirm :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Register New Token'">
+                        :tx-type="txType">
           </TokenConfirm>
           <p v-show="sendError"
              class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
@@ -161,7 +174,7 @@
           <TokenSuccess :address="address"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Register New Token'">
+                        :tx-type="txType">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -192,8 +205,29 @@
               <span class="balance">{{ formatter(balances[coldAddress]) }} VSYS</span>
             </b-btn>
           </b-form-group>
+          <b-form-group >
+            <b-form-radio-group v-model="tokenMethod"
+                                plain
+                                style="display: flex;flex-direction: column"
+                                @change="changeRadioState"
+                                :options="tokenSplitStatus?selectedOptions1:selectedOptions2"></b-form-radio-group>
+          </b-form-group>
+          <b-form-group label="Contract"
+                        label-for="descriptionInput"
+                        v-show="tokenMethod==='NFT'">
+            <b-form-select id=address-input
+                           v-model="nftContractID"
+                           :options="options(contracts,'con')"></b-form-select>
+            <div class="mt">Cannot see your NFT contract?</div>
+            <div class="no_nft_tips">You can <span @click="openContracts"
+                                                   class="tips_color">Create NFT contract</span> or add existing contract in <span @click="openContracts"
+                                                                                                                                   class="tips_color">Contracts panel.</span></div>
+            <span v-if="!isValidIssuer"
+                  class="contract-check">You are not issuer of this nft contract.</span>
+          </b-form-group>
           <b-form-group label="Contract Description"
-                        label-for="descriptionInput">
+                        label-for="descriptionInput"
+                        v-show="tokenMethod!=='NFT'">
             <b-form-textarea id="descriptionInput"
                              v-model="contractDescription"
                              :rows="2"
@@ -213,7 +247,8 @@
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Max Supply"
-                        label-for="cold-amount-input">
+                        label-for="cold-amount-input"
+                        v-show="tokenMethod!=='NFT'">
             <b-form-input id="cold-amount-input"
                           class="amount-input"
                           v-model="amount"
@@ -242,7 +277,7 @@
               Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-show="tokenMethod!=='NFT'">
             <span style="font-size: 15px !important;color: #9091A3;">Unity: 10<sup>{{ unity }}</sup> (The minimum amount will be {{ formatter(1/Math.pow(10, unity)) }} Token)</span>
             <div style="margin-top: 10px;">
               <span class="unity-number">10<sup>0</sup></span>
@@ -258,15 +293,6 @@
               <span class="unity-number-second">10<sup>16</sup></span>
             </div>
           </b-form-group>
-          <div v-if="tokenSplitStatus"
-               style="margin-top: 10px;">
-            <span>
-              <img id="img_read_cold"
-                   @click="changeIcon"
-                   style="font-size: 15px;z-index: 100;"
-                   src="@/assets/imgs/icons/signup/ic_check.svg"> Support split/merge token<span style="font-size: 13px;color: #9091A3;letter-spacing: 0;"> (Attention: cannot change after created)</span>
-            </span>
-          </div>
           <b-form-group>
             <label class="fee-remark">Transaction Fee {{ Number(fee) }} VSYS</label>
             <span v-if="isInsufficient"
@@ -276,7 +302,7 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isSubmitDisabled"
+                    :disabled="tokenMethod==='NFT'?!isValidContract:isSubmitDisabled"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -284,7 +310,7 @@
           <TokenConfirm :address="coldAddress"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Register New Token'">
+                        :tx-type="txType">
           </TokenConfirm>
           <b-row>
             <b-col class="col-lef">
@@ -323,7 +349,7 @@
           <TokenConfirm :address="coldAddress"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Register New Token'">
+                        :tx-type="txType">
           </TokenConfirm>
           <p v-show="sendError"
              class="text-danger"><small>Sorry, transaction send failed! Failed reason: {{ errorMessage }}</small></p>
@@ -352,7 +378,7 @@
           <TokenSuccess :address="coldAddress"
                         :amount=inputAmount(amount)
                         :fee="fee"
-                        :tx-type="'Register New Token'">
+                        :tx-type="txType">
           </TokenSuccess>
           <b-button variant="warning"
                     block
@@ -369,7 +395,7 @@
 import Vue from 'vue'
 import { TOKEN_CONTRACT, TOKEN_CONTRACT_WITH_SPLIT } from '@/js-v-sdk/src/contract'
 import seedLib from '@/libs/seed.js'
-import { CONTRACT_REGISTER_FEE } from '@/js-v-sdk/src/constants'
+import { CONTRACT_REGISTER_FEE, CONTRACT_EXEC_FEE } from '@/js-v-sdk/src/constants'
 import { TRANSFER_ATTACHMENT_BYTE_LIMIT } from '@/constants'
 import { NETWORK_BYTE } from '@/network'
 import TokenConfirm from './TokenConfirm'
@@ -378,11 +404,10 @@ import ColdSignature from './ColdSignature'
 import browser from '@/utils/browser'
 import Transaction from '@/js-v-sdk/src/transaction'
 import BigNumber from 'bignumber.js'
-import imgread1 from '@/assets/imgs/icons/signup/ic_check.svg'
-import imgread2 from '@/assets/imgs/icons/signup/ic_check_selected.svg'
 import common from '@/js-v-sdk/src/utils/common'
 import { mapActions, mapState } from 'vuex'
-import { TokenContractDataGenerator } from '@/js-v-sdk/src/data'
+import { TokenContractDataGenerator, NonFungibleTokenContractDataGenerator, getContractFunctionIndex } from '@/js-v-sdk/src/data'
+import { NFT } from '@/js-v-sdk/src/contract_type'
 var initData = {
     errorMessage: '',
     qrArray: new Array(0),
@@ -401,9 +426,24 @@ var initData = {
     timeStamp: Date.now() * 1e6,
     hasConfirmed: false,
     tokenId: '',
+    txType: 'Register New Token',
     selectedWalletType: this ? this.walletType : 'hotWallet',
     contractDescription: '',
-    tokenDescription: ''
+    tokenDescription: '',
+    selectedNFTContract: false,
+    nftContractID: '',
+    tokenMethod: 'FT',
+    selectedOptions1: [
+        {text: 'Fungible Token', value: 'FT'},
+        {text: 'Fungible Token with split/reverse-split function', value: 'FTWF'},
+        {text: 'Non Fungible Token', value: 'NFT'}
+    ],
+    selectedOptions2: [
+        {text: 'Fungible Token', value: 'FT'},
+        {text: 'Non Fungible Token', value: 'NFT'}
+    ],
+    isValidIssuer: true,
+    contracts: {}
 }
 export default {
     name: 'CreateToken',
@@ -439,6 +479,38 @@ export default {
     data: function() {
         return initData
     },
+    watch: {
+        nftContractID(newContractId, oldContractId) {
+            if (newContractId) {
+                try {
+                    this.getContractInfo()
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+        },
+        address(newAddress, oldAddress) {
+            if (newAddress && this.nftContractID) {
+                try {
+                    this.getContractInfo()
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+        },
+        coldAddress(newAddress, oldAddress) {
+            if (newAddress && this.nftContractID) {
+                try {
+                    this.getContractInfo()
+                } catch (e) {
+                    console.log(e)
+                }
+            }
+        }
+    },
+    created() {
+        this.getContracts()
+    },
     computed: {
         ...mapState({
             chain: 'chain',
@@ -472,6 +544,9 @@ export default {
         },
         isSubmitDisabled() {
             return !(!this.isInsufficient && (this.isValidDescription(this.contractDescription) || !this.contractDescription) && (this.isValidDescription(this.tokenDescription) || !this.tokenDescription) && this.isValidAmount)
+        },
+        isValidContract() {
+            return this.nftContractID && this.isValidIssuer
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -507,13 +582,19 @@ export default {
         },
         isInsufficient() {
             let balance = this.selectedWalletType === 'hotWallet' ? this.balances[this.address] : this.balances[this.coldAddress]
-            return BigNumber(balance).isLessThan(BigNumber(CONTRACT_REGISTER_FEE))
+            return BigNumber(balance).isLessThan(this.fee)
         },
         selectedKeypair() {
             return seedLib.fromExistingPhrasesWithIndex(this.seedPhrase, this.addresses[this.address]).keyPair
         },
         dataObject() {
             let tra = this.buildTransaction(this.coldAddresses[this.coldAddress].publicKey)
+            if (this.selectedNFTContract) {
+                tra['stored_tx']['functionExplain'] = 'Issue NFT'
+            } else {
+                tra['stored_tx']['contractInitExplain'] = 'Create token' + (this.support === false ? ' ' : ' (support split) ') + 'with max supply ' + BigNumber(tra['stored_tx']['initData'][0]['value']).dividedBy(tra['stored_tx']['initData'][1]['value'])
+                tra['stored_tx']['contractInitTextual'] = 'init(max=' + BigNumber(tra['stored_tx']['initData'][0]['value']).dividedBy(tra['stored_tx']['initData'][1]['value']) + ',unity= ' + BigNumber(tra['stored_tx']['initData'][1]['value']) + ",tokenDescription='" + tra['stored_tx']['initData'][2]['value'] + "')"
+            }
             return tra
         },
         qrPage() {
@@ -525,6 +606,55 @@ export default {
     },
     methods: {
         ...mapActions(['updateBalance', 'changeEventPool', 'changeAddTokenStatus', 'addTokenUpdateEventPool']),
+        changeRadioState(val) {
+            switch (val) {
+            case 'NFT':
+                this.fee = BigNumber(CONTRACT_EXEC_FEE)
+                this.selectedNFTContract = true
+                this.amount = 1
+                this.support = false
+                this.txType = 'Issue NFT'
+                this.getContracts()
+                break
+            case 'FT':
+                this.fee = BigNumber(CONTRACT_REGISTER_FEE)
+                this.selectedNFTContract = false
+                this.amount = 0
+                this.support = false
+                this.txType = 'Register New Token'
+                break
+            case 'FTWF':
+                this.fee = BigNumber(CONTRACT_REGISTER_FEE)
+                this.selectedNFTContract = false
+                this.amount = 0
+                this.support = true
+                this.txType = 'Register New Token'
+                break
+            }
+        },
+        getContractInfo() {
+            this.chain.getContractInfo(this.nftContractID).then(response => {
+                let issuer = response.info[0].data
+                let address = this.selectedWalletType === 'hotWallet' ? this.address : this.coldAddress
+                this.isValidIssuer = issuer === address
+            }, respError => {
+            })
+        },
+        openContracts() {
+            this.$refs.createTokenModal.hide()
+            this.$root.$emit('bv::show::modal', 'contractManagementModal')
+        },
+        getContracts() {
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            if (userInfo && userInfo.contracts) {
+                let contracts = JSON.parse(userInfo.contracts)
+                for (let contract in contracts) {
+                    if (contracts[contract] === 'NFT') {
+                        Vue.set(this.contracts, contract, contracts[contract])
+                    }
+                }
+            }
+        },
         getQrArray() {
             const qrSize = 300
             let tempDataObject = JSON.parse(JSON.stringify(this.dataObject.toJsonForColdSignature()))
@@ -536,16 +666,6 @@ export default {
                 textArray[i] = text.slice(i * qrSize, (i + 1) * qrSize)
             }
             this.qrArray = textArray
-        },
-        changeIcon() {
-            let imgId = this.selectedWalletType === 'hotWallet' ? 'img_read' : 'img_read_cold'
-            if (this.support === false) {
-                document.getElementById(imgId).src = imgread2
-                this.support = true
-            } else {
-                document.getElementById(imgId).src = imgread1
-                this.support = false
-            }
         },
         inputAmount(num) {
             return BigNumber(num)
@@ -560,15 +680,40 @@ export default {
                 this.unity++
             }
         },
+        sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms))
+        },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            let contract = this.support === false ? TOKEN_CONTRACT : TOKEN_CONTRACT_WITH_SPLIT
-            let dataGenerator = new TokenContractDataGenerator()
-            let initData = dataGenerator.createInitData(this.amount, BigNumber(Math.pow(10, this.unity)), this.tokenDescription)
-            tra.buildRegisterContractTx(publicKey, contract, initData, this.contractDescription, this.timeStamp)
+            if (this.selectedNFTContract) {
+                let dataGenerator = new NonFungibleTokenContractDataGenerator()
+                let initData = dataGenerator.createIssueData(this.tokenDescription)
+                let functionIndex = getContractFunctionIndex(NFT, 'ISSUE')
+                tra.buildExecuteContractTx(publicKey, this.nftContractID, functionIndex, initData, this.timeStamp, this.tokenDescription)
+            } else {
+                let contract = this.support === false ? TOKEN_CONTRACT : TOKEN_CONTRACT_WITH_SPLIT
+                let dataGenerator = new TokenContractDataGenerator()
+                let initData = dataGenerator.createInitData(this.amount, BigNumber(Math.pow(10, this.unity)), this.tokenDescription)
+                tra.buildRegisterContractTx(publicKey, contract, initData, this.contractDescription, this.timeStamp)
+            }
             return tra
         },
-        sendData(walletType) {
+        getTokenIndexFromLocal() {
+            let records = JSON.parse(window.localStorage.getItem(this.seedAddress))
+            let index = 0
+            let tokenRecords = records.tokens ? JSON.parse(records.tokens) : {}
+            for (let token in tokenRecords) {
+                let contractId = common.tokenIDToContractID(token)
+                if (contractId === this.nftContractID) {
+                    let tokenIndex = common.getTokenIndex(token)
+                    if (tokenIndex >= index) {
+                        index = tokenIndex
+                    }
+                }
+            }
+            return index
+        },
+        async sendData(walletType) {
             let sendTx
             if (walletType === 'hotWallet') {
                 if (this.hasConfirmed) {
@@ -583,27 +728,60 @@ export default {
                 let signature = this.coldSignature
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
-            this.chain.sendRegisterContractTx(sendTx).then(response => {
-                if (response.hasOwnProperty('error')) {
-                    this.errorMessage = response.message
+            if (this.selectedNFTContract) {
+                let newTokenIndex = this.getTokenIndexFromLocal()
+                let newTokenId = ''
+                for (; ; newTokenIndex++) {
+                    newTokenId = common.contractIDToTokenID(this.nftContractID, newTokenIndex)
+                    let res = await this.chain.getTokenInfo(newTokenId)
+                    if (res.hasOwnProperty('error')) {
+                        break
+                    }
+                    await this.sleep(500)
+                }
+                this.chain.sendExecuteContractTx(sendTx).then(response => {
+                    if (response.hasOwnProperty('error')) {
+                        this.errorMessage = response.message
+                        this.sendError = true
+                        return
+                    }
+                    if (walletType === 'hotWallet') {
+                        this.pageId++
+                    } else {
+                        this.coldPageId++
+                    }
+                    this.addTokenUpdateEventPool(newTokenId)
+                    this.updateBalance(true)
+                }, respErr => {
+                    this.errorMessage = respErr.message
+                    if (this.errorMessage === undefined) {
+                        this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
+                    }
                     this.sendError = true
-                    return
-                }
-                if (walletType === 'hotWallet') {
-                    this.pageId++
-                } else {
-                    this.coldPageId++
-                }
-                let tokenId = common.contractIDToTokenID(response.contractId)
-                this.addTokenUpdateEventPool(tokenId)
-                this.updateBalance(true)
-            }, respErr => {
-                this.errorMessage = respErr.message
-                if (this.errorMessage === undefined) {
-                    this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
-                }
-                this.sendError = true
-            })
+                })
+            } else {
+                this.chain.sendRegisterContractTx(sendTx).then(response => {
+                    if (response.hasOwnProperty('error')) {
+                        this.errorMessage = response.message
+                        this.sendError = true
+                        return
+                    }
+                    if (walletType === 'hotWallet') {
+                        this.pageId++
+                    } else {
+                        this.coldPageId++
+                    }
+                    let tokenId = common.contractIDToTokenID(response.contractId)
+                    this.addTokenUpdateEventPool(tokenId)
+                    this.updateBalance(true)
+                }, respErr => {
+                    this.errorMessage = respErr.message
+                    if (this.errorMessage === undefined) {
+                        this.errorMessage = 'Failed reason: Unknown.Please check network connection!'
+                    }
+                    this.sendError = true
+                })
+            }
         },
         nextPage() {
             this.sendError = false
@@ -633,11 +811,18 @@ export default {
             this.coldSignature = ''
             this.support = false
             this.timeStamp = Date.now() * 1e6
+            this.fee = BigNumber(CONTRACT_REGISTER_FEE)
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
             this.selectedWalletType = this.walletType
             this.contractDescription = ''
             this.tokenDescription = ''
+            this.tokenMethod = 'FT'
+            this.nftContractID = ''
+            this.txType = 'Register New Token'
+            this.selectedNFTContract = false
+            this.isValidIssuer = true
+            this.getContracts()
         },
         endSend() {
             this.$refs.createTokenModal.hide()
@@ -656,11 +841,11 @@ export default {
                 this.coldPageId = 1
             }
         },
-        options(addrs) {
+        options(addrs, type) {
             return Object.keys(addrs).reduce((options, addr) => {
                 options.push({ value: addr, text: addr })
                 return options
-            }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
+            }, [{ value: '', text: '<span class="text-muted">Please select a ' + (type === 'con' ? 'contract</span>' : 'wallet address</span>'), disabled: true }])
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
@@ -670,6 +855,18 @@ export default {
 </script>
 
 <style scoped lang="less">
+.mt{
+    margin-top: 10px;
+}
+.no_nft_tips{
+    color: #9091a3;
+    font-size: 13px
+}
+.tips_color{
+    cursor: pointer;
+    color: #FF8737;
+    font-size: 12px
+}
 .scan-ok-btn, .scan-again-btn {
     margin-top: 10px;
 }
@@ -839,6 +1036,11 @@ textarea::-webkit-input-placeholder {
 .vsys-check {
     display: block;
     margin-top: -10px;
+    font-size: 80%;
+    color: #dc3545;
+}
+.contract-check {
+    display: block;
     font-size: 80%;
     color: #dc3545;
 }
