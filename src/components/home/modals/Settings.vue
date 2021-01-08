@@ -22,6 +22,16 @@
                        size="sm">
         </b-form-select>
       </div>
+      <div class="lang-setting div-t">
+        <label class="label-st">Node</label>
+        <b-button
+          style="display: block;width: 30%;"
+          class="btn-confirm"
+          variant="warning"
+          v-b-modal.nodesManagementModal
+          size="lg">Set Nodes
+        </b-button>
+      </div>
       <div class="timeout-setting div-t">
         <label class="label-st">Session Timeout</label>
         <b-form-select class="setting-input"
@@ -79,6 +89,7 @@
         </b-button>
       </b-col>
     </b-row>
+    <NodesManagement></NodesManagement>
   </b-modal>
 </template>
 
@@ -86,8 +97,12 @@
 import Vue from 'vue'
 import { INITIAL_SESSION_TIMEOUT } from '@/constants'
 import { mapState, mapActions } from 'vuex'
+import NodesManagement from './NodesManagement'
 export default {
     name: 'Settings',
+    components: {
+        NodesManagement
+    },
     created() {
         this.curManagementStatus = this.tokenManagementStatus
         this.curSplitStatus = this.tokenSplitStatus

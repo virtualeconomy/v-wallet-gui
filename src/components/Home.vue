@@ -245,6 +245,7 @@ export default {
             this.$router.push('/login')
         } else {
             this.getNodeList()
+            this.selectNodes()
             this.getBlockHeight()
             this.getCertifiedTokens().then(res => {
                 this.updateCertifiedTokenList(res)
@@ -363,6 +364,33 @@ export default {
     },
     methods: {
         ...mapActions(['updateSelectedAddress', 'updateBalance', 'updatePaymentRedirect', 'updateCertifiedTokenList']),
+        selectNodes() {
+            let nodeList = {}
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            if (String.fromCharCode(NETWORK_BYTE) === 'T') {
+                if (userInfo && userInfo.testNodes) {
+                    try {
+                        nodeList = JSON.parse(userInfo.testNodes)
+                    } catch (err) {
+                        this.setUsrLocalStorage('testNodes', JSON.stringify({}))
+                    }
+                }
+            } else {
+                if (userInfo && userInfo.nodes) {
+                    try {
+                        nodeList = JSON.parse(userInfo.nodes)
+                    } catch (err) {
+                        this.setUsrLocalStorage('nodes', JSON.stringify({}))
+                    }
+                }
+            }
+            let suffix = '/blocks/height'
+            for (let node in nodeList) {
+                this.$http.get(node + suffix).then(res => {
+                    console.log(res)
+                })
+            }
+        },
         showErrorMsgBox(errorMessage) {
             const h = this.$createElement
             const titleVNode = h('div', { domProps: { innerHTML: 'Error' }, class: ['error-title'] })
