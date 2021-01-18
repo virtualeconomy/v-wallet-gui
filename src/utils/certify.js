@@ -13,9 +13,9 @@ var certifiedTokensList = {
     },
 }
 import Blockchain from '@/js-v-sdk/src/blockchain'
-import { NETWORK_BYTE, NODE_IP } from '@/network'
+import { NETWORK_BYTE, MAINNET_IP, TESTNET_IP } from '@/network'
 var certifiedTokens;
-var chain = new Blockchain(NODE_IP, NETWORK_BYTE);
+var chain = String.fromCharCode(NETWORK_BYTE) === 'M' ? new Blockchain(MAINNET_IP, NETWORK_BYTE) : new Blockchain(TESTNET_IP, NETWORK_BYTE);
 if (String.fromCharCode(NETWORK_BYTE) === 'T') {
     certifiedTokens = certifiedTokensList['Testnet']
 } else {

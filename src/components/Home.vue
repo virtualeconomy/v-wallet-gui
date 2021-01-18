@@ -219,6 +219,7 @@ export default {
             balance: {},
             selectedAddress: '',
             sessionClearTimeout: void 0,
+            nodesClearTimeout: void 0,
             addresses: {},
             coldAddresses: {},
             sortedAddresses: {},
@@ -237,7 +238,9 @@ export default {
             updateLeaseRecordsFlag: false,
             nodeList: [],
             certifiedTokenList: {},
-            isCertifiedTokenSplit: false
+            isCertifiedTokenSplit: false,
+            updateNodes: [],
+            nodeIndex: 0
         }
     },
     created() {
@@ -245,7 +248,6 @@ export default {
             this.$router.push('/login')
         } else {
             this.getNodeList()
-            this.selectNodes()
             this.getBlockHeight()
             this.getCertifiedTokens().then(res => {
                 this.updateCertifiedTokenList(res)
@@ -295,6 +297,7 @@ export default {
                 this.getTokenBalances()
                 this.getTokenInfo()
             }
+            this.selectNodes()
         }
     },
     mounted() {
@@ -302,6 +305,7 @@ export default {
     },
     beforeDestroy() {
         clearTimeout(this.sessionClearTimeout)
+        clearTimeout(this.nodesClearTimeout)
     },
     watch: {
         available(now, old) {
@@ -363,8 +367,8 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['updateSelectedAddress', 'updateBalance', 'updatePaymentRedirect', 'updateCertifiedTokenList']),
-        selectNodes() {
+        ...mapActions(['updateSelectedAddress', 'updateBalance', 'updatePaymentRedirect', 'updateCertifiedTokenList', 'updateChain']),
+        async selectNodes() {
             let nodeList = {}
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             if (String.fromCharCode(NETWORK_BYTE) === 'T') {
@@ -385,11 +389,36 @@ export default {
                 }
             }
             let suffix = '/blocks/height'
+            let bestHeight = 0
+            let bestElapse = 1000
+            let tmpNodes = {}
+            let promises = []
             for (let node in nodeList) {
-                this.$http.get(node + suffix).then(res => {
-                    console.log(res)
-                })
+                promises.push(new Promise((resolve, reject) => {
+                    let startTime = Date.now()
+                    this.$http.get(node + suffix).then(res => {
+                        if (res.ok && res.body.height) {
+                            let elapse = Math.ceil((Date.now() - startTime) / 1000)
+                            bestHeight = res.body.height > bestHeight ? res.body.height : bestHeight
+                            bestElapse = elapse < bestElapse ? elapse : bestElapse
+                            tmpNodes[node] = {height: res.body.height, elapse: elapse}
+                        }
+                        resolve()
+                    }, err => {
+                        console.log(err)
+                        resolve()
+                    })
+                }))
             }
+            await Promise.allSettled(promises)
+            let updateNodes = []
+            for (let node in tmpNodes) {
+                if (bestHeight - tmpNodes[node].height <= 15 && tmpNodes[node].elapse === bestElapse) {
+                    updateNodes.push(node)
+                }
+            }
+            this.updateNodes = updateNodes
+            this.setNodesClearTimeout()
         },
         showErrorMsgBox(errorMessage) {
             const h = this.$createElement
@@ -443,6 +472,27 @@ export default {
             }, respError => {
                 this.showErrorMsgBox('Unknown.Please check network connection!')
             })
+        },
+        updateChainByNodes() {
+            if (this.updateNodes.length > 0) {
+                let chainData = {
+                    node: this.updateNodes[this.nodeIndex],
+                    networkByte: NETWORK_BYTE
+                }
+                this.updateChain(chainData)
+                this.nodeIndex = (this.nodeIndex + 1) % this.updateNodes.length
+            } else {
+                if (this.nodesClearTimeout) {
+                    clearInterval(this.nodesClearTimeout)
+                    this.nodesClearTimeout = void 0
+                    this.nodeIndex = 0
+                }
+            }
+        },
+        setNodesClearTimeout() {
+            this.nodesClearTimeout = setInterval(() => {
+                setTimeout(this.updateChainByNodes, 0)
+            }, 30000) // Update chain every 30 seconds
         },
         setSessionClearTimeout() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT
