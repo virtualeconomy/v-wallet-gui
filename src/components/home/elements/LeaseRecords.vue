@@ -253,13 +253,11 @@ export default {
                 this.changeShowDisable = true
                 const recordLimit = this.showingNum
                 this.chain.getTxByType(this.address, recordLimit, LEASE_TX).then(response => {
-                    console.log(response, 'res')
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.leaseRecords = response.transactions
                         this.changeShowDisable = false
                     }
                 }, respErr => {
-                    console.log(respErr, 'err')
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.changeShowDisable = false
                     }
