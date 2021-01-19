@@ -210,7 +210,7 @@ import { mapActions, mapState } from 'vuex'
 import SendToken from './home/elements/SendToken'
 import common from '@/js-v-sdk/src/utils/common'
 import certify from '@/utils/certify'
-import { EXPLORER, TEST_EXPLORER, NETWORK_BYTE, VSYS_RATE, TEST_VSYS_RATE } from '@/network'
+import { EXPLORER, TEST_EXPLORER, NETWORK_BYTE, VSYS_RATE, TEST_VSYS_RATE, TESTNET_IP, MAINNET_IP } from '@/network'
 export default {
     name: 'Home',
     data: function() {
@@ -367,7 +367,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['updateSelectedAddress', 'updateBalance', 'updatePaymentRedirect', 'updateCertifiedTokenList', 'updateChain']),
+        ...mapActions(['updateSelectedAddress', 'updateBalance', 'updatePaymentRedirect', 'updateCertifiedTokenList', 'updateChain', 'updateNodeType']),
         async selectNodes() {
             let nodeList = {}
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
@@ -401,7 +401,7 @@ export default {
                             let elapse = Math.ceil((Date.now() - startTime) / 1000)
                             bestHeight = res.body.height > bestHeight ? res.body.height : bestHeight
                             bestElapse = elapse < bestElapse ? elapse : bestElapse
-                            tmpNodes[node] = {height: res.body.height, elapse: elapse}
+                            tmpNodes[node] = {height: res.body.height, elapse: elapse, nodeType: nodeList[node]}
                         }
                         resolve()
                     }, err => {
@@ -414,9 +414,11 @@ export default {
             let updateNodes = []
             for (let node in tmpNodes) {
                 if (bestHeight - tmpNodes[node].height <= 15 && tmpNodes[node].elapse === bestElapse) {
-                    updateNodes.push(node)
+                    let nodeInfo = { nodeURL: node, nodeType: tmpNodes[node].nodeType }
+                    updateNodes.push(nodeInfo)
                 }
             }
+            updateNodes.push({nodeURL: String.fromCharCode(NETWORK_BYTE) === 'M' ? MAINNET_IP : TESTNET_IP, nodeType: 'Full'})
             this.updateNodes = updateNodes
             this.setNodesClearTimeout()
         },
@@ -476,9 +478,10 @@ export default {
         updateChainByNodes() {
             if (this.updateNodes.length > 0) {
                 let chainData = {
-                    node: this.updateNodes[this.nodeIndex],
+                    node: this.updateNodes[this.nodeIndex].nodeURL,
                     networkByte: NETWORK_BYTE
                 }
+                this.updateNodeType(this.updateNodes[this.nodeIndex].nodeType === 'Full')
                 this.updateChain(chainData)
                 this.nodeIndex = (this.nodeIndex + 1) % this.updateNodes.length
             } else {

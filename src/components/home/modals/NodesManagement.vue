@@ -22,6 +22,13 @@
             <b-input-group class="mb-2"
                            v-for="(value, node, index) in nodeList"
                            :key="node">
+              <b-form-input :value="value"
+                            class="alias-input"
+                            readonly
+                            variant="light"
+                            size="sm"
+                            slot="prepend">
+              </b-form-input>
               <b-form-input readonly
                             size="sm"
                             class="input-t"
@@ -95,6 +102,7 @@
 import Vue from 'vue'
 import { mapState } from 'vuex'
 import { NETWORK_BYTE } from '@/network'
+import { PAYMENT_TX } from '@/js-v-sdk/src/constants'
 export default {
     name: 'NodesManagement',
     data() {
@@ -162,7 +170,7 @@ export default {
             Vue.set(userInfo, fieldName, value)
             window.localStorage.setItem(this.defaultAddress, JSON.stringify(userInfo))
         },
-        addNode() {
+        async addNode() {
             let nodeList = this.nodeList
             this.nodeURL = this.nodeURL.replace(/\s*/g, '')
             if (this.nodeURL in nodeList) {
@@ -170,19 +178,30 @@ export default {
             }
             this.init = true
             let suffix = '/addresses/balance/' + this.defaultAddress
-            this.$http.get(this.nodeURL + suffix).then(res => {
-                if (res.ok && res.body.address === this.defaultAddress) {
-                    Vue.set(nodeList, this.nodeURL, 'wallet')
+            let transactionsSuffix = '/transactions/list?address=' + this.defaultAddress + '&limit=10' + '&txType=' + PAYMENT_TX
+            let nodeType = 'Wallet'
+            try {
+                let nodeTypeRes = await this.$http.get(this.nodeURL + transactionsSuffix)
+                if (nodeTypeRes.ok) {
+                    nodeType = 'Full'
+                }
+            } catch (err) {
+                console.log(err)
+            }
+            try {
+                let networkRes = await this.$http.get(this.nodeURL + suffix)
+                if (networkRes.ok && networkRes.body.address === this.defaultAddress) {
+                    Vue.set(nodeList, this.nodeURL, nodeType)
                     let fieldName = String.fromCharCode(NETWORK_BYTE) === 'T' ? 'testNodes' : 'nodes'
                     this.setUsrLocalStorage(fieldName, JSON.stringify(nodeList))
                     this.resetData()
                 } else {
                     this.responseErr = true
                 }
-            }, error => {
-                console.log(error)
+            } catch (err) {
+                console.log(err)
                 this.responseErr = true
-            })
+            }
         },
         deleteNode(node) {
             let nodeList = this.nodeList

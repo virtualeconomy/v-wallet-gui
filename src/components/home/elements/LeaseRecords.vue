@@ -18,7 +18,7 @@
       <b-dropdown class="pd-select"
                   router-tag="div"
                   no-caret
-                  :disable="changeShowDisable"
+                  :disable="changeShowDisable || !isFullNode"
                   variant="light">
         <template slot="button-content">
           <div style="display: inline-block; margin-right: 10px">
@@ -33,6 +33,7 @@
           <img src="@/assets/imgs/icons/signup/ic_arrow_down.svg">
         </template>
         <b-dropdown-item class="selection"
+                         :disabled="!isFullNode"
                          @click="changeShowNum(num)"
                          v-for="num in showNums"
                          :key="num">
@@ -83,11 +84,11 @@
     </div>
     <img height="50"
          width="50"
-         v-if="changeShowDisable && leaseRecords.length === 0"
+         v-if="changeShowDisable && leaseRecords.length === 0 && isFullNode"
          src="@/assets/imgs/icons/wallet/ic_wait.svg">
     <div v-if="!changeShowDisable && leaseRecords.length === 0"
          class="empty">
-      There is no transaction record.
+      {{ isFullNode ? 'There is no transaction record.' : 'Current node does not support querying leasing transactions.' }}
     </div>
     <Lease show="false"
            :balances="balance"
@@ -238,7 +239,8 @@ export default {
     computed: {
         ...mapState({
             chain: 'chain',
-            total: 'total'
+            total: 'total',
+            isFullNode: 'isFullNode'
         })
     },
     methods: {
@@ -251,11 +253,13 @@ export default {
                 this.changeShowDisable = true
                 const recordLimit = this.showingNum
                 this.chain.getTxByType(this.address, recordLimit, LEASE_TX).then(response => {
+                    console.log(response, 'res')
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.leaseRecords = response.transactions
                         this.changeShowDisable = false
                     }
                 }, respErr => {
+                    console.log(respErr, 'err')
                     if (addr === this.address && recordLimit === this.showingNum) {
                         this.changeShowDisable = false
                     }

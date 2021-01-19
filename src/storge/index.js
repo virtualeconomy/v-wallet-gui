@@ -29,11 +29,15 @@ const store = new Vuex.Store({
         paymentRedirect: {},
         assetStatus: false,
         certifiedTokenList: {},
-        nodesList: []
+        nodesList: [],
+        isFullNode: true
     },
     mutations: {
         updateChain(state, status) {
             state.chain = new Blockchain(status['node'], status['networkByte'])
+        },
+        updateNodeType(state, status) {
+            state.isFullNode = status
         },
         changeSettingsStatus(state, status) {
             state.tokenSplitStatus = status['split']
@@ -75,6 +79,9 @@ const store = new Vuex.Store({
     actions: {
         updateChain(context, status) {
             context.commit('updateChain', status)
+        },
+        updateNodeType(context, status) {
+            context.commit('updateNodeType', status)
         },
         updatePaymentRedirect(context, status) {
             context.commit('updatePaymentRedirect', status)
