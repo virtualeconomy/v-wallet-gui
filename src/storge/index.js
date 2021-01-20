@@ -5,7 +5,7 @@ import BigNumber from 'bignumber.js'
 import Blockchain from '@/js-v-sdk/src/blockchain'
 import Account from '@/js-v-sdk/src/account'
 import { VSYS_PRECISION } from '@/js-v-sdk/src/constants'
-import { NODE_IP, NETWORK_BYTE } from '@/network'
+import { NETWORK_BYTE, TESTNET_IP, MAINNET_IP } from '@/network'
 import common from '@/js-v-sdk/src/utils/common'
 Vue.use(Vuex)
 Vue.use(VueResource)
@@ -13,7 +13,7 @@ Vue.use(VueResource)
 const store = new Vuex.Store({
     state: {
         account: new Account(NETWORK_BYTE),
-        chain: new Blockchain(NODE_IP, NETWORK_BYTE),
+        chain: String.fromCharCode(NETWORK_BYTE) === 'M' ? new Blockchain(MAINNET_IP, NETWORK_BYTE) : new Blockchain(TESTNET_IP, NETWORK_BYTE),
         tokenSplitStatus: JSON.parse(window.localStorage.getItem('tokenSplitStatus')),
         tokenManagementStatus: JSON.parse(window.localStorage.getItem('tokenManagementStatus')),
         heightStatus: JSON.parse(window.localStorage.getItem('heightStatus')),
@@ -28,9 +28,17 @@ const store = new Vuex.Store({
         addTokenStatus: 0,
         paymentRedirect: {},
         assetStatus: false,
-        certifiedTokenList: {}
+        certifiedTokenList: {},
+        nodesList: [],
+        isFullNode: true
     },
     mutations: {
+        updateChain(state, status) {
+            state.chain = new Blockchain(status['node'], status['networkByte'])
+        },
+        updateNodeType(state, status) {
+            state.isFullNode = status
+        },
         changeSettingsStatus(state, status) {
             state.tokenSplitStatus = status['split']
             state.tokenManagementStatus = status['management']
@@ -69,6 +77,12 @@ const store = new Vuex.Store({
         }
     },
     actions: {
+        updateChain(context, status) {
+            context.commit('updateChain', status)
+        },
+        updateNodeType(context, status) {
+            context.commit('updateNodeType', status)
+        },
         updatePaymentRedirect(context, status) {
             context.commit('updatePaymentRedirect', status)
         },

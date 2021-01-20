@@ -46,6 +46,21 @@
                                 :options="selectedOptions">
             </b-form-radio-group>
           </b-form-group>
+          <b-form-group label="TokenID"
+                        label-for="tokenID-input"
+                        v-show="selectedContractType !== 'NonFungibleContract'">
+            <b-form-input id="tokenID-input"
+                          class="amount-input"
+                          v-model="selectedTokenID"
+                          aria-describedby="inputLiveFeedback"
+                          :state="isValidToken"
+                          onfocus="this.select()">
+            </b-form-input>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     style="font-size: 15px;margin-top: 10px">
+              Error: Failed to get Token Info! (Please make sure Token ID is correct and network is available to connect node)
+            </b-form-invalid-feedback>
+          </b-form-group>
           <b-form-group label="Contract Description"
                         label-for="descriptionInput">
             <b-form-textarea id="descriptionInput"
@@ -65,7 +80,7 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="isInsufficient"
+                    :disabled="isSubmitDisabled"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -140,6 +155,21 @@
                                 style="display: flex;flex-direction: column"
                                 :options="selectedOptions"></b-form-radio-group>
           </b-form-group>
+          <b-form-group label="TokenID"
+                        label-for="tokenID-input"
+                        v-show="selectedContractType !== 'NonFungibleContract'">
+            <b-form-input id="cold-tokenID-input"
+                          class="amount-input"
+                          v-model="selectedTokenID"
+                          aria-describedby="inputLiveFeedback"
+                          :state="isValidToken"
+                          onfocus="this.select()">
+            </b-form-input>
+            <b-form-invalid-feedback id="inputLiveFeedback"
+                                     style="font-size: 15px;margin-top: 10px">
+              Error: Failed to get Token Info! (Please make sure Token ID is correct and network is available to connect node)
+            </b-form-invalid-feedback>
+          </b-form-group>
           <b-form-group label="Contract Description"
                         label-for="descriptionInput">
             <b-form-textarea id="descriptionInput"
@@ -159,7 +189,7 @@
                     class="btn-continue"
                     block
                     size="lg"
-                    :disabled="isInsufficient"
+                    :disabled="isSubmitDisabled"
                     @click="nextPage">Continue
           </b-button>
         </b-container>
@@ -267,7 +297,7 @@ import TokenSuccess from './TokenSuccess'
 import ColdSignature from './ColdSignature'
 
 var initData = {
-    selectedContractType: 'NonFungibleContract',
+    selectedContractType: NFT,
     selectedTokenID: '',
     tokenList: {},
     errorMessage: '',
@@ -286,9 +316,11 @@ var initData = {
     contractDescription: '',
     selectedOptions: [
         {text: 'Non-Fungible Token(NFT) Contract', value: NFT},
-        {text: '<span class="disabled">Payment Channel Contract (will be supported later)</span>', value: PAYMENT_CHANNEL, disabled: true},
-        {text: '<span class="disabled">Lock Contract (will be supported later)</span>', value: LOCK, disabled: true}
+        {text: 'Payment Channel Contract', value: PAYMENT_CHANNEL},
+        {text: 'Lock Contract', value: LOCK}
     ],
+    init: false,
+    responseErr: false,
     amount: 1
 }
 
@@ -325,11 +357,22 @@ export default {
     data: function() {
         return initData
     },
+    watch: {
+        selectedTokenID() {
+            this.responseErr = false
+        }
+    },
     computed: {
         ...mapState({
             chain: 'chain',
             account: 'account'
         }),
+        isValidToken() {
+            if (!this.init || this.selectedTokenID.length === 0 || this.responseErr === false) {
+                return void 0
+            }
+            return !this.responseErr
+        },
         defaultAddress() {
             return Vue.ls.get('address')
         },
@@ -356,7 +399,7 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return (this.isValidDescription(this.contractDescription) || !this.contractDescription)
+            return !((this.isValidDescription(this.contractDescription) || !this.contractDescription) && !this.isInsufficient && (this.selectedTokenID.length > 0 || this.selectedContractType === NFT))
         },
         noColdAddress() {
             return Object.keys(this.coldAddresses).length === 0 && this.coldAddresses.constructor === Object
@@ -415,7 +458,10 @@ export default {
         },
         resetData() {
             this.contractDescription = ''
-            this.selectedContractType = 'NonFungibleContract'
+            this.selectedContractType = NFT
+            this.selectedTokenID = ''
+            this.init = false
+            this.responseErr = false
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
@@ -479,11 +525,33 @@ export default {
         nextPage() {
             this.sendError = false
             this.hasConfirmed = false
-            if (this.selectedWalletType === 'hotWallet') {
-                this.pageId++
-                this.timeStamp = Date.now() * 1e6
+            if ((this.pageId === 1 || this.coldPageId === 1) && this.selectedContractType !== NFT) {
+                this.init = true
+                this.selectedTokenID = this.selectedTokenID.replace(/\s*/g, '')
+                if (this.selectedTokenID) {
+                    this.chain.getTokenInfo(this.selectedTokenID).then(response => {
+                        this.responseErr = false
+                        if (response.hasOwnProperty('error')) {
+                            this.responseErr = true
+                            return
+                        }
+                        if (this.selectedWalletType === 'hotWallet') {
+                            this.pageId++
+                            this.timeStamp = Date.now() * 1e6
+                        } else {
+                            this.coldPageId++
+                        }
+                    }, respError => {
+                        this.responseErr = true
+                    })
+                }
             } else {
-                this.coldPageId++
+                if (this.selectedWalletType === 'hotWallet') {
+                    this.pageId++
+                    this.timeStamp = Date.now() * 1e6
+                } else {
+                    this.coldPageId++
+                }
             }
         },
         prevPage() {
@@ -504,7 +572,6 @@ export default {
             this.address = this.walletType === 'hotWallet' ? this.selectedAddress : this.defaultAddress
             this.coldAddress = this.walletType === 'coldWallet' ? this.selectedAddress : this.defaultColdAddress
             this.selectedWalletType = this.walletType
-            this.contractDescription = ''
         },
         endSend() {
             this.$refs.createContractModal.hide()
@@ -532,6 +599,7 @@ export default {
         },
         closeModal() {
             this.resetData()
+            this.resetPage()
             this.$refs.createContractModal.hide()
         },
         inputAmount(num) {

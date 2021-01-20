@@ -2,20 +2,20 @@
 // make sure to add official token svg in src/assets/imgs/icons/token with 'tokenName.svg' format
 var certifiedTokensList = {
     Mainnet: {
-        'TWZZfKFqcaNVe5TrphLRNEm5DQFnBRJMjDDByqv84': { name: 'IPX', support_split: false, unity: 1000000000, iconUrl: '@/assets/imgs/icons/token/IPX.svg'},
-        'TWaN4DqnRMdUS5d1ohCn9Vh9VdGWDLm9Um1jHbQiF': { name: 'BlockDesk', support_split: false, unity: 100000000, iconUrl: '@/assets/imgs/icons/token/BlockDesk.png'},
-        'TWZ3nPYyCJAJJmfJBzxcqe8ZfpYJMQK4dpiQ1m6v4': { name: 'GoldZip', support_split: false, unity: 1000, iconUrl: '@/assets/imgs/icons/token/GoldZip.jpg'}
+        'TWZZfKFqcaNVe5TrphLRNEm5DQFnBRJMjDDByqv84': { name: 'IPX', support_split: false, unity: 1000000000, iconUrl: require('@/assets/imgs/icons/token/IPX.svg') },
+        'TWaN4DqnRMdUS5d1ohCn9Vh9VdGWDLm9Um1jHbQiF': { name: 'BlockDesk', support_split: false, unity: 100000000, iconUrl: require('@/assets/imgs/icons/token/BlockDesk.png') },
+        'TWZ3nPYyCJAJJmfJBzxcqe8ZfpYJMQK4dpiQ1m6v4': { name: 'GoldZip', support_split: false, unity: 1000, iconUrl: require('@/assets/imgs/icons/token/GoldZip.jpg') }
     },
     Testnet: {
-        'TWscu6rbRF2PEsnY1bRky4aKxxKTzn69WMFLFdLxK': { name: 'DM', support_split: true, unity: 1000, iconUrl: '@/assets/imgs/icons/token/DM.svg'},
-        'TWuyTczrVc4KeDUBpksxY8bpcogKfKqoVGE7cwcs3': { name: 'VTEST', support_split: true, unity: 100000, iconUrl: '@/assets/imgs/icons/token/VTEST.svg'},
-        'TWtSxBEx7rmsQ34MyWzwBCYYwRJh4K9xsL9zPkMK8': { name: 'DLL', support_split: false, unity: 100000000, iconUrl: '@/assets/imgs/icons/token/DLL.svg'}
+        'TWscu6rbRF2PEsnY1bRky4aKxxKTzn69WMFLFdLxK': { name: 'DM', support_split: true, unity: 1000, iconUrl: require('@/assets/imgs/icons/token/DM.svg') },
+        'TWuyTczrVc4KeDUBpksxY8bpcogKfKqoVGE7cwcs3': { name: 'VTEST', support_split: true, unity: 100000, iconUrl: require('@/assets/imgs/icons/token/VTEST.svg') },
+        'TWtSxBEx7rmsQ34MyWzwBCYYwRJh4K9xsL9zPkMK8': { name: 'DLL', support_split: false, unity: 100000000, iconUrl: require('@/assets/imgs/icons/token/DLL.svg') }
     },
 }
 import Blockchain from '@/js-v-sdk/src/blockchain'
-import { NETWORK_BYTE, NODE_IP } from '@/network'
+import { NETWORK_BYTE, MAINNET_IP, TESTNET_IP } from '@/network'
 var certifiedTokens;
-var chain = new Blockchain(NODE_IP, NETWORK_BYTE);
+var chain = String.fromCharCode(NETWORK_BYTE) === 'M' ? new Blockchain(MAINNET_IP, NETWORK_BYTE) : new Blockchain(TESTNET_IP, NETWORK_BYTE);
 if (String.fromCharCode(NETWORK_BYTE) === 'T') {
     certifiedTokens = certifiedTokensList['Testnet']
 } else {

@@ -210,7 +210,7 @@ import { mapActions, mapState } from 'vuex'
 import SendToken from './home/elements/SendToken'
 import common from '@/js-v-sdk/src/utils/common'
 import certify from '@/utils/certify'
-import { EXPLORER, TEST_EXPLORER, NETWORK_BYTE, VSYS_RATE, TEST_VSYS_RATE } from '@/network'
+import { EXPLORER, TEST_EXPLORER, NETWORK_BYTE, VSYS_RATE, TEST_VSYS_RATE, TESTNET_IP, MAINNET_IP } from '@/network'
 export default {
     name: 'Home',
     data: function() {
@@ -219,6 +219,7 @@ export default {
             balance: {},
             selectedAddress: '',
             sessionClearTimeout: void 0,
+            nodesClearTimeout: void 0,
             addresses: {},
             coldAddresses: {},
             sortedAddresses: {},
@@ -237,7 +238,9 @@ export default {
             updateLeaseRecordsFlag: false,
             nodeList: [],
             certifiedTokenList: {},
-            isCertifiedTokenSplit: false
+            isCertifiedTokenSplit: false,
+            updateNodes: [],
+            nodeIndex: 0
         }
     },
     created() {
@@ -294,6 +297,7 @@ export default {
                 this.getTokenBalances()
                 this.getTokenInfo()
             }
+            this.selectNodes()
         }
     },
     mounted() {
@@ -301,6 +305,7 @@ export default {
     },
     beforeDestroy() {
         clearTimeout(this.sessionClearTimeout)
+        clearTimeout(this.nodesClearTimeout)
     },
     watch: {
         available(now, old) {
@@ -362,7 +367,61 @@ export default {
         }
     },
     methods: {
-        ...mapActions(['updateSelectedAddress', 'updateBalance', 'updatePaymentRedirect', 'updateCertifiedTokenList']),
+        ...mapActions(['updateSelectedAddress', 'updateBalance', 'updatePaymentRedirect', 'updateCertifiedTokenList', 'updateChain', 'updateNodeType']),
+        async selectNodes() {
+            let nodeList = {}
+            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            if (String.fromCharCode(NETWORK_BYTE) === 'T') {
+                if (userInfo && userInfo.testNodes) {
+                    try {
+                        nodeList = JSON.parse(userInfo.testNodes)
+                    } catch (err) {
+                        this.setUsrLocalStorage('testNodes', JSON.stringify({}))
+                    }
+                }
+            } else {
+                if (userInfo && userInfo.nodes) {
+                    try {
+                        nodeList = JSON.parse(userInfo.nodes)
+                    } catch (err) {
+                        this.setUsrLocalStorage('nodes', JSON.stringify({}))
+                    }
+                }
+            }
+            let suffix = '/blocks/height'
+            let bestHeight = 0
+            let bestElapse = 1000
+            let tmpNodes = {}
+            let promises = []
+            for (let node in nodeList) {
+                promises.push(new Promise((resolve, reject) => {
+                    let startTime = Date.now()
+                    this.$http.get(node + suffix).then(res => {
+                        if (res.ok && res.body.height) {
+                            let elapse = Math.ceil((Date.now() - startTime) / 1000)
+                            bestHeight = res.body.height > bestHeight ? res.body.height : bestHeight
+                            bestElapse = elapse < bestElapse ? elapse : bestElapse
+                            tmpNodes[node] = {height: res.body.height, elapse: elapse, nodeType: nodeList[node]}
+                        }
+                        resolve()
+                    }, err => {
+                        console.log(err)
+                        resolve()
+                    })
+                }))
+            }
+            await Promise.allSettled(promises)
+            let updateNodes = []
+            for (let node in tmpNodes) {
+                if (bestHeight - tmpNodes[node].height <= 15 && tmpNodes[node].elapse === bestElapse) {
+                    let nodeInfo = { nodeURL: node, nodeType: tmpNodes[node].nodeType }
+                    updateNodes.push(nodeInfo)
+                }
+            }
+            updateNodes.push({nodeURL: String.fromCharCode(NETWORK_BYTE) === 'M' ? MAINNET_IP : TESTNET_IP, nodeType: 'Wallet'})
+            this.updateNodes = updateNodes
+            this.setNodesClearTimeout()
+        },
         showErrorMsgBox(errorMessage) {
             const h = this.$createElement
             const titleVNode = h('div', { domProps: { innerHTML: 'Error' }, class: ['error-title'] })
@@ -415,6 +474,28 @@ export default {
             }, respError => {
                 this.showErrorMsgBox('Unknown.Please check network connection!')
             })
+        },
+        updateChainByNodes() {
+            if (this.updateNodes.length > 0) {
+                let chainData = {
+                    node: this.updateNodes[this.nodeIndex].nodeURL,
+                    networkByte: NETWORK_BYTE
+                }
+                this.updateNodeType(this.updateNodes[this.nodeIndex].nodeType === 'Wallet')
+                this.updateChain(chainData)
+                this.nodeIndex = (this.nodeIndex + 1) % this.updateNodes.length
+            } else {
+                if (this.nodesClearTimeout) {
+                    clearInterval(this.nodesClearTimeout)
+                    this.nodesClearTimeout = void 0
+                    this.nodeIndex = 0
+                }
+            }
+        },
+        setNodesClearTimeout() {
+            this.nodesClearTimeout = setInterval(() => {
+                setTimeout(this.updateChainByNodes, 0)
+            }, 30000) // Update chain every 30 seconds
         },
         setSessionClearTimeout() {
             let oldTimeout = INITIAL_SESSION_TIMEOUT

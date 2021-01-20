@@ -5,6 +5,7 @@
       <span>Transaction Records</span>
       <div v-if="Object.keys(txRecords).length > 0"
            class="show-fee"
+           :style="{right: isFullNode ? '488px' : '368px'}"
            @click="showFee">
         <span class="show-position"> ShowTxFee </span>
         <input class="show-fee2"
@@ -16,6 +17,7 @@
         class="type-select"
         router-tag="div"
         no-caret
+        v-show="isFullNode"
         :disabled="changeShowDisable || changeTypeShowDisable"
         variant="light">
         <template
@@ -204,7 +206,8 @@ export default {
     },
     computed: {
         ...mapState({
-            chain: 'chain'
+            chain: 'chain',
+            isFullNode: 'isFullNode'
         }),
         seedaddress() {
             if (Vue.ls.get('address')) {
@@ -249,6 +252,7 @@ export default {
                 const txType = this.showingTypeValue
                 let records = JSON.parse(window.localStorage.getItem(this.seedaddress))
                 let tokenRecords = records.tokens ? JSON.parse(records.tokens) : {}
+                this.showingTypeValue = this.isFullNode ? this.showingTypeValue : 0
                 const getTransactions = () => { return this.showingTypeValue === 0 ? this.chain.getTxHistory(addr, recordLimit) : this.chain.getTxByType(addr, recordLimit, txType) }
                 getTransactions().then(response => {
                     if (addr === this.address && recordLimit === this.showingNum && txType === this.showingTypeValue) {
