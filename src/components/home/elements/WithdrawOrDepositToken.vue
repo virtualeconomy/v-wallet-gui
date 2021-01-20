@@ -33,6 +33,41 @@
               {{ this.validContractType ? 'Invalid Contract ID' : 'Not PaymentChannel Contract or Lock Contract' }}
             </b-form-invalid-feedback>
           </b-form-group>
+          <b-button variant="warning"
+                    class="btn-continue"
+                    size="lg"
+                    block
+                    :disabled="!isValidContractId"
+                    @click="checkContract1">Check Contract
+          </b-button>
+          <b-form-group label="Token ID"
+                        label-for="address-input"
+                        style="margin-top:20px"
+                        v-if="false">
+            <b-form-select id=address-input
+                           class="addr-input"
+                           v-model="address"
+                           :options="options(addresses)"></b-form-select>
+            <b-btn
+              block
+              variant="light"
+              disabled
+              class="balance-input"
+              readonly>
+              <span class="balance-title">
+                <img src="@/assets/imgs/icons/operate/ic_token2.svg"
+                     class="blance_avatar">
+              </span>
+              <span class="balance">Available {{ functionName === 'Withdraw' ? 'withdraw' : 'deposit' }} amount {{ 1 }} </span>
+            </b-btn>
+          </b-form-group>
+          <b-form-group style="text-align:center">
+            <img height="40"
+                 width="40"
+                 v-if="false"
+                 style="margin-top:20px"
+                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
+          </b-form-group>
           <b-form-group label="Amount"
                         label-for="amount-input">
             <b-form-input id="amount-input"
@@ -137,6 +172,40 @@
             <b-form-invalid-feedback id="inputLiveFeedback">
               {{ this.validContractType ? 'Invalid Contract ID' : 'Not PaymentChannel Contract or Lock Contract' }}
             </b-form-invalid-feedback>
+          </b-form-group>
+          <b-button variant="warning"
+                    class="btn-continue"
+                    size="lg"
+                    block
+                    :disabled="!isValidContractId"
+                    @click="checkContract1">Check Contract
+          </b-button>
+          <b-form-group label="Token ID"
+                        label-for="address-input"
+                        style="margin-top:20px">
+            <b-form-select id=address-input
+                           class="addr-input"
+                           v-model="address"
+                           :options="options(addresses)"></b-form-select>
+            <b-btn
+              block
+              variant="light"
+              disabled
+              class="balance-input"
+              readonly>
+              <span class="balance-title">
+                <img src="@/assets/imgs/icons/operate/ic_token2.svg"
+                     class="blance_avatar">
+              </span>
+              <span class="balance">Available {{ functionName === 'Withdraw' ? 'withdraw' : 'deposit' }} amount {{ 1 }} </span>
+            </b-btn>
+          </b-form-group>
+          <b-form-group style="text-align:center">
+            <img height="40"
+                 width="40"
+                 v-if="false"
+                 style="margin-top:20px"
+                 src="@/assets/imgs/icons/wallet/ic_wait.svg">
           </b-form-group>
           <b-form-group label="Amount"
                         label-for="cold-amount-input">
@@ -573,12 +642,29 @@ export default {
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
+        },
+        options(addrs) {
+            return Object.keys(addrs).reduce((options, addr) => {
+                options.push({ value: addr, text: addr })
+                return options
+            }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
         }
     }
 }
 </script>
 
 <style scoped lang="less">
+.addr-input {
+    border: 1px solid #E8E9ED;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    border-bottom: none;
+    background-color: #FFF;
+    font-size: 15px;
+    color: #181B3A;
+    letter-spacing: 0;
+    height: 48px !important;
+}
 .scan-ok-btn, .scan-again-btn {
     margin-top: 10px;
 }
@@ -615,6 +701,10 @@ export default {
     font-size: 15px;
     color: #9091A3;
     letter-spacing: 0;
+}
+.blance_avatar{
+    width: 20px;
+    height: 20px;
 }
 .balance {
     float: right;
