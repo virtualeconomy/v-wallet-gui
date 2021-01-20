@@ -22,7 +22,7 @@
             <b-input-group class="mb-2"
                            v-for="(value, node, index) in nodeList"
                            :key="node">
-              <b-form-input :value="value"
+              <b-form-input :value="nodeName(value)"
                             class="alias-input"
                             readonly
                             variant="light"
@@ -141,6 +141,9 @@ export default {
         }
     },
     methods: {
+        nodeName(value) {
+            return value + 'Node'
+        },
         getLocalNodes() {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             if (userInfo && userInfo.nodes) {
@@ -179,11 +182,11 @@ export default {
             this.init = true
             let suffix = '/addresses/balance/' + this.defaultAddress
             let transactionsSuffix = '/transactions/list?address=' + this.defaultAddress + '&limit=10' + '&txType=' + PAYMENT_TX
-            let nodeType = 'Wallet'
+            let nodeType = 'Full'
             try {
                 let nodeTypeRes = await this.$http.get(this.nodeURL + transactionsSuffix)
                 if (nodeTypeRes.ok) {
-                    nodeType = 'Full'
+                    nodeType = 'Wallet'
                 }
             } catch (err) {
                 console.log(err)
@@ -251,7 +254,7 @@ export default {
     height: 48px !important;
     font-size: 15px;
     letter-spacing: 0;
-    width: 80px;
+    width: 95px;
 }
 .label-title {
     font-size: 28px;

@@ -418,7 +418,7 @@ export default {
                     updateNodes.push(nodeInfo)
                 }
             }
-            updateNodes.push({nodeURL: String.fromCharCode(NETWORK_BYTE) === 'M' ? MAINNET_IP : TESTNET_IP, nodeType: 'Full'})
+            updateNodes.push({nodeURL: String.fromCharCode(NETWORK_BYTE) === 'M' ? MAINNET_IP : TESTNET_IP, nodeType: 'Wallet'})
             this.updateNodes = updateNodes
             this.setNodesClearTimeout()
         },
@@ -481,7 +481,7 @@ export default {
                     node: this.updateNodes[this.nodeIndex].nodeURL,
                     networkByte: NETWORK_BYTE
                 }
-                this.updateNodeType(this.updateNodes[this.nodeIndex].nodeType === 'Full')
+                this.updateNodeType(this.updateNodes[this.nodeIndex].nodeType === 'Wallet')
                 this.updateChain(chainData)
                 this.nodeIndex = (this.nodeIndex + 1) % this.updateNodes.length
             } else {
