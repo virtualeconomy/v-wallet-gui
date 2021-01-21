@@ -30,7 +30,7 @@
                           placeholder="Payment channel contract or Lock contract"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
-              {{ this.validContractType ? 'Invalid Contract ID' : 'Not PaymentChannel Contract or Lock Contract' }}
+              {{ this.validContractType ? 'Invalid Contract ID' : 'This is not PaymentChannel Contract or Lock Contract' }}
             </b-form-invalid-feedback>
           </b-form-group>
           <b-button variant="warning"
@@ -58,7 +58,7 @@
                 <img src="@/assets/imgs/icons/operate/ic_token2.svg"
                      class="blance_avatar">
               </span>
-              <span class="balance">Available {{ functionName === 'Withdraw' ? 'withdraw' : 'deposit' }} amount {{ showTokenBalance }} </span>
+              <span class="balance">Available {{ functionName === 'Withdraw' ? 'withdraw' : 'deposit' }} amount {{ formatter(showTokenBalance) }} </span>
             </b-btn>
           </b-form-group>
           <b-form-group style="text-align:center">
@@ -68,7 +68,8 @@
                  style="margin-top:20px"
                  src="@/assets/imgs/icons/wallet/ic_wait.svg">
           </b-form-group>
-          <b-form-group label="Amount"
+          <b-form-group v-show="showToken"
+                        label="Amount"
                         label-for="amount-input">
             <b-form-input id="amount-input"
                           class="amount-input"
@@ -101,7 +102,7 @@
               Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-show="showToken">
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
             <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
@@ -110,6 +111,7 @@
                     class="btn-continue"
                     size="lg"
                     block
+                    v-show="showToken"
                     :disabled="isSubmitDisabled"
                     @click="nextPage">{{ functionName === 'Withdraw' ? 'Withdraw' : 'Deposit' }}
           </b-button>
@@ -174,7 +176,7 @@
                           placeholder="Payment channel contract or Lock contract"
                           aria-describedby="inputLiveFeedback"></b-form-input>
             <b-form-invalid-feedback id="inputLiveFeedback">
-              {{ this.validContractType ? 'Invalid Contract ID' : 'Not PaymentChannel Contract or Lock Contract' }}
+              {{ this.validContractType ? 'Invalid Contract ID' : 'This is not PaymentChannel Contract or Lock Contract' }}
             </b-form-invalid-feedback>
           </b-form-group>
           <b-button variant="warning"
@@ -202,7 +204,7 @@
                 <img src="@/assets/imgs/icons/operate/ic_token2.svg"
                      class="blance_avatar">
               </span>
-              <span class="balance">Available {{ functionName === 'Withdraw' ? 'withdraw' : 'deposit' }} amount {{ showTokenBalance }} </span>
+              <span class="balance">Available {{ functionName === 'Withdraw' ? 'withdraw' : 'deposit' }} amount {{ formatter(showTokenBalance) }} </span>
             </b-btn>
           </b-form-group>
           <b-form-group style="text-align:center">
@@ -212,7 +214,8 @@
                  style="margin-top:20px"
                  src="@/assets/imgs/icons/wallet/ic_wait.svg">
           </b-form-group>
-          <b-form-group label="Amount"
+          <b-form-group v-show="showToken"
+                        label="Amount"
                         label-for="cold-amount-input">
             <b-form-input id="cold-amount-input"
                           class="amount-input"
@@ -245,7 +248,7 @@
               Invalid Input.
             </b-form-invalid-feedback>
           </b-form-group>
-          <b-form-group>
+          <b-form-group v-show="showToken">
             <label class="fee-remark">Transaction Fee {{ formatter(fee) }} VSYS</label>
             <span v-if="isInsufficient"
                   class="vsys-check">Insufficient VSYS balance</span>
@@ -254,6 +257,7 @@
                     class="btn-continue"
                     block
                     size="lg"
+                    v-show="showToken"
                     :disabled="isSubmitDisabled"
                     @click="nextPage">{{ functionName === 'Withdraw' ? 'Withdraw' : 'Deposit' }}
           </b-button>
