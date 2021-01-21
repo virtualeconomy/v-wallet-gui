@@ -37,17 +37,17 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="!isValidContractId"
-                    @click="checkContract1">Check Contract
+                    @click="checkContract">Check Contract
           </b-button>
           <b-form-group label="Token ID"
                         label-for="address-input"
                         style="margin-top:20px"
-                        v-if="false">
-            <b-form-select id=address-input
-                           class="addr-input"
-                           v-model="address"
-                           :options="options(addresses)"></b-form-select>
+                        v-if="!isWaiting && showToken">
+            <b-form-input id=address-input
+                          class="addr-input"
+                          style="text-align: center"
+                          readonly
+                          v-model="showTokenId"></b-form-input>
             <b-btn
               block
               variant="light"
@@ -58,13 +58,13 @@
                 <img src="@/assets/imgs/icons/operate/ic_token2.svg"
                      class="blance_avatar">
               </span>
-              <span class="balance">Available {{ functionName === 'Withdraw' ? 'withdraw' : 'deposit' }} amount {{ 1 }} </span>
+              <span class="balance">Available {{ functionName === 'Withdraw' ? 'withdraw' : 'deposit' }} amount {{ showTokenBalance }} </span>
             </b-btn>
           </b-form-group>
           <b-form-group style="text-align:center">
             <img height="40"
                  width="40"
-                 v-if="false"
+                 v-if="isWaiting"
                  style="margin-top:20px"
                  src="@/assets/imgs/icons/wallet/ic_wait.svg">
           </b-form-group>
@@ -89,6 +89,10 @@
               Deposited {{ this.actionName === 'Deposit Token' ? 'token' : 'vsys' }} is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isExceededContractBalance && (this.functionName === 'Withdraw')">
+              Withdrawn {{ this.actionName === 'Withdraw Token' ? 'token' : 'vsys' }} is larger than balance
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative">
               Negative number is not allowed
             </b-form-invalid-feedback>
@@ -107,7 +111,7 @@
                     size="lg"
                     block
                     :disabled="isSubmitDisabled"
-                    @click="checkContract">{{ functionName === 'Withdraw' ? 'Withdraw' : 'Deposit' }}
+                    @click="nextPage">{{ functionName === 'Withdraw' ? 'Withdraw' : 'Deposit' }}
           </b-button>
         </b-container>
         <b-container v-if="pageId===2">
@@ -177,16 +181,17 @@
                     class="btn-continue"
                     size="lg"
                     block
-                    :disabled="!isValidContractId"
-                    @click="checkContract1">Check Contract
+                    @click="checkContract">Check Contract
           </b-button>
           <b-form-group label="Token ID"
                         label-for="address-input"
-                        style="margin-top:20px">
-            <b-form-select id=address-input
-                           class="addr-input"
-                           v-model="address"
-                           :options="options(addresses)"></b-form-select>
+                        style="margin-top:20px"
+                        v-if="!isWaiting && showToken">
+            <b-form-input id=address-input
+                          class="addr-input"
+                          style="text-align: center"
+                          readonly
+                          v-model="showTokenId"></b-form-input>
             <b-btn
               block
               variant="light"
@@ -197,13 +202,13 @@
                 <img src="@/assets/imgs/icons/operate/ic_token2.svg"
                      class="blance_avatar">
               </span>
-              <span class="balance">Available {{ functionName === 'Withdraw' ? 'withdraw' : 'deposit' }} amount {{ 1 }} </span>
+              <span class="balance">Available {{ functionName === 'Withdraw' ? 'withdraw' : 'deposit' }} amount {{ showTokenBalance }} </span>
             </b-btn>
           </b-form-group>
           <b-form-group style="text-align:center">
             <img height="40"
                  width="40"
-                 v-if="false"
+                 v-if="isWaiting"
                  style="margin-top:20px"
                  src="@/assets/imgs/icons/wallet/ic_wait.svg">
           </b-form-group>
@@ -228,6 +233,10 @@
               Deposited token is larger than balance
             </b-form-invalid-feedback>
             <b-form-invalid-feedback id="inputLiveFeedback"
+                                     v-else-if="isExceededContractBalance && (this.functionName === 'Withdraw')">
+              Withdrawn {{ this.actionName === 'Withdraw Token' ? 'token' : 'vsys' }} is larger than balance
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputLiveFeedback"
                                      v-else-if="isNegative">
               Negative number is not allowed
             </b-form-invalid-feedback>
@@ -246,7 +255,7 @@
                     block
                     size="lg"
                     :disabled="isSubmitDisabled"
-                    @click="checkContract">{{ this.actionName === 'Withdraw Token' ? 'Withdraw' : 'Deposit' }}
+                    @click="nextPage">{{ functionName === 'Withdraw' ? 'Withdraw' : 'Deposit' }}
           </b-button>
         </b-container>
         <b-container v-if="coldPageId===2">
@@ -340,9 +349,9 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { CONTRACT_EXEC_FEE, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT, SYSTEM_CONTRACT_DEPOSIT_FUNCIDX, SYSTEM_CONTRACT_WITHDRAW_FUNCIDX } from '@/js-v-sdk/src/constants'
+import { CONTRACT_EXEC_FEE, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT, SYSTEM_CONTRACT_DEPOSIT_FUNCIDX, SYSTEM_CONTRACT_WITHDRAW_FUNCIDX, ACCOUNT_ADDR_TYPE, VSYS_PRECISION } from '@/js-v-sdk/src/constants'
 import { NETWORK_BYTE } from '@/network'
-import {SYSTEM_CONTRACT_TOKEN_ID_TEST} from '@/constants'
+import { SYSTEM_CONTRACT_TOKEN_ID_TEST, SYSTEM_CONTRACT_TOKEN_ID } from '@/constants'
 import TokenConfirm from '../modals/TokenConfirm'
 import TokenSuccess from '../modals/TokenSuccess'
 import ColdSignature from '../modals/ColdSignature'
@@ -374,6 +383,9 @@ export default {
             isSplit: '',
             tokenUnity: '',
             tokenBalance: BigNumber(0),
+            contractBalance: BigNumber(0),
+            isWaiting: false,
+            showToken: false,
             actionName: ''
         }
     },
@@ -414,6 +426,13 @@ export default {
             chain: 'chain',
             account: 'account'
         }),
+        showTokenBalance() {
+            return this.functionName === 'Deposit' ? this.tokenBalance : this.contractBalance
+        },
+        showTokenId() {
+            let systemTokenId = String.fromCharCode(NETWORK_BYTE) === 'M' ? SYSTEM_CONTRACT_TOKEN_ID : SYSTEM_CONTRACT_TOKEN_ID_TEST
+            return systemTokenId === this.tokenId ? 'VSYS' : this.tokenId
+        },
         defaultAddress() {
             return Vue.ls.get('address')
         },
@@ -428,13 +447,16 @@ export default {
             return seedLib.decryptSeedPhrase(this.secretInfo.encrSeed, Vue.ls.get('pwd'))
         },
         isSubmitDisabled() {
-            return !(!this.isInsufficient && this.isValidAmount && this.isValidContractId)
+            return !(!this.isInsufficient && this.isValidAmount && this.isValidContractId && this.showToken)
         },
         isValidAmount() {
             if (BigNumber(this.amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision && this.isValidNumFormat && (this.actionName === 'Withdraw Token' || this.actionName === 'Withdraw VSYS' ? true : !this.isExceededBalance) && !this.isNegative
+            return this.checkPrecision && this.isValidNumFormat && (this.actionName === 'Withdraw Token' || this.actionName === 'Withdraw VSYS' ? !this.isExceededContractBalance : !this.isExceededBalance) && !this.isNegative
+        },
+        isExceededContractBalance() {
+            return BigNumber(this.amount).isGreaterThan(this.contractBalance)
         },
         isExceededBalance() {
             let tokenBalance = this.actionName === 'Deposit VSYS' ? BigNumber(this.tokenBalance).minus(CONTRACT_EXEC_FEE) : this.tokenBalance
@@ -489,6 +511,60 @@ export default {
     },
     methods: {
         ...mapActions(['updateBalance']),
+        async checkContract() {
+            this.isWaiting = true
+            this.chain.getContractInfo(this.contractId).then(async response => {
+                if (response.type === 'PaymentChannelContract' || response.type === 'LockContract') {
+                    this.sendError = false
+                    this.hasConfirmed = false
+                    let tokenId = ''
+                    let contractInfo = response.info
+                    for (let i = 0; i < contractInfo.length; i++) {
+                        if (contractInfo[i]['name'] === 'tokenId' && contractInfo[i]['type'] === 'TokenId') {
+                            tokenId = contractInfo[i]['data']
+                        }
+                    }
+                    let tokenContract = common.tokenIDToContractID(tokenId)
+                    let tokenContractType = ''
+                    try {
+                        let tokenRes = await this.chain.getContractInfo(tokenContract)
+                        this.isSplit = tokenRes.type === 'TokenContractWithSplit'
+                        tokenContractType = tokenRes.type
+                    } catch (err) {
+                        console.log(err)
+                    }
+                    if (tokenContractType === 'SystemContract') {
+                        this.tokenUnity = VSYS_PRECISION
+                        this.tokenBalance = this.balance.toString()
+                    } else {
+                        try {
+                            let tokenBalanceRes = await this.chain.getTokenBalance(this.address, tokenId)
+                            this.tokenUnity = BigNumber(tokenBalanceRes.unity)
+                            this.tokenBalance = BigNumber(tokenBalanceRes.balance).dividedBy(tokenBalanceRes.unity).toString()
+                        } catch (err) {
+                            console.log(err)
+                        }
+                    }
+                    let systemTokenId = String.fromCharCode(NETWORK_BYTE) === 'M' ? SYSTEM_CONTRACT_TOKEN_ID : SYSTEM_CONTRACT_TOKEN_ID_TEST
+                    this.actionName = this.functionName + (tokenId === systemTokenId ? ' VSYS' : ' Token')
+                    this.tokenId = tokenId
+                    try {
+                        let contractBalanceRes = await this.chain.getContractData(this.contractId, 0, ACCOUNT_ADDR_TYPE, this.address)
+                        this.contractBalance = BigNumber(contractBalanceRes.value).dividedBy(this.tokenUnity).toString()
+                    } catch (err) {
+                        console.log(err)
+                    }
+                    this.validContractType = true
+                    this.showToken = true
+                } else {
+                    this.validContractType = false
+                }
+                this.isWaiting = false
+            }, respErr => {
+                this.isWaiting = false
+                this.validContractType = false
+            })
+        },
         inputAmount(num) {
             return BigNumber(num)
         },
@@ -557,24 +633,6 @@ export default {
                 this.sendError = true
             })
         },
-        checkContract() {
-            this.chain.getContractInfo(this.contractId).then(response => {
-                if (response.type === 'PaymentChannelContract' || response.type === 'LockContract') {
-                    this.sendError = false
-                    this.hasConfirmed = false
-                    if (this.walletType === 'hotWallet') {
-                        this.pageId++
-                        this.timeStamp = Date.now() * 1e6
-                    } else {
-                        this.coldPageId++
-                    }
-                } else {
-                    this.validContractType = false
-                }
-            }, respErr => {
-                this.validContractType = false
-            })
-        },
         nextPage() {
             this.sendError = false
             this.hasConfirmed = false
@@ -605,30 +663,14 @@ export default {
             this.isSplit = ''
             this.tokenUnity = ''
             this.tokenBalance = BigNumber(0)
+            this.contractBalance = BigNumber(0)
+            this.isWaiting = false
+            this.showToken = false
         },
         hideContractError() {
-            this.chain.getContractInfo(this.contractId).then(response => {
-                let tokenId = ''
-                let contractInfo = response.info
-                for (let i = 0; i < contractInfo.length; i++) {
-                    if (contractInfo[i]['name'] === 'tokenId' && contractInfo[i]['type'] === 'TokenId') {
-                        tokenId = contractInfo[i]['data']
-                    }
-                }
-                this.chain.getTokenInfo(tokenId).then(res => {
-                    this.tokenUnity = BigNumber(res.unity)
-                })
-                this.chain.getTokenBalance(this.address, tokenId).then(res => {
-                    this.tokenBalance = BigNumber(res.balance).dividedBy(res.unity).toString()
-                })
-                this.actionName = this.functionName + (tokenId === SYSTEM_CONTRACT_TOKEN_ID_TEST ? ' VSYS' : ' Token')
-                this.tokenId = tokenId
-                let tokenContract = common.tokenIDToContractID(tokenId)
-                this.chain.getContractInfo(tokenContract).then(res => {
-                    this.isSplit = res.type === 'TokenContractWithSplit'
-                })
-                this.validContractType = true
-            })
+            this.validContractType = void 0
+            this.showToken = false
+            this.isWaiting = false
         },
         endSend() {
             this.$refs.withdrawOrDepositTokenModal.hide()
@@ -642,12 +684,6 @@ export default {
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
-        },
-        options(addrs) {
-            return Object.keys(addrs).reduce((options, addr) => {
-                options.push({ value: addr, text: addr })
-                return options
-            }, [{ value: '', text: '<span class="text-muted">Please select a wallet address</span>', disabled: true }])
         }
     }
 }
