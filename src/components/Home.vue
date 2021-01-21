@@ -226,9 +226,9 @@ export default {
             walletType: '',
             sortFlag: 0,
             activeTab: 'token',
-            leasedIn: BigNumber(0),
-            leasedOut: BigNumber(0),
-            total: BigNumber(0),
+            leasedIn: BigNumber(NaN),
+            leasedOut: BigNumber(NaN),
+            total: BigNumber(NaN),
             tokenId: '',
             isSplit: false,
             unity: BigNumber(1),
@@ -345,7 +345,7 @@ export default {
             }
         },
         secretInfo() {
-            if (this.userInfo) {
+            if (this.userInfo && Vue.ls.get('pwd')) {
                 return JSON.parse(
                     seedLib.decryptSeedPhrase(this.userInfo.info, Vue.ls.get('pwd')))
             }
@@ -442,7 +442,7 @@ export default {
         },
         getTokenBalances() {
             for (const addr in this.addresses) {
-                Vue.set(this.tokenBalances, addr, BigNumber(0))
+                Vue.set(this.tokenBalances, addr, BigNumber(NaN))
                 this.chain.getTokenBalance(addr, this.tokenId).then(response => {
                     let value = BigNumber(response.balance).dividedBy(response.unity)
                     Vue.set(this.tokenBalances, addr, value)
@@ -450,7 +450,7 @@ export default {
                 })
             }
             for (const addr in this.coldAddresses) {
-                Vue.set(this.tokenBalances, addr, BigNumber(0))
+                Vue.set(this.tokenBalances, addr, BigNumber(NaN))
                 this.chain.getTokenBalance(addr, this.tokenId).then(response => {
                     let value = BigNumber(response.balance).dividedBy(response.unity)
                     Vue.set(this.tokenBalances, addr, value)
@@ -541,7 +541,7 @@ export default {
                     }
                 }
             }, respError => {
-                Vue.set(this.balance, address, new BigNumber(0))
+                Vue.set(this.balance, address, new BigNumber(NaN))
             })
         },
         getBlockHeight() {

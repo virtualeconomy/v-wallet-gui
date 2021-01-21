@@ -45,7 +45,7 @@ export default {
         balance: {
             type: BigNumber,
             default: function() {
-                return BigNumber(0)
+                return BigNumber(NaN)
             },
             required: true
         },

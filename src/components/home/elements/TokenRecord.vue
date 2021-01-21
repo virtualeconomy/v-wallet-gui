@@ -148,7 +148,7 @@ export default {
     data: function() {
         return {
             isSplit: false,
-            tokenBalance: BigNumber(0),
+            tokenBalance: BigNumber(NaN),
             unity: BigNumber(1),
             tokenBalances: {},
             tokens: {},
@@ -315,7 +315,7 @@ export default {
         },
         getTokenBalances() {
             for (const addr in this.addresses) {
-                Vue.set(this.tokenBalances, addr, BigNumber(0))
+                Vue.set(this.tokenBalances, addr, BigNumber(NaN))
                 this.chain.getTokenBalance(addr, this.tokenId).then(response => {
                     let value = BigNumber(response.balance).dividedBy(response.unity)
                     Vue.set(this.tokenBalances, addr, value)
@@ -323,7 +323,7 @@ export default {
                 })
             }
             for (const addr in this.coldAddresses) {
-                Vue.set(this.tokenBalances, addr, BigNumber(0))
+                Vue.set(this.tokenBalances, addr, BigNumber(NaN))
                 this.chain.getTokenBalance(addr, this.tokenId).then(response => {
                     let value = BigNumber(response.balance).dividedBy(response.unity)
                     Vue.set(this.tokenBalances, addr, value)

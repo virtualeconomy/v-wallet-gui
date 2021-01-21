@@ -6,6 +6,9 @@ export default {
     },
     bigNumberFormatter(num) {
         num = BigNumber(num)
+        if (num.isNaN()) {
+            return ''
+        }
         if (!(num.modulo(1).toNumber())) {
             return num.toFixed(2)
         } else {
