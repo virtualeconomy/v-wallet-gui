@@ -215,6 +215,7 @@ export default {
             if (newAddr === '' || this.activeTab !== 'token') {
                 return
             }
+            this.tokenBalance = BigNumber(NaN)
             this.updateToken()
         },
         activeTab(newTab, oldTab) {

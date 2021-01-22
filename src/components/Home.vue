@@ -527,6 +527,7 @@ export default {
             this.setSessionClearTimeout()
         },
         getBalance: function(address) {
+            Vue.set(this.balance, address, new BigNumber(NaN))
             this.chain.getBalanceDetail(address).then(response => {
                 let value = BigNumber(response.available).dividedBy(VSYS_PRECISION)
                 let changeStatus = value === this.balance[address]
