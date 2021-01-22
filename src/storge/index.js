@@ -58,10 +58,10 @@ const store = new Vuex.Store({
         },
         updateSelectedAddress(state, status) {
             state.selectedAddress = status['address']
-            state.available = status['balance'] ? status['balance'] : BigNumber(0)
-            state.total = BigNumber(0)
-            state.leasedIn = BigNumber(0)
-            state.leasedOut = BigNumber(0)
+            state.available = status['balance'] ? status['balance'] : BigNumber(NaN)
+            state.total = BigNumber(NaN)
+            state.leasedIn = BigNumber(NaN)
+            state.leasedOut = BigNumber(NaN)
         },
         changeEventPool(state, status) {
             state.eventPool = status
