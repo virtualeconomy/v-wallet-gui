@@ -714,7 +714,7 @@ export default {
                 let lastTokenIndexRes = await this.chain.getLastTokenIndex(this.nftContractID)
                 let newTokenIndex = 0
                 if (lastTokenIndexRes.hasOwnProperty('lastTokenIndex')) {
-                    newTokenIndex = lastTokenIndexRes['lastTokenIndex'] + 1
+                    newTokenIndex = lastTokenIndexRes['lastTokenIndex']
                 } else {
                     this.errorMessage = 'Failed reason: Unable to get last token index.'
                     this.sendError = true
