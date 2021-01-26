@@ -680,9 +680,6 @@ export default {
                 this.unity++
             }
         },
-        sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms))
-        },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
             if (this.selectedNFTContract) {
@@ -697,21 +694,6 @@ export default {
                 tra.buildRegisterContractTx(publicKey, contract, initData, this.contractDescription, this.timeStamp)
             }
             return tra
-        },
-        getTokenIndexFromLocal() {
-            let records = JSON.parse(window.localStorage.getItem(this.seedAddress))
-            let index = 0
-            let tokenRecords = records.tokens ? JSON.parse(records.tokens) : {}
-            for (let token in tokenRecords) {
-                let contractId = common.tokenIDToContractID(token)
-                if (contractId === this.nftContractID) {
-                    let tokenIndex = common.getTokenIndex(token)
-                    if (tokenIndex >= index) {
-                        index = tokenIndex
-                    }
-                }
-            }
-            return index
         },
         async sendData(walletType) {
             let sendTx
@@ -729,16 +711,16 @@ export default {
                 sendTx = this.dataObject.toJsonForSendingTx(signature)
             }
             if (this.selectedNFTContract) {
-                let newTokenIndex = this.getTokenIndexFromLocal()
-                let newTokenId = ''
-                for (; ; newTokenIndex++) {
-                    newTokenId = common.contractIDToTokenID(this.nftContractID, newTokenIndex)
-                    let res = await this.chain.getTokenInfo(newTokenId)
-                    if (res.hasOwnProperty('error')) {
-                        break
-                    }
-                    await this.sleep(500)
+                let lastTokenIndexRes = await this.chain.getLastTokenIndex(this.nftContractID)
+                let newTokenIndex = 0
+                if (lastTokenIndexRes.hasOwnProperty('lastTokenIndex')) {
+                    newTokenIndex = lastTokenIndexRes['lastTokenIndex']
+                } else {
+                    this.errorMessage = 'Failed reason: Unable to get last token index.'
+                    this.sendError = true
+                    return
                 }
+                let newTokenId = common.contractIDToTokenID(this.nftContractID, newTokenIndex)
                 this.chain.sendExecuteContractTx(sendTx).then(response => {
                     if (response.hasOwnProperty('error')) {
                         this.errorMessage = response.message
