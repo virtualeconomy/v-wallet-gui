@@ -645,6 +645,7 @@ export default {
             this.$root.$emit('bv::show::modal', 'contractManagementModal')
         },
         getContracts() {
+            this.contracts = {}
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             if (userInfo && userInfo.contracts) {
                 let contracts = JSON.parse(userInfo.contracts)
@@ -714,7 +715,7 @@ export default {
                 let lastTokenIndexRes = await this.chain.getLastTokenIndex(this.nftContractID)
                 let newTokenIndex = 0
                 if (lastTokenIndexRes.hasOwnProperty('lastTokenIndex') || (lastTokenIndexRes.hasOwnProperty('error') && lastTokenIndexRes['error'] === 199)) {
-                    newTokenIndex = lastTokenIndexRes['lastTokenIndex'] ? lastTokenIndexRes['lastTokenIndex'] + 1 : newTokenIndex
+                    newTokenIndex = lastTokenIndexRes.hasOwnProperty('lastTokenIndex') ? lastTokenIndexRes['lastTokenIndex'] + 1 : newTokenIndex
                 } else {
                     this.errorMessage = 'Failed reason: Unable to get last token index.'
                     this.sendError = true
