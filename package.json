@@ -20,7 +20,7 @@
     },
     "dependencies": {
         "@babel/runtime": "^7.3.1",
-        "apexcharts": "^2.6.0",
+        "apexcharts": "^3.24.0",
         "axlsign": "^1.0.0",
         "base-58": "0.0.1",
         "bignumber.js": "^7.2.1",
