@@ -152,7 +152,7 @@ export default {
             resFields: {
                 transaction_id: 'id',
                 transaction_fee: 'fee',
-                'timestamp(in nano second)': 'timestamp',
+                'timestamp': 'timestamp',
                 recipient_address: 'recipient',
                 amount: 'amount',
                 encoded_attachment: 'attachment'
@@ -340,6 +340,7 @@ export default {
                         tempResponse[i].amount = BigNumber(this.response[i].amount).dividedBy(VSYS_PRECISION)
                     }
                     tempResponse[i].fee = tempResponse[i].fee / VSYS_PRECISION
+                    tempResponse[i].timestamp = new Date(tempResponse[i].timestamp / 1e6).toLocaleString()
                 }
                 this.responseExport = tempResponse
             }
