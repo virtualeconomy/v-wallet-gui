@@ -8,59 +8,118 @@
            :busy="true"
            title="Add Token"
            @hidden="closeModal">
+    <div class="add_title">Add Token</div>
     <button class="close btn-close"
             @click="closeModal">
       <img src="@/assets/imgs/icons/operate/ic_close.svg">
     </button>
-    <b-tabs>
-      <b-tab title="Add Token">
-        <b-container
-          class="text-left">
-          <b-form-group label="Token ID or Name"
-                        class="forms"
-                        label-for="amountInput">
-            <div class="select-certified-token">
-              <b-dropdown class="m-2"
-                          no-caret
-                          id="dropdown-grouped"
-                          text="Select Token"
-                          size="sm"
-                          right
-                          variant="warning">
-                <div style="height:150px;overflow:scroll">
-                  <b-dropdown-group id="dropdown-group-1"
-                                    v-for="(token, idx) in certifiedTokenList"
-                                    :key="idx">
-                    <b-dropdown-item-button @click="selectToken(idx, token.name)">
-                      <img :src="token.iconUrl"
-                           style="width: 20px; height: 20px">
-                      <span style="color: mediumblue; margin-left: 20px">{{ token.name }}</span>
-                    </b-dropdown-item-button>
-                    <b-dropdown-divider></b-dropdown-divider>
-                  </b-dropdown-group>
-                </div>
-              </b-dropdown>
+    <b-tabs @input="tokenTabChange">
+      <b-tab active>
+        <template slot="title">
+          <div><span>Verified Token</span></div>
+        </template>
+        <div>
+          <div>
+            <div class="scroll">
+              <div v-for="(certifiedToken, tokenId) in certifiedTokenList"
+                   :key="tokenId">
+                <b-btn class="token-unit"
+                       @click="addVerifiedToken(tokenId, certifiedToken.name)">
+                  <div class="token-svg"><img width="56px"
+                                              height="56px"
+                                              :src="certifiedToken.iconUrl">
+                  <span class="cer-name">{{ certifiedToken.name }}</span></div>
+                  <div class="notice"
+                       v-if="isExistedToken(tokenId)">Already added!</div>
+                </b-btn>
+              </div>
             </div>
-            <b-form-input id="amountInput"
-                          class="input-t"
+          </div>
+          <b-row class="button-row"
+                 style="margin-top:30px">
+            <b-col class="col-lef">
+              <b-button
+                class="btn-cancel"
+                block
+                variant="light"
+                size="lg"
+                @click="closeModal">Cancel
+              </b-button>
+            </b-col>
+            <b-col class="col-rig">
+              <b-button
+                block
+                class="btn-confirm"
+                variant="warning"
+                size="lg"
+                :disabled="isSubmitDisabled"
+                @click="addToken">Add
+              </b-button>
+            </b-col>
+          </b-row>
+        </div>
+      </b-tab>
+      <b-tab>
+        <template slot="title">
+          <div><span>Custom Token</span></div>
+        </template>
+        <div class="content">
+          <div class="form-group cus-group">
+            <label>Token ID</label>
+            <b-form-input class="form-control"
                           v-model="tokenId"
-                          aria-describedby="inputLiveFeedback"
-                          placeholder="Please input Token ID or Name"
-                          :state="isValidToken">
-            </b-form-input>
-            <b-form-invalid-feedback id="inputLiveFeedback"
-                                     style="font-size: 15px;margin-top: 10px">
+                          :state="isValidToken(tokenId)"
+                          aria-describedby="inputTokenLiveFeedback"
+                          placeholder="Please input Token ID"
+                          onfocus="this.select()"></b-form-input>
+            <b-form-invalid-feedback id="inputTokenLiveFeedback"
+                                     style="margin-top: -20px"
+                                     v-if="isVerifiedToken(tokenId)">
+              It's verified Token!
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputTokenLiveFeedback"
+                                     style="margin-top: -20px"
+                                     v-else>
               Error: Failed to get Token Info! (Please make sure Token ID is correct and network is available to connect node)
             </b-form-invalid-feedback>
-            <b-button variant="warning"
-                      class="btn-o"
-                      block
-                      size="lg"
-                      :disabled="isAddable"
-                      @click="addModal">Add
-            </b-button>
-          </b-form-group>
-        </b-container>
+            <label>Token Symbol</label>
+            <b-form-input class="form-control input-bottom"
+                          v-model="tokenSymbol"
+                          :state="checkSymbol(tokenSymbol)"
+                          aria-describedby="inputSymbolLiveFeedback"
+                          placeholder="Please input Token Symbol"
+                          onfocus="this.select()"></b-form-input>
+            <b-form-invalid-feedback id="inputSymbolLiveFeedback"
+                                     v-if="!isValidSymbol(tokenSymbol)">
+              Symbol must be digits or English letters within 10.
+            </b-form-invalid-feedback>
+            <b-form-invalid-feedback id="inputSymbolLiveFeedback"
+                                     v-if="!isUsedSymbol(tokenSymbol)">
+              Symbol already exists.
+            </b-form-invalid-feedback>
+          </div>
+          <b-row class="button-row">
+            <b-col class="col-lef">
+              <b-button
+                class="btn-cancel"
+                block
+                variant="light"
+                size="lg"
+                @click="closeModal">Cancel
+              </b-button>
+            </b-col>
+            <b-col class="col-rig">
+              <b-button
+                block
+                class="btn-confirm"
+                variant="warning"
+                size="lg"
+                :disabled="isSubmitDisabled"
+                @click="addToken">Add
+              </b-button>
+            </b-col>
+          </b-row>
+        </div>
       </b-tab>
     </b-tabs>
   </b-modal>
@@ -69,16 +128,24 @@
 <script>
 import Vue from 'vue'
 import common from '@/js-v-sdk/src/utils/common'
-import { mapActions, mapState } from 'vuex'
-import certify from '@/utils/certify'
+import { mapState } from 'vuex'
 export default {
     name: 'AddToken',
-    data() {
+    data: function() {
         return {
-            tokens: {},
+            activeTab: 'verified',
             tokenId: '',
-            init: false,
+            tokenSymbol: '',
+            selectedVerifiedToken: '',
+            selectedVerifiedSymbol: '',
             responseErr: false
+        }
+    },
+    props: {
+        tokenRecords: {
+            type: Object,
+            require: true,
+            default: function() {}
         }
     },
     watch: {
@@ -91,83 +158,198 @@ export default {
             chain: 'chain',
             certifiedTokenList: 'certifiedTokenList'
         }),
-        contractId() {
-            try {
-                return common.tokenIDToContractID(this.tokenId)
-            } catch (e) {
-                return null
+        isSubmitDisabled() {
+            let tokenId = this.activeTab === 'custom' ? this.tokenId : this.selectedVerifiedToken
+            if (this.activeTab === 'verified') {
+                return this.isExistedToken(tokenId)
+            } else {
+                return tokenId.length <= 0 || !this.checkSymbol(this.tokenSymbol) || this.isVerifiedToken(tokenId) || this.tokenSymbol.length <= 0
             }
         },
         seedAddress() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
             }
-        },
-        defaultAddress() {
-            return Vue.ls.get('address')
-        },
-        isAddable() {
-            return this.tokenId.length <= 0
-        },
-        isValidToken() {
-            if (!this.init || this.tokenId.length === 0 || this.responseErr === false) {
-                return void 0
-            }
-            return !this.responseErr
         }
     },
     methods: {
-        ...mapActions(['changeAddTokenStatus']),
         closeModal() {
-            this.init = false
             this.responseErr = false
             this.tokenId = ''
-            this.tokens = {}
+            this.tokenSymbol = ''
+            this.activeTab = 'verified'
             this.$refs.addTokenModal.hide()
         },
+        tokenTabChange(tabIndex) {
+            if (tabIndex === 0) {
+                this.activeTab = 'verified'
+            } else if (tabIndex === 1) {
+                this.activeTab = 'custom'
+            }
+        },
         setUsrLocalStorage(fieldName, value) {
-            let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
+            let userInfo = JSON.parse(window.localStorage.getItem(this.seedAddress))
             Vue.set(userInfo, fieldName, value)
             window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
         },
-        addModal() {
-            this.init = true
-            let tokens = {}
-            let tmpUserInfo = JSON.parse(window.localStorage.getItem(this.seedAddress))
-            if (tmpUserInfo && tmpUserInfo.tokens) {
-                tokens = JSON.parse(tmpUserInfo.tokens)
+        addToken() {
+            let tmp = this.tokenRecords
+            let tokenId = this.activeTab === 'custom' ? this.tokenId : this.selectedVerifiedToken
+            let tokenSymbol = this.activeTab === 'custom' ? this.tokenSymbol : this.selectedVerifiedSymbol
+            tokenId = tokenId.replace(/\s*/g, '')
+            let iconUrl = ''
+            if (tokenId in this.certifiedTokenList) {
+                iconUrl = this.certifiedTokenList[tokenId].iconUrl
             }
-            this.tokenId = this.tokenId.replace(/\s*/g, '')
-            let tokenId = certify.getTokenId(this.tokenId)
-            this.tokenId = tokenId === null ? this.tokenId : tokenId
-            if (this.tokenId in tokens) {
+            if (tokenId in tmp) {
                 this.$refs.addTokenModal.hide()
                 return
             }
-            if (this.tokenId) {
-                this.chain.getContractInfo(this.contractId).then(response => {
+            if (tokenId) {
+                this.chain.getTokenInfo(tokenId).then(response => {
                     this.responseErr = false
                     if (response.hasOwnProperty('error')) {
                         this.responseErr = true
                         return
                     }
-                    Vue.set(tokens, this.tokenId, response.info[1].data)
-                    this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
-                    this.changeAddTokenStatus()
-                    this.$refs.addTokenModal.hide()
+                    let contractID = common.tokenIDToContractID(tokenId)
+                    this.chain.getContractInfo(contractID).then(res => {
+                        if (res.hasOwnProperty('error')) {
+                            this.responseErr = true
+                            return
+                        }
+                        if (res.type !== 'NonFungibleContract' && res.type !== 'TokenContract' && res.type !== 'TokenContractWithSplit') {
+                            this.responseErr = true
+                            return
+                        }
+                        let contractType = res.type
+                        let maker = res.info[1].data
+                        let tokenInfo = { 'name': tokenSymbol, 'contractType': contractType, 'iconUrl': iconUrl, 'maker': maker, 'unity': response.unity }
+                        Vue.set(tmp, tokenId, tokenInfo)
+                        this.setUsrLocalStorage('tokens', JSON.stringify(tmp))
+                        this.$refs.addTokenModal.hide()
+                    }, err => {
+                        console.log(err)
+                        this.responseErr = true
+                    })
                 }, respError => {
                     this.responseErr = true
                 })
             }
         },
-        selectToken(id) {
-            this.tokenId = id
+        addVerifiedToken(tokenId, verifiedSymbol) {
+            this.selectedVerifiedToken = tokenId
+            this.selectedVerifiedSymbol = verifiedSymbol
+        },
+        isExistedToken(tokenId) {
+            return tokenId in this.tokenRecords
+        },
+        checkSymbol(symbol) {
+            return this.isUsedSymbol(symbol) && this.isValidSymbol(symbol)
+        },
+        isUsedSymbol(symbol) {
+            if (symbol === 'VSYS') {
+                return false
+            }
+            let tmp = this.tokenRecords
+            for (let tokenId in tmp) {
+                if (tmp[tokenId].name === symbol) {
+                    return false
+                }
+            }
+            return true
+        },
+        isValidSymbol(symbol) {
+            let Regx = /^[A-Za-z0-9]*$/
+            return symbol.length <= 10 && Regx.test(symbol)
+        },
+        isValidToken(tokenId) {
+            if (tokenId.length === 0) {
+                return void 0
+            }
+            return !this.responseErr && !this.isVerifiedToken(tokenId)
+        },
+        isVerifiedToken(tokenId) {
+            return tokenId in this.certifiedTokenList
         }
     }
 }
 </script>
 
 <style scoped lang="less">
+.add_title{
+    font-size: 20px;
+    font-weight: 500;
+    margin-left: 10px;
+}
+.scroll {
+    height: 210px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    z-index: 100;
+    background: rgba(247,247,252,1);
+}
+.token-unit {
+    width: 100%;
+    height: 88px;
+    background: rgba(247,247,252,1);
+    border-radius: 4px;
+    padding-left: 24px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+    border: rgba(247,247,252,1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between
+}
+.token-unit:active, .token-unit:focus, .token-unit:hover, .token-unit:active:focus {
+    height: 88px;
+    background: rgba(247, 247, 252, 1);
+    border-radius: 4px;
+    border: 1px solid rgba(255, 136, 55, 1);
+    padding-left: 24px;
+    padding-bottom: 16px;
+    padding-top: 16px;
+}
+.cer-name {
+    margin-left: 20px;
+    height:21px;
+    font-size:18px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(50,50,51,1);
+    line-height:21px;
+}
+.notice {
+    font-size:12px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(246,0,46,1);
+    line-height:14px;
+}
+
+.cus-group {
+    // padding-top: 32px;
+    // margin-bottom: 118px;
+    // padding-right: 24px;
+    // padding-left: 24px;
+}
+.cus-group label {
+    margin-left: 4px;
+    font-size:14px;
+    font-family:SFProText-Regular,SFProText;
+    font-weight:400;
+    color:rgba(50,50,51,1);
+    line-height:16px;
+    margin-bottom: 12px;
+}
+.cus-group input {
+    height:48px;
+    background:rgba(255,255,255,1);
+    border-radius:4px;
+    border:1px solid rgba(230,230,237,1);
+    margin-bottom: 24px;
+}
 #address-qrcode {
     margin-top: 30px;
     text-align: center;

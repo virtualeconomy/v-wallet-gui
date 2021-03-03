@@ -16,7 +16,7 @@
       <b-col class="record-detail"
              cols="auto">
         <b-row>
-          <b-col class="title">{{ officialName(tokenId) }}</b-col>
+          <b-col class="title">{{ localName(tokenId) }}</b-col>
         </b-row>
       </b-col>
       <b-col class="record-blank"></b-col>
@@ -53,15 +53,16 @@
             </div>
           </template>
           <b-dropdown-item @click="showModal">Get Token Info</b-dropdown-item>
+          <b-dropdown-item @click="showModalRename">Rename Symbol</b-dropdown-item>
           <b-dropdown-item v-if="!isCertified(tokenId)"
                            @click="verify">Verification</b-dropdown-item>
-          <b-dropdown-item v-if="(tokenManagementStatus || address === tokenMaker) && contractType !=='NonFungibleContract'"
+          <b-dropdown-item v-if="(tokenManagementStatus || address === maker) && contractType !=='NonFungibleContract'"
                            :disabled="contractType==='NonFungibleContract'"
                            @click="supersede">Supersede</b-dropdown-item>
-          <b-dropdown-item v-if="(tokenManagementStatus || address === tokenMaker) && contractType !=='NonFungibleContract'"
+          <b-dropdown-item v-if="(tokenManagementStatus || address === maker) && contractType !=='NonFungibleContract'"
                            :disabled="contractType==='NonFungibleContract'"
                            @click="issueToken">Issue Token</b-dropdown-item>
-          <b-dropdown-item v-if="(tokenManagementStatus || address === tokenMaker) && contractType !=='NonFungibleContract'"
+          <b-dropdown-item v-if="(tokenManagementStatus || address === maker) && contractType !=='NonFungibleContract'"
                            @click="destroyToken">Destroy Token</b-dropdown-item>
           <b-dropdown-item v-if="tokenSplitStatus && isSplit"
                            @click="splitToken">Split Token</b-dropdown-item>
@@ -79,6 +80,8 @@
                     :current-supply="formatter(currentSupply)"
                     :token-description="tokenDescription">
     </TokenInfoModal>
+    <RenameSymbol :token-id="tokenId"
+                  @refreshTokens="refreshTokens"></RenameSymbol>
     <IssueOrDestroyToken :token-id="tokenId"
                          :issuer="issuer"
                          :address="address"
@@ -132,6 +135,7 @@ import common from '@/js-v-sdk/src/utils/common'
 import base58 from 'base-58'
 import converters from '@/js-v-sdk/src/utils/converters'
 import TokenInfoModal from './TokenInfoModal'
+import RenameSymbol from './RenameSymbol'
 import SendToken from './SendToken'
 import BigNumber from 'bignumber.js'
 import IssueOrDestroyToken from './IssueOrDestroyToken'
@@ -144,7 +148,7 @@ import { mapActions, mapState } from 'vuex'
 import Receive from '../modals/Receive'
 export default {
     name: 'TokenRecord',
-    components: { TokenInfoModal, SendToken, SplitTokenOrSupersede, WithdrawOrDepositToken, IssueOrDestroyToken, Receive },
+    components: { TokenInfoModal, SendToken, SplitTokenOrSupersede, WithdrawOrDepositToken, IssueOrDestroyToken, Receive, RenameSymbol },
     data: function() {
         return {
             isSplit: false,
@@ -189,8 +193,8 @@ export default {
             default: this ? this.defaultAddress : undefined,
             require: true
         },
-        tokenMaker: {
-            type: String,
+        tokenInfo: {
+            type: Object,
             default: function() {},
             require: true
         },
@@ -225,9 +229,8 @@ export default {
         }
     },
     created() {
-        this.getTokenInfo()
+        this.init()
         this.updateToken()
-        this.getContractType()
     },
     computed: {
         ...mapState({
@@ -277,6 +280,12 @@ export default {
     },
     methods: {
         ...mapActions(['removeTokenUpdateEventPool']),
+        init() {
+            this.contractType = this.tokenInfo['contractType']
+            this.maker = this.tokenInfo['maker']
+            this.isSplit = this.contractType === 'TokenContractWithSplit'
+            this.contractId = common.tokenIDToContractID(this.tokenId)
+        },
         setUsrLocalStorage(fieldName, value) {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
             Vue.set(userInfo, fieldName, value)
@@ -291,12 +300,17 @@ export default {
         isCertified(tokenId) {
             return tokenId in this.certifiedTokenList
         },
-        officialName(tokenId) {
+        localName(tokenId) {
             if (tokenId in this.certifiedTokenList) {
                 return this.certifiedTokenList[tokenId].name
             } else {
-                return tokenId
+                if (this.tokenInfo.hasOwnProperty('name')) {
+                    return this.tokenInfo['name']
+                } else return tokenId
             }
+        },
+        refreshTokens() {
+            this.$emit('refreshTokens', 'refresh')
         },
         officialTokenSvg(tokenId) {
             return this.certifiedTokenList[tokenId].iconUrl
@@ -347,6 +361,9 @@ export default {
             this.chain.getTokenInfo(this.tokenId).then(response => {
                 this.tokens = response
                 this.unity = BigNumber(this.tokens.unity)
+                if (this.isSplit) {
+                    this.updateLocalToken(this.unity.toString())
+                }
                 if (this.isCertified(this.tokenId) && this.isSplit) {
                     this.updateUnity(this.tokenId, this.unity.toNumber())
                 }
@@ -354,9 +371,15 @@ export default {
             })
             this.updateToken()
         },
+        updateLocalToken() {
+
+        },
         showModal() {
             this.getTokenInfo()
             this.$root.$emit('bv::show::modal', 'tokenInfoModal_' + this.tokenId)
+        },
+        showModalRename() {
+            this.$root.$emit('bv::show::modal', 'renameSymbol_' + this.tokenId)
         },
         verify() {
             window.open('https://docs.google.com/forms/d/e/1FAIpQLSer2SHC0qLi5l_4q-8zXcQG_nAraUBkMB9LPDI0MLuSB_03vg/viewform')
@@ -366,7 +389,9 @@ export default {
                 alert('This feature is not supported')
             } else {
                 this.getTokenBalances()
-                this.getTokenInfo()
+                if (this.isSplit) {
+                    this.getTokenInfo()
+                }
                 this.$root.$emit('bv::show::modal', 'sendTokenModal_' + this.tokenId + 'false', '#btnShow')
             }
         },
@@ -375,7 +400,6 @@ export default {
                 alert('This feature is not supported')
             } else {
                 this.functionName = 'Supersede'
-                this.getTokenInfo()
                 this.$root.$emit('bv::show::modal', 'splitTokenOrSupersedeModal_' + this.tokenId)
             }
         },
@@ -421,13 +445,6 @@ export default {
         },
         updateUnity(tokenId, unity) {
             this.certifiedTokenList[tokenId].unity = unity
-        },
-        getContractType() {
-            let contractId = common.tokenIDToContractID(this.tokenId)
-            this.chain.getContractInfo(contractId).then(response => {
-                this.contractType = response.type
-            }, respError => {
-            })
         }
     }
 }
