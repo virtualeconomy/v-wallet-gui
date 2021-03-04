@@ -19,6 +19,7 @@
                      :cold-addresses="coldAddresses"
                      :wallet-type="walletType"
                      :balances="balances"
+                     :token-records="tokenRecords"
                      :active-tab="activeTab"
                      @refreshTokens="refreshTokens"
                      @removeFlag="removeToken"></TokenRecord>

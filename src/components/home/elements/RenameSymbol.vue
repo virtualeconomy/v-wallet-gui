@@ -60,19 +60,20 @@ import Vue from 'vue'
 
 export default {
     name: 'RenameSymbolModal',
-    created() {
-        this.getTokenRecords()
-    },
     props: {
         tokenId: {
             type: String,
             default: ''
+        },
+        tokenRecords: {
+            type: Object,
+            default: function() {},
+            require: true
         }
     },
     data: function() {
         return {
-            name: '',
-            tokenRecords: {}
+            name: ''
         }
     },
     computed: {
@@ -98,12 +99,6 @@ export default {
             this.$emit('refreshTokens', 'refresh')
             this.closeModal()
         },
-        getTokenRecords() {
-            let records = JSON.parse(window.localStorage.getItem(this.seedAddress))
-            if (records.tokens) {
-                this.tokenRecords = JSON.parse(records.tokens)
-            }
-        },
         checkSymbol(name) {
             return this.isUsedSymbol(name) && this.isValidSymbol(name)
         },
@@ -128,7 +123,6 @@ export default {
         },
         closeModal() {
             this.name = ''
-            this.getTokenRecords()
             this.$refs.renameModal.hide()
         }
     }

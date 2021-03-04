@@ -81,6 +81,7 @@
                     :token-description="tokenDescription">
     </TokenInfoModal>
     <RenameSymbol :token-id="tokenId"
+                  :token-records="tokenRecords"
                   @refreshTokens="refreshTokens"></RenameSymbol>
     <IssueOrDestroyToken :token-id="tokenId"
                          :issuer="issuer"
@@ -207,6 +208,11 @@ export default {
             type: Object,
             default: function() {
             },
+            require: true
+        },
+        tokenRecords: {
+            type: Object,
+            default: function() {},
             require: true
         },
         activeTab: {
