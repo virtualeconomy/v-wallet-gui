@@ -655,13 +655,13 @@ export default {
                 let token = result.body.data.list[index]
                 let contractId = common.tokenIDToContractID(token.Id)
                 let contractInfo = await this.chain.getContractInfo(contractId)
-                this.isCertifiedTokenSplit = contractInfo.type === 'TokenContractWithSplit'
                 let tokenInfo = await this.chain.getTokenInfo(token.Id)
                 this.certifiedTokenList[token.Id] = {
                     name: token.Name,
-                    support_split: this.isCertifiedTokenSplit,
-                    unity: BigNumber(tokenInfo.unity),
-                    iconUrl: url + token.IconUrl
+                    contractType: contractInfo.type,
+                    iconUrl: url + token.IconUrl,
+                    maker: contractInfo['info'][1]['data'],
+                    unity: tokenInfo.unity
                 }
             }
         },

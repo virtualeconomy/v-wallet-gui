@@ -113,7 +113,7 @@
 </template>
 
 <script>
-import { VSYS_PRECISION, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX, ACCOUNT_ADDR_TYPE, INT32_TYPE, AMOUNT_TYPE, CONTRACT_ACCOUNT_TYPE } from '@/js-v-sdk/src/constants'
+import { VSYS_PRECISION, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX, INT32_TYPE, SEND_FUNCIDX, WITHDRAW_FUNCIDX, DEPOSIT_FUNCIDX, SEND_FUNCIDX_SPLIT, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX_SPLIT, NFT_CONTRACT_SEND_FUNCIDX, NFT_CONTRACT_DEPOSIT_FUNCIDX, NFT_CONTRACT_WITHDRAW_FUNCIDX } from '@/js-v-sdk/src/constants'
 import BigNumber from 'bignumber.js'
 import TransactionRecord from './TransactionRecord'
 import Vue from 'vue'
@@ -226,41 +226,65 @@ export default {
             const d = new Date(date / 1e6)
             return monthNames[d.getMonth()] + ', ' + d.getFullYear()
         },
-        parseExecution(functionIndex, Data) {
-            // [functionType, tokenType]
+        parseExecution(contractType, functionIndex, Data) {
             let functionType = false // Only support send, deposit, withdraw
-            let tokenType = false // nft and ft (Fungible Token)
-            let tokenIndex = 0
-            let amount = 1
             let functionData = convert.parseFunctionData(Data)
+            let amount = 0
             let recipient = ''
-            if (functionData.length === 2) {
-                if (functionData[0]['type'] === ACCOUNT_ADDR_TYPE) {
+            switch (contractType) {
+            case 'TokenContract':
+                switch (functionIndex) {
+                case SEND_FUNCIDX:
                     functionType = 'Sent'
                     recipient = functionData[0]['data']
-                }
-                if (functionData[1]['type'] === INT32_TYPE) {
-                    tokenType = 'nft'
-                    tokenIndex = functionData[1]['data']
-                } else if (functionData[1]['type'] === AMOUNT_TYPE) {
-                    tokenType = 'ft'
                     amount = functionData[1]['data']
-                }
-            } else if (functionData.length === 3) {
-                if (functionData[0]['type'] === ACCOUNT_ADDR_TYPE && functionData[1]['type'] === CONTRACT_ACCOUNT_TYPE) {
-                    functionType = 'Deposit'
-                } else if (functionData[0]['type'] === CONTRACT_ACCOUNT_TYPE && functionData[1]['type'] === ACCOUNT_ADDR_TYPE) {
+                    break
+                case WITHDRAW_FUNCIDX:
                     functionType = 'Withdraw'
-                }
-                if (functionData[2]['type'] === INT32_TYPE) {
-                    tokenType = 'nft'
-                    tokenIndex = functionData[2]['data']
-                } else if (functionData[2]['type'] === AMOUNT_TYPE) {
-                    tokenType = 'ft'
                     amount = functionData[2]['data']
+                    break
+                case DEPOSIT_FUNCIDX:
+                    functionType = 'Deposit'
+                    amount = functionData[2]['data']
+                    break
                 }
+                break
+            case 'TokenContractWithSplit':
+                switch (functionIndex) {
+                case SEND_FUNCIDX_SPLIT:
+                    functionType = 'Sent'
+                    recipient = functionData[0]['data']
+                    amount = functionData[1]['data']
+                    break
+                case WITHDRAW_FUNCIDX_SPLIT:
+                    functionType = 'Withdraw'
+                    amount = functionData[2]['data']
+                    break
+                case DEPOSIT_FUNCIDX_SPLIT:
+                    functionType = 'Deposit'
+                    amount = functionData[2]['data']
+                    break
+                }
+                break
+            case 'NonFungibleContract':
+                switch (functionIndex) {
+                case NFT_CONTRACT_SEND_FUNCIDX:
+                    functionType = 'Sent'
+                    recipient = functionData[0]['data']
+                    amount = 1
+                    break
+                case NFT_CONTRACT_WITHDRAW_FUNCIDX:
+                    functionType = 'Withdraw'
+                    amount = functionData[2]['data']
+                    break
+                case NFT_CONTRACT_DEPOSIT_FUNCIDX:
+                    functionType = 'Deposit'
+                    amount = functionData[2]['data']
+                    break
+                }
+                break
             }
-            return [functionType, tokenType, tokenIndex, amount, recipient]
+            return [functionType, amount, recipient]
         },
         getTxRecords(type) {
             if (this.address) {
@@ -292,17 +316,24 @@ export default {
                             recItem['index'] = ++count
                             recList[month].push(recItem)
                             if (recItem['type'] === EXECUTE_CONTRACT_TX) {
-                                let [functionType, tokenType, tokenIndex, amount, recipient] = this.parseExecution(recItem['functionIndex'], recItem['functionData'])
-                                if (functionType && tokenType) {
-                                    let tokenId = common.contractIDToTokenID(recItem['contractId'], tokenIndex)
-                                    if (certify.isCertified(tokenId) || tokenRecords.hasOwnProperty(tokenId)) {
-                                        recItem['tokenName'] = certify.isCertified(tokenId) ? certify.officialName(tokenId) : tokenRecords[tokenId]['name']
-                                        recItem['functionType'] = functionType
-                                        recItem['recipient'] = recipient
-                                        recItem['amount'] = tokenType === 'nft' ? 1 : amount
-                                        recItem['unity'] = certify.isCertified(tokenId) ? certify.getUnity(tokenId) : tokenRecords[tokenId]['unity']
-                                        recItem['tokenId'] = tokenId
+                                let tokenIndex = 0
+                                let functionData = convert.parseFunctionData(recItem['functionData'])
+                                for (let index in functionData) {
+                                    if (functionData[index]['type'] === INT32_TYPE) {
+                                        tokenIndex = functionData[index]['data']
+                                        break
                                     }
+                                }
+                                let tokenId = common.contractIDToTokenID(recItem['contractId'], tokenIndex)
+                                if (certify.isCertified(tokenId) || tokenRecords.hasOwnProperty(tokenId)) {
+                                    let contractType = certify.isCertified(tokenId) ? certify.getContractType(tokenId) : tokenRecords[tokenId]['contractType']
+                                    let [functionType, amount, recipient] = this.parseExecution(contractType, recItem['functionIndex'], recItem['functionData'])
+                                    recItem['tokenName'] = certify.isCertified(tokenId) ? certify.officialName(tokenId) : tokenRecords[tokenId]['name']
+                                    recItem['functionType'] = functionType
+                                    recItem['recipient'] = recipient
+                                    recItem['amount'] = amount
+                                    recItem['unity'] = certify.isCertified(tokenId) ? certify.getUnity(tokenId) : tokenRecords[tokenId]['unity']
+                                    recItem['tokenId'] = tokenId
                                 }
                             }
                             if (recItem['type'] === REGISTER_CONTRACT_TX) {
