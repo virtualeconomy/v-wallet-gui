@@ -280,7 +280,8 @@ export default {
             }
         },
         localName() {
-            return this.txRecord['tokenName'] ? this.txRecord['tokenName'] : 'VSYS'
+            let tokenName = this.txRecord['tokenName'] ? this.txRecord['tokenName'] : 'VSYS'
+            return tokenName.length > 10 ? 'Token(...' + tokenName.slice(-4) + ')' : tokenName
         },
         txType() {
             if (this.txRecord['type'] === PAYMENT_TX) {
