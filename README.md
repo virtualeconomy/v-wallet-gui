@@ -55,6 +55,7 @@ $ git clone https://github.com/virtualeconomy/v-wallet-gui.git
   5. run
 
 ```
+# This runs testnet by default, if you want to switch network to mainnet, modify the NETWORK_BYTE of network.js from T to M
 $ npm run dev
 ```
   6. open the website on ```localhost:8080```
@@ -62,6 +63,6 @@ $ npm run dev
   7. if you want the wallet to access data from a different address, edit ```config/nginx.default.conf```
 
 ```bash
-  proxy_pass http://wallet.v.systems:9922
+  proxy_pass https://wallet.v.systems/api
 ```
 to a particular address
