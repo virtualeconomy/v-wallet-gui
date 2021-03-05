@@ -2,14 +2,18 @@
 // make sure to add official token svg in src/assets/imgs/icons/token with 'tokenName.svg' format
 var certifiedTokensList = {
     Mainnet: {
-        'TWZZfKFqcaNVe5TrphLRNEm5DQFnBRJMjDDByqv84': { name: 'IPX', support_split: false, unity: 1000000000, iconUrl: require('@/assets/imgs/icons/token/IPX.svg') },
-        'TWaN4DqnRMdUS5d1ohCn9Vh9VdGWDLm9Um1jHbQiF': { name: 'BlockDesk', support_split: false, unity: 100000000, iconUrl: require('@/assets/imgs/icons/token/BlockDesk.png') },
-        'TWZ3nPYyCJAJJmfJBzxcqe8ZfpYJMQK4dpiQ1m6v4': { name: 'GoldZip', support_split: false, unity: 1000, iconUrl: require('@/assets/imgs/icons/token/GoldZip.jpg') }
+        'TWZ3nPYyCJAJJmfJBzxcqe8ZfpYJMQK4dpiQ1m6v4': { name: 'GoldZip', contractType: 'TokenContractWithSplit', iconUrl: require('@/assets/imgs/icons/token/GoldZip.jpg'), maker: 'AR4fEgfZpQcjbqtnEYs5XAw8AgXx8c98AY5', unity: '1000' },
+        'TWZC7k5ahbBFZpRxpKP37596WjafGmL3ZQh8qmsWV': { name: 'ECHELON', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/ECHELON.jpg'), maker: 'ARDMhaoCNeRbDVQd3uJSDDieQsS6zW2Y5As', unity: '100000000' },
+        'TWZZfKFqcaNVe5TrphLRNEm5DQFnBRJMjDDByqv84': { name: 'IPX', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/IPX.svg'), maker: 'ARDjj5VXwXDtK4FpJcnR14rPffGwawgPrtf', unity: '1000000000' },
+        'TWZgYwK7SqzAfD8affZMQgiwwgid6Qfh6M9s52AGf': { name: 'LongMen', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/LongMen.jpeg'), maker: 'ARQ12n8iiXnc99fq6hzRN4Q8TXd6KYhY2Hy', unity: '10000000000' },
+        'TWaN4DqnRMdUS5d1ohCn9Vh9VdGWDLm9Um1jHbQiF': { name: 'BlockDesk', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/BlockDesk.png'), maker: 'ARNxREqVbkoctT5aV5MnsMXeqP1rEuPySSq', unity: '100000000' },
+        'TWar6LKVSYRwxkEZ3Viqa1QAZeq25w93WmHAbppbf': { name: 'OCT', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/OCT.jpg'), maker: 'AR4oTsXJA1rVePF7eYWSZCosgtrDpd4tiMp', unity: '100000000' },
+        'TWayhKjbWyPUNNBkPZymLL2LUehSdQiZNxLWYfNBt': { name: 'Vgan', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/Vgan.png'), maker: 'ARDEepsHirjZF4LgXDG3XQexcmP15Rkv99r', unity: '1' }
     },
     Testnet: {
-        'TWscu6rbRF2PEsnY1bRky4aKxxKTzn69WMFLFdLxK': { name: 'DM', support_split: true, unity: 1000, iconUrl: require('@/assets/imgs/icons/token/DM.svg') },
-        'TWuyTczrVc4KeDUBpksxY8bpcogKfKqoVGE7cwcs3': { name: 'VTEST', support_split: true, unity: 100000, iconUrl: require('@/assets/imgs/icons/token/VTEST.svg') },
-        'TWtSxBEx7rmsQ34MyWzwBCYYwRJh4K9xsL9zPkMK8': { name: 'DLL', support_split: false, unity: 100000000, iconUrl: require('@/assets/imgs/icons/token/DLL.svg') }
+        'TWscu6rbRF2PEsnY1bRky4aKxxKTzn69WMFLFdLxK': { name: 'DM', contractType: 'TokenContractWithSplit', iconUrl: require('@/assets/imgs/icons/token/DM.svg'), maker: 'AU7nJLcT1mThXGTT1KDkoAtfPzc82Sgay1V', unity: '1000' },
+        'TWuyTczrVc4KeDUBpksxY8bpcogKfKqoVGE7cwcs3': { name: 'VTest', contractType: 'TokenContractWithSplit', iconUrl: require('@/assets/imgs/icons/token/VTEST.svg'), maker: 'AUAztxsft2v6rmjRRb72nLea6BNyRHHWpUR', unity: '1000000' },
+        'TWtSxBEx7rmsQ34MyWzwBCYYwRJh4K9xsL9zPkMK8': { name: 'DLL', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/DLL.svg'), maker: 'AU3rAtDrCnh2dLqxpoyUKswsYbx3CdAzbQC', unity: '100000000' }
     },
 }
 import Blockchain from '@/js-v-sdk/src/blockchain'
@@ -22,7 +26,7 @@ if (String.fromCharCode(NETWORK_BYTE) === 'T') {
     certifiedTokens = certifiedTokensList['Mainnet']
 }
 for (let token in certifiedTokens) {
-    if (certifiedTokens[token].support_split) {
+    if (certifiedTokens[token].contractType === 'TokenContractWithSplit') {
         chain.getTokenInfo(token).then(response => {
             certifiedTokens[token].unity = response.unity
         })
@@ -41,6 +45,9 @@ export default {
     },
     getUnity(tokenId) {
         return certifiedTokens[tokenId].unity
+    },
+    getContractType(tokenId) {
+        return certifiedTokens[tokenId].contractType
     },
     updateUnity(tokenId, unity) {
         certifiedTokens[tokenId].unity = unity

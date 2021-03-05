@@ -46,17 +46,17 @@
                src="@/assets/imgs/icons/wallet/ic_exec_fail.svg"
                width="60px"
                height="60px">
-          <img v-else-if="txIcon==='execute contract function' && txStatus === 'Success'"
+          <img v-else-if="(txIcon === 'execute contract function' || txIcon === 'deposit' || txIcon === 'withdraw') && txStatus === 'Success'"
                src="@/assets/imgs/icons/wallet/ic_exec_success.svg"
                width="60px"
                height="60px">
-          <img v-else-if="txIcon==='execute contract function' && txStatus !== 'Success'"
+          <img v-else-if="(txIcon === 'execute contract function' || txIcon === 'deposit' || txIcon === 'withdraw') && txStatus !== 'Success'"
                src="@/assets/imgs/icons/wallet/ic_exec_fail.svg"
                width="60px"
                height="60px">
         </div>
         <div v-if="txIcon!=='register contract'&& txIcon!=='execute contract function'"
-             :class="txClass + '-amount'">{{ txIcon === 'sent' ? '-' : txIcon === 'received' ? '+' : '' }}{{ formatter(txAmount) }} {{ officialName }}</div>
+             :class="txClass + '-amount'">{{ (txIcon === 'sent' || txIcon === 'deposit') ? '-' : (txIcon === 'received' || txIcon === 'withdraw') ? '+' : '' }}{{ formatter(txAmount) }} {{ localName }}</div>
       </div>
       <div class="tx-address"
            v-if="displayAddress!==''">
@@ -116,7 +116,7 @@
         </div>
       </div>
       <div class="tx-address"
-           v-if="((txType === 'Sent' || txType === 'Received') && contractId) || txType === 'Register Contract' || txType === 'Execute Contract Function' || txTitle === 'Withdraw Token' || txTitle === 'Withdraw VSYS' || txTitle === 'Deposit Token' || txTitle === 'Deposit VSYS'">
+           v-if="((txType === 'Sent' || txType === 'Received') && contractId) || txType === 'Register Contract' || txType === 'Execute Contract Function' || txType === 'Withdraw' || txType === 'Deposit'">
         <label>Contract ID</label>
         <span class="addrPos">{{ contractId }}</span>
         <div>
@@ -222,6 +222,7 @@ import BigNumber from 'bignumber.js'
 import { TX_FEE } from '@/js-v-sdk/src/constants'
 import { TX_URL } from '@/constants'
 import { NETWORK_BYTE, EXPLORER, TEST_EXPLORER } from '@/network'
+import common from '@/js-v-sdk/src/utils/common'
 import { mapActions, mapState } from 'vuex'
 export default {
     name: 'TxInfoModal',
@@ -231,7 +232,7 @@ export default {
         }
     },
     props: {
-        officialName: {
+        localName: {
             type: String,
             default: 'VSYS'
         },
@@ -320,6 +321,7 @@ export default {
     },
     computed: {
         ...mapState({
+            chain: 'chain',
             heightStatus: 'heightStatus'
         }),
         defaultAddress() {
@@ -331,7 +333,12 @@ export default {
             }
         },
         txClass() {
-            return this.txIcon.replace(/\s+/g, '')
+            let txClass = (this.txIcon === 'deposit' || this.txIcon === 'withdraw') ? 'executecontractfunction' : this.txIcon.replace(/\s+/g, '')
+            if (txClass === 'executecontractfunction' && this.txStatus !== 'Success') {
+                return txClass + 'failed'
+            } else {
+                return txClass
+            }
         },
         displayId() {
             if (this.isMobile() && this.modalId.length > 24) {
@@ -384,11 +391,32 @@ export default {
                 tokens = JSON.parse(tmpUserInfo.tokens)
             }
             if (this.tokenId) {
-                Vue.set(tokens, this.tokenId, this.txAddress)
-                this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
+                this.chain.getTokenInfo(this.tokenId).then(response => {
+                    if (response.hasOwnProperty('error')) {
+                        return
+                    }
+                    let contractID = common.tokenIDToContractID(this.tokenId)
+                    this.chain.getContractInfo(contractID).then(res => {
+                        if (res.hasOwnProperty('error')) {
+                            return
+                        }
+                        if (res.type !== 'NonFungibleContract' && res.type !== 'TokenContract' && res.type !== 'TokenContractWithSplit') {
+                            return
+                        }
+                        let contractType = res.type
+                        let maker = res.info[1].data
+                        let tokenInfo = { 'name': this.tokenId, 'contractType': contractType, 'iconUrl': '', 'maker': maker, 'unity': response.unity }
+                        Vue.set(tokens, this.tokenId, tokenInfo)
+                        this.setUsrLocalStorage('tokens', JSON.stringify(tokens))
+                        this.changeAddTokenStatus()
+                        this.reload()
+                    }, err => {
+                        console.log(err)
+                    })
+                }, respError => {
+                    console.log(respError)
+                })
             }
-            this.changeAddTokenStatus()
-            this.reload()
         },
         isTokenExisted() {
             let userInfo = JSON.parse(window.localStorage.getItem(this.defaultAddress))
@@ -646,6 +674,18 @@ export default {
     .leasedin-amount {
         font-size: 28px;
         color: #86BEF7;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .executecontractfunction-amount {
+        font-size: 28px;
+        color: #73CC5A;
+        letter-spacing: 0;
+        text-align: center;
+    }
+    .executecontractfunctionfailed-amount {
+        font-size: 28px;
+        color: #F5354B;
         letter-spacing: 0;
         text-align: center;
     }

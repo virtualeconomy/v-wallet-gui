@@ -142,11 +142,17 @@ const store = new Vuex.Store({
                         }
                     } else {
                         context.state['chain'].getContractInfo(common.tokenIDToContractID(tokenId)).then(response => {
-                            Vue.set(tokens, tokenId, response.info[1].data)
-                            let userInfo = JSON.parse(window.localStorage.getItem(defaultAddress))
-                            Vue.set(userInfo, 'tokens', JSON.stringify(tokens))
-                            window.localStorage.setItem(seedaddress, JSON.stringify(userInfo))
-                            context.commit('changeAddTokenStatus')
+                            let contractType = response.type
+                            let maker = response.info[1].data
+                            context.state['chain'].getTokenInfo(tokenId).then(resp => {
+                                let tokenInfo = { 'name': tokenId, 'contractType': contractType, 'iconUrl': '', 'maker': maker, 'unity': resp.unity }
+                                Vue.set(tokens, tokenId, tokenInfo)
+                                let userInfo = JSON.parse(window.localStorage.getItem(defaultAddress))
+                                Vue.set(userInfo, 'tokens', JSON.stringify(tokens))
+                                window.localStorage.setItem(seedaddress, JSON.stringify(userInfo))
+                                context.commit('changeAddTokenStatus')
+                            }, resErr => {
+                            })
                         }, respError => {
                         })
                     }

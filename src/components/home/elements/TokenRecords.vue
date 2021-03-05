@@ -10,16 +10,18 @@
       <div v-if="Object.keys(tokenRecords).length > 0 && Object.keys(tokenRecords) !== undefined"
            class="scroll"
            :style="{height: myHeight}">
-        <TokenRecord v-for="(tokenMaker,tokenId) in tokenRecords"
+        <TokenRecord v-for="(tokenInfo,tokenId) in tokenRecords"
                      :key="tokenId"
                      :token-id="tokenId"
-                     :token-maker="tokenMaker"
+                     :token-info="tokenInfo"
                      :address="address"
                      :addresses="addresses"
                      :cold-addresses="coldAddresses"
                      :wallet-type="walletType"
                      :balances="balances"
+                     :token-records="tokenRecords"
                      :active-tab="activeTab"
+                     @refreshTokens="refreshTokens"
                      @removeFlag="removeToken"></TokenRecord>
       </div>
       <div v-else
@@ -31,7 +33,8 @@
         <br>
         <span class="add-token-input-second">Click on <b-button class="add-button"
                                                                 v-b-modal.addTokenModal>Add Token</b-button> to add them to your account</span>
-        <AddToken show="false"></AddToken>
+        <AddToken :token-records="tokenRecords"
+                  show="false"></AddToken>
       </div>
     </div>
 
@@ -44,6 +47,7 @@ import Vue from 'vue'
 import browser from '@/utils/browser'
 import TokenRecord from './TokenRecord'
 import AddToken from '../modals/AddToken'
+import common from '@/js-v-sdk/src/utils/common'
 import { mapState } from 'vuex'
 export default {
     name: 'TokenRecords',
@@ -117,24 +121,70 @@ export default {
         addTokenStatus() {
             return this.$store.state.addTokenStatus
         },
-        seedaddress() {
+        seedAddress() {
             if (Vue.ls.get('address')) {
                 return Vue.ls.get('address')
             }
         },
         userInfo() {
-            return JSON.parse(window.localStorage.getItem(this.seedaddress))
+            return JSON.parse(window.localStorage.getItem(this.seedAddress))
         }
     },
     methods: {
         isMobile() {
             return browser.isMobile()
         },
+        refreshTokens() {
+            this.getTokenRecords()
+        },
+        setUsrLocalStorage(fieldName, value) {
+            let userInfo = JSON.parse(window.localStorage.getItem(this.seedAddress))
+            Vue.set(userInfo, fieldName, value)
+            window.localStorage.setItem(this.seedAddress, JSON.stringify(userInfo))
+        },
+        upgradeLocalTokens() {
+            let keys = Object.keys(this.tokenRecords)
+            if (keys.length > 0 && !this.tokenRecords[keys[0]].hasOwnProperty('name')) {
+                let tmp = this.tokenRecords
+                for (let id in keys) {
+                    let tokenId = keys[id]
+                    let isAddable = true
+                    this.chain.getTokenInfo(tokenId).then(response => {
+                        if (response.hasOwnProperty('error')) {
+                            isAddable = false
+                        }
+                        let contractID = common.tokenIDToContractID(tokenId)
+                        this.chain.getContractInfo(contractID).then(res => {
+                            if (res.hasOwnProperty('error')) {
+                                isAddable = false
+                            }
+                            if (res.type !== 'NonFungibleContract' && res.type !== 'TokenContract' && res.type !== 'TokenContractWithSplit') {
+                                isAddable = false
+                            }
+                            let contractType = res.type
+                            let maker = res.info[1].data
+                            if (isAddable) {
+                                let tokenInfo = { 'name': tokenId, 'contractType': contractType, 'iconUrl': '', 'maker': maker, 'unity': response.unity }
+                                Vue.set(tmp, tokenId, tokenInfo)
+                                this.setUsrLocalStorage('tokens', JSON.stringify(tmp))
+                            } else {
+                                Vue.delete(tmp, tokenId)
+                                this.setUsrLocalStorage('tokens', JSON.stringify(tmp))
+                            }
+                        }, resErr => {
+                        })
+                    }, respError => {
+                    })
+                }
+            }
+        },
         getTokenRecords() {
             if (this.address) {
-                let records = JSON.parse(window.localStorage.getItem(this.seedaddress))
+                let records = JSON.parse(window.localStorage.getItem(this.seedAddress))
                 if (records.tokens) {
                     this.tokenRecords = JSON.parse(records.tokens)
+                    // Upgrade local tokens
+                    this.upgradeLocalTokens()
                 }
             }
         },

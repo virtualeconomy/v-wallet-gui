@@ -113,7 +113,7 @@
 </template>
 
 <script>
-import { VSYS_PRECISION, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX, NFT_CONTRACT_SEND_FUNCIDX, ACCOUNT_ADDR_TYPE, INT32_TYPE, AMOUNT_TYPE, SEND_FUNCIDX, SEND_FUNCIDX_SPLIT } from '@/js-v-sdk/src/constants'
+import { VSYS_PRECISION, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX, INT32_TYPE, SEND_FUNCIDX, WITHDRAW_FUNCIDX, DEPOSIT_FUNCIDX, SEND_FUNCIDX_SPLIT, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX_SPLIT, NFT_CONTRACT_SEND_FUNCIDX, NFT_CONTRACT_DEPOSIT_FUNCIDX, NFT_CONTRACT_WITHDRAW_FUNCIDX } from '@/js-v-sdk/src/constants'
 import BigNumber from 'bignumber.js'
 import TransactionRecord from './TransactionRecord'
 import Vue from 'vue'
@@ -148,7 +148,6 @@ export default {
             response: [],
             responseExport: [],
             downloadFileType: 'csv',
-            tokenRecords: {},
             resFields: {
                 transaction_id: 'id',
                 transaction_fee: 'fee',
@@ -227,15 +226,65 @@ export default {
             const d = new Date(date / 1e6)
             return monthNames[d.getMonth()] + ', ' + d.getFullYear()
         },
-        getSendExecuteContractTxType(functionIndex, Data) {
+        parseExecution(contractType, functionIndex, Data) {
+            let functionType = false // Only support send, deposit, withdraw
             let functionData = convert.parseFunctionData(Data)
-            if (functionIndex === NFT_CONTRACT_SEND_FUNCIDX && functionData.length === 2 && functionData[0]['type'] === ACCOUNT_ADDR_TYPE && functionData[1]['type'] === INT32_TYPE) {
-                return 'NFT'
-            } else if ((functionIndex === SEND_FUNCIDX || functionIndex === SEND_FUNCIDX_SPLIT) && functionData.length === 2 && functionData[0]['type'] === ACCOUNT_ADDR_TYPE && functionData[1]['type'] === AMOUNT_TYPE) {
-                return 'Fungible Token'
-            } else {
-                return false
+            let amount = 0
+            let recipient = ''
+            switch (contractType) {
+            case 'TokenContract':
+                switch (functionIndex) {
+                case SEND_FUNCIDX:
+                    functionType = 'Sent'
+                    recipient = functionData[0]['data']
+                    amount = functionData[1]['data']
+                    break
+                case WITHDRAW_FUNCIDX:
+                    functionType = 'Withdraw'
+                    amount = functionData[2]['data']
+                    break
+                case DEPOSIT_FUNCIDX:
+                    functionType = 'Deposit'
+                    amount = functionData[2]['data']
+                    break
+                }
+                break
+            case 'TokenContractWithSplit':
+                switch (functionIndex) {
+                case SEND_FUNCIDX_SPLIT:
+                    functionType = 'Sent'
+                    recipient = functionData[0]['data']
+                    amount = functionData[1]['data']
+                    break
+                case WITHDRAW_FUNCIDX_SPLIT:
+                    functionType = 'Withdraw'
+                    amount = functionData[2]['data']
+                    break
+                case DEPOSIT_FUNCIDX_SPLIT:
+                    functionType = 'Deposit'
+                    amount = functionData[2]['data']
+                    break
+                }
+                break
+            case 'NonFungibleContract':
+                switch (functionIndex) {
+                case NFT_CONTRACT_SEND_FUNCIDX:
+                    functionType = 'Sent'
+                    recipient = functionData[0]['data']
+                    amount = 1
+                    break
+                case NFT_CONTRACT_WITHDRAW_FUNCIDX:
+                    functionType = 'Withdraw'
+                    amount = functionData[2]['data']
+                    break
+                case NFT_CONTRACT_DEPOSIT_FUNCIDX:
+                    functionType = 'Deposit'
+                    amount = functionData[2]['data']
+                    break
+                }
+                break
             }
+            return [functionType, amount, recipient]
         },
         getTxRecords(type) {
             if (this.address) {
@@ -267,18 +316,24 @@ export default {
                             recItem['index'] = ++count
                             recList[month].push(recItem)
                             if (recItem['type'] === EXECUTE_CONTRACT_TX) {
-                                let tokenId = common.contractIDToTokenID(recItem['contractId'])
-                                if ((certify.isCertified(tokenId) && this.getSendExecuteContractTxType(recItem['functionIndex'], recItem['functionData']) === 'Fungible Token') || (tokenRecords.hasOwnProperty(tokenId) && this.getSendExecuteContractTxType(recItem['functionIndex'], recItem['functionData']) === 'NFT')) {
-                                    let functionData = convert.parseFunctionData(recItem['functionData'])
-                                    recItem['recipient'] = functionData[0]['data']
-                                    if (functionData[1]['type'] === INT32_TYPE) {
-                                        recItem['amount'] = 1
-                                        recItem['officialName'] = 'NFT'
-                                    } else {
-                                        recItem['officialName'] = certify.officialName(tokenId)
-                                        recItem['amount'] = functionData[1]['data']
+                                let tokenIndex = 0
+                                let functionData = convert.parseFunctionData(recItem['functionData'])
+                                for (let index in functionData) {
+                                    if (functionData[index]['type'] === INT32_TYPE) {
+                                        tokenIndex = functionData[index]['data']
+                                        break
                                     }
-                                    recItem['sentToken'] = true
+                                }
+                                let tokenId = common.contractIDToTokenID(recItem['contractId'], tokenIndex)
+                                if (certify.isCertified(tokenId) || tokenRecords.hasOwnProperty(tokenId)) {
+                                    let contractType = certify.isCertified(tokenId) ? certify.getContractType(tokenId) : tokenRecords[tokenId]['contractType']
+                                    let [functionType, amount, recipient] = this.parseExecution(contractType, recItem['functionIndex'], recItem['functionData'])
+                                    recItem['tokenName'] = certify.isCertified(tokenId) ? certify.officialName(tokenId) : tokenRecords[tokenId]['name']
+                                    recItem['functionType'] = functionType
+                                    recItem['recipient'] = recipient
+                                    recItem['amount'] = amount
+                                    recItem['unity'] = certify.isCertified(tokenId) ? certify.getUnity(tokenId) : tokenRecords[tokenId]['unity']
+                                    recItem['tokenId'] = tokenId
                                 }
                             }
                             if (recItem['type'] === REGISTER_CONTRACT_TX) {
@@ -286,7 +341,13 @@ export default {
                                 let triggersLength = contract.triggers.length
                                 let descriptorsLength = contract.descriptors.length
                                 if (triggersLength === 1) {
-                                    recItem['contractType'] = 'TokenContract'
+                                    if (descriptorsLength === 12) {
+                                        recItem['contractType'] = 'TokenContractWithSplit'
+                                    } else if (descriptorsLength === 6) {
+                                        recItem['contractType'] = 'NonFungibleContract'
+                                    } else if (descriptorsLength === 11) {
+                                        recItem['contractType'] = 'TokenContract'
+                                    }
                                 } else if (triggersLength === 3 && descriptorsLength === 6) {
                                     recItem['contractType'] = 'PaymentChannelContract'
                                 } else if (triggersLength === 3 && descriptorsLength === 1) {

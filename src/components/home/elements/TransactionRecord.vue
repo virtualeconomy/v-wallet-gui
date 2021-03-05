@@ -3,7 +3,7 @@
                fluid>
     <b-row align-v="center">
       <b-col class="select-cancel-lease"
-             v-if="startCancelLease && txIcon==='leased out' && leaseStatus !== 'canceled'"
+             v-if="startCancelLease && txIcon === 'leased out' && leaseStatus !== 'canceled'"
              cols="auto">
         <input class="select-lease-out"
                type="checkbox"
@@ -13,43 +13,43 @@
       </b-col>
       <b-col class="record-icon"
              cols="auto">
-        <img v-if="txIcon==='sent'"
+        <img v-if="txIcon ==='sent'"
              src="@/assets/imgs/icons/wallet/ic_sent.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='received'"
+        <img v-else-if="txIcon === 'received'"
              src="@/assets/imgs/icons/wallet/ic_received.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='leased in'"
+        <img v-else-if="txIcon === 'leased in'"
              src="@/assets/imgs/icons/wallet/ic_leasing_reverse.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='leased out'"
+        <img v-else-if="txIcon === 'leased out'"
              src="@/assets/imgs/icons/wallet/ic_leasing.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='leased out canceled'"
+        <img v-else-if="txIcon === 'leased out canceled'"
              src="@/assets/imgs/icons/wallet/ic_leasing_cancel.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='leased in canceled'"
+        <img v-else-if="txIcon === 'leased in canceled'"
              src="@/assets/imgs/icons/wallet/ic_leasing_cancel_in.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='register contract' && txStatus === 'Success'"
+        <img v-else-if="txIcon === 'register contract' && txStatus === 'Success'"
              src="@/assets/imgs/icons/wallet/ic_contract_signup.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='register contract' && txStatus !== 'Success'"
+        <img v-else-if="txIcon === 'register contract' && txStatus !== 'Success'"
              src="@/assets/imgs/icons/wallet/ic_exec_fail.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='execute contract function' && txStatus === 'Success'"
+        <img v-else-if="(txIcon === 'execute contract function' || txIcon === 'deposit' || txIcon === 'withdraw') && txStatus === 'Success'"
              src="@/assets/imgs/icons/wallet/ic_exec_success.svg"
              width="32px"
              height="32px">
-        <img v-else-if="txIcon==='execute contract function' && txStatus !== 'Success'"
+        <img v-else-if="(txIcon === 'execute contract function' || txIcon === 'deposit' || txIcon === 'withdraw') && txStatus !== 'Success'"
              src="@/assets/imgs/icons/wallet/ic_exec_fail.svg"
              width="32px"
              height="32px">
@@ -94,11 +94,11 @@
       <b-col :class="'amount-' + txClass"
              cols="auto">
         <div>
-          <span v-if="txIcon === 'sent' || txIcon === 'received'">{{ txIcon === 'sent' ? '-' : '+' }}</span>
-          <span v-if="txIcon === 'sent' || txIcon === 'received' || txIcon === 'leased out' || txIcon === 'leased out canceled' || txIcon==='leased in' || txIcon==='leased in canceled'">{{ formatter(txAmount) }} {{ officialName }}</span>
+          <span v-if="txIcon === 'sent' || txIcon === 'received' || txIcon === 'deposit' || txIcon === 'withdraw'">{{ (txIcon === 'sent' || txIcon === 'deposit') ? '-' : '+' }}</span>
+          <span v-if="txIcon === 'sent' || txIcon === 'received' || txIcon === 'leased out' || txIcon === 'leased out canceled' || txIcon==='leased in' || txIcon==='leased in canceled' || txIcon === 'deposit' || txIcon === 'withdraw'">{{ formatter(txAmount) }} {{ localName }}</span>
         </div>
         <div class="tx-fee"
-             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'register contract' || txIcon === 'execute contract function') && feeFlag">
+             v-if="(txIcon === 'sent' || txIcon === 'leased out canceled' || txIcon === 'leased out' || txIcon === 'register contract' || txIcon === 'execute contract function' || txIcon === 'deposit' || txIcon === 'withdraw') && feeFlag">
           <span v-if="(!txFee.isEqualTo(0))"> Tx Fee: - {{ formatter(txFee) }} VSYS </span>
         </div>
       </b-col>
@@ -149,7 +149,7 @@
                  :trans-type="transType"
                  :self-send="selfSend"
                  :tx-recipient="txRecipient"
-                 :official-name="officialName"
+                 :local-name="localName"
                  :v-if="transType==='payment'"></TxInfoModal>
     <TxInfoModal :modal-id="txRecord.id"
                  :tx-fee="txFee"
@@ -181,14 +181,12 @@ import base58 from 'base-58'
 import converters from '@/js-v-sdk/src/utils/converters'
 import CancelLease from '../modals/CancelLease'
 import { SYSTEM_CONTRACT_TOKEN_ID_TEST, SYSTEM_CONTRACT_TOKEN_ID } from '@/js-v-sdk/src/contract'
-import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX, CONTRACT_ACCOUNT_TYPE, ACCOUNT_ADDR_TYPE } from '@/js-v-sdk/src/constants'
+import { PAYMENT_TX, VSYS_PRECISION, LEASE_TX, CANCEL_LEASE_TX, REGISTER_CONTRACT_TX, EXECUTE_CONTRACT_TX } from '@/js-v-sdk/src/constants'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { mapState } from 'vuex'
 import { NETWORK_BYTE } from '@/network'
-import certify from '@/utils/certify'
 import Vue from 'vue'
-import convert from '@/js-v-sdk/src/utils/convert'
 export default {
     name: 'Record',
     components: { CancelLease, TxInfoModal },
@@ -281,10 +279,9 @@ export default {
                 return ''
             }
         },
-        officialName() {
-            if (this.isSentToken) {
-                return this.txRecord['officialName']
-            } else return 'VSYS'
+        localName() {
+            let tokenName = this.txRecord['tokenName'] ? this.txRecord['tokenName'] : 'VSYS'
+            return tokenName.length > 10 ? 'Token(...' + tokenName.slice(-4) + ')' : tokenName
         },
         txType() {
             if (this.txRecord['type'] === PAYMENT_TX) {
@@ -308,10 +305,14 @@ export default {
             } else if (this.txRecord['type'] === REGISTER_CONTRACT_TX) {
                 return 'Register Contract'
             } else if (this.txRecord['type'] === EXECUTE_CONTRACT_TX) {
-                if (this.isSentToken && this.txStatus === 'Success') {
-                    if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined) {
-                        return 'Received'
-                    } else return 'Sent'
+                if (this.txRecord['functionType']) {
+                    if (this.txRecord['functionType'] === 'Sent') {
+                        if (this.txStatus === 'Success') {
+                            if (this.txRecord.recipient === this.address && this.txRecord.SelfSend === undefined) {
+                                return 'Received'
+                            } else return 'Sent'
+                        } else return 'Execute Contract Function'
+                    } else return this.txRecord['functionType']
                 } else return 'Execute Contract Function'
             } else {
                 return 'Received'
@@ -321,7 +322,7 @@ export default {
             return this.txType.toString().toLowerCase()
         },
         txClass() {
-            let txName = this.txIcon.replace(/\s+/g, '')
+            let txName = (this.txIcon === 'deposit' || this.txIcon === 'withdraw') ? 'executecontractfunction' : this.txIcon.replace(/\s+/g, '')
             if (txName === 'executecontractfunction' && this.txRecord.status !== 'Success') {
                 return txName + 'failed'
             } else {
@@ -371,20 +372,12 @@ export default {
             } else if (this.txType === 'Received') {
                 return 'Received'
             } else if (this.txType === 'Execute Contract Function') {
-                let functionData = convert.parseFunctionData(this.txRecord.functionData)
-                if (functionData.length === 3) {
-                    let tokenId = common.contractIDToTokenID(this.txRecord.contractId)
-                    let systemTokenId = String.fromCharCode(NETWORK_BYTE) === 'T' ? SYSTEM_CONTRACT_TOKEN_ID_TEST : SYSTEM_CONTRACT_TOKEN_ID
-                    if (functionData[0]['type'] === CONTRACT_ACCOUNT_TYPE && functionData[1]['type'] === ACCOUNT_ADDR_TYPE) {
-                        return 'Withdraw ' + (tokenId === systemTokenId ? 'VSYS' : 'Token')
-                    }
-                    if (functionData[1]['type'] === CONTRACT_ACCOUNT_TYPE && functionData[0]['type'] === ACCOUNT_ADDR_TYPE) {
-                        return 'Deposit ' + (tokenId === systemTokenId ? 'VSYS' : 'Token')
-                    }
-                }
                 return 'Execute Contract Function'
             } else if (this.txType === 'Register Contract') {
                 return 'Register ' + this.txRecord.contractType
+            } else if (this.txType === 'Withdraw' || this.txType === 'Deposit') {
+                let systemTokenId = String.fromCharCode(NETWORK_BYTE) === 'T' ? SYSTEM_CONTRACT_TOKEN_ID_TEST : SYSTEM_CONTRACT_TOKEN_ID
+                return this.txType + ' ' + (this.txRecord['tokenId'] === systemTokenId ? 'VSYS' : 'Token')
             }
         },
         txTime() {
@@ -420,14 +413,8 @@ export default {
             return this.txRecord.contractId
         },
         txAmount() {
-            if (this.isSentToken) {
-                let tokenId = common.contractIDToTokenID(this.txRecord.contractId)
-                let unity = 1
-                try {
-                    unity = certify.getUnity(tokenId)
-                } catch (e) {
-                }
-                return BigNumber(this.txRecord.amount).dividedBy(unity)
+            if (this.txRecord['functionType']) {
+                return BigNumber(this.txRecord.amount).dividedBy(this.txRecord.unity)
             }
             if (this.txRecord.lease) {
                 return BigNumber(this.txRecord.lease.amount).dividedBy(VSYS_PRECISION)
@@ -460,9 +447,6 @@ export default {
             }
             return oldHeight
         },
-        isSentToken() {
-            return this.txRecord.sentToken === true
-        },
         txAttachment() {
             let value = this.txRecord.attachment === void 0 ? '' : this.txRecord.attachment
             let bytes = base58.decode(value)
@@ -484,15 +468,6 @@ export default {
                 this.tokenId = 'Failed to get token id'
             })
         },
-        getSendTokenId() {
-            if (this.txRecord.officialName === 'NFT') {
-                let functionData = convert.parseFunctionData(this.txRecord.functionData)
-                let tokenIndex = functionData[1]['data']
-                this.tokenId = common.contractIDToTokenID(this.txRecord.contractId, tokenIndex)
-            } else {
-                this.tokenId = common.contractIDToTokenID(this.txRecord.contractId)
-            }
-        },
         copyTxId() {
             this.$refs.tId.select()
             window.document.execCommand('copy')
@@ -507,8 +482,8 @@ export default {
             if (this.txType === 'Register Contract') {
                 this.getContractType()
             }
-            if ((this.txType === 'Sent' || this.txType === 'Received') && this.isSentToken) {
-                this.getSendTokenId()
+            if ((this.txType === 'Sent' || this.txType === 'Received') && this.txRecord['functionType'] === 'Sent') {
+                this.tokenId = this.txRecord['tokenId']
             }
             this.heightGap = this.getLastHeight - this.txRecord.height
             this.$root.$emit('bv::show::modal', 'txInfoModal_' + this.transType + this.txRecord.id + this.selfSend)
