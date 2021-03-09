@@ -7,7 +7,7 @@
            src="@/assets/imgs/icons/operate/ic_success_circle.svg">
     </div>
     <div class="infos">
-      <b-form-group v-if="txType.slice(0, 7) === 'Deposit' || txType.slice(0, 7) === 'Withdra'"
+      <b-form-group v-if="txType.startsWith('Deposit') || txType.startsWith('Withdraw')"
                     label-cols
                     class="form-line"
                     label="Contract ID"
@@ -91,7 +91,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group v-else-if="txType.slice(0, 7) === 'Deposit' || txType.slice(0, 7) === 'Withdra'"
+      <b-form-group v-else-if="txType.startsWith('Deposit') || txType.startsWith('Withdraw')"
                     label-cols
                     class="form-line"
                     label="Amount"
