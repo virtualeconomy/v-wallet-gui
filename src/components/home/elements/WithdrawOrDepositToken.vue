@@ -353,7 +353,7 @@
 <script>
 import Vue from 'vue'
 import seedLib from '@/libs/seed.js'
-import { CONTRACT_EXEC_FEE, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT, SYSTEM_CONTRACT_DEPOSIT_FUNCIDX, SYSTEM_CONTRACT_WITHDRAW_FUNCIDX, ACCOUNT_ADDR_TYPE, VSYS_PRECISION } from '@/js-v-sdk/src/constants'
+import { CONTRACT_EXEC_FEE, WITHDRAW_FUNCIDX, WITHDRAW_FUNCIDX_SPLIT, DEPOSIT_FUNCIDX, DEPOSIT_FUNCIDX_SPLIT, SYSTEM_CONTRACT_DEPOSIT_FUNCIDX, SYSTEM_CONTRACT_WITHDRAW_FUNCIDX, ACCOUNT_ADDR_TYPE, VSYS_PRECISION, NFT_CONTRACT_DEPOSIT_FUNCIDX, NFT_CONTRACT_WITHDRAW_FUNCIDX } from '@/js-v-sdk/src/constants'
 import { NETWORK_BYTE } from '@/network'
 import { SYSTEM_CONTRACT_TOKEN_ID_TEST, SYSTEM_CONTRACT_TOKEN_ID } from '@/constants'
 import TokenConfirm from '../modals/TokenConfirm'
@@ -365,7 +365,7 @@ import BigNumber from 'bignumber.js'
 import base58 from 'base-58'
 import { mapActions, mapState } from 'vuex'
 import Transaction from '@/js-v-sdk/src/transaction'
-import { TokenContractDataGenerator, SystemContractDataGenerator } from '@/js-v-sdk/src/data'
+import { TokenContractDataGenerator, SystemContractDataGenerator, NonFungibleTokenContractDataGenerator } from '@/js-v-sdk/src/data'
 export default {
     name: 'WithdrawToken',
     components: {ColdSignature, TokenSuccess, TokenConfirm},
@@ -373,6 +373,7 @@ export default {
         return {
             errorMessage: '',
             amount: 0,
+            tokenIndex: 0,
             attachment: '',
             pageId: 1,
             fee: BigNumber(CONTRACT_EXEC_FEE),
@@ -457,7 +458,7 @@ export default {
             if (BigNumber(this.amount).isEqualTo(0)) {
                 return void 0
             }
-            return this.checkPrecision && this.isValidNumFormat && (this.actionName === 'Withdraw Token' || this.actionName === 'Withdraw VSYS' ? !this.isExceededContractBalance : !this.isExceededBalance) && !this.isNegative
+            return this.checkPrecision && this.isValidNumFormat && (this.actionName === 'Withdraw Token' || this.actionName === 'Withdraw VSYS' || this.actionName === 'Withdraw NFT' ? !this.isExceededContractBalance : !this.isExceededBalance) && !this.isNegative
         },
         isExceededContractBalance() {
             return BigNumber(this.amount).isGreaterThan(this.contractBalance)
@@ -484,10 +485,14 @@ export default {
                 return 'Deposit Token to Contract'
             case 'Deposit VSYS':
                 return 'Deposit VSYS to Contract'
+            case 'Deposit NFT':
+                return 'Deposit NFT to Contract'
             case 'Withdraw Token':
                 return 'Withdraw Token from Contract'
             case 'Withdraw VSYS':
                 return 'Withdraw VSYS from Contract'
+            case 'Withdraw NFT':
+                return 'Withdraw NFT from Contract'
             }
         },
         isValidContractId() {
@@ -532,7 +537,11 @@ export default {
                     let tokenContractType = ''
                     try {
                         let tokenRes = await this.chain.getContractInfo(tokenContract)
-                        this.isSplit = tokenRes.type === 'TokenContractWithSplit'
+                        if (tokenRes.type === 'TokenContractWithSplit') {
+                            this.isSplit = true
+                        } else if (tokenRes.type === 'NonFungibleContract') {
+                            this.tokenIndex = common.getTokenIndex(tokenId)
+                        }
                         tokenContractType = tokenRes.type
                     } catch (err) {
                         console.log(err)
@@ -540,17 +549,17 @@ export default {
                     if (tokenContractType === 'SystemContract') {
                         this.tokenUnity = VSYS_PRECISION
                         this.tokenBalance = this.balance.toString()
+                        this.actionName = this.functionName + ' VSYS'
                     } else {
                         try {
                             let tokenBalanceRes = await this.chain.getTokenBalance(this.address, tokenId)
                             this.tokenUnity = BigNumber(tokenBalanceRes.unity)
                             this.tokenBalance = BigNumber(tokenBalanceRes.balance).dividedBy(tokenBalanceRes.unity).toString()
+                            this.actionName = this.functionName + (tokenContractType === 'NonFungibleContract' ? ' NFT' : ' Token')
                         } catch (err) {
                             console.log(err)
                         }
                     }
-                    let systemTokenId = String.fromCharCode(NETWORK_BYTE) === 'M' ? SYSTEM_CONTRACT_TOKEN_ID : SYSTEM_CONTRACT_TOKEN_ID_TEST
-                    this.actionName = this.functionName + (tokenId === systemTokenId ? ' VSYS' : ' Token')
                     this.tokenId = tokenId
                     try {
                         let contractBalanceRes = await this.chain.getContractData(this.contractId, 0, ACCOUNT_ADDR_TYPE, this.address)
@@ -574,7 +583,15 @@ export default {
         },
         buildTransaction(publicKey) {
             let tra = new Transaction(NETWORK_BYTE)
-            let dataGenerator = this.actionName === 'Withdraw Token' || this.actionName === 'Deposit Token' ? new TokenContractDataGenerator() : new SystemContractDataGenerator()
+            let dataGenerator = new TokenContractDataGenerator()
+            switch (this.actionName) {
+            case 'Withdraw NFT':case 'Deposit NFT':
+                dataGenerator = new NonFungibleTokenContractDataGenerator()
+                break
+            case 'Withdraw VSYS':case 'Deposit VSYS':
+                dataGenerator = new SystemContractDataGenerator()
+                break
+            }
             let functionIndex, functionData
             switch (this.actionName) {
             case 'Deposit Token':
@@ -585,6 +602,10 @@ export default {
                 functionIndex = SYSTEM_CONTRACT_DEPOSIT_FUNCIDX
                 functionData = dataGenerator.createDepositData(this.address, this.contractId, this.amount)
                 break
+            case 'Deposit NFT':
+                functionIndex = NFT_CONTRACT_DEPOSIT_FUNCIDX
+                functionData = dataGenerator.createDepositData(this.address, this.contractId, this.tokenIndex)
+                break
             case 'Withdraw Token':
                 functionIndex = this.isSplit ? WITHDRAW_FUNCIDX_SPLIT : WITHDRAW_FUNCIDX
                 functionData = dataGenerator.createWithdrawData(this.contractId, this.address, this.amount, this.tokenUnity)
@@ -592,6 +613,10 @@ export default {
             case 'Withdraw VSYS':
                 functionData = dataGenerator.createWithdrawData(this.contractId, this.address, this.amount)
                 functionIndex = SYSTEM_CONTRACT_WITHDRAW_FUNCIDX
+                break
+            case 'Withdraw NFT':
+                functionIndex = NFT_CONTRACT_WITHDRAW_FUNCIDX
+                functionData = dataGenerator.createWithdrawData(this.contractId, this.address, this.tokenIndex)
                 break
             }
             tra.buildExecuteContractTx(publicKey, this.executorContractId, functionIndex, functionData, this.timeStamp)
@@ -666,6 +691,7 @@ export default {
             this.actionName = ''
             this.isSplit = ''
             this.tokenUnity = ''
+            this.tokenIndex = 0
             this.tokenBalance = BigNumber(0)
             this.contractBalance = BigNumber(0)
             this.isWaiting = false

@@ -275,11 +275,13 @@ export default {
                     break
                 case NFT_CONTRACT_WITHDRAW_FUNCIDX:
                     functionType = 'Withdraw'
-                    amount = functionData[2]['data']
+                    // functionData[2]['data']: token Index
+                    amount = 1
                     break
                 case NFT_CONTRACT_DEPOSIT_FUNCIDX:
                     functionType = 'Deposit'
-                    amount = functionData[2]['data']
+                    // functionData[2]['data']: token Index
+                    amount = 1
                     break
                 }
                 break

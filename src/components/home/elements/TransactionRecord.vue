@@ -482,7 +482,7 @@ export default {
             if (this.txType === 'Register Contract') {
                 this.getContractType()
             }
-            if ((this.txType === 'Sent' || this.txType === 'Received') && this.txRecord['functionType'] === 'Sent') {
+            if (((this.txType === 'Sent' || this.txType === 'Received') && this.txRecord['functionType'] === 'Sent') || (this.txIcon === 'deposit' || this.txIcon === 'withdraw')) {
                 this.tokenId = this.txRecord['tokenId']
             }
             this.heightGap = this.getLastHeight - this.txRecord.height

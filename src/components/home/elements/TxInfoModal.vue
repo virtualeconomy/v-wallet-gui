@@ -130,7 +130,7 @@
         </div>
       </div>
       <div class="tx-address"
-           v-if="((txType === 'Sent' || txType === 'Received') && tokenId)">
+           v-if="((txType === 'Sent' || txType === 'Received' || txType === 'Deposit' || txType === 'Withdraw') && tokenId)">
         <label>Token ID</label>
         <span class="addrPos">{{ tokenId }}</span>
         <div>

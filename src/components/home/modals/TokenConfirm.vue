@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="infos">
-      <b-form-group v-if="txType==='Withdraw Token from Contract' || txType==='Deposit Token to Contract' || txType==='Deposit VSYS to Contract' || txType==='Withdraw VSYS from Contract'"
+      <b-form-group v-if="txType.slice(0, 7) === 'Deposit' || txType.slice(0, 7) === 'Withdra'"
                     label-cols
                     class="form-line"
                     label="Contract ID"
@@ -85,7 +85,7 @@
                       :plaintext="true">
         </b-form-input>
       </b-form-group>
-      <b-form-group v-else-if="txType==='Withdraw Token from Contract' || txType==='Deposit Token to Contract' || txType==='Deposit VSYS to Contract' || txType==='Withdraw VSYS from Contract'"
+      <b-form-group v-else-if="txType.slice(0, 7) === 'Deposit' || txType.slice(0, 7) === 'Withdra'"
                     label-cols
                     class="form-line"
                     label="Amount"
@@ -252,6 +252,7 @@ export default {
 .des {
     font-size: 15px;
     color: #181B3A;
+    width: 260px;
     letter-spacing: 0;
     text-align: right;
 }
