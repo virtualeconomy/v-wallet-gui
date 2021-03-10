@@ -97,7 +97,7 @@
         <span>{{ formatter(txFee) || 0 }} VSYS</span>
       </div>
       <div class="tx-attachment"
-           v-if="txIcon === 'sent' || txIcon === 'received' || txIcon === 'register contract' || txIcon === 'execute contract function'">
+           v-if="['Sent', 'Received', 'Register Contract', 'Execute Contract Function', 'Withdraw', 'Deposit'].includes(txType) && txAttachment">
         <label>Description</label>
         <span>{{ txAttachment }}</span>
         <span class="tx-attachment-whole">{{ txAttachment }}</span>
@@ -116,7 +116,7 @@
         </div>
       </div>
       <div class="tx-address"
-           v-if="((txType === 'Sent' || txType === 'Received') && contractId) || txType === 'Register Contract' || txType === 'Execute Contract Function' || txType === 'Withdraw' || txType === 'Deposit'">
+           v-if="((txType === 'Sent' || txType === 'Received') && contractId) || ['Register Contract', 'Execute Contract Function', 'Withdraw', 'Deposit'].includes(txType)">
         <label>Contract ID</label>
         <span class="addrPos">{{ contractId }}</span>
         <div>
@@ -130,7 +130,7 @@
         </div>
       </div>
       <div class="tx-address"
-           v-if="((txType === 'Sent' || txType === 'Received') && tokenId)">
+           v-if="(['Sent', 'Received', 'Deposit', 'Withdraw'].includes(txType) && tokenId)">
         <label>Token ID</label>
         <span class="addrPos">{{ tokenId }}</span>
         <div>
