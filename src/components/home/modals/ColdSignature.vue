@@ -214,7 +214,7 @@ export default {
                     if (api > API_VERSION) this.apiError = true
                     if (protocol !== PROTOCOL) this.protocolError = true
                     if (opc !== OPC_SIGNATURE) this.opcError = true
-                    if (crypto.isValidTransactionSignature(this.transactionBytes, signature, this.coldPublicKey) && !this.qrError) {
+                    if (crypto.verifySignature(this.transactionBytes, signature, this.coldPublicKey) && !this.qrError) {
                         let _this = this
                         setTimeout(function() {
                             _this.$emit('get-signature', signature)
