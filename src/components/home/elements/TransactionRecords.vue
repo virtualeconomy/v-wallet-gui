@@ -151,7 +151,7 @@ export default {
             resFields: {
                 transaction_id: 'id',
                 transaction_fee: 'fee',
-                'timestamp': 'timestamp',
+                timestamp: 'timestamp',
                 recipient_address: 'recipient',
                 amount: 'amount',
                 encoded_attachment: 'attachment'
@@ -400,7 +400,7 @@ export default {
                 let tempResponse = JSON.parse(JSON.stringify(this.response))
                 for (let i = 0; i < tempResponse.length; i++) {
                     if (tempResponse[i].amount) {
-                        tempResponse[i].amount = BigNumber(this.response[i].amount).dividedBy(VSYS_PRECISION)
+                        tempResponse[i].amount = BigNumber(this.response[i].amount).dividedBy(tempResponse[i].unity ? tempResponse[i].unity : VSYS_PRECISION)
                     }
                     tempResponse[i].fee = tempResponse[i].fee / VSYS_PRECISION
                     tempResponse[i].timestamp = new Date(tempResponse[i].timestamp / 1e6).toLocaleString()
