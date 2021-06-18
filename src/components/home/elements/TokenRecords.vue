@@ -1,10 +1,18 @@
 <template>
   <div class="records">
     <div class="title-records">
-      <span>Token watch list</span>
-      <b-button class="add-token-button text-decoration-none"
-                variant="link"
-                v-b-modal.addTokenModal>&oplus;</b-button>
+      <div style="z-index:200">
+        <span>Token watch list</span>
+        <b-button class="add-token-button text-decoration-none"
+                  variant="link"
+                  v-b-modal.addTokenModal>&oplus;</b-button>
+      </div>
+      <b-button variant="white"
+                class="btn-creat"
+                @click="createToken">
+        <img v-if="!isMobile()"
+             class="icon-btn"
+             src="@/assets/imgs/icons/wallet/ic_new_token_yellow.svg"><b>Create Token</b></b-button>
     </div>
     <div class="inherit-height">
       <div v-if="Object.keys(tokenRecords).length > 0 && Object.keys(tokenRecords) !== undefined"
@@ -34,7 +42,12 @@
         <AddToken show="false"></AddToken>
       </div>
     </div>
-
+    <CreateToken show="false"
+                 :balances="balances"
+                 :cold-addresses="coldAddresses"
+                 :addresses="addresses"
+                 :selected-address="address"
+                 :wallet-type="walletType"></CreateToken>
   </div>
 </template>
 
@@ -43,12 +56,13 @@
 import Vue from 'vue'
 import browser from '@/utils/browser'
 import TokenRecord from './TokenRecord'
+import CreateToken from '../modals/CreateToken'
 import AddToken from '../modals/AddToken'
 import { mapState } from 'vuex'
 export default {
     name: 'TokenRecords',
     components: {
-        TokenRecord, AddToken
+        TokenRecord, AddToken, CreateToken
     },
     created() {
         this.myHeight = (this.isMobile() ? window.innerHeight + 100 : window.innerHeight - 400) + 'px'
@@ -124,9 +138,18 @@ export default {
         },
         userInfo() {
             return JSON.parse(window.localStorage.getItem(this.seedaddress))
+        },
+        getDevice() {
+            if (this.coldAddresses && this.coldAddresses[this.address] && this.coldAddresses[this.address].hasOwnProperty('device')) {
+                return this.coldAddresses[this.address].device
+            }
+            return ''
         }
     },
     methods: {
+        i() {
+            console.log('xx')
+        },
         isMobile() {
             return browser.isMobile()
         },
@@ -142,12 +165,30 @@ export default {
             if (remove === true) {
                 this.getTokenRecords()
             }
+        },
+        createToken() {
+            if (this.getDevice === 'Ledger') {
+                alert('This feature is not supported')
+            } else {
+                this.$root.$emit('bv::show::modal', 'createTokenModal', '#btnShow')
+            }
         }
     }
 }
 </script>
 
 <style scoped lang="less">
+.icon-btn {
+    margin-right: 10px;
+}
+.btn-creat {
+    border-color: #FF8837;
+    color: #FF8837;
+    font-size: 17px;
+    font-weight:lighter;
+    height: 42px;
+    z-index: 200
+}
 .empty {
     padding: 24px 0;
     background-color: #1111;
@@ -183,6 +224,7 @@ export default {
     letter-spacing: 0;
     display: flex;
     align-items: Center;
+    justify-content: space-between
 }
 .add {
     background: #FAFAFA;

@@ -24,12 +24,12 @@
       </p>
     </div>
     <div class="col align-self-center text-right">
-      <b-button variant="white"
-                class="btn-creat"
-                @click="createToken">
+      <b-button variant="dark"
+                class="btn-swap"
+                v-b-modal.swapModal>
         <img v-if="!isMobile"
              class="icon-btn"
-             src="@/assets/imgs/icons/wallet/ic_new_token_yellow.svg"><b>Create Token</b></b-button>
+             src="@/assets/imgs/icons/wallet/swap.svg"><b>V Swap</b></b-button>
       <b-button variant="dark"
                 class="btn-send"
                 v-b-modal.sendModal>
@@ -63,12 +63,6 @@
           :wallet-type="walletType"></Send>
     <Receive show="false"
              :address="address"></Receive>
-    <CreateToken show="false"
-                 :balances="balances"
-                 :cold-addresses="coldAddresses"
-                 :addresses="addresses"
-                 :selected-address="address"
-                 :wallet-type="walletType"></CreateToken>
     <WithdrawOrDepositToken :address="address"
                             :wallet-type="walletType"
                             :addresses="addresses"
@@ -77,13 +71,14 @@
                             :balance="balances[address]"
                             :function-name="functionName">
     </WithdrawOrDepositToken>
+    <Swap></Swap>
   </div>
 </template>
 
 <script>
-import CreateToken from '../modals/CreateToken'
 import Receive from '../modals/Receive'
 import Send from '../modals/Send'
+import Swap from '../modals/Swap'
 import browser from '@/utils/browser'
 import BigNumber from 'bignumber.js'
 import { mapState } from 'vuex'
@@ -93,7 +88,7 @@ import WithdrawOrDepositToken from './WithdrawOrDepositToken'
 export default {
     name: 'TokenPane',
     components: {
-        CreateToken, Receive, WithdrawOrDepositToken, Send
+        Receive, WithdrawOrDepositToken, Send, Swap
     },
     data() {
         return {
@@ -189,13 +184,6 @@ export default {
         },
         formatter(num) {
             return browser.bigNumberFormatter(num)
-        },
-        createToken() {
-            if (this.getDevice === 'Ledger') {
-                alert('This feature is not supported')
-            } else {
-                this.$root.$emit('bv::show::modal', 'createTokenModal', '#btnShow')
-            }
         }
     }
 }
@@ -214,6 +202,10 @@ export default {
 .btn-send:active, .btn-send:hover{
     background-color: #E03146 !important;
     border: 1px solid #E03146 !important;
+};
+.btn-swap:active, .btn-swap:hover{
+    background-color: #EF8637 !important;
+    border: 1px solid #EF8637 !important;
 };
 .btn-receive {
     margin-bottom: 6px;
@@ -238,14 +230,16 @@ export default {
 .icon-btn {
     margin-right: 10px;
 }
-.btn-creat {
+.btn-swap {
     margin-bottom: 6px;
     border-color: #FF8837;
-    color: #FF8837;
+    background-color: #FF8837;
+    color: #ffffff;
     margin-right: 15px;
     font-size: 17px;
     font-weight:lighter;
     height: 42px;
+    width: 124px;
 }
 .btn-send {
     margin-bottom: 6px;
