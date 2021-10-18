@@ -8,7 +8,8 @@ var certifiedTokensList = {
         'TWZgYwK7SqzAfD8affZMQgiwwgid6Qfh6M9s52AGf': { name: 'LongMen', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/LongMen.jpeg'), maker: 'ARQ12n8iiXnc99fq6hzRN4Q8TXd6KYhY2Hy', unity: '10000000000' },
         'TWaN4DqnRMdUS5d1ohCn9Vh9VdGWDLm9Um1jHbQiF': { name: 'BlockDesk', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/BlockDesk.png'), maker: 'ARNxREqVbkoctT5aV5MnsMXeqP1rEuPySSq', unity: '100000000' },
         'TWar6LKVSYRwxkEZ3Viqa1QAZeq25w93WmHAbppbf': { name: 'OCT', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/OCT.jpg'), maker: 'AR4oTsXJA1rVePF7eYWSZCosgtrDpd4tiMp', unity: '100000000' },
-        'TWayhKjbWyPUNNBkPZymLL2LUehSdQiZNxLWYfNBt': { name: 'Vgan', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/Vgan.png'), maker: 'ARDEepsHirjZF4LgXDG3XQexcmP15Rkv99r', unity: '1' }
+        'TWayhKjbWyPUNNBkPZymLL2LUehSdQiZNxLWYfNBt': { name: 'Vgan', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/Vgan.png'), maker: 'ARDEepsHirjZF4LgXDG3XQexcmP15Rkv99r', unity: '1' },
+        'TWaSLbyVdxTX1C4jPcy56E6iSeRQUkivabcgvPQQU': { name: 'XGO', contractType: 'TokenContract', iconUrl: require('@/assets/imgs/icons/token/XGO.png'),maker: 'AR32ncj1LUcFHGYJZ1R8s7LeMb5CLmAnRPi', unity: '100000000' }
     },
     Testnet: {
         'TWscu6rbRF2PEsnY1bRky4aKxxKTzn69WMFLFdLxK': { name: 'DM', contractType: 'TokenContractWithSplit', iconUrl: require('@/assets/imgs/icons/token/DM.svg'), maker: 'AU7nJLcT1mThXGTT1KDkoAtfPzc82Sgay1V', unity: '1000' },
