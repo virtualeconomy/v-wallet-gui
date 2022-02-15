@@ -76,8 +76,8 @@
                              v-model="tokenDescription"
                              :rows="2"
                              :no-resize="true"
-                             placeholder="Max 140 characters. When you have done, this content can not be revised"
-                             :state="isValidDescription(tokenDescription)">
+                             placeholder="Max 90 characters. When you have done, this content can not be revised"
+                             :state="isValidDescription(tokenDescription, 'tokenDescription')">
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Max Supply"
@@ -242,8 +242,8 @@
                              v-model="tokenDescription"
                              :rows="2"
                              :no-resize="true"
-                             placeholder="Max 140 characters. When you have done, this content can not be revised"
-                             :state="isValidDescription(tokenDescription)">
+                             placeholder="Max 90 characters. When you have done, this content can not be revised"
+                             :state="isValidDescription(tokenDescription, 'tokenDescription')">
             </b-form-textarea>
           </b-form-group>
           <b-form-group label="Max Supply"
@@ -393,6 +393,8 @@
 
 <script>
 import Vue from 'vue'
+import base58 from 'base-58'
+import converters from '@/js-v-sdk/src/utils/converters'
 import { TOKEN_CONTRACT, TOKEN_CONTRACT_WITH_SPLIT } from '@/js-v-sdk/src/contract'
 import seedLib from '@/libs/seed.js'
 import { CONTRACT_REGISTER_FEE, CONTRACT_EXEC_FEE } from '@/js-v-sdk/src/constants'
@@ -543,7 +545,7 @@ export default {
             return this.seedPhrase.split(' ')
         },
         isSubmitDisabled() {
-            return !(!this.isInsufficient && (this.isValidDescription(this.contractDescription) || !this.contractDescription) && (this.isValidDescription(this.tokenDescription) || !this.tokenDescription) && this.isValidAmount)
+            return !(!this.isInsufficient && (this.isValidDescription(this.contractDescription) || !this.contractDescription) && (this.isValidDescription(this.tokenDescription, 'tokenDescription') || !this.tokenDescription) && this.isValidAmount)
         },
         isValidContract() {
             return this.nftContractID && this.isValidIssuer
@@ -573,11 +575,11 @@ export default {
             return this.checkPrecision && this.isValidNumFormat && !this.isBiggerThanMax && !this.isNegative
         },
         isValidDescription() {
-            return function(description) {
+            return function(description, type) {
                 if (!description) {
                     return void 0
                 }
-                return common.getLength(description) <= TRANSFER_ATTACHMENT_BYTE_LIMIT
+                return common.getLength(description) <= (type === 'tokenDescription' ? 90 : TRANSFER_ATTACHMENT_BYTE_LIMIT)
             }
         },
         isInsufficient() {
@@ -687,11 +689,11 @@ export default {
                 let dataGenerator = new NonFungibleTokenContractDataGenerator()
                 let initData = dataGenerator.createIssueData(this.tokenDescription)
                 let functionIndex = getContractFunctionIndex(NFT, 'ISSUE')
-                tra.buildExecuteContractTx(publicKey, this.nftContractID, functionIndex, initData, this.timeStamp, this.tokenDescription)
+                tra.buildExecuteContractTx(publicKey, this.nftContractID, functionIndex, initData, this.timeStamp, base58.encode(converters.stringToByteArray(this.tokenDescription)))
             } else {
                 let contract = this.support === false ? TOKEN_CONTRACT : TOKEN_CONTRACT_WITH_SPLIT
                 let dataGenerator = new TokenContractDataGenerator()
-                let initData = dataGenerator.createInitData(this.amount, BigNumber(Math.pow(10, this.unity)), this.tokenDescription)
+                let initData = dataGenerator.createInitData(this.amount, BigNumber(Math.pow(10, this.unity)), base58.encode(converters.stringToByteArray(this.tokenDescription)))
                 tra.buildRegisterContractTx(publicKey, contract, initData, this.contractDescription, this.timeStamp)
             }
             return tra

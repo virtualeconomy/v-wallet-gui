@@ -275,11 +275,11 @@ export default {
         },
         tokenDescription() {
             if (this.tokens.description && this.tokens.description !== undefined) {
-                let bytes = base58.decode(this.tokens.description)
                 try {
+                    let bytes = base58.decode(this.tokens.description)
                     return converters.byteArrayToString(bytes)
                 } catch (e) {
-                    return ''
+                    return this.tokens.description
                 }
             }
         }
