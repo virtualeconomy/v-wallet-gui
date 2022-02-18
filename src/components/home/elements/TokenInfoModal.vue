@@ -53,7 +53,7 @@
       </div>
       <div class="tx-attachment">
         <label>Token Description</label>
-        <span>{{ tokenDescription }}</span>
+        <span :style="{textAlign: tokenDescription.length > 21 ? 'left' : ''}">{{ tokenDescription }}</span>
       </div>
     </div>
   </b-modal>
@@ -214,17 +214,24 @@ export default {
         border-bottom: 1px solid #E8E9ED;
         height: 48px;
         padding-top: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
         span {
             float:right;
             font-size: 13px;
             color: #4F515E;
             letter-spacing: 0;
             text-align: right;
+            overflow-y: scroll;
+            width: 60%;
+            height: 100%;
         }
         label {
           font-size: 15px;
           color: #9091A3;
           letter-spacing: 0;
+          width: 30%;
         }
     }
     .sent-amount {
