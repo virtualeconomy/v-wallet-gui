@@ -65,7 +65,7 @@
         "babel-loader": "^8.0.0",
         "babel-plugin-transform-vue-jsx": "^4.0.1",
         "chalk": "^2.0.1",
-        "chromedriver": "^2.27.2",
+        "chromedriver": "^119.0.1",
         "compression-webpack-plugin": "^1.1.11",
         "copy-webpack-plugin": "^4.0.1",
         "cross-spawn": "^5.0.1",
